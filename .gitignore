@@ -1,0 +1,5 @@
+user/commands/*
+Lib/
+Scripts/
+Engines/*
+Include/
