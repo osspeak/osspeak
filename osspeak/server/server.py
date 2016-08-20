@@ -1,11 +1,9 @@
 import socket
-import locale
 import sys
 import subprocess
 import time
 from functools import partial
 from asyncio.subprocess import PIPE
-from contextlib import closing
 sys.path.append("..") 
 from osspeak import protocols, defaults
 from osspeak.server import handlers

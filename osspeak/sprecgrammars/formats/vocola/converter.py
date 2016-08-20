@@ -35,6 +35,9 @@ class SrgsXmlConverter:
             ruleref_item = ET.Element('item')
             ruleref = ET.Element('ruleref', attrib={'uri': '#{}'.format(rule_node.id)})
             ruleref_item.append(ruleref)
+            tag = ET.Element('tag')
+            tag.text = 'out.{0}=rules.{0};'.format(rule_node.id)
+            ruleref_item.append(tag)
             choices.append(ruleref_item)
         return root
 

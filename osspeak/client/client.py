@@ -4,29 +4,29 @@ import sys
 import subprocess
 import time
 from asyncio.subprocess import PIPE
-from contextlib import closing
 import xml.etree.ElementTree as ET
 sys.path.append("..")
 # sys.path.append(r'C:\Users\evan\modules\osspeak\sprecgrammars')
 from osspeak import protocols, defaults
-import asyncore
-import time
 import threading
-from osspeak.client import cmdmodule
+from osspeak.client import cmdmodule, dispatcher
 import pprint
 
 def main():
 
-    messenger = protocols.SocketMessenger(port=defaults.CLIENT_PORT, other_port=defaults.SERVER_PORT)
+    # messenger = protocols.SocketMessenger(port=defaults.CLIENT_PORT, other_port=defaults.SERVER_PORT)
+    msg_dispatcher = dispatcher.SingleProcessMessageDispatcher()
     try:
+        print(defaults.COMMUNICATION_MODE)
         cmd_module_loader = cmdmodule.CommandModuleHandler()
         cmd_module_loader.load_command_json()
         grammar = cmd_module_loader.build_srgs_xml_grammar()
         msg = 'grammar_content {}'.format(ET.tostring(grammar).decode('utf8'))
-        print(msg)
-        messenger.send_message(msg)
+        # messenger.send_message(msg)
+        msg_dispatcher.message_engine(msg)
+        input('Press the any key: ')
     finally:
-        messenger.cleanup()
+        msg_dispatcher.cleanup()
 
 
 if __name__ == "__main__":

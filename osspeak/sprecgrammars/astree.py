@@ -25,3 +25,9 @@ class WordNode(ASTNode):
 
 class OrNode(ASTNode):
     pass
+
+class GroupingNode(ASTNode):
+
+    def __init__(self):
+        super().__init__()
+        self.children = []
