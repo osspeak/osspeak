@@ -15,7 +15,6 @@ DEFAULT_PORT_NUMBER = 8301
 def dispatch_engine_output(engine_process, messenger):
     return
     for line in engine_process.stdout:
-        print(line)
         line = line.decode('utf8')
         messenger.send_message(line)
 

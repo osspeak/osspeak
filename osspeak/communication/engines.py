@@ -22,7 +22,6 @@ class SpeechEngineCommunicator:
 
     def dispatch_engine_output(self):
         for line in self.engine_process.stdout:
-            print(line)
             line = line.decode('utf8')
             self.dispatcher.send_message(line)
 

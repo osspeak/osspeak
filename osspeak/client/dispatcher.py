@@ -9,7 +9,10 @@ class MessageDispatcher:
         pass
 
     def process_received_message(self, msg):
-        pass
+        split_message = msg.strip().split(' ')
+        if split_message[0] == 'result':
+            action = self.cmd_module_loader.actions[split_message[1]]
+            action.perform()
 
 class MultipleProcessMessageDispatcher(MessageDispatcher):
     pass
@@ -24,4 +27,4 @@ class SingleProcessMessageDispatcher(MessageDispatcher):
         self.engine_communicator.send_message(msg)
 
     def send_message(self, msg):
-        pass
+        self.process_received_message(msg)

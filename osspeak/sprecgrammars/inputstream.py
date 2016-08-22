@@ -10,7 +10,7 @@ class InputStream:
         return ch
 
     def peek(self):
-        return self.text[self.pos]
+        return None if self.eof() else self.text[self.pos]
 
     def eof(self):
         return self.pos >= len(self.text)
