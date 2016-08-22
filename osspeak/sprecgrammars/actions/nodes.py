@@ -6,6 +6,7 @@ class Action:
         self.children = []
 
     def perform(self):
+        print(self.children)
         for subaction in self.children:
             subaction.perform()
 

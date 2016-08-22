@@ -10,12 +10,23 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         ch = self.stream.peek()
         if ch == "'":
             return self.read_literal()
+        return self.read_word_literal()
 
     def read_literal(self):
         literal_text = ''
         # skip first apostrophe
         self.stream.next()
-        while self.stream.peek() not in ("'", None):
+        while self.stream.peek() != "'":
+            if not self.stream.peek():
+                self.croak("Missing closing ' character")
+            literal_text += self.stream.next()
+        # skip last apostrophe
+        self.stream.next()
+        return tokens.LiteralToken(literal_text)
+
+    def read_word_literal(self):
+        literal_text = ''
+        while self.stream.peek() not in (None, '\n', '\t'):
             literal_text += self.stream.next()
         return tokens.LiteralToken(literal_text)
 

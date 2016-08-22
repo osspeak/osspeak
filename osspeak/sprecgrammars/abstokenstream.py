@@ -21,10 +21,10 @@ class AbstractTokenStream:
         return self.current
 
     def eof(self):
-        return self.peek() == None
+        return self.peek() is None
 
-    def croak(self):
-        pass
+    def croak(self, text):
+        raise RuntimeError(text)
 
     def read_while(self, predicate):
         val = ''
@@ -35,39 +35,3 @@ class AbstractTokenStream:
     def __iter__(self):
         while not self.eof():
             yield self.next()
-
-        #  while (!TokStream.Eof())
-        #     {
-        #         Token t = TokStream.Next();
-        #         ParseToken(t);
-        #     }
-
-        # public string ReadWhile(Func<string, bool> predicate)
-        # {
-        #     var str = "";
-        #     while (!Input.Eof() && predicate(Input.Peek()))
-        #         str += Input.Next();
-        #     return str;
-        # }
-
-            # public T Next()
-        # {
-        #     var tok = Current;
-        #     Current = default(T);
-        #     return tok != null ? tok : ReadNext();
-        # }
-        # public T Peek()
-        # {
-        #     if (Current != null) return Current;
-        #     Current = ReadNext();
-        #     return Current;
-        # }
-        # public bool Eof()
-        # {
-        #     return Peek() == null;
-        # }
-
-        # public void Croak(string msg)
-        # {
-        #     Input.Croak(msg);
-        # }
