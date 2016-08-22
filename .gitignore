@@ -1,7 +1,6 @@
 user/commands/*
 Lib/
 Scripts/
-Engines/*
 *.pyc
 Include/
 
