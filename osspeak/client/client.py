@@ -10,6 +10,7 @@ sys.path.append("..")
 from osspeak import protocols, defaults
 import threading
 from osspeak.client import cmdmodule, dispatcher
+from osspeak.communication import guimanager
 import pprint
 
 def main():
@@ -17,6 +18,8 @@ def main():
     # messenger = protocols.SocketMessenger(port=defaults.CLIENT_PORT, other_port=defaults.SERVER_PORT)
     msg_dispatcher = dispatcher.SingleProcessMessageDispatcher()
     try:
+        msg_dispatcher.gui_manager = guimanager.GuiManager()
+        msg_dispatcher.gui_manager.launch()
         msg_dispatcher.cmd_module_loader = cmdmodule.CommandModuleHandler()
         msg_dispatcher.cmd_module_loader.load_command_json()
         msg_dispatcher.cmd_module_loader.create_grammar_nodes()
