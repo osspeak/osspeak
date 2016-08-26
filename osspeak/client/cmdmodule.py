@@ -7,7 +7,7 @@ from osspeak.sprecgrammars import astree
 from osspeak.sprecgrammars.formats import VocolaParser, SrgsXmlConverter
 # print(dir(sprecgrammars.parsers))
 
-class CommandModuleHandler:
+class CommandModuleWatcher:
 
     def __init__(self):
         self.cmd_modules = {}

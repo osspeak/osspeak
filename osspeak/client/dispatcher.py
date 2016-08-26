@@ -1,4 +1,4 @@
-from osspeak.communication.engines import SpeechEngineCommunicator
+from osspeak.communication.engines import ProcessManager
 
 class MessageDispatcher:
 
@@ -20,8 +20,8 @@ class MultipleProcessMessageDispatcher(MessageDispatcher):
 class SingleProcessMessageDispatcher(MessageDispatcher):
     
     def __init__(self):
-        self.engine_communicator = SpeechEngineCommunicator(self)
-        self.engine_communicator.start_engine_listening()
+        self.engine_communicator = ProcessManager(self)
+        self.engine_communicator.start_stdout_listening()
 
     def message_engine(self, msg):
         self.engine_communicator.send_message(msg)
