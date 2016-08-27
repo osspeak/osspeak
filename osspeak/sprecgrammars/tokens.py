@@ -11,5 +11,18 @@ class OrToken(BaseToken):
 
 class ParenToken(BaseToken):
 
-    def __init__(self, is_open):
-        self.is_open = is_open
+    def __init__(self, char):
+        assert char in '()'
+        self.is_open = char == '('
+
+class BracketToken(BaseToken):
+
+    def __init__(self, char):
+        assert char in '[]'
+        self.is_open = char == '['
+
+class RepetitionToken(BaseToken):
+
+    def __init__(low=0, high=None):
+        self.low = low
+        self.high = high

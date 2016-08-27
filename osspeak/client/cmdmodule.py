@@ -28,6 +28,7 @@ class CommandModuleWatcher:
             scope = cmd_module.get('scope')
             grammar = self.grammar_nodes.get(scope, astree.GrammarNode())
             for cmd, action_text in cmd_module['Commands']:
+                print(cmd)
                 parser = VocolaParser(cmd)
                 rule = parser.parse_as_rule()
                 grammar.rules.append(rule)

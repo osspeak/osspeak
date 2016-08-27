@@ -45,10 +45,18 @@ class SrgsXmlConverter:
         rule = ET.Element('rule', attrib={'id': node.id})
         choices = ET.Element('one-of')
         rule.append(choices)
+        self.fill_choices(node, choices)
+        print(ET.tostring(rule))
+        return rule
+
+    def fill_choices(self, node, choices):
         choices.append(ET.Element('item'))
         for child in node.children:
             if isinstance(child, astree.OrNode):
                 choices.append(ET.Element('item'))
             elif isinstance(child, astree.WordNode):
                 choices[-1].text = child.text if choices[-1].text is None else '{} {}'.format(choices[-1].text, child.text)
-        return rule
+            elif isinstance(child, astree.GroupingNode):
+                child_choices = ET.Element('one-of')
+                choices.append(child_choices)
+                self.fill_choices(child, child_choices)

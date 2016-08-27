@@ -12,6 +12,11 @@ class VocolaTokenStream(abstokenstream.AbstractTokenStream):
             return self.read_word()
         if ch == '|':
             return self.read_ortoken()
+        if ch in '()':
+            print('asdasd')
+            return self.read_paren_token()
+        self.croak('Invalid character: {}'.format(ch))
+        
 
     def read_word(self):
         val = self.read_while(lambda ch: ch.isalpha())
@@ -21,6 +26,8 @@ class VocolaTokenStream(abstokenstream.AbstractTokenStream):
         self.stream.next()
         return tokens.OrToken()
 
+    def read_paren_token(self):
+        return tokens.ParenToken(self.stream.next())
 
         # public override Token ReadNext()
         # {

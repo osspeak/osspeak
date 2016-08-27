@@ -16,6 +16,7 @@ class Rule(ASTNode):
     def __init__(self):
         super().__init__()
         self.children = []
+        self.open = True
 
 class WordNode(ASTNode):
 
@@ -31,3 +32,4 @@ class GroupingNode(ASTNode):
     def __init__(self):
         super().__init__()
         self.children = []
+        self.open = True
