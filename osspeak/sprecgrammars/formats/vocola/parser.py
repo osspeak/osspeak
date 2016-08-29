@@ -14,6 +14,7 @@ class VocolaParser(BaseParser):
             tokens.WordToken: self.parse_word_token,
             tokens.OrToken: self.parse_or_token,
             tokens.ParenToken: self.parse_paren_token,
+            tokens.RepetitionToken: self.parse_repetition_token,
         }
 
     def parse_as_rule(self):
@@ -22,32 +23,43 @@ class VocolaParser(BaseParser):
         for tok in self.stream:
             self.token_list.append(tok)
             self.parse_map[type(tok)](tok)
-        print(top_level_rule.children)
         return top_level_rule
 
     def parse_word_token(self, tok):
         self.maybe_pop_top_grouping()
         word_node = astree.WordNode(tok.text)
-        self.grouping_stack[-1].children.append(word_node)
+        self.top.children.append(word_node)
 
     def parse_or_token(self, tok):
         self.maybe_pop_top_grouping()
         or_node = astree.OrNode()
-        self.grouping_stack[-1].children.append(or_node)
+        self.top.children.append(or_node)
 
     def parse_paren_token(self, tok):
         self.maybe_pop_top_grouping()
         if tok.is_open:
             grouping_node = astree.GroupingNode()
-            self.grouping_stack[-1].children.append(grouping_node)
+            self.top.children.append(grouping_node)
             self.grouping_stack.append(grouping_node)
         else:
-            self.grouping_stack[-1].open = False
+            self.top.open = False
+
+    def parse_repetition_token(self, tok):
+        if not self.top.open:
+            repeated_node = self.top
+        elif self.top.children:
+            repeated_node = top.children[-1]
+        else:
+            self.croak('Invalid repetition')
 
     def apply_repetition(self, node, low=0, high=None):
         if low is not None:
             node.low = low
 
     def maybe_pop_top_grouping(self):
-        if not self.grouping_stack[-1].open:
+        if not self.top.open:
             return self.grouping_stack.pop()
+
+    @property
+    def top(self):
+        return self.grouping_stack[-1]

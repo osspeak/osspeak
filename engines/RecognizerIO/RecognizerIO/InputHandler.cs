@@ -26,10 +26,10 @@ namespace RecognizerIO
                     string xml = String.Join(" ", splitInput.Skip(1).ToArray());
                     string tmpPath = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".xml";
                     System.IO.File.WriteAllText(tmpPath, xml);
-                    //tmpPath = @"C:\Users\evan\AppData\Local\Temp\3a51ea28-bc0f-4443-a4f1-257173c076d5.xml";
+                    //tmpPath = @"C:\Users\evan\AppData\Local\Temp\776852a2-b582-47de-8d03-ac6b5460668e.xml";
                     EngManager.LoadGrammar(tmpPath);
                     EngManager.Begin();
-                    System.IO.File.Delete(tmpPath);
+                    //System.IO.File.Delete(tmpPath);
                     break;
             }
         }

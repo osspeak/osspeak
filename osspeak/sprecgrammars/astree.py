@@ -23,6 +23,12 @@ class WordNode(ASTNode):
     def __init__(self, text):
         super().__init__()
         self.text = text
+        self.repeat_low = 1
+        self.repeat_high = 1
+
+    @property
+    def is_single(self):
+        return self.repeat_low == 1 and self.repeat_high == 1
 
 class OrNode(ASTNode):
     pass
@@ -33,3 +39,5 @@ class GroupingNode(ASTNode):
         super().__init__()
         self.children = []
         self.open = True
+        self.repeat_low = 1
+        self.repeat_high = 1

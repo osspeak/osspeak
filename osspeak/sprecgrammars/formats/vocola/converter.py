@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 from osspeak.sprecgrammars import astree
 import uuid
+from pprint import pprint
 
 class SrgsXmlConverter:
 
@@ -46,7 +47,7 @@ class SrgsXmlConverter:
         choices = ET.Element('one-of')
         rule.append(choices)
         self.fill_choices(node, choices)
-        print(ET.tostring(rule))
+        pprint(ET.tostring(rule))
         return rule
 
     def fill_choices(self, node, choices):
@@ -55,8 +56,37 @@ class SrgsXmlConverter:
             if isinstance(child, astree.OrNode):
                 choices.append(ET.Element('item'))
             elif isinstance(child, astree.WordNode):
-                choices[-1].text = child.text if choices[-1].text is None else '{} {}'.format(choices[-1].text, child.text)
+                self.add_text_to_item_tag(choices[-1], child)
             elif isinstance(child, astree.GroupingNode):
                 child_choices = ET.Element('one-of')
-                choices.append(child_choices)
+                choices[-1].append(child_choices)
                 self.fill_choices(child, child_choices)
+
+    def add_text_to_item_tag(self, parent_item, word_node):
+        assert self.get_repeat_vals(parent_item) == (1, 1)
+        text = word_node.text
+        if not parent_item:
+            if word_node.is_single:
+                self.append_text(parent_item, word_node.text)
+                return
+            else:
+                text = text if parent_item.text is None else '{} {}'.format(parent_item.text, text)
+                parent_item.text = None
+        if not parent_item or parent_item[-1].tag != 'item' or parent_item[-1] or not word_node.is_single:
+            parent_item.append(ET.Element('item'))
+        self.apply_repeat_attrib(parent_item[-1], word_node.repeat_low, word_node.repeat_high)
+        self.append_text(parent_item[-1], text)
+
+    def apply_repeat_attrib(self, elem, low, high):
+        if (low, high) != (1, 1):
+            elem.attrib['repeat'] = '{}-{}'.format(low, high if high else '')
+
+    def append_text(self, elem, text):
+        elem.text = text if elem.text is None else '{} {}'.format(elem.text, text)
+
+    def get_repeat_vals(self, elem):
+        repeat_str = elem.attrib.get('repeat', '1-1')
+        low, high = repeat_str.split('-')
+        return int(low) if low else 0, int(high) if high else None
+
+        

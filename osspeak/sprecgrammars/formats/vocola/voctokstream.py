@@ -40,7 +40,12 @@ class VocolaTokenStream(abstokenstream.AbstractTokenStream):
         '''
         # skip first underscore
         assert self.stream.next() == '_'
-        low = self.read_digits()
+        low = self.read_digits() or 0
+        high = low
+        if self.stream.peek() == '-':
+            self.stream.next()
+            high = self.read_digits() or None
+        return tokens.RepetitionToken(low=low, high=high)
 
 
     def read_paren_token(self):
