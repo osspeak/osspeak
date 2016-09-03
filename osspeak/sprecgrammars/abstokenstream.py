@@ -1,4 +1,4 @@
-from osspeak.sprecgrammars import inputstream
+from sprecgrammars import inputstream
 import re
 
 class AbstractTokenStream:

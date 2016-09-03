@@ -2,10 +2,10 @@ import sys
 
 def load_platform_module():
 	if sys.platform == 'win32':
-		from osspeak.platforms import windows
+		from platforms import windows
 		return windows
 	elif sys.platform == 'linux':
-		from osspeak.platforms import linux
+		from platforms import linux
 		return linux
 	raise RuntimeError('Unsupported platform: {}'.format(sys.platform))
 

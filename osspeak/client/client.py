@@ -9,8 +9,8 @@ sys.path.append("..")
 # sys.path.append(r'C:\Users\evan\modules\osspeak\sprecgrammars')
 from osspeak import protocols, defaults
 import threading
-from osspeak.client import cmdmodule, dispatcher, evtdispatch
-from osspeak.communication import guimanager
+from client import cmdmodule, dispatcher, evtdispatch
+from communication import guimanager
 import pprint
 
 def main():

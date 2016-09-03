@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from osspeak.sprecgrammars import astree
+from sprecgrammars import astree
 import uuid
 from pprint import pprint
 
@@ -28,8 +28,10 @@ class SrgsXmlConverter:
         root = ET.Element('grammar', attrib=self.grammar_attrib)
         ruleref_container = ET.Element('rule', attrib={'id': self.grammar_attrib['root']})
         root.append(ruleref_container)
-        choices = ET.Element('one-of')
-        ruleref_container.append(choices)
+        x = ET.Element('item', attrib={'repeat': '1-'})
+        choices = ET.Element('one-of', attrib={})
+        x.append(choices)
+        ruleref_container.append(x)
         for rule_node in grammar_node.rules:
             rule = self.convert_rule(rule_node)
             root.append(rule)
@@ -78,6 +80,7 @@ class SrgsXmlConverter:
         self.append_text(parent_item[-1], text)
 
     def apply_repeat_attrib(self, elem, low, high):
+        elem.attrib.pop('repeat', None)
         if (low, high) != (1, 1):
             elem.attrib['repeat'] = '{}-{}'.format(low, high if high else '')
 

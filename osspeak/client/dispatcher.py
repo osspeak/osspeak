@@ -1,4 +1,4 @@
-from osspeak.communication.engines import ProcessManager
+from communication.engines import ProcessManager
 
 class MessageDispatcher:
 

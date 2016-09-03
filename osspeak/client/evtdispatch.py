@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
-from osspeak.communication.engines import ProcessManager
-from osspeak.client import cmdmodule
+from communication.engines import ProcessManager
+from client import cmdmodule
 
 class EventDispatcher:
 

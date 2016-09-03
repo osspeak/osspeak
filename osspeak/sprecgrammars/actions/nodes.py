@@ -1,4 +1,4 @@
-from osspeak.platforms import api
+from platforms import api
 
 class Action:
 
@@ -19,3 +19,8 @@ class LiteralKeysAction(Action):
     def perform(self):
         print(self.text)
         api.type_literal(self.text)
+
+def FunctionCall(Action):
+
+    def __init__(self):
+        self.arguments = []

@@ -6,7 +6,7 @@ from functools import partial
 from asyncio.subprocess import PIPE
 sys.path.append("..") 
 from osspeak import protocols, defaults
-from osspeak.server import handlers
+from server import handlers
 import threading
 
 ENGINE_PATH = r'C:\Users\evan\modules\OSSpeak\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.exe'

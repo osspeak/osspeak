@@ -2,9 +2,9 @@ import os
 import json
 import collections
 import xml.etree.ElementTree as ET
-from osspeak.sprecgrammars.actions.parser import ActionParser
-from osspeak.sprecgrammars import astree
-from osspeak.sprecgrammars.formats import VocolaParser, SrgsXmlConverter
+from sprecgrammars.actions.parser import ActionParser
+from sprecgrammars import astree
+from sprecgrammars.formats import VocolaParser, SrgsXmlConverter
 # print(dir(sprecgrammars.parsers))
 
 class CommandModuleWatcher:

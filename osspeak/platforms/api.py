@@ -1,5 +1,5 @@
 # from osspeak import keyinput
-from osspeak.platforms import platformhandler
+from platforms import platformhandler
 
 def send_string(string_to_send, delay=.02, direction='both'):
     tokenized_keys = keyinput.tokenize_keypresses(string_to_send)

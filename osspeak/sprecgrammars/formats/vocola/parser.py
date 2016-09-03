@@ -1,6 +1,6 @@
-from osspeak.sprecgrammars import astree, tokens
-from osspeak.sprecgrammars.formats.baseparser import BaseParser
-from osspeak.sprecgrammars.formats.vocola import voctokstream
+from sprecgrammars import astree, tokens
+from sprecgrammars.formats.baseparser import BaseParser
+from sprecgrammars.formats.vocola import voctokstream
 
 
 class VocolaParser(BaseParser):

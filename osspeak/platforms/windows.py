@@ -5,7 +5,7 @@ Collection of Windows-specific I/O functions
 import msvcrt
 import time
 import ctypes as ct
-from osspeak.platforms import winconstants
+from platforms import winconstants
 
 EnumWindows = ct.windll.user32.EnumWindows
 EnumWindowsProc = ct.WINFUNCTYPE(ct.c_bool, ct.POINTER(ct.c_int), ct.POINTER(ct.c_int))

@@ -1,2 +1,2 @@
-from osspeak.sprecgrammars.formats.vocola.parser import VocolaParser
-from osspeak.sprecgrammars.formats.vocola.converter import SrgsXmlConverter
+from sprecgrammars.formats.vocola.parser import VocolaParser
+from sprecgrammars.formats.vocola.converter import SrgsXmlConverter

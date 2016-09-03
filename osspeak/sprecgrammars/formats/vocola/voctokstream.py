@@ -1,5 +1,5 @@
-from osspeak.sprecgrammars import abstokenstream
-from osspeak.sprecgrammars import tokens
+from sprecgrammars import abstokenstream
+from sprecgrammars import tokens
 
 class VocolaTokenStream(abstokenstream.AbstractTokenStream):
 
