@@ -21,7 +21,6 @@ class ActionParser(BaseParser):
         for tok in self.stream:
             print(tok)
             self.parse_map[type(tok)](tok)
-        print(action.children[-1].arguments)
         return action
 
     def parse_word_token(self, tok):

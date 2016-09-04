@@ -13,7 +13,13 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         if ch == "'":
             return self.read_literal()
         if ch in '()':
-            return self.read_paren_token()  
+            return self.read_paren_token()
+        if ch == '{':
+            return self.read_brace_token()
+        if ch == '+':
+            return self.read_plus_token()
+        if ch == ',':
+            return self.read_comma_token()
         return self.read_word()
 
     def read_literal(self):
@@ -36,3 +42,12 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
 
     def read_paren_token(self):
         return tokens.ParenToken(self.stream.next())
+
+    def read_brace_token(self):
+        return tokens.BraceToken(self.stream.next())
+
+    def read_plus_token(self):
+        return tokens.PlusToken()
+
+    def read_comma_token(self):
+        return tokens.CommaToken()
