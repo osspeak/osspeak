@@ -2,6 +2,11 @@ from platforms import api
 
 class Action:
 
+    def add(self):
+        raise NotImplementedError
+
+class RootAction(Action):
+
     def __init__(self):
         self.children = []
 
@@ -20,7 +25,11 @@ class LiteralKeysAction(Action):
         print(self.text)
         api.type_literal(self.text)
 
-def FunctionCall(Action):
+class FunctionCall(Action):
 
-    def __init__(self):
+    def __init__(self, func_name):
         self.arguments = []
+        self.func_name = func_name
+
+    def add(self, tok):
+        pass

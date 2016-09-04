@@ -1,3 +1,4 @@
 action_names = {
-    'mouse.click': None
+    'mouse.click': None,
+    'mouse.get': None,
 }
