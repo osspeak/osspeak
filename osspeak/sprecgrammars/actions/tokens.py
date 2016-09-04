@@ -16,3 +16,6 @@ class ParenToken(ActionToken):
     
     def __init__(self, ch):
         self.is_open = ch == '('
+
+class CommaToken(ActionToken):
+    pass
