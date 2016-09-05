@@ -1,24 +1,45 @@
-# from osspeak import keyinput
-from platforms import platformhandler
+import sys
 
-def send_string(string_to_send, delay=.02, direction='both'):
-    tokenized_keys = keyinput.tokenize_keypresses(string_to_send)
-    platformhandler.transcribe_line(tokenized_keys, delay, direction)
+def load_platform_module():
+	if sys.platform == 'win32':
+		from platforms import windows
+		return windows
+	elif sys.platform == 'linux':
+		from platforms import linux
+		return linux
+	raise RuntimeError('Unsupported platform: {}'.format(sys.platform))
 
-def mouse_move(x=None, y=None, relative=True):
-    platformhandler.mouse_move(x, y, relative)
+platform = load_platform_module()
 
-def mouse_click(button='left', direction='both', number=1):
-    platformhandler.mouse_click(button, direction, number)
+def flush_io_buffer():
+	platform.flush_io_buffer()
+
+def get_active_window_name():
+	return platform.get_active_window_name()
+	
+def maximize_active_window():
+	platform.maximize_active_window()
+
+def transcribe_line(key_inputs, delay, direction):
+    platform.transcribe_line(key_inputs, delay, direction)
+
+def mouse_click(button, direction, number):
+	platform.mouse_click(button, direction, number)
+
+def mouse_move(x, y, relative):
+	platform.mouse_move(x, y, relative)
 
 def activate_window(title):
-	'''
-	title is a string or list of strings
-	'''
-	platformhandler.activate_window(title)
-    
-def maximize_active_window():
-    platformhandler.maximize_active_window()
+    if isinstance(title, str):
+        title = [title]
+    title = [name.lower() for name in title]
+    platform.activate_window(title)
+
+def get_clipboard_contents():
+    return platform.get_clipboard_contents()
+
+def set_clipboard_contents(text):
+    platform.set_clipboard_contents(text)
 
 def type_literal(text):
-    platformhandler.type_literal(text)
+	platform.type_literal(text)

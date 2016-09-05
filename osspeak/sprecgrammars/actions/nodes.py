@@ -2,6 +2,9 @@ from platforms import api
 
 class Action:
 
+    def evaluate(self):
+        raise NotImplementedError
+
     def add(self, *a, **k):
         raise NotImplementedError
 
@@ -25,8 +28,10 @@ class LiteralKeysAction(Action):
         self.text = text
 
     def perform(self):
-        print(self.text)
         api.type_literal(self.text)
+
+    def evaluate(self):
+        return self.text
 
 class FunctionCall(Action):
 
