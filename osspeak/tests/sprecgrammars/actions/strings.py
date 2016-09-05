@@ -1,1 +1,4 @@
 EMPTY = ''
+
+BASIC_KEYPRESS = '{shift+ctrl+e}'
+KEYPRESS_WITHOUT_DELIMITER = '{alt 4}'

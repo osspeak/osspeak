@@ -22,7 +22,11 @@ class BraceToken(ActionToken):
         self.is_open = ch == '{'
 
 class CommaToken(ActionToken):
-    pass
+
+    def __init__(self):
+        self.text = ','
 
 class PlusToken(ActionToken):
-    pass
+    
+    def __init__(self):
+        self.text = '+'

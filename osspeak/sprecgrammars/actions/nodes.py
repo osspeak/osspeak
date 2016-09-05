@@ -33,7 +33,14 @@ class FunctionCall(Action):
     def __init__(self, func_name):
         self.arguments = []
         self.func_name = func_name
-        self.expecting_comma = False
 
     def add(self, node):
         self.arguments.append(node)
+
+class KeySequence(Action):
+
+    def __init__(self):
+        self.keys = []
+
+    def add(self, node):
+        self.keys.append(node)

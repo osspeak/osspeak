@@ -9,17 +9,21 @@ class ActionParser(BaseParser):
         super().__init__(text)
         self.stream = actionstream.ActionTokenStream(self.text)
         self.action_stack = []
+        self.grouping_delimeter_flags = {}
         self.parse_map = {
             tokens.LiteralToken: self.parse_literal_token,
             tokens.WordToken: self.parse_word_token,
             tokens.ParenToken: self.parse_paren,
+            tokens.BraceToken: self.parse_curly_brace,
+            tokens.PlusToken: self.parse_plus_sign,
+            tokens.CommaToken: self.parse_plus_sign,
         }
 
     def parse(self):
         action = nodes.RootAction()
         self.action_stack = [action]
         for tok in self.stream:
-            print(tok)
+            # print('toke', tok)
             self.parse_map[type(tok)](tok)
         return action
 
@@ -30,8 +34,7 @@ class ActionParser(BaseParser):
 
     def parse_function(self, func_name):
         func = nodes.FunctionCall(func_name)
-        self.action_stack[-1].add(func)
-        self.action_stack.append(func)
+        self.add_grouped_action(func)
         next_token = self.peek()
         if not isinstance(next_token, tokens.ParenToken) or not next_token.is_open:
             self.stream.croak('missing paren')
@@ -42,6 +45,27 @@ class ActionParser(BaseParser):
         if len(self.action_stack) < 2:
             self.error('too many closing arens')
         self.action_stack.pop()
+
+    def parse_curly_brace(self, tok):
+        if tok.is_open:
+            seq = nodes.KeySequence()
+            self.add_grouped_action(seq)
+            return
+        if len(self.action_stack) < 2:
+            self.error('too many closing arens')
+        self.action_stack.pop()
+
+    def parse_plus_sign(self, tok):
+        if not isinstance(self.action_stack[-1], nodes.KeySequence):
+            return self.parse_literal_token(tok)
+        seq = self.action_stack[-1]
+        self.grouping_delimeter_flags[seq] = False
+
+    def parse_comma_token(self, tok):
+        if not isinstance(self.action_stack[-1], nodes.FunctionCall):
+            return self.parse_literal_token(tok)
+        seq = self.action_stack[-1]
+        self.grouping_delimeter_flags[seq] = False        
 
     def next(self):
         return self.stream.next()
@@ -57,5 +81,22 @@ class ActionParser(BaseParser):
         
     def parse_literal_token(self, tok):
         literal_action = nodes.LiteralKeysAction(tok.text)
-        self.action_stack[-1].add(literal_action)
+        self.add_single_action(literal_action)
+
+    def add_single_action(self, action):
+        self.set_delimeter_flag()
+        self.action_stack[-1].add(action)
+
+    def add_grouped_action(self, action):
+        self.set_delimeter_flag()
+        self.action_stack[-1].add(action)
+        self.action_stack.append(action)
+        self.grouping_delimeter_flags[action] = False
+
+    def set_delimeter_flag(self):
+        # if top level action is expecting a delimeter (, or +), raise an error
+        if len(self.action_stack) > 1:
+            if self.grouping_delimeter_flags[self.action_stack[-1]]:
+                self.error('foobar')
+            self.grouping_delimeter_flags[self.action_stack[-1]] = True
 

@@ -1,7 +1,7 @@
 from sprecgrammars import abstokenstream
 from sprecgrammars.actions import tokens
 
-WORD_DELIMETERS = set(['{', '}', '(', ')', ', ', ' ', '\n', '\t'])
+WORD_DELIMETERS = set(['{', '}', '(', ')', ', ', ' ', '\n', '\t', '+', ','])
 
 class ActionTokenStream(abstokenstream.AbstractTokenStream):
 
@@ -14,7 +14,7 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
             return self.read_literal()
         if ch in '()':
             return self.read_paren_token()
-        if ch == '{':
+        if ch in '{}':
             return self.read_brace_token()
         if ch == '+':
             return self.read_plus_token()
@@ -47,7 +47,9 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         return tokens.BraceToken(self.stream.next())
 
     def read_plus_token(self):
+        self.stream.next()
         return tokens.PlusToken()
 
     def read_comma_token(self):
+        self.stream.next()
         return tokens.CommaToken()
