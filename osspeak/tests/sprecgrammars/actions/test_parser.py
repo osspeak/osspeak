@@ -25,3 +25,10 @@ class TestActionParser(unittest.TestCase):
     def test_keypress_without_delimiter(self):
         with self.assertRaises(RuntimeError):
             action = self.parse_action_string(strings.KEYPRESS_WITHOUT_DELIMITER)
+
+    def test_basic_function(self):
+        action = self.parse_action_string(strings.BASIC_FUNCTION)
+        self.assertEqual(len(action.children), 1)
+        self.assertIsInstance(action.children[0], nodes.FunctionCall)
+        self.assertEqual(action.children[0].func_name, 'mouse.click')
+        self.assertEqual(action.children[0].arguments, [])

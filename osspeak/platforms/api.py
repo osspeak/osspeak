@@ -43,3 +43,6 @@ def set_clipboard_contents(text):
 
 def type_literal(text):
 	platform.type_literal(text)
+
+def type_keypresses(text, direction='both'):
+	platform.type_keypresses(text, direction=direction)

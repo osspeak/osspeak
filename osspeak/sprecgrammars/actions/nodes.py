@@ -49,3 +49,7 @@ class KeySequence(Action):
 
     def add(self, node):
         self.keys.append(node)
+
+    def perform(self):
+        keypresses = [node.evaluate() for node in self.keys]
+        api.type_keypresses(keypresses)

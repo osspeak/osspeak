@@ -22,7 +22,7 @@ class EventDispatcher:
 
     def on_engine_message(self, msg):
         split_message = msg.strip().split(' ')
-        if split_message[0] == 'result':
+        if split_message[0] == 'result': 
             action = self.cmd_module_watcher.actions[split_message[1]]
             action.perform()
 

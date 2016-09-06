@@ -40,9 +40,12 @@ def transcribe_line(key_inputs, delay, direction):
         else:
             press_key_combination([k.lower() for k in key_input.keys], direction)
 
-def type_literal(text):
+def type_literal(text, direction='both'):
     for char in text:
-        press_key(char, 'both')
+        press_key(char, direction)
+
+def type_keypresses(keys, direction='both'):
+    press_key_combination([k.lower() for k in keys], direction)
 
 def press_key(key_input, direction):
     if len(key_input) == 1 and key_input.isupper():
