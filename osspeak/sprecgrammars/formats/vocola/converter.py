@@ -20,35 +20,40 @@ class SrgsXmlConverter:
             'root': 'r' + str(uuid.uuid4()).replace('-', ''),
             'tag-format': 'semantics/1.0'
         }
+        self.root = ET.Element('grammar', attrib=self.grammar_attrib)
+
 
     def convert(self, node):
         return self.convert_map[type(node)](node)
 
     def convert_grammar(self, grammar_node):
-        root = ET.Element('grammar', attrib=self.grammar_attrib)
+        self.root = ET.Element('grammar', attrib=self.grammar_attrib)
         ruleref_container = ET.Element('rule', attrib={'id': self.grammar_attrib['root']})
-        root.append(ruleref_container)
-        x = ET.Element('item', attrib={'repeat': '1-'})
-        choices = ET.Element('one-of', attrib={})
-        x.append(choices)
-        ruleref_container.append(x)
+        self.root.append(ruleref_container)
+        repeat_item = ET.Element('item', attrib={'repeat': '1-'})
+        top_level_choices = ET.Element('one-of', attrib={})
+        repeat_item.append(top_level_choices)
+        ruleref_container.append(repeat_item)
         for rule_node in grammar_node.rules:
             rule = self.convert_rule(rule_node)
-            root.append(rule)
-            ruleref_item = ET.Element('item')
-            ruleref = ET.Element('ruleref', attrib={'uri': '#{}'.format(rule_node.id)})
-            ruleref_item.append(ruleref)
-            tag = ET.Element('tag')
-            tag.text = 'out.{0}=rules.{0};'.format(rule_node.id)
-            ruleref_item.append(tag)
-            choices.append(ruleref_item)
-        return root
+            self.root.append(rule)
+            top_level_choices.append(self.get_ruleref_item(rule_node.id))
+        return self.root
 
-    def convert_rule(self, node):
-        rule = ET.Element('rule', attrib={'id': node.id})
+    def get_ruleref_item(self, ruleid):
+        ruleref_item = ET.Element('item')
+        ruleref = ET.Element('ruleref', attrib={'uri': '#{}'.format(ruleid)})
+        ruleref_item.append(ruleref)
+        tag = ET.Element('tag')
+        tag.text = 'out.{0}=rules.{0};'.format(ruleid)
+        ruleref_item.append(tag)
+        return ruleref_item
+
+    def convert_rule(self, rule_node):
+        rule = ET.Element('rule', attrib={'id': rule_node.id})
         choices = ET.Element('one-of')
         rule.append(choices)
-        self.fill_choices(node, choices)
+        self.fill_choices(rule_node, choices)
         pprint(ET.tostring(rule))
         return rule
 
@@ -58,13 +63,17 @@ class SrgsXmlConverter:
             if isinstance(child, astree.OrNode):
                 choices.append(ET.Element('item'))
             elif isinstance(child, astree.WordNode):
-                self.add_text_to_item_tag(choices[-1], child)
+                self.add_text_to_item_elem(choices[-1], child)
             elif isinstance(child, astree.GroupingNode):
+                rule = ET.Element('rule', attrib={'id': child.id})
                 child_choices = ET.Element('one-of')
-                choices[-1].append(child_choices)
+                rule.append(child_choices)
+                self.root.append(rule)
+                rritem = self.get_ruleref_item(child.id)
+                choices[-1].append(rritem)
                 self.fill_choices(child, child_choices)
 
-    def add_text_to_item_tag(self, parent_item, word_node):
+    def add_text_to_item_elem(self, parent_item, word_node):
         assert self.get_repeat_vals(parent_item) == (1, 1)
         text = word_node.text
         if not parent_item:
