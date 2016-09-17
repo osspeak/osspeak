@@ -26,7 +26,7 @@ namespace RecognizerIO
                     string xml = String.Join(" ", splitInput.Skip(1).ToArray());
                     string tmpPath = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".xml";
                     System.IO.File.WriteAllText(tmpPath, xml);
-                    tmpPath = @"C:\Users\evan\AppData\Local\Temp\44af39ec-f439-4645-8e0a-a27b1097ce0f.xml";
+                    tmpPath = @"C:\Users\evan\AppData\Local\Temp\7a18cb51-3c60-4e1f-a7f5-94de04551cf0.xml";
                     EngManager.LoadGrammar(tmpPath);
                     EngManager.Begin();
                     //System.IO.File.Delete(tmpPath);

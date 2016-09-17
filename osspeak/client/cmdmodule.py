@@ -3,16 +3,16 @@ import json
 import collections
 import xml.etree.ElementTree as ET
 from sprecgrammars.actions.parser import ActionParser
+from client import commands
 from sprecgrammars import astree
 from sprecgrammars.formats import VocolaParser, SrgsXmlConverter
-# print(dir(sprecgrammars.parsers))
 
 class CommandModuleWatcher:
 
     def __init__(self):
         self.cmd_modules = {}
         # key is string id, val is Action instance
-        self.actions = {}
+        self.command_map = {}
         self.grammar_nodes = {}
 
     def load_command_json(self):
@@ -20,19 +20,16 @@ class CommandModuleWatcher:
             for fname in filenames:
                 full_path = os.path.join(root, fname)
                 with open(full_path) as f:
-                    cmd_module = json.load(f)
+                    cmd_module = commands.CommandModule(json.load(f))
                     self.cmd_modules[full_path] = cmd_module
 
     def create_grammar_nodes(self):
         for path, cmd_module in self.cmd_modules.items():
-            scope = cmd_module.get('scope')
+            scope = cmd_module.config.get('scope')
             grammar = self.grammar_nodes.get(scope, astree.GrammarNode())
-            for cmd, action_text in cmd_module['Commands']:
-                print(cmd)
-                parser = VocolaParser(cmd)
-                rule = parser.parse_as_rule()
-                grammar.rules.append(rule)
-                self.actions[rule.id] = self.create_action(action_text)
+            for cmd in cmd_module.commands:
+                grammar.rules.append(cmd.rule)
+                self.command_map[cmd.id] = cmd
             self.grammar_nodes[scope] = grammar
 
     def build_srgs_xml_grammar(self):
@@ -41,7 +38,6 @@ class CommandModuleWatcher:
         grammar = converter.convert_grammar(grammar_node)
         return grammar
 
-    def create_action(self, text):
-        parser = ActionParser(text)
-        return parser.parse()
+    def perform_action(self, action):
+        pass
         

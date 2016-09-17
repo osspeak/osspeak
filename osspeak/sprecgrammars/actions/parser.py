@@ -20,12 +20,12 @@ class ActionParser(BaseParser):
         }
 
     def parse(self):
-        action = nodes.RootAction()
-        self.action_stack = [action]
+        root_action = nodes.RootAction()
+        self.action_stack = [root_action]
         for tok in self.stream:
             # print('toke', tok)
             self.parse_map[type(tok)](tok)
-        return action
+        return root_action
 
     def parse_word_token(self, tok):
         if tok.text not in mappings.action_names:

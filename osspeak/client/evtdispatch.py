@@ -24,6 +24,7 @@ class EventDispatcher:
         split_message = msg.strip().split(' ')
         if split_message[0] == 'result': 
             action = self.cmd_module_watcher.actions[split_message[1]]
+            self.cmd_module_watcher.perform_action(action)
             action.perform()
 
     def main_loop(self):
