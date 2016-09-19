@@ -27,7 +27,7 @@ namespace RecognizerIO.Engines
         {
             foreach (var semanticResult in root.ToArray())
             {
-                Variables[semanticResult.Key] = semanticResult.Value == null ? "" : semanticResult.Value.Value.ToString();
+                Variables[semanticResult.Key] = semanticResult.Value.ToArray().Count() == 0 ? semanticResult.Value.Value.ToString() : "";
                 BuildVariables(semanticResult.Value);
             }
         }

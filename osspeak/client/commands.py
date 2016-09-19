@@ -27,8 +27,11 @@ class Command:
         parser = VocolaParser(self.rule_text)
         self.rule = parser.parse_as_rule()
         self.grouping_variables = collections.OrderedDict()
+        # make a copy in perform_action to keep track of string values
+        self.grouping_variables_values = collections.OrderedDict()
         for grouping in parser.groupings + parser.grouping_stack[1:]:
             self.grouping_variables[grouping.id] = grouping
+            self.grouping_variables_values[grouping.id] = ''
         print(self.grouping_variables)
 
     def init_action(self, action_text):
@@ -37,12 +40,27 @@ class Command:
         self.action = parser.parse()
 
     def perform_action(self, engine_result):
-        vars = self.grouping_variables.copy()
+        grouping_vars = self.grouping_variables_values.copy()
         for varid, varval in engine_result['Variables'].items():
-            assert varid in vars
-            vars[varid] = varval
-        print(vars)
+            assert varid in grouping_vars
+            grouping_vars[varid] = varval
+        self.assign_parent_variables(engine_result['Variables'], grouping_vars)
+        var_list = list(grouping_vars.values())
+        print(var_list)
         self.action.perform()
+
+    def assign_parent_variables(self, result_vars, grouping_vars):
+        for ruleid in result_vars:
+            if result_vars[ruleid]:
+                continue
+            print('rid ', ruleid)
+            self.assign_variable(self.grouping_variables[ruleid], grouping_vars)
+
+    def assign_variable(self, grouping, grouping_vars):
+        for child in grouping.children:
+            if isinstance(child, astree.WordNode):
+                print(child.text)
+            print(child)
 
     @property
     def id(self):
