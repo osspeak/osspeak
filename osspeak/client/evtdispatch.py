@@ -1,3 +1,4 @@
+import json
 import xml.etree.ElementTree as ET
 from communication.engines import ProcessManager
 from client import cmdmodule
@@ -21,11 +22,11 @@ class EventDispatcher:
         self.engine_process.send_message(msg)
 
     def on_engine_message(self, msg):
-        split_message = msg.strip().split(' ')
-        if split_message[0] == 'result': 
-            action = self.cmd_module_watcher.actions[split_message[1]]
-            self.cmd_module_watcher.perform_action(action)
-            action.perform()
+        parsed_message = json.loads(msg)
+        print(parsed_message)
+        if parsed_message['Type'] == 'result': 
+            cmd = self.cmd_module_watcher.command_map[parsed_message['RuleId']]
+            cmd.perform_action(parsed_message)
 
     def main_loop(self):
         input()

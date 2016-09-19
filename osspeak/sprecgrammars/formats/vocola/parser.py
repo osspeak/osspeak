@@ -9,6 +9,7 @@ class VocolaParser(BaseParser):
         super().__init__(text)
         self.stream = voctokstream.VocolaTokenStream(self.text)
         self.grouping_stack = []
+        self.groupings = []
         self.token_list = []
         self.parse_map = {
             tokens.WordToken: self.parse_word_token,
@@ -26,7 +27,9 @@ class VocolaParser(BaseParser):
         return top_level_rule
 
     def parse_word_token(self, tok):
-        self.maybe_pop_top_grouping()
+        top_grouping = self.maybe_pop_top_grouping()
+        if top_grouping is not None:
+            self.groupings.append(top_grouping)
         word_node = astree.WordNode(tok.text)
         self.top.children.append(word_node)
 

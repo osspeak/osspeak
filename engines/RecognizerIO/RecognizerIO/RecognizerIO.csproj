@@ -54,6 +54,7 @@
     <Compile Include="ActionTokenStream.cs" />
     <Compile Include="CommandLoader.cs" />
     <Compile Include="Engines\EngineManager.cs" />
+    <Compile Include="Engines\ProcessedRecognitionResult.cs" />
     <Compile Include="InputHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

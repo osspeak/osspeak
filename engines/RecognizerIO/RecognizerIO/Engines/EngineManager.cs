@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Speech.Recognition;
+using Newtonsoft.Json;
 using TextToSRG;
 using System.Threading.Tasks;
 
@@ -30,8 +31,9 @@ namespace RecognizerIO.Engines
         void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
             if (e.Result == null || e.Result.Confidence <= .9) return;
-            string ruleid = e.Result.Semantics.First().Key;
-            Console.WriteLine("result " + ruleid + " " + e.Result.Text);
+            var result = new ProcessedRecognitionResult(e.Result);
+            string serializedResult = JsonConvert.SerializeObject(result);
+            Console.WriteLine(serializedResult);
         }
 
         public void Begin()

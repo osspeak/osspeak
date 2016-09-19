@@ -21,6 +21,7 @@ class CommandModuleWatcher:
                 full_path = os.path.join(root, fname)
                 with open(full_path) as f:
                     cmd_module = commands.CommandModule(json.load(f))
+                    cmd_module.load_commands()
                     self.cmd_modules[full_path] = cmd_module
 
     def create_grammar_nodes(self):
@@ -37,7 +38,3 @@ class CommandModuleWatcher:
         converter = SrgsXmlConverter()
         grammar = converter.convert_grammar(grammar_node)
         return grammar
-
-    def perform_action(self, action):
-        pass
-        
