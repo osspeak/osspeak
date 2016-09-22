@@ -57,10 +57,17 @@ class Command:
             self.assign_variable(self.grouping_variables[ruleid], grouping_vars)
 
     def assign_variable(self, grouping, grouping_vars):
+        val_list = []
+        correct_option = False
+        print(grouping_vars)
+        if grouping_vars[grouping.id]:
+            return grouping_vars[grouping.id]
         for child in grouping.children:
             if isinstance(child, astree.WordNode):
+                val_list.append(child.text)
                 print(child.text)
             print(child)
+        grouping_vars[grouping.id] = ' '.join(val_list)
 
     @property
     def id(self):
