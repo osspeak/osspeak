@@ -35,9 +35,7 @@ class RuleParser(BaseParser):
         return top_level_rule
 
     def parse_word_token(self, tok):
-        top_grouping = self.maybe_pop_top_grouping()
-        if top_grouping is not None:
-            self.groupings.append(top_grouping)
+        self.maybe_pop_top_grouping()
         word_node = astree.WordNode(tok.text)
         self.top.children.append(word_node)
 
@@ -47,9 +45,7 @@ class RuleParser(BaseParser):
         self.top.children.append(or_node)
 
     def parse_paren_token(self, tok):
-        top_grouping = self.maybe_pop_top_grouping()
-        if top_grouping is not None:
-            self.groupings.append(top_grouping)
+        self.maybe_pop_top_grouping()
         if tok.is_open:
             grouping_node = astree.GroupingNode()
             self.top.children.append(grouping_node)
@@ -71,7 +67,8 @@ class RuleParser(BaseParser):
 
     def maybe_pop_top_grouping(self):
         if not self.top.open:
-            return self.grouping_stack.pop()
+            grouping = self.grouping_stack.pop()
+            self.groupings.append(grouping)
 
     @property
     def top(self):
