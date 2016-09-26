@@ -17,7 +17,6 @@ class RootAction(Action):
         self.children.append(child)
 
     def perform(self):
-        print(self.children)
         for subaction in self.children:
             subaction.perform()
 

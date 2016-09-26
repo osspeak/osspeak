@@ -21,6 +21,13 @@ class BracketToken(BaseToken):
         assert char in '[]'
         self.is_open = char == '['
 
+
+class GreaterThanToken(BaseToken):
+    pass
+
+class LessThanToken(BaseToken):
+    pass
+
 class RepetitionToken(BaseToken):
 
     def __init__(low=0, high=None):

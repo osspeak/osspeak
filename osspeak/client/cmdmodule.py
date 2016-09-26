@@ -4,8 +4,8 @@ import collections
 import xml.etree.ElementTree as ET
 from sprecgrammars.actions.parser import ActionParser
 from client import commands
-from sprecgrammars import astree
-from sprecgrammars.formats import VocolaParser, SrgsXmlConverter
+from sprecgrammars.formats.rules import astree
+from sprecgrammars.formats import RuleParser, SrgsXmlConverter
 
 class CommandModuleWatcher:
 

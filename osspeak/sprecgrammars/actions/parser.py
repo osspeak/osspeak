@@ -23,8 +23,7 @@ class ActionParser(BaseParser):
         root_action = nodes.RootAction()
         self.action_stack = [root_action]
         for tok in self.stream:
-            # print('toke', tok)
-            self.parse_map[type(tok)](tok)
+           self.parse_map[type(tok)](tok)
         return root_action
 
     def parse_word_token(self, tok):

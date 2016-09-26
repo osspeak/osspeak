@@ -1,7 +1,7 @@
 from sprecgrammars import abstokenstream
 from sprecgrammars import tokens
 
-class VocolaTokenStream(abstokenstream.AbstractTokenStream):
+class RuleTokenStream(abstokenstream.AbstractTokenStream):
 
     def read_next(self):
         whitespace = self.read_whitespace()

@@ -1,13 +1,18 @@
-from sprecgrammars import astree, tokens
+from sprecgrammars import tokens
 from sprecgrammars.formats.baseparser import BaseParser
-from sprecgrammars.formats.vocola import voctokstream
+from sprecgrammars.formats.rules import ruletokstream, astree
 
 
-class VocolaParser(BaseParser):
+class RuleParser(BaseParser):
+    '''
+    Convert a rule string i.e. 'hello (world|universe) into
+    an abstract syntax tree of nodes that can be serialized
+    into speech recognition grammar formats like SRGS XML. 
+    '''
 
     def __init__(self, text):
         super().__init__(text)
-        self.stream = voctokstream.VocolaTokenStream(self.text)
+        self.stream = ruletokstream.RuleTokenStream(self.text)
         self.grouping_stack = []
         self.groupings = []
         self.token_list = []

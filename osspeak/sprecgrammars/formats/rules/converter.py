@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from sprecgrammars import astree
+from sprecgrammars.formats.rules import astree
 import uuid
 from pprint import pprint
 
@@ -54,7 +54,6 @@ class SrgsXmlConverter:
         choices = ET.Element('one-of')
         rule.append(choices)
         self.fill_choices(rule_node, choices)
-        pprint(ET.tostring(rule))
         return rule
 
     def fill_choices(self, node, choices):
