@@ -29,6 +29,9 @@ class RuleParser(BaseParser):
         for tok in self.stream:
             self.token_list.append(tok)
             self.parse_map[type(tok)](tok)
+        for grouping in self.groupings + self.grouping_stack[1:]:
+            top_level_rule.grouping_variables[grouping.id] = grouping
+            top_level_rule.grouping_variables_values[grouping.id] = ''
         return top_level_rule
 
     def parse_word_token(self, tok):
@@ -44,7 +47,9 @@ class RuleParser(BaseParser):
         self.top.children.append(or_node)
 
     def parse_paren_token(self, tok):
-        self.maybe_pop_top_grouping()
+        top_grouping = self.maybe_pop_top_grouping()
+        if top_grouping is not None:
+            self.groupings.append(top_grouping)
         if tok.is_open:
             grouping_node = astree.GroupingNode()
             self.top.children.append(grouping_node)

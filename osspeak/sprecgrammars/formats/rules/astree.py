@@ -1,3 +1,4 @@
+import collections
 import uuid
 
 class ASTNode:
@@ -16,6 +17,9 @@ class Rule(ASTNode):
     def __init__(self):
         super().__init__()
         self.children = []
+        self.grouping_variables = collections.OrderedDict()
+        # make a copy in perform_action to keep track of string values
+        self.grouping_variables_values = collections.OrderedDict()
         self.open = True
 
 class WordNode(ASTNode):

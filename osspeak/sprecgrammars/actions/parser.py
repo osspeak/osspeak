@@ -9,7 +9,7 @@ class ActionParser(BaseParser):
         super().__init__(text)
         self.stream = actionstream.ActionTokenStream(self.text)
         self.action_stack = []
-        self.grouping_delimeter_flags = {}
+        self.grouping_delimiter_flags = {}
         self.parse_map = {
             tokens.LiteralToken: self.parse_literal_token,
             tokens.WordToken: self.parse_word_token,
@@ -58,13 +58,13 @@ class ActionParser(BaseParser):
         if not isinstance(self.action_stack[-1], nodes.KeySequence):
             return self.parse_literal_token(tok)
         seq = self.action_stack[-1]
-        self.grouping_delimeter_flags[seq] = False
+        self.grouping_delimiter_flags[seq] = False
 
     def parse_comma_token(self, tok):
         if not isinstance(self.action_stack[-1], nodes.FunctionCall):
             return self.parse_literal_token(tok)
         seq = self.action_stack[-1]
-        self.grouping_delimeter_flags[seq] = False        
+        self.grouping_delimiter_flags[seq] = False        
 
     def next(self):
         return self.stream.next()
@@ -83,19 +83,19 @@ class ActionParser(BaseParser):
         self.add_single_action(literal_action)
 
     def add_single_action(self, action):
-        self.set_delimeter_flag()
+        self.set_delimiter_flag()
         self.action_stack[-1].add(action)
 
     def add_grouped_action(self, action):
-        self.set_delimeter_flag()
+        self.set_delimiter_flag()
         self.action_stack[-1].add(action)
         self.action_stack.append(action)
-        self.grouping_delimeter_flags[action] = False
+        self.grouping_delimiter_flags[action] = False
 
-    def set_delimeter_flag(self):
-        # if top level action is expecting a delimeter (, or +), raise an error
+    def set_delimiter_flag(self):
+        # if top level action is expecting a delimiter (, or +), raise an error
         if len(self.action_stack) > 1:
-            if self.grouping_delimeter_flags[self.action_stack[-1]]:
+            if self.grouping_delimiter_flags[self.action_stack[-1]]:
                 self.error('foobar')
-            self.grouping_delimeter_flags[self.action_stack[-1]] = True
+            self.grouping_delimiter_flags[self.action_stack[-1]] = True
 

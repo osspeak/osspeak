@@ -1,7 +1,7 @@
 from sprecgrammars import abstokenstream
 from sprecgrammars.actions import tokens
 
-WORD_DELIMETERS = set(['{', '}', '(', ')', ', ', ' ', '\n', '\t', '+', ','])
+WORD_DELIMITERS = set(['{', '}', '(', ')', ', ', ' ', '\n', '\t', '+', ','])
 
 class ActionTokenStream(abstokenstream.AbstractTokenStream):
 
@@ -36,7 +36,7 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
 
     def read_word(self):
         literal_text = ''
-        while not self.stream.eof() and self.stream.peek() not in WORD_DELIMETERS:
+        while not self.stream.eof() and self.stream.peek() not in WORD_DELIMITERS:
             literal_text += self.stream.next()
         return tokens.WordToken(literal_text)
 

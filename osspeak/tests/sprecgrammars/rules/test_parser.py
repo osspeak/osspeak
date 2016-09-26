@@ -21,3 +21,8 @@ class TestRuleParser(unittest.TestCase):
         self.assertEqual(rule.children[0].children[1].children[0].text, 'world')
         self.assertIsInstance(rule.children[0].children[1].children[1], OrNode)
         self.assertEqual(rule.children[0].children[1].children[2].text, 'universe')
+
+
+    def test_grouping1_parser_grouping(self):
+        rule = self.parse_rule(strings.GROUPING1)
+        print(rule.grouping_variables)

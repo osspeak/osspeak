@@ -26,12 +26,9 @@ class Command:
         self.rule_text = rule_text
         parser = RuleParser(self.rule_text)
         self.rule = parser.parse_as_rule()
-        self.grouping_variables = collections.OrderedDict()
-        # make a copy in perform_action to keep track of string values
-        self.grouping_variables_values = collections.OrderedDict()
         for grouping in parser.groupings + parser.grouping_stack[1:]:
-            self.grouping_variables[grouping.id] = grouping
-            self.grouping_variables_values[grouping.id] = ''
+            self.rule.grouping_variables[grouping.id] = grouping
+            self.rule.grouping_variables_values[grouping.id] = ''
 
     def init_action(self, action_text):
         self.action_text = action_text
@@ -39,8 +36,8 @@ class Command:
         self.action = parser.parse()
 
     def perform_action(self, engine_result):
-        grouping_vars = self.grouping_variables_values.copy()
-        print(self.grouping_variables)
+        grouping_vars = self.rule.grouping_variables_values.copy()
+        print(self.rule.grouping_variables)
         for varid, varval in engine_result['Variables'].items():
             assert varid in grouping_vars
             grouping_vars[varid] = varval
@@ -52,7 +49,7 @@ class Command:
         for ruleid in result_vars:
             if result_vars[ruleid]:
                 continue
-            self.assign_variable(self.grouping_variables[ruleid], result_vars, grouping_vars)
+            self.assign_variable(self.rule.grouping_variables[ruleid], result_vars, grouping_vars)
 
     def assign_variable(self, grouping, result_vars, grouping_vars):
         '''
