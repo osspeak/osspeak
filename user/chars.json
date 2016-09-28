@@ -1,0 +1,6 @@
+{
+    "Commands": [
+        ["(left|right|up|down|like(purple|orange) test(red|blue)drink)", "{left} hello!+,"],
+        ["(hello (world|universe))", "{left}"]
+    ]
+}

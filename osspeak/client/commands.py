@@ -10,25 +10,31 @@ class CommandModule:
     def __init__(self, config):
         self.config = config
         self.commands = []
+        self.variables = []
 
-    def load_commands(self):
+    def load_commands(self, varmap):
         for rule_text, action_text in self.config['Commands']:
-            cmd = Command(rule_text, action_text)
+            cmd = Command(rule_text, action_text, variables=varmap)
             self.commands.append(cmd)
+
+    def load_variables(self, varmap):
+        for varname, rule_text in self.config['Variables']:
+            var = astree.VariableNode(varname, rule_text)
+            varmap[varname] = var
+            self.variables.append(var)
+        print(varmap)
 
 class Command:
     
-    def __init__(self, rule_text, action_text):
+    def __init__(self, rule_text, action_text, variables=None):
+        self.variables = variables
         self.init_rule(rule_text)
         self.init_action(action_text)
 
     def init_rule(self, rule_text):
         self.rule_text = rule_text
-        parser = RuleParser(self.rule_text)
+        parser = RuleParser(self.rule_text, self.variables)
         self.rule = parser.parse_as_rule()
-        for grouping in parser.groupings + parser.grouping_stack[1:]:
-            self.rule.grouping_variables[grouping.id] = grouping
-            self.rule.grouping_variables_values[grouping.id] = ''
 
     def init_action(self, action_text):
         self.action_text = action_text

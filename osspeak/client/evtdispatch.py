@@ -16,6 +16,7 @@ class EventDispatcher:
     def start_module_watcher(self):
         self.cmd_module_watcher = cmdmodule.CommandModuleWatcher()
         self.cmd_module_watcher.load_command_json()
+        self.cmd_module_watcher.create_rule_grammar_nodes()
         self.cmd_module_watcher.create_grammar_nodes()
         grammar = self.cmd_module_watcher.build_srgs_xml_grammar()
         msg = 'grammar_content {}'.format(ET.tostring(grammar).decode('utf8'))

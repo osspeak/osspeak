@@ -22,11 +22,10 @@ class BracketToken(BaseToken):
         self.is_open = char == '['
 
 
-class GreaterThanToken(BaseToken):
-    pass
-
-class LessThanToken(BaseToken):
-    pass
+class VariableToken(BaseToken):
+    
+    def __init__(self, name):
+        self.name = name
 
 class RepetitionToken(BaseToken):
 

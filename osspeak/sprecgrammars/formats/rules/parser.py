@@ -10,8 +10,9 @@ class RuleParser(BaseParser):
     into speech recognition grammar formats like SRGS XML. 
     '''
 
-    def __init__(self, text):
+    def __init__(self, text, variables):
         super().__init__(text)
+        self.variables = variables
         self.stream = ruletokstream.RuleTokenStream(self.text)
         self.grouping_stack = []
         self.groupings = []
@@ -21,6 +22,7 @@ class RuleParser(BaseParser):
             tokens.OrToken: self.parse_or_token,
             tokens.ParenToken: self.parse_paren_token,
             tokens.RepetitionToken: self.parse_repetition_token,
+            tokens.VariableToken: self.parse_variable_token,
         }
 
     def parse_as_rule(self):
@@ -60,6 +62,12 @@ class RuleParser(BaseParser):
             repeated_node = top.children[-1]
         else:
             self.croak('Invalid repetition')
+
+    def parse_variable_token(self, tok):
+        print('toke', tok, tok.name, self.variables)
+        if tok.name in self.variables:
+            return self.variables[tok.name]
+        self.croak('Missing variable')
 
     def apply_repetition(self, node, low=0, high=None):
         if low is not None:

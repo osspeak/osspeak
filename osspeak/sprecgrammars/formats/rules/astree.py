@@ -45,3 +45,9 @@ class GroupingNode(ASTNode):
         self.open = True
         self.repeat_low = 1
         self.repeat_high = 1
+
+class VariableNode(ASTNode):
+
+    def __init__(self, name, rule_text):
+        self.name = name
+        self.rule_text = rule_text

@@ -14,6 +14,8 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
             return self.read_ortoken()
         if ch in '()':
             return self.read_paren_token()
+        if ch == '<':
+            return self.read_variable()
         if ch == '_':
             if whitespace:
                 self.croak('Repetition must immediately follow a word or grouping')
@@ -53,3 +55,8 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
 
     def read_digits(self):
         return self.read_while(lambda ch: ch.isdigit())
+
+    def read_variable(self):
+        var_name = self.read_while(lambda ch: ch != '>')
+        self.stream.next()
+        return tokens.VariableToken(var_name[1:])

@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,20 +20,22 @@ namespace RecognizerIO
 
         public void ProcessIncomingInput(string input)
         {
-            var splitInput = input.Split(' ');
-            switch (splitInput[0])
+            dynamic jsonMsg = JsonConvert.DeserializeObject(input);
+            string msgType = jsonMsg.Type;
+            switch (msgType)
             {
-                case "grammar_content":
-                    string xml = String.Join(" ", splitInput.Skip(1).ToArray());
-                    string tmpPath = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".xml";
-                    System.IO.File.WriteAllText(tmpPath, xml);
-                    //tmpPath = @"C:\Users\evan\AppData\Local\Temp\7a18cb51-3c60-4e1f-a7f5-94de04551cf0.xml";
-                    EngManager.LoadGrammar(tmpPath);
+                case "load grammar":
+                    string xmlPath = jsonMsg.path;
+                    EngManager.LoadGrammar(xmlPath);
                     EngManager.Begin();
-                    //System.IO.File.Delete(tmpPath);
                     break;
             }
         }
     }
+    class MainProcessMessage
+    {
+        public string Type;
+
+    }
 }
-//grammar_content
+
