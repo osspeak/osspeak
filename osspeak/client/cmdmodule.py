@@ -1,6 +1,7 @@
 import os
 import json
 import collections
+import tempfile
 import xml.etree.ElementTree as ET
 from sprecgrammars.actions.parser import ActionParser
 from client import commands
@@ -11,6 +12,7 @@ class CommandModuleWatcher:
 
     def __init__(self):
         self.cmd_modules = {}
+        self.active_scope = None
         # key is string id, val is Action instance
         self.command_map = {}
         self.grammar_nodes = collections.defaultdict(self.init_scope_grammars)
@@ -28,32 +30,39 @@ class CommandModuleWatcher:
             scope = cmd_module.config.get('scope')
             scope_info = self.grammar_nodes[scope]
             cmd_module.load_commands(scope_info['variables'])
-            grammar = scope_info['main grammar']
+            grammar = scope_info['main grammar']['node']
             for cmd in cmd_module.commands:
                 grammar.rules.append(cmd.rule)
                 self.command_map[cmd.id] = cmd
-            self.grammar_nodes[scope] = grammar
 
     def create_rule_grammar_nodes(self):
         for path, cmd_module in self.cmd_modules.items():
             scope = cmd_module.config.get('scope')
             scope_info = self.grammar_nodes[scope]
             cmd_module.load_variables(scope_info['variables'])
-            grammar = scope_info['variable grammar']
-            for cmd in cmd_module.commands:
-                grammar.rules.append(cmd.rule)
-                self.command_map[cmd.id] = cmd
-            self.grammar_nodes[scope]['variable grammar'] = grammar
+            grammar = scope_info['variable grammar']['node']
+            for var in cmd_module.variables:
+                grammar.rules.append(var.rule)
 
     def init_scope_grammars(self):
         return {
-            'main grammar': astree.GrammarNode(),
-            'variable grammar': astree.GrammarNode(),
+            'main grammar': {'node': astree.GrammarNode(), 'xml': None},
+            'variable grammar': {'node': astree.GrammarNode(), 'xml': None},
             'variables': {},
         }
 
-    def build_srgs_xml_grammar(self):
-        grammar_node = self.grammar_nodes[None]
+    def build_srgs_xml_grammar(self, scope):
+        grammar_node = self.grammar_nodes[scope]['main grammar']['node']
         converter = SrgsXmlConverter()
         grammar = converter.convert_grammar(grammar_node)
         return grammar
+
+    def serialize_scope_xml(self, scope):
+        scope_info = self.grammar_nodes[scope]
+        for grammar_name in ('main', 'variable'):
+            gramkey = '{} grammar'.format(grammar_name)
+            grammar_node = scope_info[gramkey]['node']
+            converter = SrgsXmlConverter()
+            scope_info[gramkey]['xml'] = converter.convert_grammar(grammar_node)
+        print(scope_info)
+

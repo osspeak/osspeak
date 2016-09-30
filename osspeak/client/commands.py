@@ -19,7 +19,7 @@ class CommandModule:
 
     def load_variables(self, varmap):
         for varname, rule_text in self.config['Variables']:
-            var = astree.VariableNode(varname, rule_text)
+            var = astree.VariableNode(varname, rule_text, varmap)
             varmap[varname] = var
             self.variables.append(var)
         print(varmap)

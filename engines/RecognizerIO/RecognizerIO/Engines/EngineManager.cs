@@ -41,5 +41,10 @@ namespace RecognizerIO.Engines
             Engine.RecognizeAsync(RecognizeMode.Multiple);
         }
 
+        public void Stop()
+        {
+            Engine.RecognizeAsyncCancel();
+        }
+
     }
 }

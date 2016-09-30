@@ -1,6 +1,7 @@
 import collections
 import uuid
 
+
 class ASTNode:
     def __init__(self):
         # xml attributes must start with letter so prefix id with 'r'
@@ -48,6 +49,12 @@ class GroupingNode(ASTNode):
 
 class VariableNode(ASTNode):
 
-    def __init__(self, name, rule_text):
+    def __init__(self, name, rule_text, varmap):
         self.name = name
         self.rule_text = rule_text
+        self.init_rule(varmap)
+
+    def init_rule(self, varmap):
+        from sprecgrammars.formats import RuleParser
+        parser = RuleParser(self.rule_text, varmap)
+        self.rule = parser.parse_as_rule()
