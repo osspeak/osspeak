@@ -40,14 +40,14 @@ class CommandModuleWatcher:
             scope = cmd_module.config.get('scope')
             scope_info = self.grammar_nodes[scope]
             cmd_module.load_variables(scope_info['variables'])
-            grammar = scope_info['variable grammar']['node']
+            grammar = scope_info['main grammar']['node']
             for var in cmd_module.variables:
                 grammar.rules.append(var.rule)
 
     def init_scope_grammars(self):
         return {
             'main grammar': {'node': astree.GrammarNode(), 'xml': None},
-            'variable grammar': {'node': astree.GrammarNode(), 'xml': None},
+            # 'variable grammar': {'node': astree.GrammarNode(is_main_grammar=False), 'xml': None},
             'variables': {},
         }
 
@@ -59,7 +59,7 @@ class CommandModuleWatcher:
 
     def serialize_scope_xml(self, scope):
         scope_info = self.grammar_nodes[scope]
-        for grammar_name in ('main', 'variable'):
+        for grammar_name in ('main',):
             gramkey = '{} grammar'.format(grammar_name)
             grammar_node = scope_info[gramkey]['node']
             converter = SrgsXmlConverter()

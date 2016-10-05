@@ -9,9 +9,10 @@ class ASTNode:
 
 class GrammarNode(ASTNode):
      
-     def __init__(self):
+     def __init__(self, is_main_grammar=True):
          super().__init__()
          self.rules = []
+         self.is_main_grammar = is_main_grammar
 
 class Rule(ASTNode):
 

@@ -27,19 +27,21 @@ class EventDispatcher:
             'Type': 'load grammars',
             'Grammars': {
                 'foo': ET.tostring(scope_info['main grammar']['xml']).decode('utf8'),
-                'bar': ET.tostring(scope_info['variable grammar']['xml']).decode('utf8'),
+                # 'bar': ET.tostring(scope_info['variable grammar']['xml']).decode('utf8'),
             },
             'Init': True,
         }
-        print(json.dumps(msg))
         self.engine_process.send_message(json.dumps(msg))
 
     def on_engine_message(self, msg):
         parsed_message = json.loads(msg)
-        print(parsed_message)
+        print(msg)
         if parsed_message['Type'] == 'result': 
             cmd = self.cmd_module_watcher.command_map[parsed_message['RuleId']]
             cmd.perform_action(parsed_message)
+        elif parsed_message['Type'] == 'error':
+            print('error!')
+            print(parsed_message)
 
     def main_loop(self):
         input()
