@@ -19,9 +19,13 @@ namespace RecognizerIO
             //EngManager.LoadGrammar(@"C:\Users\evan\AppData\Local\Temp\1a2f4100-8b3f-47f5-a3f2-ca79d282682b.xml");
         }
 
-        //{"Type": "load grammars", "Init": true, "Grammars": {"foo": "<grammar mode=\"voice\" root=\"r28a91f8b02df47519b30a27ebe6a442d\" tag-format=\"semantics/1.0\" version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/06/grammar\"><rule id =\"r28a91f8b02df47519b30a27ebe6a442d\"><item repeat=\"1-\"><one-of><item><ruleref uri=\"#re91410181e2e424884ee05bf40fbae3c\" /><tag>out.re91410181e2e424884ee05bf40fbae3c=rules.re91410181e2e424884ee05bf40fbae3c;</tag></item></one-of></item></rule><rule id =\"re91410181e2e424884ee05bf40fbae3c\"><one-of><item>bar</item></one-of></rule></grammar>", "bar": "<grammar mode=\"voice\" root=\"rd095b61c5ab448209cb6b7bdfb975fa7\" tag-format=\"semantics/1.0\" version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/06/grammar\"><rule id=\"rd095b61c5ab448209cb6b7bdfb975fa7\"><item repeat=\"1-\"><one-of><item><ruleref uri=\"#rf7101cd8b2b748cf95ee7f921d2437fa\" /><tag>out.rf7101cd8b2b748cf95ee7f921d2437fa=rules.rf7101cd8b2b748cf95ee7f921d2437fa;</tag></item></one-of></item></rule><rule id =\"r26cbf9b7af554304bc5226c6676330d9\"><one-of><item>a</item><item>b</item><item>c</item></one-of></rule><rule id=\"rf7101cd8b2b748cf95ee7f921d2437fa\"><one-of><item><item><ruleref uri =\"#r26cbf9b7af554304bc5226c6676330d9\" /><tag>out.r26cbf9b7af554304bc5226c6676330d9=rules.r26cbf9b7af554304bc5226c6676330d9;</tag></item></item></one-of></rule></grammar>"}}
         public void ProcessIncomingInput(string input)
         {
+            /*
+            EngManager.LoadGrammar(@"C:\Users\evan\AppData\Local\Temp\17b78875-79f8-4335-aa92-f826dbdcb7b4.xml");
+            EngManager.Begin();
+            return;
+            */
             var p = @"C:\Users\evan\AppData\Local\Temp\tmpovlw8elw";
             using (StreamReader sr = new StreamReader(p))
             {

@@ -32,3 +32,8 @@ class RepetitionToken(BaseToken):
     def __init__(low=0, high=None):
         self.low = low
         self.high = high
+
+class ReplacementToken(BaseToken):
+    
+    def __init__(self):
+        self.text = ''

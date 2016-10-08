@@ -28,20 +28,28 @@ class SrgsXmlConverter:
 
     def convert_grammar(self, grammar_node):
         self.root = ET.Element('grammar', attrib=self.grammar_attrib)
-        if grammar_node.is_main_grammar:
-            ruleref_container = ET.Element('rule', attrib={'id': self.grammar_attrib['root']})
-            self.root.append(ruleref_container)
-            repeat_item = ET.Element('item', attrib={'repeat': '1-'})
-            top_level_choices = ET.Element('one-of', attrib={})
-            repeat_item.append(top_level_choices)
-            ruleref_container.append(repeat_item)
+        top_level_choices = self.build_top_level_choices()
         for rule_node in grammar_node.rules:
-            rule = self.convert_rule(rule_node)
-            self.root.append(rule)
-            if grammar_node.is_main_grammar:
-                top_level_choices.append(self.get_ruleref_item(rule_node.id))
+            self.append_rule_node(rule_node, top_level_choices)
+        for rule_node in (var.rule for var in grammar_node.variables):
+            self.append_rule_node(rule_node, top_level_choices)
         return self.root
 
+    def append_rule_node(self, rule_node, top_level_choices):
+        rule = self.convert_rule(rule_node)
+        self.root.append(rule)
+        if not rule_node.is_variable:
+            top_level_choices.append(self.get_ruleref_item(rule_node.id))
+
+    def build_top_level_choices(self):
+        ruleref_container = ET.Element('rule', attrib={'id': self.grammar_attrib['root']})
+        self.root.append(ruleref_container)
+        repeat_item = ET.Element('item', attrib={'repeat': '1-'})
+        top_level_choices = ET.Element('one-of', attrib={})
+        repeat_item.append(top_level_choices)
+        ruleref_container.append(repeat_item)
+        return top_level_choices
+    
     def get_ruleref_item(self, ruleid):
         ruleref_item = ET.Element('item')
         ruleref = ET.Element('ruleref', attrib={'uri': '#{}'.format(ruleid)})
@@ -73,6 +81,9 @@ class SrgsXmlConverter:
                 rritem = self.get_ruleref_item(child.id)
                 choices[-1].append(rritem)
                 self.fill_choices(child, child_choices)
+            elif isinstance(child, astree.VariableNode):
+                rritem = self.get_ruleref_item(child.rule.id)
+                choices[-1].append(rritem)
 
     def add_text_to_item_elem(self, parent_item, word_node):
         assert self.get_repeat_vals(parent_item) == (1, 1)

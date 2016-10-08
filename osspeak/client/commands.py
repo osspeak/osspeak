@@ -22,7 +22,6 @@ class CommandModule:
             var = astree.VariableNode(varname, rule_text, varmap)
             varmap[varname] = var
             self.variables.append(var)
-        print(varmap)
 
 class Command:
     
@@ -43,7 +42,6 @@ class Command:
 
     def perform_action(self, engine_result):
         grouping_vars = self.rule.grouping_variables_values.copy()
-        print(self.rule.grouping_variables)
         for varid, varval in engine_result['Variables'].items():
             assert varid in grouping_vars
             grouping_vars[varid] = varval

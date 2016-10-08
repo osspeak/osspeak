@@ -31,7 +31,7 @@ namespace RecognizerIO.Engines
         void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
             if (e.Result == null || e.Result.Confidence <= .9) return;
-            var result = new ProcessedRecognitionResult(e.Result);
+            var result = new ProcessedRecognitionResult(e.Result.Semantics);
             string serializedResult = JsonConvert.SerializeObject(result);
             Console.WriteLine(serializedResult);
         }

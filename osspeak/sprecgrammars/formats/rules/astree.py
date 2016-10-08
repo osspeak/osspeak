@@ -5,13 +5,18 @@ import uuid
 class ASTNode:
     def __init__(self):
         # xml attributes must start with letter so prefix id with 'r'
-        self.id = 'r' + str(uuid.uuid4()).replace('-', '')
+        self._id = str(uuid.uuid4()).replace('-', '')
+
+    @property
+    def id(self):
+        return 'r{}'.format(self._id)
 
 class GrammarNode(ASTNode):
      
      def __init__(self, is_main_grammar=True):
          super().__init__()
          self.rules = []
+         self.variables = []
          self.is_main_grammar = is_main_grammar
 
 class Rule(ASTNode):
@@ -23,6 +28,11 @@ class Rule(ASTNode):
         # make a copy in perform_action to keep track of string values
         self.grouping_variables_values = collections.OrderedDict()
         self.open = True
+        self.is_variable = False
+
+    @property
+    def id(self):
+        return '{}{}'.format('v' if self.is_variable else 'r', self._id)
 
 class WordNode(ASTNode):
 
@@ -31,6 +41,7 @@ class WordNode(ASTNode):
         self.text = text
         self.repeat_low = 1
         self.repeat_high = 1
+        self.action_substitute = None
 
     @property
     def is_single(self):
@@ -47,10 +58,12 @@ class GroupingNode(ASTNode):
         self.open = True
         self.repeat_low = 1
         self.repeat_high = 1
+        self.action_substitute = None
 
 class VariableNode(ASTNode):
 
     def __init__(self, name, rule_text, varmap):
+        super().__init__()
         self.name = name
         self.rule_text = rule_text
         self.init_rule(varmap)
@@ -59,3 +72,4 @@ class VariableNode(ASTNode):
         from sprecgrammars.formats import RuleParser
         parser = RuleParser(self.rule_text, varmap)
         self.rule = parser.parse_as_rule()
+        self.rule.is_variable = True

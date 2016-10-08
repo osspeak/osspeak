@@ -42,7 +42,7 @@ class CommandModuleWatcher:
             cmd_module.load_variables(scope_info['variables'])
             grammar = scope_info['main grammar']['node']
             for var in cmd_module.variables:
-                grammar.rules.append(var.rule)
+                grammar.variables.append(var)
 
     def init_scope_grammars(self):
         return {
@@ -64,5 +64,4 @@ class CommandModuleWatcher:
             grammar_node = scope_info[gramkey]['node']
             converter = SrgsXmlConverter()
             scope_info[gramkey]['xml'] = converter.convert_grammar(grammar_node)
-        print(scope_info)
 

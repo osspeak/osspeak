@@ -35,10 +35,11 @@ class EventDispatcher:
 
     def on_engine_message(self, msg):
         parsed_message = json.loads(msg)
-        print(msg)
-        if parsed_message['Type'] == 'result': 
-            cmd = self.cmd_module_watcher.command_map[parsed_message['RuleId']]
-            cmd.perform_action(parsed_message)
+        if parsed_message['Type'] == 'recognition': 
+            print(parsed_message)
+            for cmd_recognition in parsed_message['Commands']:
+                cmd = self.cmd_module_watcher.command_map[cmd_recognition['RuleId']]
+                cmd.perform_action(cmd_recognition)
         elif parsed_message['Type'] == 'error':
             print('error!')
             print(parsed_message)

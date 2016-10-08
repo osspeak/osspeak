@@ -46,6 +46,11 @@ class RuleParser(BaseParser):
         or_node = astree.OrNode()
         self.top.children.append(or_node)
 
+    def parse_variable_token(self, tok):
+        self.maybe_pop_top_grouping()
+        var_node = self.variables[tok.name]
+        self.top.children.append(var_node)
+
     def parse_paren_token(self, tok):
         self.maybe_pop_top_grouping()
         if tok.is_open:
@@ -62,12 +67,6 @@ class RuleParser(BaseParser):
             repeated_node = top.children[-1]
         else:
             self.croak('Invalid repetition')
-
-    def parse_variable_token(self, tok):
-        print('toke', tok, tok.name, self.variables)
-        if tok.name in self.variables:
-            return self.variables[tok.name]
-        self.croak('Missing variable')
 
     def apply_repetition(self, node, low=0, high=None):
         if low is not None:

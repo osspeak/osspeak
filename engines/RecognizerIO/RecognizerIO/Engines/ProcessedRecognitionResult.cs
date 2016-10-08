@@ -7,16 +7,29 @@ namespace RecognizerIO.Engines
 {
     class ProcessedRecognitionResult
     {
-        public string RuleId { get; set; }
-        public Dictionary<string, string> Variables;
-        public string Type = "result";
+        public List<CommandRecognition> Commands = new List<CommandRecognition>();
+        public string Type = "recognition";
 
-        public ProcessedRecognitionResult(RecognitionResult result)
+        public ProcessedRecognitionResult(SemanticValue semantics)
         {
-            var root = result.Semantics.First();
-            Variables = new Dictionary<string, string>();
-            RuleId = root.Key;
-            BuildVariables(root.Value);
+            foreach(var cmdResult in semantics)
+            {
+                var recognition = new CommandRecognition(cmdResult.Value, cmdResult.Key);
+                Commands.Add(recognition);
+            }
+            var root = "4";
+        }
+    }
+
+    class CommandRecognition
+    {
+        public string RuleId { get; set; }
+        public Dictionary<string, string> Variables = new Dictionary<string, string>();
+
+        public CommandRecognition(SemanticValue cmdMatch, string ruleId)
+        {
+            RuleId = ruleId;
+            BuildVariables(cmdMatch);
         }
         /// <summary>
         /// Recurse through result tree to build Variables dictionary
@@ -27,7 +40,10 @@ namespace RecognizerIO.Engines
         {
             foreach (var semanticResult in root.ToArray())
             {
-                Variables[semanticResult.Key] = semanticResult.Value.ToArray().Count() == 0 ? semanticResult.Value.Value.ToString() : "";
+                if (semanticResult.Key[0] == 'r')
+                {
+                    Variables[semanticResult.Key] = semanticResult.Value.ToArray().Count() == 0 ? semanticResult.Value.Value.ToString() : "";
+                }
                 BuildVariables(semanticResult.Value);
             }
         }
