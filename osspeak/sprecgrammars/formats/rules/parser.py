@@ -10,9 +10,9 @@ class RuleParser(BaseParser):
     into speech recognition grammar formats like SRGS XML. 
     '''
 
-    def __init__(self, text, variables):
+    def __init__(self, text, variables=None):
         super().__init__(text)
-        self.variables = variables
+        self.variables = {} if variables is None else variables
         self.stream = ruletokstream.RuleTokenStream(self.text)
         self.grouping_stack = []
         self.groupings = []

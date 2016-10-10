@@ -30,3 +30,8 @@ class PlusToken(ActionToken):
     
     def __init__(self):
         self.text = '+'
+
+class PositionalVariableToken(ActionToken):
+
+    def __init__(self, pos):
+        self.pos = pos

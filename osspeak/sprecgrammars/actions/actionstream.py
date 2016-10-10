@@ -20,6 +20,8 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
             return self.read_plus_token()
         if ch == ',':
             return self.read_comma_token()
+        if ch == '$':
+            return self.read_positional_variable_token()
         return self.read_word()
 
     def read_literal(self):
@@ -53,3 +55,14 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
     def read_comma_token(self):
         self.stream.next()
         return tokens.CommaToken()
+
+    def read_positional_variable_token(self):
+        self.stream.next()
+        pos_or_neg_multiplier = 1
+        if self.stream.peek() == '-':
+            self.stream.next()
+            pos_or_neg_multiplier = -1
+        position = self.read_while(lambda ch: ch.isdigit())
+        if not position:
+            self.croak('Positional variable must have a number')
+        return tokens.PositionalVariableToken(int(position) * pos_or_neg_multiplier)

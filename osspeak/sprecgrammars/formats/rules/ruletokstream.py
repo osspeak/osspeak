@@ -16,12 +16,13 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
             return self.read_paren_token()
         if ch == '<':
             return self.read_variable()
+        if ch == '=':
+            return self.read_action_substitute()
         if ch == '_':
             if whitespace:
                 self.croak('Repetition must immediately follow a word or grouping')
             return self.read_repetition()
         self.croak('Invalid character: {}'.format(ch))
-        
 
     def read_whitespace(self):
         return self.read_while(lambda ch: ch in ' \n\t')
@@ -49,7 +50,6 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
             high = self.read_digits() or None
         return tokens.RepetitionToken(low=low, high=high)
 
-
     def read_paren_token(self):
         return tokens.ParenToken(self.stream.next())
 
@@ -60,3 +60,13 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
         var_name = self.read_while(lambda ch: ch != '>')
         self.stream.next()
         return tokens.VariableToken(var_name[1:])
+
+    def read_action_substitute(self):
+        assert self.stream.next() == '='
+        remaining_text = self.stream.text[self.stream.pos:]
+        tok = tokens.ActionSubstituteToken(remaining_text)
+        # could increase self.stream.stream.pos, but better to use
+        # stream interface
+        for i in range(tok.consumed_char_count):
+            self.stream.next()
+        return tok

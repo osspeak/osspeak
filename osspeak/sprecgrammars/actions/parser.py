@@ -3,11 +3,10 @@ from sprecgrammars.actions import actionstream, nodes
 from sprecgrammars.actions import tokens
 from platforms.actions import mappings
 
-class ActionParser(BaseParser):
+class ActionParser:
 
     def __init__(self, text):
-        super().__init__(text)
-        self.stream = actionstream.ActionTokenStream(self.text)
+        self.stream = actionstream.ActionTokenStream(text)
         self.action_stack = []
         self.grouping_delimiter_flags = {}
         self.parse_map = {
@@ -20,11 +19,22 @@ class ActionParser(BaseParser):
         }
 
     def parse(self):
-        root_action = nodes.RootAction()
-        self.action_stack = [root_action]
+        self.init_action_stack()
         for tok in self.stream:
            self.parse_map[type(tok)](tok)
-        return root_action
+        return self.action_stack[0]
+
+    def parse_substitute_action(self):
+        self.init_action_stack()
+        for tok in self.stream:
+           self.parse_map[type(tok)](tok)
+           break
+        return self.action_stack[0]            
+
+    def init_action_stack(self):
+        root_action = nodes.RootAction()
+        self.action_stack = [root_action]
+
 
     def parse_word_token(self, tok):
         if tok.text not in mappings.action_names:
@@ -98,4 +108,4 @@ class ActionParser(BaseParser):
             if self.grouping_delimiter_flags[self.action_stack[-1]]:
                 self.error('foobar')
             self.grouping_delimiter_flags[self.action_stack[-1]] = True
-
+    

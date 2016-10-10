@@ -1,3 +1,5 @@
+from sprecgrammars.actions import parser, actionstream
+
 class BaseToken:
     pass
 
@@ -21,7 +23,6 @@ class BracketToken(BaseToken):
         assert char in '[]'
         self.is_open = char == '['
 
-
 class VariableToken(BaseToken):
     
     def __init__(self, name):
@@ -33,7 +34,10 @@ class RepetitionToken(BaseToken):
         self.low = low
         self.high = high
 
-class ReplacementToken(BaseToken):
+class ActionSubstituteToken(BaseToken):
     
-    def __init__(self):
-        self.text = ''
+    def __init__(self, text):
+        self.text = text
+        action_parser = parser.ActionParser(text)
+        self.action = action_parser.parse_substitute_action()
+        self.consumed_char_count = action_parser.stream.stream.pos

@@ -33,16 +33,16 @@ class EventDispatcher:
         }
         self.engine_process.send_message(json.dumps(msg))
 
-    def on_engine_message(self, msg):
-        parsed_message = json.loads(msg)
-        if parsed_message['Type'] == 'recognition': 
-            print(parsed_message)
-            for cmd_recognition in parsed_message['Commands']:
+    def on_engine_message(self, msg_string):
+        msg = json.loads(msg_string)
+        if msg['Type'] == 'recognition': 
+            print(msg)
+            for cmd_recognition in msg['Commands']:
                 cmd = self.cmd_module_watcher.command_map[cmd_recognition['RuleId']]
                 cmd.perform_action(cmd_recognition)
-        elif parsed_message['Type'] == 'error':
+        elif msg['Type'] == 'error':
             print('error!')
-            print(parsed_message)
+            print(msg)
 
     def main_loop(self):
         input()
