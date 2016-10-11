@@ -23,6 +23,7 @@ class RuleParser(BaseParser):
             tokens.ParenToken: self.parse_paren_token,
             tokens.RepetitionToken: self.parse_repetition_token,
             tokens.VariableToken: self.parse_variable_token,
+            tokens.ActionSubstituteToken: self.parse_action_substitute_token
         }
 
     def parse_as_rule(self):
@@ -67,6 +68,12 @@ class RuleParser(BaseParser):
             repeated_node = top.children[-1]
         else:
             self.croak('Invalid repetition')
+
+    def parse_action_substitute_token(self, tok):
+        if self.top.open:
+            self.top.children[-1].action_substitute = tok.action
+        else:
+            self.top.action_substitute = tok.action
 
     def apply_repetition(self, node, low=0, high=None):
         if low is not None:

@@ -2,6 +2,7 @@ import unittest
 
 from sprecgrammars.formats.rules import converter, parser 
 from sprecgrammars.formats.rules.astree import GroupingNode, OrNode, WordNode 
+from sprecgrammars.actions import nodes
 from tests.sprecgrammars.rules import strings
 
 class TestRuleParser(unittest.TestCase):
@@ -25,4 +26,14 @@ class TestRuleParser(unittest.TestCase):
 
     def test_grouping1_parser_grouping(self):
         rule = self.parse_rule(strings.GROUPING1)
-        print(rule.grouping_variables)
+
+    def test_substitute1_parser_grouping(self):
+        rule = self.parse_rule(strings.SUBSTITUTE1)
+        first_action = rule.children[0].children[0].action_substitute
+        self.assertIsInstance(first_action, nodes.RootAction)
+        self.assertIsInstance(first_action.children[0], nodes.LiteralKeysAction)
+        self.assertEqual(first_action.children[0].text, 'left')
+        second_action = rule.children[0].children[2].action_substitute
+        self.assertIsInstance(second_action, nodes.RootAction)
+        self.assertIsInstance(second_action.children[0], nodes.LiteralKeysAction)
+        self.assertEqual(second_action.children[0].text, 'right')
