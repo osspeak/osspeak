@@ -1,6 +1,7 @@
 import collections
 
 from sprecgrammars.actions.parser import ActionParser
+from sprecgrammars.actions import nodes
 from client import commands
 from sprecgrammars.formats.rules import astree
 from sprecgrammars.formats import RuleParser, SrgsXmlConverter
@@ -41,13 +42,19 @@ class Command:
         self.action = parser.parse()
 
     def perform_action(self, engine_result):
-        grouping_vars = self.rule.grouping_variables_values.copy()
+        # empty variables dict, gets filled based on result
+        grouping_vars = self.rule.grouping_variables.copy()
+        for k in grouping_vars:
+            grouping_vars[k] = None
+        print(grouping_vars)
         for varid, varval in engine_result['Variables'].items():
             assert varid in grouping_vars
             grouping_vars[varid] = varval
+        substitution_ids = set(engine_result['SubstitutionIds'])
         self.assign_parent_variables(engine_result['Variables'], grouping_vars)
         var_list = list(grouping_vars.values())
-        self.action.perform()
+        print(var_list[0].children)
+        self.action.perform(var_list)
 
     def assign_parent_variables(self, result_vars, grouping_vars):
         for ruleid in result_vars:
@@ -63,25 +70,27 @@ class Command:
         Groupings that don't match any words and don't
         have any matching children do not get transmitted by the engine.
         '''
-        val_list = []
-        correct_option = False
         if grouping_vars[grouping.id]:
             return grouping_vars[grouping.id]
+        variable_action = nodes.RootAction()
+        # grouping is a container of options, meaning only one child
+        # can match for each recognition
+        correct_option = False
         for child in grouping.children:
             if isinstance(child, astree.WordNode):
-                val_list.append(child.text)
+                variable_action.children.append(nodes.LiteralKeysAction(child.text))
             elif isinstance(child, astree.GroupingNode):
                 if child.id in result_vars:
                     correct_option = True
                     self.assign_variable(child, result_vars, grouping_vars)
-                    val_list.append(grouping_vars[child.id])
+                    variable_action.children.append(grouping_vars[child.id])
                 else:
                     assert not correct_option
             elif isinstance(child, astree.OrNode):
                 if correct_option:
                     break
-                val_list = []
-        grouping_vars[grouping.id] = ' '.join(val_list)
+                variable_action.children = []
+        grouping_vars[grouping.id] = variable_action
 
     @property
     def id(self):

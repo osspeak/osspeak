@@ -25,6 +25,7 @@ namespace RecognizerIO.Engines
     {
         public string RuleId { get; set; }
         public Dictionary<string, string> Variables = new Dictionary<string, string>();
+        public List<string> SubstitutionIds = new List<string>();
 
         public CommandRecognition(SemanticValue cmdMatch, string ruleId)
         {
@@ -43,6 +44,11 @@ namespace RecognizerIO.Engines
                 if (semanticResult.Key[0] == 'r')
                 {
                     Variables[semanticResult.Key] = semanticResult.Value.ToArray().Count() == 0 ? semanticResult.Value.Value.ToString() : "";
+                }
+                // substitution
+                else if (semanticResult.Key[0] == 's')
+                {
+                    SubstitutionIds.Add(semanticResult.Key);
                 }
                 BuildVariables(semanticResult.Value);
             }

@@ -47,7 +47,6 @@ class CommandModuleWatcher:
     def init_scope_grammars(self):
         return {
             'main grammar': {'node': astree.GrammarNode(), 'xml': None},
-            # 'variable grammar': {'node': astree.GrammarNode(is_main_grammar=False), 'xml': None},
             'variables': {},
         }
 

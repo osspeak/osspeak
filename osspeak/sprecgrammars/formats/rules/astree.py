@@ -13,11 +13,10 @@ class ASTNode:
 
 class GrammarNode(ASTNode):
      
-     def __init__(self, is_main_grammar=True):
+     def __init__(self):
          super().__init__()
          self.rules = []
          self.variables = []
-         self.is_main_grammar = is_main_grammar
 
 class Rule(ASTNode):
 
@@ -46,6 +45,10 @@ class WordNode(ASTNode):
     @property
     def is_single(self):
         return self.repeat_low == 1 and self.repeat_high == 1
+
+    @property
+    def id(self):
+        return '{}{}'.format('' if self.action_substitute is None else 's', self._id)
 
 class OrNode(ASTNode):
     pass

@@ -16,9 +16,9 @@ class RootAction(Action):
     def add(self, child):
         self.children.append(child)
 
-    def perform(self):
+    def perform(self, variables):
         for subaction in self.children:
-            subaction.perform()
+            subaction.perform(variables)
 
 class LiteralKeysAction(Action):
     
@@ -26,7 +26,7 @@ class LiteralKeysAction(Action):
         super().__init__()
         self.text = text
 
-    def perform(self):
+    def perform(self, variables):
         api.type_literal(self.text)
 
     def evaluate(self):
@@ -49,6 +49,6 @@ class KeySequence(Action):
     def add(self, node):
         self.keys.append(node)
 
-    def perform(self):
+    def perform(self, variables):
         keypresses = [node.evaluate() for node in self.keys]
         api.type_keypresses(keypresses)

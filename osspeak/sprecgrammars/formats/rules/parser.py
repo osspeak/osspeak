@@ -32,9 +32,10 @@ class RuleParser(BaseParser):
         for tok in self.stream:
             self.token_list.append(tok)
             self.parse_map[type(tok)](tok)
-        for grouping in self.groupings + self.grouping_stack[1:]:
+        assert len(self.grouping_stack) == 1
+        for grouping in self.groupings:
             top_level_rule.grouping_variables[grouping.id] = grouping
-            top_level_rule.grouping_variables_values[grouping.id] = ''
+            top_level_rule.grouping_variables_values[grouping.id] = None
         return top_level_rule
 
     def parse_word_token(self, tok):
@@ -50,6 +51,7 @@ class RuleParser(BaseParser):
     def parse_variable_token(self, tok):
         self.maybe_pop_top_grouping()
         var_node = self.variables[tok.name]
+        self.groupings.extend(list(var_node.rule.grouping_variables.values()))
         self.top.children.append(var_node)
 
     def parse_paren_token(self, tok):
@@ -60,6 +62,7 @@ class RuleParser(BaseParser):
             self.grouping_stack.append(grouping_node)
         else:
             self.top.open = False
+            self.maybe_pop_top_grouping()
 
     def parse_repetition_token(self, tok):
         if not self.top.open:
