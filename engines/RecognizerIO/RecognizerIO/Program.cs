@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,10 +14,21 @@ namespace RecognizerIO
         static void Main(string[] args)
         {
             var inputHandler = new InputHandler();
-            while (true)
+            bool shutdown = false;
+            while (!shutdown)
             {
-                var communicatorInput = Console.ReadLine();
-                inputHandler.ProcessIncomingInput(communicatorInput);
+                try
+                {
+                    var communicatorInput = Console.ReadLine();
+                    shutdown = inputHandler.ProcessIncomingInput(communicatorInput);
+                }
+                catch (Exception e)
+                {
+                    var error = new Error(e);
+                    string serializedError = JsonConvert.SerializeObject(error);
+                    Console.WriteLine(serializedError);
+                    throw;
+                }
             }
         }
     }

@@ -52,3 +52,11 @@ class KeySequence(Action):
     def perform(self, variables):
         keypresses = [node.evaluate() for node in self.keys]
         api.type_keypresses(keypresses)
+
+class PositionalVariable(Action):
+
+    def __init__(self, pos):
+        self.pos = pos
+
+    def perform(self, variables):
+        variables[self.pos - 1].perform(variables)

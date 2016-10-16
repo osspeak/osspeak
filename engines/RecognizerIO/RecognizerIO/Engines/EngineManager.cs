@@ -30,8 +30,13 @@ namespace RecognizerIO.Engines
 
         void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            if (e.Result == null || e.Result.Confidence <= .9) return;
-            var result = new ProcessedRecognitionResult(e.Result.Semantics);
+            HandleRecognition(e.Result);
+        }
+
+        public void HandleRecognition(RecognitionResult srResult)
+        {
+            if (srResult == null || srResult.Confidence <= .9) return;
+            var result = new ProcessedRecognitionResult(srResult.Semantics);
             string serializedResult = JsonConvert.SerializeObject(result);
             Console.WriteLine(serializedResult);
         }

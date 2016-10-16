@@ -2,6 +2,7 @@
 using System.IO;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Speech.Recognition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,20 +20,16 @@ namespace RecognizerIO
             //EngManager.LoadGrammar(@"C:\Users\evan\AppData\Local\Temp\1a2f4100-8b3f-47f5-a3f2-ca79d282682b.xml");
         }
 
-        public void ProcessIncomingInput(string input)
+        public bool ProcessIncomingInput(string input)
         {
             /*
             EngManager.LoadGrammar(@"C:\Users\evan\AppData\Local\Temp\17b78875-79f8-4335-aa92-f826dbdcb7b4.xml");
             EngManager.Begin();
             return;
             */
-            var p = @"C:\Users\evan\AppData\Local\Temp\tmpovlw8elw";
-            using (StreamReader sr = new StreamReader(p))
-            {
-                //input = sr.ReadToEnd();
-            }
             dynamic jsonMsg = JsonConvert.DeserializeObject(input);
             string msgType = jsonMsg.Type;
+            bool shutdown = false;
             switch (msgType)
             {
                 case "load grammars":
@@ -50,7 +47,18 @@ namespace RecognizerIO
                     break;
                 case "load settings":
                     break;
+                case "emulate recognition":
+                    string text = jsonMsg.Text;
+                    EngManager.Engine.EmulateRecognize(text);
+                    break;
+                case "shutdown":
+                    shutdown = true;
+                    break;
+                case "stop":
+                    EngManager.Stop();
+                    break;
             }
+            return shutdown;
         }
     }
     class MainProcessMessage

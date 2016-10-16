@@ -1,4 +1,6 @@
-from communication.engines import ProcessManager
+import json
+
+from communication.procs import ProcessManager
 
 class MessageDispatcher:
 

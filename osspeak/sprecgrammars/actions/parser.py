@@ -16,6 +16,7 @@ class ActionParser:
             tokens.BraceToken: self.parse_curly_brace,
             tokens.PlusToken: self.parse_plus_sign,
             tokens.CommaToken: self.parse_plus_sign,
+            tokens.PositionalVariableToken: self.parse_positional_variable_token,
         }
 
     def parse(self):
@@ -29,12 +30,11 @@ class ActionParser:
         for tok in self.stream:
            self.parse_map[type(tok)](tok)
            break
-        return self.action_stack[0]            
+        return self.action_stack[0]
 
     def init_action_stack(self):
         root_action = nodes.RootAction()
         self.action_stack = [root_action]
-
 
     def parse_word_token(self, tok):
         if tok.text not in mappings.action_names:
@@ -74,7 +74,7 @@ class ActionParser:
         if not isinstance(self.action_stack[-1], nodes.FunctionCall):
             return self.parse_literal_token(tok)
         seq = self.action_stack[-1]
-        self.grouping_delimiter_flags[seq] = False        
+        self.grouping_delimiter_flags[seq] = False  
 
     def next(self):
         return self.stream.next()
@@ -87,6 +87,10 @@ class ActionParser:
 
     def eof():
         return self.peek() is None
+
+    def parse_positional_variable_token(self, tok):
+        var_action = nodes.PositionalVariable(tok.pos)
+        self.add_single_action(var_action)
         
     def parse_literal_token(self, tok):
         literal_action = nodes.LiteralKeysAction(tok.text)
