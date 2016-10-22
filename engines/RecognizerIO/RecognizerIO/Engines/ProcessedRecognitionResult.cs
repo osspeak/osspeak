@@ -10,12 +10,15 @@ namespace RecognizerIO.Engines
         public List<CommandRecognition> Commands = new List<CommandRecognition>();
         public string Type = "recognition";
 
-        public ProcessedRecognitionResult(SemanticValue semantics)
+        public ProcessedRecognitionResult(string semantics)
         {
-            foreach(var cmdResult in semantics)
+            string[] splitCmds = semantics.Split(new[] { "-command-" }, StringSplitOptions.None).Skip(1).ToArray();
+            foreach(var cmd in splitCmds)
             {
-                var recognition = new CommandRecognition(cmdResult.Value, cmdResult.Key);
-                Commands.Add(recognition);
+                string[] cmdPieces = cmd.Split(':');
+                string[] cmdVars = cmdPieces[1].Split('|');
+                Commands.Add(new CommandRecognition(cmdPieces[0], cmdVars.Take(cmdVars.Length - 1).ToList()));
+
             }
             var root = "4";
         }
@@ -24,33 +27,14 @@ namespace RecognizerIO.Engines
     class CommandRecognition
     {
         public string RuleId { get; set; }
-        public Dictionary<string, string> Variables = new Dictionary<string, string>();
-        public List<string> SubstitutionIds = new List<string>();
+        public List<string[]> Variables = new List<string[]>();
 
-        public CommandRecognition(SemanticValue cmdMatch, string ruleId)
+        public CommandRecognition(string ruleId, List<string> cmdVars)
         {
             RuleId = ruleId;
-            BuildVariables(cmdMatch);
-        }
-        /// <summary>
-        /// Recurse through result tree to build Variables dictionary
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="root"></param>
-        private void BuildVariables(SemanticValue root)
-        {
-            foreach (var semanticResult in root.ToArray())
+            foreach (var cmdVar in cmdVars)
             {
-                if (semanticResult.Key[0] == 'r')
-                {
-                    Variables[semanticResult.Key] = semanticResult.Value.ToArray().Count() == 0 ? semanticResult.Value.Value.ToString() : "";
-                }
-                // substitution
-                else if (semanticResult.Key[0] == 's')
-                {
-                    SubstitutionIds.Add(semanticResult.Key);
-                }
-                BuildVariables(semanticResult.Value);
+                Variables.Add(cmdVar.Split('='));
             }
         }
     }

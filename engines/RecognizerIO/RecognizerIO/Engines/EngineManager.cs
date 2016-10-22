@@ -29,14 +29,15 @@ namespace RecognizerIO.Engines
         }
 
         void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
-        {
+        {   
             HandleRecognition(e.Result);
         }
 
         public void HandleRecognition(RecognitionResult srResult)
         {
             if (srResult == null || srResult.Confidence <= .9) return;
-            var result = new ProcessedRecognitionResult(srResult.Semantics);
+            var resultText = srResult.Semantics.Value.ToString().Replace("[object Object]", "");
+            var result = new ProcessedRecognitionResult(resultText);
             string serializedResult = JsonConvert.SerializeObject(result);
             Console.WriteLine(serializedResult);
         }

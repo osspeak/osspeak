@@ -4,6 +4,7 @@ import collections
 import tempfile
 import xml.etree.ElementTree as ET
 from sprecgrammars.actions.parser import ActionParser
+from settings import usersettings
 from client import commands
 from sprecgrammars.formats.rules import astree
 from sprecgrammars.formats import RuleParser, SrgsXmlConverter
@@ -18,7 +19,10 @@ class CommandModuleWatcher:
         self.grammar_nodes = collections.defaultdict(self.init_scope_grammars)
 
     def load_command_json(self):
-        for root, dirs, filenames in os.walk(r'C:\Users\evan\modules\OSSpeak\user\commands'):
+        command_dir = usersettings.command_directory()
+        if not os.path.isdir(command_dir):
+            os.makedirs(command_dir)
+        for root, dirs, filenames in os.walk(command_dir):
             for fname in filenames:
                 full_path = os.path.join(root, fname)
                 with open(full_path) as f:
