@@ -73,7 +73,6 @@ class Command:
                 increment += 1
             elif remaining_id in grouping_node.child_ids:
                 child_node = grouping_node.child_ids[remaining_id]
-                print(child_node)
                 if isinstance(child_node, astree.WordNode):
                     assert remaining_id.startswith('s')
                     var_action.children.append(child_node.action_substitute)
@@ -81,9 +80,7 @@ class Command:
                     increment += 1
                     continue
                 remaining_increment = self.bind_variable(bound_variables, semantic_variables, idx)
-                print('test', child_node.action_substitute)
-                child_action = bound_variables[remaining_id] if child_node.action_substitute is None else child_node.action_substitute
-                var_action.children.append(child_action)
+                var_action.children.append(bound_variables[remaining_id])
                 idx += remaining_increment
                 increment += remaining_increment
             else:
