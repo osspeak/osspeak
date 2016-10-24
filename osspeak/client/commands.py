@@ -1,4 +1,5 @@
 import collections
+import itertools
 
 from sprecgrammars.actions.parser import ActionParser
 from sprecgrammars.actions import nodes
@@ -43,59 +44,40 @@ class Command:
 
     def perform_action(self, engine_result):
         # empty variables dict, gets filled based on result
-        grouping_vars = self.rule.grouping_variables.copy()
-        for k in grouping_vars:
-            grouping_vars[k] = None
-        print(grouping_vars)
-        for varid, varval in engine_result['Variables'].items():
-            assert varid in grouping_vars
-            grouping_vars[varid] = varval
-        substitution_ids = set(engine_result['SubstitutionIds'])
-        self.assign_parent_variables(engine_result['Variables'], grouping_vars, substitution_ids)
-        var_list = list(grouping_vars.values())
-        print(var_list[0].children[0].children[0])
+        bound_variables = self.rule.grouping_variables.copy()
+        for k in bound_variables:
+            bound_variables[k] = None
+        i = 0
+        while i < len(engine_result['Variables']):
+            increment = self.bind_variable(bound_variables, engine_result['Variables'], i)
+            i += increment
+        print(engine_result['Variables'], bound_variables)
+        var_list = list(bound_variables.values())
         self.action.perform(var_list)
 
-    def assign_parent_variables(self, result_vars, grouping_vars, substitution_ids):
-        for ruleid in result_vars:
-            if result_vars[ruleid]:
-                continue
-            self.assign_variable(self.rule.grouping_variables[ruleid], result_vars, grouping_vars, substitution_ids)
-
-    def assign_variable(self, grouping, result_vars, grouping_vars, substitution_ids):
-        '''
-        Traverse the grouping tree to assign a text value to all matched
-        groupings. This implementation rests on the
-        assumption that only leaf groupings have matching text information.
-        Groupings that don't match any words and don't
-        have any matching children do not get transmitted by the engine.
-        '''
-        if grouping_vars[grouping.id]:
-            return grouping_vars[grouping.id]
-        variable_action = nodes.RootAction()
-        # grouping is a container of other Rules pieces, meaning only
-        # one child can match for each recognition
-        correct_option = False
-        for child in grouping.children:
-            if isinstance(child, astree.WordNode):
-                if child.id in substitution_ids:
-                    action = child.action_substitute
-                    correct_option = True
-                else:
-                    action = nodes.LiteralKeysAction(child.text)
-                variable_action.children.append(action)
-            elif isinstance(child, astree.GroupingNode):
-                if child.id in result_vars:
-                    correct_option = True
-                    self.assign_variable(child, result_vars, grouping_vars, substitution_ids)
-                    variable_action.children.append(grouping_vars[child.id])
-                else:
-                    assert not correct_option
-            elif isinstance(child, astree.OrNode):
-                if correct_option:
-                    break
-                variable_action.children = []
-        grouping_vars[grouping.id] = variable_action
+    def bind_variable(self, bound_variables, semantic_variables, idx):
+        var_id, var_text = semantic_variables[idx]
+        increment = 1
+        grouping_node = self.rule.grouping_variables.get(var_id)
+        if grouping_node is None:
+            return increment
+        if bound_variables[var_id] is None:
+            bound_variables[var_id] = nodes.RootAction()
+        var_action = bound_variables[var_id]
+        idx += 1
+        while idx < len(semantic_variables):
+            remaining_id, remaining_text = semantic_variables[idx]
+            if remaining_id == 'literal-{}'.format(var_id):
+                var_action.children.append(nodes.LiteralKeysAction(remaining_text))
+                idx += 1
+                increment += 1
+            elif remaining_id in grouping_node.child_ids:
+                remaining_increment = self.bind_variable(bound_variables, semantic_variables, idx)
+                idx += remaining_increment
+                increment += remaining_increment
+            else:
+                break
+        return increment
 
     @property
     def id(self):

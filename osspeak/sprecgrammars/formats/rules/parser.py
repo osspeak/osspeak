@@ -35,6 +35,7 @@ class RuleParser(BaseParser):
         assert len(self.grouping_stack) == 1
         for grouping in self.groupings:
             top_level_rule.grouping_variables[grouping.id] = grouping
+            grouping.child_ids = set((c.id for c in grouping.children))
         return top_level_rule
 
     def parse_word_token(self, tok):

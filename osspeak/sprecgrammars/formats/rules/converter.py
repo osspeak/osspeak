@@ -64,7 +64,7 @@ class SrgsXmlConverter:
         ruleref = ET.Element('ruleref', attrib={'uri': '#{}'.format(ruleid)})
         ruleref_item.append(ruleref)
         tag = ET.Element('tag')
-        tag.text = 'out += "r{}=|" + rules.latest();'.format(ruleid) if text is None else text
+        tag.text = 'out += "{}=|" + rules.latest();'.format(ruleid) if text is None else text
         ruleref_item.append(tag)
         return ruleref_item
 

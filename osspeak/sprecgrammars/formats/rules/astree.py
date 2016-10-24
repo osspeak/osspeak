@@ -61,6 +61,7 @@ class GroupingNode(ASTNode):
         self.repeat_low = 1
         self.repeat_high = 1
         self.action_substitute = None
+        self.child_ids = set()
 
 class VariableNode(ASTNode):
 
