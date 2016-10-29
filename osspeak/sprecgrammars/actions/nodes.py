@@ -67,3 +67,13 @@ class PositionalVariable(Action):
 
     def perform(self, variables):
         variables[self.pos - 1].perform(variables)
+
+class WhitespaceNode(Action):
+
+    def __init__(self, text):
+        self.text = text
+
+class AppendModifierNode(Action):
+
+    def __init__(self):
+        pass

@@ -116,7 +116,7 @@ class ActionParser:
             self.grouping_delimiter_flags[self.action_stack[-1]] = True
 
     def parse_whitespace_token(self, tok):
-        pass
+        return nodes.WhitespaceNode(tok.text)
     
     def parse_underscore_token(self, tok):
-        pass
+        return nodes.AppendModifierNode()

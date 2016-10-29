@@ -78,3 +78,4 @@ class VariableNode(ASTNode):
         parser = RuleParser(self.rule_text, varmap)
         self.rule = parser.parse_as_rule()
         self.rule.is_variable = True
+

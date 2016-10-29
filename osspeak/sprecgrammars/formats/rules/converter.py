@@ -94,12 +94,11 @@ class SrgsXmlConverter:
                 choices[-1].append(rritem)
 
     def add_grouping(self, child, choices):
-        print('butt', child, child.repeat_low, child.repeat_high)
         rule = ET.Element('rule', attrib={'id': child.id})
         self.root.append(rule)
         child_choices = ET.Element('one-of')
         rule.append(child_choices)
-        rritem = self.get_ruleref_item(child.id)
+        rritem = self.get_ruleref_item(child.id, low=child.repeat_low, high=child.repeat_high)
         choices[-1].append(rritem)
         self.fill_choices(child, child_choices)
 
@@ -129,6 +128,7 @@ class SrgsXmlConverter:
             text_tag.text = 'out += "literal-{}={}|";'.format(parent_node.id, parent_elem[-1].text)
 
     def apply_repeat_attrib(self, elem, low, high, low_default=0, high_default=99):
+        print('foo', elem, low, high)
         elem.attrib.pop('repeat', None)
         low = low_default if low is None else low
         high = high_default if high is None else high
