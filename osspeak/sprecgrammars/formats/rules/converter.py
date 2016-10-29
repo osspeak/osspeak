@@ -59,9 +59,10 @@ class SrgsXmlConverter:
         ruleref_container.append(repeat_item)
         return top_level_choices
     
-    def get_ruleref_item(self, ruleid, text=None):
+    def get_ruleref_item(self, ruleid, text=None, low=1, high=1):
         ruleref_item = ET.Element('item')
         ruleref = ET.Element('ruleref', attrib={'uri': '#{}'.format(ruleid)})
+        self.apply_repeat_attrib(ruleref_item, low, high)
         ruleref_item.append(ruleref)
         tag = ET.Element('tag')
         tag.text = 'out += "{}=|" + rules.latest();'.format(ruleid) if text is None else text
@@ -88,10 +89,12 @@ class SrgsXmlConverter:
             elif isinstance(child, astree.GroupingNode):
                 self.add_grouping(child, choices)
             elif isinstance(child, astree.VariableNode):
-                rritem = self.get_ruleref_item(child.rule.id)
+                text = 'out += "{}=|" + rules.latest();'.format(child.rule.id)
+                rritem = self.get_ruleref_item(child.rule.id, text=None, low=child.repeat_low, high=child.repeat_high)
                 choices[-1].append(rritem)
 
     def add_grouping(self, child, choices):
+        print('butt', child, child.repeat_low, child.repeat_high)
         rule = ET.Element('rule', attrib={'id': child.id})
         self.root.append(rule)
         child_choices = ET.Element('one-of')
@@ -106,7 +109,8 @@ class SrgsXmlConverter:
         word_item = ET.Element('item')
         word_item.text = child.text
         rule.append(word_item)
-        rritem = self.get_ruleref_item(child.id)
+        text = 'out += "{}=" + rules.latest() + "|";'.format(child.id)
+        rritem = self.get_ruleref_item(child.id, text=text)
         choices[-1].append(rritem)
 
     def add_text_to_item_elem(self, parent_elem, word_node, parent_node):
@@ -116,16 +120,20 @@ class SrgsXmlConverter:
         (parent_elem[-1] and parent_elem[-1].find('ruleref') is not None) or
         not word_node.is_single):
             parent_elem.append(ET.Element('item'))
-            parent_elem[-1].append(ET.Element('tag'))
+            if not isinstance(parent_node, astree.Rule):
+                parent_elem[-1].append(ET.Element('tag'))
         self.apply_repeat_attrib(parent_elem[-1], word_node.repeat_low, word_node.repeat_high)
         self.append_text(parent_elem[-1], text)
-        text_tag = parent_elem[-1].find('tag')
-        text_tag.text = 'out += "literal-{}={}|";'.format(parent_node.id, parent_elem[-1].text)
+        if not isinstance(parent_node, astree.Rule):
+            text_tag = parent_elem[-1].find('tag')
+            text_tag.text = 'out += "literal-{}={}|";'.format(parent_node.id, parent_elem[-1].text)
 
-    def apply_repeat_attrib(self, elem, low, high):
+    def apply_repeat_attrib(self, elem, low, high, low_default=0, high_default=99):
         elem.attrib.pop('repeat', None)
+        low = low_default if low is None else low
+        high = high_default if high is None else high
         if (low, high) != (1, 1):
-            elem.attrib['repeat'] = '{}-{}'.format(low, high if high else '')
+            elem.attrib['repeat'] = '{}-{}'.format(low, high)
 
     def append_text(self, elem, text):
         elem.text = text if elem.text is None else '{} {}'.format(elem.text, text)

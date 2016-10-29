@@ -1,15 +1,16 @@
 from sprecgrammars import abstokenstream
 from sprecgrammars.actions import tokens
 
-WORD_DELIMITERS = set(['{', '}', '(', ')', ', ', ' ', '\n', '\t', '+', ','])
+WORD_DELIMITERS = set(['{', '}', '(', ')', ',', ' ', '\n', '\t', '+', ','])
 
 class ActionTokenStream(abstokenstream.AbstractTokenStream):
 
     def read_next(self):
-        self.read_while(lambda ch: ch in ' \n\t')
         if self.stream.eof():
             return
         ch = self.stream.peek()
+        if ch in ' \t\n':
+            return self.read_whitespace()
         if ch == "'":
             return self.read_literal()
         if ch in '()':
@@ -22,7 +23,14 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
             return self.read_comma_token()
         if ch == '$':
             return self.read_positional_variable_token()
+        if ch == '_':
+            return self.read_underscore()
+        # self.croak('Invalid character: {}'.format(ch))
         return self.read_word()
+
+    def read_whitespace(self):
+        text = self.read_while(lambda ch: ch in ' \n\t')
+        return tokens.WhitespaceToken(text)
 
     def read_literal(self):
         literal_text = ''
@@ -66,3 +74,8 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         if not position:
             self.croak('Positional variable must have a number')
         return tokens.PositionalVariableToken(int(position) * pos_or_neg_multiplier)
+
+    def read_underscore(self):
+        self.read_while(lambda ch: ch == '_')
+        return tokens.UnderscoreToken()
+        

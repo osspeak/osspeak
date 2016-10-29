@@ -2,6 +2,9 @@ from platforms import api
 
 class Action:
 
+    def __init__(self):
+        pass
+
     def evaluate(self):
         raise NotImplementedError
 
@@ -11,6 +14,7 @@ class Action:
 class RootAction(Action):
 
     def __init__(self):
+        super().__init__()
         self.children = []
 
     def add(self, child):
@@ -35,6 +39,7 @@ class LiteralKeysAction(Action):
 class FunctionCall(Action):
 
     def __init__(self, func_name):
+        super().__init__()
         self.arguments = []
         self.func_name = func_name
 
@@ -44,6 +49,7 @@ class FunctionCall(Action):
 class KeySequence(Action):
 
     def __init__(self):
+        super().__init__()
         self.keys = []
 
     def add(self, node):
@@ -56,6 +62,7 @@ class KeySequence(Action):
 class PositionalVariable(Action):
 
     def __init__(self, pos):
+        super().__init__()
         self.pos = pos
 
     def perform(self, variables):

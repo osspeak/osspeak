@@ -68,6 +68,8 @@ class VariableNode(ASTNode):
     def __init__(self, name, rule_text, varmap):
         super().__init__()
         self.name = name
+        self.repeat_low = 1
+        self.repeat_high = 1
         self.rule_text = rule_text
         self.init_rule(varmap)
 

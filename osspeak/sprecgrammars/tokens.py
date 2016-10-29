@@ -30,7 +30,7 @@ class VariableToken(BaseToken):
 
 class RepetitionToken(BaseToken):
 
-    def __init__(low=0, high=None):
+    def __init__(self, low=0, high=None):
         self.low = low
         self.high = high
 

@@ -17,6 +17,8 @@ class ActionParser:
             tokens.PlusToken: self.parse_plus_sign,
             tokens.CommaToken: self.parse_plus_sign,
             tokens.PositionalVariableToken: self.parse_positional_variable_token,
+            tokens.WhitespaceToken: self.parse_whitespace_token,
+            tokens.UnderscoreToken: self.parse_underscore_token,
         }
 
     def parse(self):
@@ -112,4 +114,9 @@ class ActionParser:
             if self.grouping_delimiter_flags[self.action_stack[-1]]:
                 self.error('foobar')
             self.grouping_delimiter_flags[self.action_stack[-1]] = True
+
+    def parse_whitespace_token(self, tok):
+        pass
     
+    def parse_underscore_token(self, tok):
+        pass

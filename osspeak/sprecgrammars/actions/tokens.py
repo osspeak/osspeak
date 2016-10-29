@@ -35,3 +35,13 @@ class PositionalVariableToken(ActionToken):
 
     def __init__(self, pos):
         self.pos = pos
+
+class UnderscoreToken(ActionToken):
+
+    def __init__(self):
+        pass
+
+class WhitespaceToken(ActionToken):
+
+    def __init__(self, text):
+        self.text = text

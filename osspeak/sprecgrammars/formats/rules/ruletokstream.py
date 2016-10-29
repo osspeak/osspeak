@@ -8,7 +8,7 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
         if self.stream.eof():
             return
         ch = self.stream.peek()
-        if ch.isalpha():
+        if ch.isalnum():
             return self.read_word()
         if ch == '|':
             return self.read_ortoken()
@@ -28,7 +28,7 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
         return self.read_while(lambda ch: ch in ' \n\t')
 
     def read_word(self):
-        val = self.read_while(lambda ch: ch.isalpha())
+        val = self.read_while(lambda ch: ch.isalnum())
         return tokens.WordToken(val)
 
     def read_ortoken(self):

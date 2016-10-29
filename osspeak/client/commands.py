@@ -84,7 +84,6 @@ class Command:
                 idx += remaining_increment
                 increment += remaining_increment
             else:
-                assert 0
                 break
         if grouping_node.action_substitute is not None:
             bound_variables[var_id] = grouping_node.action_substitute
