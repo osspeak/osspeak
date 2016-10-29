@@ -3,9 +3,14 @@ from platforms import api
 class Action:
 
     def __init__(self):
-        pass
+        # 
+        self.modifiers = []
 
-    def evaluate(self):
+    def evaluate(self, variables):
+        print(type(self))
+        raise NotImplementedError
+
+    def perform(self, variables):
         raise NotImplementedError
 
     def add(self, *a, **k):
@@ -33,7 +38,7 @@ class LiteralKeysAction(Action):
     def perform(self, variables):
         api.type_literal(self.text)
 
-    def evaluate(self):
+    def evaluate(self, variables):
         return self.text
 
 class FunctionCall(Action):
@@ -56,7 +61,7 @@ class KeySequence(Action):
         self.keys.append(node)
 
     def perform(self, variables):
-        keypresses = [node.evaluate() for node in self.keys]
+        keypresses = [node.evaluate(variables) for node in self.keys]
         api.type_keypresses(keypresses)
 
 class PositionalVariable(Action):
@@ -65,15 +70,20 @@ class PositionalVariable(Action):
         super().__init__()
         self.pos = pos
 
+    def evaluate(self, variables):
+        return variables[self.pos - 1].evaluate(variables)
+
     def perform(self, variables):
         variables[self.pos - 1].perform(variables)
 
 class WhitespaceNode(Action):
 
     def __init__(self, text):
+        super().__init__()
         self.text = text
 
-class AppendModifierNode(Action):
+    def evaluate(self, variables):
+        pass
 
-    def __init__(self):
+    def perform(self, variables):
         pass

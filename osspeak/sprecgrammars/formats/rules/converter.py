@@ -128,7 +128,6 @@ class SrgsXmlConverter:
             text_tag.text = 'out += "literal-{}={}|";'.format(parent_node.id, parent_elem[-1].text)
 
     def apply_repeat_attrib(self, elem, low, high, low_default=0, high_default=99):
-        print('foo', elem, low, high)
         elem.attrib.pop('repeat', None)
         low = low_default if low is None else low
         high = high_default if high is None else high
