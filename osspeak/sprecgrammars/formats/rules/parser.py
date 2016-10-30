@@ -65,7 +65,6 @@ class RuleParser(BaseParser):
             self.maybe_pop_top_grouping()
 
     def parse_repetition_token(self, tok):
-        print('rep', tok, tok.low, tok.high)
         if not self.top.open:
             repeated_node = self.top
         elif self.top.children:
@@ -74,7 +73,6 @@ class RuleParser(BaseParser):
             self.croak('Invalid repetition')
         repeated_node.repeat_low = tok.low
         repeated_node.repeat_high = tok.high
-        print(repeated_node.repeat_low, repeated_node.repeat_high)
 
     def parse_action_substitute_token(self, tok):
         if self.top.open:

@@ -63,8 +63,15 @@ class Command:
             return increment
         if bound_variables[var_id] is None:
             bound_variables[var_id] = nodes.RootAction()
+        increment += self.bind_child_variables(idx, var_id, bound_variables, semantic_variables, grouping_node)
+        if grouping_node.action_substitute is not None:
+            bound_variables[var_id] = grouping_node.action_substitute
+        return increment
+
+    def bind_child_variables(self, idx, var_id, bound_variables, semantic_variables, grouping_node):
         var_action = bound_variables[var_id]
         idx += 1
+        increment = 0
         while idx < len(semantic_variables):
             remaining_id, remaining_text = semantic_variables[idx]
             if remaining_id == 'literal-{}'.format(var_id):
@@ -85,8 +92,6 @@ class Command:
                 increment += remaining_increment
             else:
                 break
-        if grouping_node.action_substitute is not None:
-            bound_variables[var_id] = grouping_node.action_substitute
         return increment
 
     @property

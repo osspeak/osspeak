@@ -1,9 +1,10 @@
 import subprocess
 import threading
 import json
+import sys
 import xml.etree.ElementTree as ET
 
-ENGINE_PATH = r'C:\Users\evan\modules\OSSpeak\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.exe'
+ENGINE_PATH = r'engines\wsr\RecognizerIO.exe' if getattr(sys, 'frozen', False) else r'..\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.exe'
 
 class ProcessManager:
 

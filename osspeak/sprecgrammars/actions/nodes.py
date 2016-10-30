@@ -3,11 +3,10 @@ from platforms import api
 class Action:
 
     def __init__(self):
-        # 
+        # what follows an underscore, ie {left_2_down}
         self.modifiers = []
 
     def evaluate(self, variables):
-        print(type(self))
         raise NotImplementedError
 
     def perform(self, variables):
@@ -15,6 +14,24 @@ class Action:
 
     def add(self, *a, **k):
         raise NotImplementedError
+
+    def error(self, msg):
+        raise RuntimeError(msg)
+
+    def apply_modifiers(self, variables):
+        applied_modifiers = {}
+        evaluated_modifiers = [action.evaluate(variables) for action in self.modifiers]
+        for modifier in evaluated_modifiers:
+            if modifier.isdigit():
+                if 'repeat' in applied_modifiers:
+                    self.error('multiple nums')
+                applied_modifiers['repeat'] = int(modifier)
+            else:
+                if 'direction' in applied_modifiers:
+                    self.error('multiple nums')
+                applied_modifiers['direction'] = modifier
+        return applied_modifiers
+
 
 class RootAction(Action):
 
@@ -24,6 +41,9 @@ class RootAction(Action):
 
     def add(self, child):
         self.children.append(child)
+
+    def evaluate(self, variables):
+        return ''.join((child.evaluate(variables) for child in self.children))
 
     def perform(self, variables):
         for subaction in self.children:
@@ -61,7 +81,8 @@ class KeySequence(Action):
         self.keys.append(node)
 
     def perform(self, variables):
-        keypresses = [node.evaluate(variables) for node in self.keys]
+        modifiers = self.apply_modifiers(variables)
+        keypresses = [node.evaluate(variables) for node in self.keys] * modifiers.get('repeat', 1)
         api.type_keypresses(keypresses)
 
 class PositionalVariable(Action):
@@ -71,10 +92,13 @@ class PositionalVariable(Action):
         self.pos = pos
 
     def evaluate(self, variables):
-        return variables[self.pos - 1].evaluate(variables)
+        var = variables[self.pos - 1]
+        return '' if var is None else var.evaluate(variables)
 
     def perform(self, variables):
-        variables[self.pos - 1].perform(variables)
+        var = variables[self.pos - 1]
+        if var is not None:
+            var.perform(variables)
 
 class WhitespaceNode(Action):
 
