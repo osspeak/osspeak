@@ -33,8 +33,10 @@ class ActionParser:
     def parse_substitute_action(self):
         self.init_grouped_action_stack()
         for tok in self.stream:
-           self.parse_map[type(tok)](tok)
-           break
+            tok_type = type(tok)
+            self.parse_map[tok_type](tok)
+            if tok_type is not tokens.WhitespaceToken:
+                break
         return self.grouped_action_stack[0]
 
     def init_grouped_action_stack(self):

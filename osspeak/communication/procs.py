@@ -4,7 +4,10 @@ import json
 import sys
 import xml.etree.ElementTree as ET
 
-ENGINE_PATH = r'engines\wsr\RecognizerIO.exe' if getattr(sys, 'frozen', False) else r'..\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.exe'
+if getattr(sys, 'frozen', False):
+    ENGINE_PATH = r'engines\wsr\RecognizerIO.exe'
+else:
+    ENGINE_PATH = r'..\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.exe'
 
 class ProcessManager:
 
