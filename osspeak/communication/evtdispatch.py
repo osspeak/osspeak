@@ -18,6 +18,7 @@ class EventDispatcher:
         self.cmd_module_watcher.load_command_json()
         self.cmd_module_watcher.create_rule_grammar_nodes()
         self.cmd_module_watcher.create_grammar_nodes()
+        self.cmd_module_watcher.load_functions()
         self.cmd_module_watcher.serialize_scope_xml(None)
 
     def main_loop(self):

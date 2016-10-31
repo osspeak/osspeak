@@ -3,6 +3,7 @@ import itertools
 
 from sprecgrammars.actions.parser import ActionParser
 from sprecgrammars.actions import nodes
+from sprecgrammars.functions.parser import FunctionDefinitionParser
 from client import commands
 from sprecgrammars.formats.rules import astree
 from sprecgrammars.formats import RuleParser, SrgsXmlConverter
@@ -11,6 +12,7 @@ class CommandModule:
 
     def __init__(self, config):
         self.config = config
+        self.functions = []
         self.commands = []
         self.variables = []
 
@@ -24,6 +26,13 @@ class CommandModule:
             var = astree.VariableNode(varname, rule_text, varmap)
             varmap[varname] = var
             self.variables.append(var)
+
+    def load_functions(self, funcmap):
+        for func_signature, func_action_text in self.config['Functions']:
+            fparser = FunctionDefinitionParser(func_signature)
+            func = fparser.parse()
+            funcmap[func.name] = func
+            self.functions.append(func)
 
 class Command:
     

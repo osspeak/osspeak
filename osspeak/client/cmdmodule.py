@@ -48,10 +48,17 @@ class CommandModuleWatcher:
             for var in cmd_module.variables:
                 grammar.variables.append(var)
 
+    def load_functions(self):
+        for path, cmd_module in self.cmd_modules.items():
+            scope = cmd_module.config.get('scope')
+            scope_info = self.grammar_nodes[scope]
+            cmd_module.load_functions(scope_info['functions'])          
+
     def init_scope_grammars(self):
         return {
             'main grammar': {'node': astree.GrammarNode(), 'xml': None},
             'variables': {},
+            'functions': {},
         }
 
     def build_srgs_xml_grammar(self, scope):

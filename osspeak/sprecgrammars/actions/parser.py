@@ -17,7 +17,7 @@ class ActionParser:
             tokens.ParenToken: self.parse_paren,
             tokens.BraceToken: self.parse_curly_brace,
             tokens.PlusToken: self.parse_plus_sign,
-            tokens.CommaToken: self.parse_plus_sign,
+            tokens.CommaToken: self.parse_comma_token,
             tokens.PositionalVariableToken: self.parse_positional_variable_token,
             tokens.WhitespaceToken: self.parse_whitespace_token,
             tokens.UnderscoreToken: self.parse_underscore_token,
