@@ -36,6 +36,11 @@ class PositionalVariableToken(ActionToken):
     def __init__(self, pos):
         self.pos = pos
 
+class NamedVariableToken(ActionToken):
+
+    def __init__(self, name):
+        self.name = name
+
 class UnderscoreToken(ActionToken):
 
     def __init__(self):

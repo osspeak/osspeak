@@ -5,8 +5,9 @@ from platforms.actions import mappings
 
 class ActionParser:
 
-    def __init__(self, text):
+    def __init__(self, text, defined_functions=None):
         self.stream = actionstream.ActionTokenStream(text)
+        self.defined_functions = {} if defined_functions is None else defined_functions
         self.grouped_action_stack = []
         self.grouping_delimiter_flags = {}
         self.append_modifier_flag = False
@@ -19,6 +20,7 @@ class ActionParser:
             tokens.PlusToken: self.parse_plus_sign,
             tokens.CommaToken: self.parse_comma_token,
             tokens.PositionalVariableToken: self.parse_positional_variable_token,
+            tokens.NamedVariableToken: self.parse_named_variable_token,
             tokens.WhitespaceToken: self.parse_whitespace_token,
             tokens.UnderscoreToken: self.parse_underscore_token,
         }
@@ -44,12 +46,13 @@ class ActionParser:
         self.grouped_action_stack = [root_action]
 
     def parse_word_token(self, tok):
-        if tok.text not in mappings.action_names:
+        if tok.text not in self.defined_functions:
             return self.parse_literal_token(tok)
         self.parse_function(tok.text)
 
     def parse_function(self, func_name):
         func = nodes.FunctionCall(func_name)
+        func.definition = self.defined_functions[func_name]
         self.add_action(func, grouped=True)
         next_token = self.peek()
         if not isinstance(next_token, tokens.ParenToken) or not next_token.is_open:
@@ -98,6 +101,10 @@ class ActionParser:
 
     def parse_positional_variable_token(self, tok):
         var_action = nodes.PositionalVariable(tok.pos)
+        self.add_action(var_action)
+
+    def parse_named_variable_token(self, tok):
+        var_action = nodes.Argument(tok.name)
         self.add_action(var_action)
         
     def parse_literal_token(self, tok):

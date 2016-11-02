@@ -22,7 +22,7 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         if ch == ',':
             return self.read_comma_token()
         if ch == '$':
-            return self.read_positional_variable_token()
+            return self.read_variable_token()
         if ch == '_':
             return self.read_underscore()
         # self.croak('Invalid character: {}'.format(ch))
@@ -64,8 +64,14 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         self.stream.next()
         return tokens.CommaToken()
 
-    def read_positional_variable_token(self):
+    def read_variable_token(self):
         self.stream.next()
+        ch = self.stream.peek()
+        if ch.isdigit() or ch == '-':
+            return self.read_positional_variable_token()
+        return self.read_named_variable_token()
+
+    def read_positional_variable_token(self):
         pos_or_neg_multiplier = 1
         if self.stream.peek() == '-':
             self.stream.next()
@@ -74,6 +80,12 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         if not position:
             self.croak('Positional variable must have a number')
         return tokens.PositionalVariableToken(int(position) * pos_or_neg_multiplier)
+
+    def read_named_variable_token(self):
+        if self.stream.eof() or not self.stream.peek().isalpha():
+            self.stream.croak()
+        name = self.read_while(lambda ch: ch.isalnum())
+        return tokens.NamedVariableToken(name)
 
     def read_underscore(self):
         self.read_while(lambda ch: ch == '_')

@@ -31,28 +31,28 @@ class CommandModuleWatcher:
 
     def create_grammar_nodes(self):
         for path, cmd_module in self.cmd_modules.items():
-            scope = cmd_module.config.get('scope')
-            scope_info = self.grammar_nodes[scope]
-            cmd_module.load_commands(scope_info['variables'])
-            grammar = scope_info['main grammar']['node']
+            scope_name = cmd_module.config.get('scope')
+            scope = self.grammar_nodes[scope_name]
+            cmd_module.load_commands(scope)
+            grammar = scope['main grammar']['node']
             for cmd in cmd_module.commands:
                 grammar.rules.append(cmd.rule)
                 self.command_map[cmd.id] = cmd
 
     def create_rule_grammar_nodes(self):
         for path, cmd_module in self.cmd_modules.items():
-            scope = cmd_module.config.get('scope')
-            scope_info = self.grammar_nodes[scope]
-            cmd_module.load_variables(scope_info['variables'])
-            grammar = scope_info['main grammar']['node']
+            scope_name = cmd_module.config.get('scope')
+            scope = self.grammar_nodes[scope_name]
+            cmd_module.load_variables(scope)
+            grammar = scope['main grammar']['node']
             for var in cmd_module.variables:
                 grammar.variables.append(var)
 
     def load_functions(self):
         for path, cmd_module in self.cmd_modules.items():
-            scope = cmd_module.config.get('scope')
-            scope_info = self.grammar_nodes[scope]
-            cmd_module.load_functions(scope_info['functions'])          
+            scope_name = cmd_module.config.get('scope')
+            scope = self.grammar_nodes[scope_name]
+            cmd_module.load_functions(scope)          
 
     def init_scope_grammars(self):
         return {

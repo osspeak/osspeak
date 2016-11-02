@@ -18,7 +18,6 @@ class FunctionDefinitionParser:
         for tok in self.stream:
             tok_type = type(tok)
             self.parse_map[tok_type](tok)
-        print(self.function)
         return self.function
 
     def parse_default_action_token(self, tok):

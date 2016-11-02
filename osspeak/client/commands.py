@@ -16,28 +16,32 @@ class CommandModule:
         self.commands = []
         self.variables = []
 
-    def load_commands(self, varmap):
+    def load_commands(self, scope):
         for rule_text, action_text in self.config['Commands']:
-            cmd = Command(rule_text, action_text, variables=varmap)
+            cmd = Command(rule_text, action_text, scope=scope)
             self.commands.append(cmd)
 
-    def load_variables(self, varmap):
+    def load_variables(self, scope):
         for varname, rule_text in self.config['Variables']:
-            var = astree.VariableNode(varname, rule_text, varmap)
-            varmap[varname] = var
+            var = astree.VariableNode(varname, rule_text, scope['variables'])
+            scope['variables'][varname] = var
             self.variables.append(var)
 
-    def load_functions(self, funcmap):
-        for func_signature, func_action_text in self.config['Functions']:
+    def load_functions(self, scope):
+        for func_signature, func_text in self.config['Functions']:
             fparser = FunctionDefinitionParser(func_signature)
             func = fparser.parse()
-            funcmap[func.name] = func
+            action_parser = ActionParser(func_text, defined_functions=scope['functions'])
+            func.action = action_parser.parse()
+            scope['functions'][func.name] = func
             self.functions.append(func)
 
 class Command:
     
-    def __init__(self, rule_text, action_text, variables=None):
-        self.variables = variables
+    def __init__(self, rule_text, action_text, scope=None):
+        self.scope = {} if scope is None else scope
+        self.variables = self.scope.get('variables', {})
+        self.functions = self.scope.get('functions', {})
         self.init_rule(rule_text)
         self.init_action(action_text)
 
@@ -48,14 +52,12 @@ class Command:
 
     def init_action(self, action_text):
         self.action_text = action_text
-        parser = ActionParser(self.action_text)
+        parser = ActionParser(self.action_text, defined_functions=self.functions)
         self.action = parser.parse()
 
     def perform_action(self, engine_result):
         # empty variables dict, gets filled based on result
-        bound_variables = self.rule.grouping_variables.copy()
-        for k in bound_variables:
-            bound_variables[k] = None
+        bound_variables = self.rule.grouping_variables_empty.copy()
         i = 0
         while i < len(engine_result['Variables']):
             increment = self.bind_variable(bound_variables, engine_result['Variables'], i)

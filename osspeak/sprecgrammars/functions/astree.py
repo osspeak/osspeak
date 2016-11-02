@@ -8,6 +8,7 @@ class FunctionDefinition(FunctionDefinitionBase):
         self.parameters = []
         self.args_name = None
         self.kwargs_name = None
+        self.action = None
 
 class FunctionParameter(FunctionDefinitionBase):
     

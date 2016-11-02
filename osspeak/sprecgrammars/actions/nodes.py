@@ -42,12 +42,12 @@ class RootAction(Action):
     def add(self, child):
         self.children.append(child)
 
-    def evaluate(self, variables):
-        return ''.join((child.evaluate(variables) for child in self.children))
+    def evaluate(self, variables, arguments=None):
+        return ''.join((child.evaluate(variables, arguments=arguments) for child in self.children))
 
-    def perform(self, variables):
+    def perform(self, variables, arguments=None):
         for subaction in self.children:
-            subaction.perform(variables)
+            subaction.perform(variables, arguments=arguments)
 
 class LiteralKeysAction(Action):
     
@@ -55,10 +55,10 @@ class LiteralKeysAction(Action):
         super().__init__()
         self.text = text
 
-    def perform(self, variables):
+    def perform(self, variables, arguments=None):
         api.type_literal(self.text)
 
-    def evaluate(self, variables):
+    def evaluate(self, variables, arguments=None):
         return self.text
 
 class FunctionCall(Action):
@@ -67,9 +67,24 @@ class FunctionCall(Action):
         super().__init__()
         self.arguments = []
         self.func_name = func_name
+        self.definition = None
 
     def add(self, node):
         self.arguments.append(node)
+
+    def get_arguments(self, variables, arguments):
+        args = {}
+        for (param, arg) in zip(self.definition.parameters, self.arguments):
+            args[param.name] = arg.evaluate(variables, arguments)
+        return args
+
+    def perform(self, variables, arguments=None):
+        args = self.get_arguments(variables, arguments)
+        self.definition.action.perform(variables, args)
+
+    def evaluate(self, variables, arguments=None):
+        args = self.get_arguments(variables, arguments)
+        return self.definition.action.evaluate(variables, args)
 
 class KeySequence(Action):
 
@@ -80,9 +95,9 @@ class KeySequence(Action):
     def add(self, node):
         self.keys.append(node)
 
-    def perform(self, variables):
+    def perform(self, variables, arguments=None):
         modifiers = self.apply_modifiers(variables)
-        keypresses = [node.evaluate(variables) for node in self.keys] * modifiers.get('repeat', 1)
+        keypresses = [node.evaluate(variables, arguments) for node in self.keys] * modifiers.get('repeat', 1)
         api.type_keypresses(keypresses)
 
 class PositionalVariable(Action):
@@ -91,11 +106,11 @@ class PositionalVariable(Action):
         super().__init__()
         self.pos = pos
 
-    def evaluate(self, variables):
+    def evaluate(self, variables, arguments=None):
         var = variables[self.pos - 1]
-        return '' if var is None else var.evaluate(variables)
+        return '' if var is None else var.evaluate(variables, arguments)
 
-    def perform(self, variables):
+    def perform(self, variables, arguments=None):
         var = variables[self.pos - 1]
         if var is not None:
             var.perform(variables)
@@ -106,8 +121,25 @@ class WhitespaceNode(Action):
         super().__init__()
         self.text = text
 
-    def evaluate(self, variables):
+    def evaluate(self, variables, arguments=None):
         pass
 
-    def perform(self, variables):
+    def perform(self, variables, arguments=None):
         pass
+
+class Argument(Action):
+
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
+
+    def evaluate(self, variables, arguments=None):
+        arguments = {} if arguments is None else arguments
+        return arguments.get(self.name, '')
+
+    def perform(self, variables, arguments=None):
+        print('perform', variables, arguments, self.name)
+        arguments = {} if arguments is None else arguments
+        # TODO: add function calls, probably needs extra work
+        action = arguments.get(self.name, '')
+        api.type_literal(action)

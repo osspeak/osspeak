@@ -35,6 +35,7 @@ class RuleParser(BaseParser):
         assert len(self.grouping_stack) == 1
         for grouping in self.groupings:
             top_level_rule.grouping_variables[grouping.id] = grouping
+            top_level_rule.grouping_variables_empty[grouping.id] = None
             grouping.child_ids = {c.id: c for c in grouping.children}
         return top_level_rule
 
