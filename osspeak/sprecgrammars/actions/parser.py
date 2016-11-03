@@ -71,6 +71,7 @@ class ActionParser:
         self.pop_grouped_action()
 
     def pop_grouped_action(self):
+        print(self.grouped_action_stack)
         if len(self.grouped_action_stack) < 2:
             self.error('too many closing arens')
         self.action_to_modify = self.grouped_action_stack.pop()        
@@ -122,16 +123,6 @@ class ActionParser:
             self.grouped_action_stack.append(action)
             self.grouping_delimiter_flags[action] = False
         self.action_to_modify = action 
-
-    # def add_single_action(self, action):
-    #     self.set_delimiter_flag()
-    #     self.grouped_action_stack[-1].add(action)
-
-    # def add_grouped_action(self, action):
-    #     self.set_delimiter_flag()
-    #     self.grouped_action_stack[-1].add(action)
-    #     self.grouped_action_stack.append(action)
-    #     self.grouping_delimiter_flags[action] = False
 
     def set_delimiter_flag(self):
         # if top level action is expecting a delimiter (, or +), raise an error

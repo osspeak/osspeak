@@ -45,10 +45,7 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         return tokens.LiteralToken(literal_text)
 
     def read_word(self):
-        literal_text = ''
-        while not self.stream.eof() and self.stream.peek() not in WORD_DELIMITERS:
-            literal_text += self.stream.next()
-        return tokens.WordToken(literal_text)
+        return tokens.WordToken(self._read_word())
 
     def read_paren_token(self):
         return tokens.ParenToken(self.stream.next())

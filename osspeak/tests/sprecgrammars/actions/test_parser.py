@@ -2,13 +2,23 @@ import os
 import unittest
 
 from sprecgrammars.actions import nodes, tokens, parser
+from sprecgrammars import api
 from tests.sprecgrammars.actions import strings
 
 class TestActionParser(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        cls.function_definitions = {}
+        defs = {
+            'mouse.click()': '' 
+        }
+        for sig, action in defs.items():
+            func_def = api.func_definition(sig, action)
+            cls.function_definitions[func_def.name] = func_def
+
     def parse_action_string(self, action_string):
-        action_parser = parser.ActionParser(action_string)
-        action = action_parser.parse()
+        action = api.action(action_string, self.function_definitions)
         self.assertIsInstance(action, nodes.RootAction)
         return action
 

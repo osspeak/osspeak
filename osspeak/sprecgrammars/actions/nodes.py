@@ -113,7 +113,7 @@ class PositionalVariable(Action):
     def perform(self, variables, arguments=None):
         var = variables[self.pos - 1]
         if var is not None:
-            var.perform(variables)
+            var.perform(variables, arguments)
 
 class WhitespaceNode(Action):
 

@@ -7,6 +7,7 @@ import json
 import getpass
 import requests
 import zipfile
+import argparse
 import io
 import tempfile
 import time
@@ -31,13 +32,20 @@ UPLOAD_URL = 'https://github.com/api/uploads/repos/osspeak/osspeak/releases'
 
 
 def main():
+    cl_args = parse_cl_args()
     tests_passed = run_tests()
     if not tests_passed:
         print('Unit test(s) failed')
         return
-    # build_osspeak()
-    create_github_release()
-    # build_gui()
+    build_osspeak()
+    build_gui()
+    if cl_args.release:
+        create_github_release()
+
+def parse_cl_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--release', action='store_true')
+    return parser.parse_args()
 
 def build_gui():
     start_dir = os.getcwd()

@@ -1,0 +1,8 @@
+C:\Users\evan\modules\OSSpeak\engines\RecognizerIO\RecognizerIO\bin\Release\RecognizerIO.exe.config
+C:\Users\evan\modules\OSSpeak\engines\RecognizerIO\RecognizerIO\bin\Release\RecognizerIO.exe
+C:\Users\evan\modules\OSSpeak\engines\RecognizerIO\RecognizerIO\bin\Release\RecognizerIO.pdb
+C:\Users\evan\modules\OSSpeak\engines\RecognizerIO\RecognizerIO\bin\Release\Newtonsoft.Json.dll
+C:\Users\evan\modules\OSSpeak\engines\RecognizerIO\RecognizerIO\bin\Release\Newtonsoft.Json.xml
+C:\Users\evan\modules\OSSpeak\engines\RecognizerIO\RecognizerIO\obj\Release\RecognizerIO.csprojResolveAssemblyReference.cache
+C:\Users\evan\modules\OSSpeak\engines\RecognizerIO\RecognizerIO\obj\Release\RecognizerIO.exe
+C:\Users\evan\modules\OSSpeak\engines\RecognizerIO\RecognizerIO\obj\Release\RecognizerIO.pdb

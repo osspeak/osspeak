@@ -17,7 +17,7 @@ class TestFunctionParser(unittest.TestCase):
         self.assertEqual(func.name, 'foo')
         self.assertEqual(func.parameters, [])
 
-    def test_positiional_params(self):
+    def test_positional_params(self):
         func = self.parse_function_string(strings.POSITIONAL_PARAMS)
         self.assertEqual(func.name, 'funcName')
         self.assertEqual(len(func.parameters), 2)
