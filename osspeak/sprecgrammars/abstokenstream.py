@@ -1,7 +1,7 @@
 from sprecgrammars import inputstream
 import re
 
-WORD_DELIMITERS = set(['{', '}', '(', ')', ',', ' ', '\n', '\t', '+', ','])
+WORD_DELIMITERS = set(['{', '}', '(', ')', ',', ' ', '\n', '\t', '+', ',', '|'])
 
 class AbstractTokenStream:
 

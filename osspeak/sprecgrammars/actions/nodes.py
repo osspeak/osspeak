@@ -108,12 +108,16 @@ class PositionalVariable(Action):
 
     def evaluate(self, variables, arguments=None):
         var = variables[self.pos - 1]
-        return '' if var is None else var.evaluate(variables, arguments)
+        modifiers = self.apply_modifiers(variables)
+        result = '' if var is None else var.evaluate(variables, arguments)
+        return result * modifiers.get('repeat', 1)
 
     def perform(self, variables, arguments=None):
         var = variables[self.pos - 1]
+        modifiers = self.apply_modifiers(variables)
         if var is not None:
-            var.perform(variables, arguments)
+            for i in range(modifiers.get('repeat', 1)):
+                var.perform(variables, arguments)
 
 class WhitespaceNode(Action):
 
