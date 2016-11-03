@@ -102,12 +102,7 @@ def run_tests():
     return result.wasSuccessful()
 
 def upload_release_folder(upload_url, auth, zip_name='windows-cli.zip'):
-    fd, fname = tempfile.mkstemp(suffix='.zip')
-    shutil.make_archive(fname[:-4], root_dir='dist', format='zip')
-    with open(fname, 'rb') as f:
-        zip_bytes = f.read()
-    os.close(fd)
-    os.remove(fname)
+    zip_bytes = write_release_zip()
     headers = {
         'Content-Type': 'application/zip',
         'name': 'windows-cli.zip'
@@ -118,6 +113,15 @@ def upload_release_folder(upload_url, auth, zip_name='windows-cli.zip'):
         auth=auth,
         headers=headers
     )
+
+def write_release_zip():
+    fd, fname = tempfile.mkstemp(suffix='.zip')
+    shutil.make_archive(fname[:-4], root_dir='dist', format='zip')
+    with open(fname, 'rb') as f:
+        zip_bytes = f.read()
+    os.close(fd)
+    os.remove(fname)
+    return zip_bytes
 
 if __name__ == '__main__':
     main()
