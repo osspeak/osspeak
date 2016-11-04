@@ -1,3 +1,5 @@
+import copy
+
 from sprecgrammars import tokens
 from sprecgrammars.formats.baseparser import BaseParser
 from sprecgrammars.formats.rules import ruletokstream, astree
@@ -51,7 +53,7 @@ class RuleParser(BaseParser):
 
     def parse_variable_token(self, tok):
         self.maybe_pop_top_grouping()
-        var_node = self.variables[tok.name]
+        var_node = copy.copy(self.variables[tok.name])
         self.groupings.extend(list(var_node.rule.grouping_variables.values()))
         self.top.children.append(var_node)
 

@@ -35,7 +35,7 @@ namespace RecognizerIO.Engines
 
         public void HandleRecognition(RecognitionResult srResult)
         {
-            if (srResult == null || srResult.Confidence <= .9) return;
+            if (srResult == null || srResult.Confidence <= .5) return;
             var resultText = srResult.Semantics.Value.ToString().Replace("[object Object]", "");
             var result = new ProcessedRecognitionResult(resultText);
             string serializedResult = JsonConvert.SerializeObject(result);
