@@ -1,3 +1,5 @@
+import types
+
 from platforms import api
 
 class Action:
@@ -79,8 +81,12 @@ class FunctionCall(Action):
         return args
 
     def perform(self, variables, arguments=None):
-        args = self.get_arguments(variables, arguments)
-        self.definition.action.perform(variables, args)
+        if isinstance(self.definition, types.FunctionType):
+            args = [a.evaluate(variables, arguments) for a in self.arguments]
+            self.definition(*args)
+        else:
+            args = self.get_arguments(variables, arguments)
+            self.definition.action.perform(variables, args)
 
     def evaluate(self, variables, arguments=None):
         args = self.get_arguments(variables, arguments)
@@ -142,7 +148,6 @@ class Argument(Action):
         return arguments.get(self.name, '')
 
     def perform(self, variables, arguments=None):
-        print('perform', variables, arguments, self.name)
         arguments = {} if arguments is None else arguments
         # TODO: add function calls, probably needs extra work
         action = arguments.get(self.name, '')

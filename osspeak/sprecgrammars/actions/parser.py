@@ -1,6 +1,7 @@
 from sprecgrammars.formats.baseparser import BaseParser
 from sprecgrammars.actions import actionstream, nodes
 from sprecgrammars.actions import tokens
+from sprecgrammars.functions import library
 from platforms.actions import mappings
 
 class ActionParser:
@@ -46,13 +47,16 @@ class ActionParser:
         self.grouped_action_stack = [root_action]
 
     def parse_word_token(self, tok):
-        if tok.text not in self.defined_functions:
+        if tok.text in library.builtin_functions:
+            self.parse_function(tok.text, library.builtin_functions[tok.text]) 
+        elif tok.text in self.defined_functions:
+            self.parse_function(tok.text, self.defined_functions[tok.text]) 
+        else:
             return self.parse_literal_token(tok)
-        self.parse_function(tok.text)
 
-    def parse_function(self, func_name):
+    def parse_function(self, func_name, definition):
         func = nodes.FunctionCall(func_name)
-        func.definition = self.defined_functions[func_name]
+        func.definition = definition
         self.add_action(func, grouped=True)
         next_token = self.peek()
         if not isinstance(next_token, tokens.ParenToken) or not next_token.is_open:

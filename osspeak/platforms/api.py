@@ -23,7 +23,7 @@ def maximize_active_window():
 def transcribe_line(key_inputs, delay, direction):
     platform.transcribe_line(key_inputs, delay, direction)
 
-def mouse_click(button, direction, number):
+def mouse_click(button='left', direction='both', number=1):
 	platform.mouse_click(button, direction, number)
 
 def mouse_move(x, y, relative):

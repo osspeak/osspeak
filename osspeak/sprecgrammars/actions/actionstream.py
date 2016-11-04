@@ -45,7 +45,8 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         return tokens.LiteralToken(literal_text)
 
     def read_word(self):
-        return tokens.WordToken(self._read_word())
+        text = self._read_word()
+        return tokens.WordToken(text)
 
     def read_paren_token(self):
         return tokens.ParenToken(self.stream.next())
