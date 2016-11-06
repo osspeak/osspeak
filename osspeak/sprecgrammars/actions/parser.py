@@ -75,7 +75,6 @@ class ActionParser:
         self.pop_grouped_action()
 
     def pop_grouped_action(self):
-        print(self.grouped_action_stack)
         if len(self.grouped_action_stack) < 2:
             self.error('too many closing arens')
         self.action_to_modify = self.grouped_action_stack.pop()        

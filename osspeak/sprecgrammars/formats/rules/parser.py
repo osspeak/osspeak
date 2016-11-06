@@ -38,8 +38,17 @@ class RuleParser(BaseParser):
         for grouping in self.groupings:
             top_level_rule.grouping_variables[grouping.id] = grouping
             top_level_rule.grouping_variables_empty[grouping.id] = None
-            grouping.child_ids = {c.id: c for c in grouping.children}
+            grouping.child_ids = self.build_child_ids(grouping)
+            # grouping.child_ids = {c.id: c if isinstance(c, astree.VariableNode) else c.rule.id: c for c in grouping.children}
         return top_level_rule
+
+    def build_child_ids(self, grouping):
+        child_ids = {}
+        for child in grouping.children:
+            # node = child.rule if isinstance(child, astree.VariableNode) else child
+            node = child
+            child_ids[node.id] = node
+        return child_ids
 
     def parse_word_token(self, tok):
         self.maybe_pop_top_grouping()
@@ -53,7 +62,9 @@ class RuleParser(BaseParser):
 
     def parse_variable_token(self, tok):
         self.maybe_pop_top_grouping()
+        # want a copy to avoid mutating original, ie repeat
         var_node = copy.copy(self.variables[tok.name])
+        var_node._id = self.variables[tok.name]._id
         self.groupings.extend(list(var_node.rule.grouping_variables.values()))
         self.top.children.append(var_node)
 

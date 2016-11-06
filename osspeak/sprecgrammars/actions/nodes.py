@@ -103,7 +103,7 @@ class KeySequence(Action):
 
     def perform(self, variables, arguments=None):
         modifiers = self.apply_modifiers(variables)
-        keypresses = [node.evaluate(variables, arguments) for node in self.keys] * modifiers.get('repeat', 1)
+        keypresses = [node.valuate(variables, arguments) for node in self.keys] * modifiers.get('repeat', 1)
         api.type_keypresses(keypresses)
 
 class PositionalVariable(Action):
