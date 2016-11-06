@@ -1,3 +1,5 @@
+import os
+
 from platforms import api
 
 def focus(title):
@@ -6,3 +8,7 @@ def focus(title):
 
 def close():
     api.close_active_window()
+
+def start(name):
+    print(name)
+    os.startfile(name)
