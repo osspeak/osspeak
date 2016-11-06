@@ -46,3 +46,6 @@ def type_literal(text):
 
 def type_keypresses(text, direction='both'):
 	platform.type_keypresses(text, direction=direction)
+
+def close_active_window():
+	platform.close_active_window()

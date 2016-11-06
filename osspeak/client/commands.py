@@ -63,7 +63,6 @@ class Command:
             increment = self.bind_variable(bound_variables, engine_result['Variables'], idx)
             idx += increment
         var_list = list(bound_variables.values())
-        print('vl', var_list[0].children)
         self.action.perform(var_list)
 
     def bind_variable(self, bound_variables, semantic_variables, idx):
@@ -76,7 +75,6 @@ class Command:
             bound_variables[var_id] = nodes.RootAction()
         increment += self.bind_child_variables(idx, var_id, bound_variables, semantic_variables, grouping_node)
         if grouping_node.action_substitute is not None:
-            print('foo', grouping_node.action_substitute)
             bound_variables[var_id] = grouping_node.action_substitute
         return increment
 
