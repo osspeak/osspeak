@@ -1,4 +1,4 @@
-from client import cmdmodule, dispatcher
+from client import dispatcher
 from communication import evtdispatch
 from interfaces.cli import menu
 

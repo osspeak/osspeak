@@ -4,7 +4,7 @@ import itertools
 from sprecgrammars.actions.parser import ActionParser
 from sprecgrammars.actions import nodes
 from sprecgrammars.functions.parser import FunctionDefinitionParser
-from client import commands
+from client import commands, scopes
 from sprecgrammars.formats.rules import astree
 from sprecgrammars.formats import RuleParser, SrgsXmlConverter
 
@@ -12,47 +12,46 @@ class CommandModule:
 
     def __init__(self, config):
         self.config = config
+        self.scope = None
         self.functions = []
         self.commands = []
         self.variables = []
 
-    def load_commands(self, scope):
-        for rule_text, action_text in self.config['Commands']:
-            cmd = Command(rule_text, action_text, scope=scope)
+    def load_commands(self):
+        for rule_text, action_text in self.config.get('Commands', {}):
+            cmd = Command(rule_text, action_text, scope=self.scope)
             self.commands.append(cmd)
 
-    def load_variables(self, scope):
+    def load_variables(self):
         for varname, rule_text in self.config.get('Variables', {}):
-            var = astree.VariableNode(varname, rule_text, scope['variables'])
-            scope['variables'][varname] = var
+            var = astree.VariableNode(varname, rule_text, self.scope.variables)
+            self.scope.variables[varname] = var
             self.variables.append(var)
 
-    def load_functions(self, scope):
+    def load_functions(self):
         for func_signature, func_text in self.config.get('Functions', {}):
             fparser = FunctionDefinitionParser(func_signature)
             func = fparser.parse()
-            action_parser = ActionParser(func_text, defined_functions=scope['functions'])
+            action_parser = ActionParser(func_text, defined_functions=self.scope.functions)
             func.action = action_parser.parse()
-            scope['functions'][func.name] = func
+            self.scope.functions[func.name] = func
             self.functions.append(func)
 
 class Command:
     
     def __init__(self, rule_text, action_text, scope=None):
-        self.scope = {} if scope is None else scope
-        self.variables = self.scope.get('variables', {})
-        self.functions = self.scope.get('functions', {})
+        self.scope = scopes.Scope() if scope is None else scope
         self.init_rule(rule_text)
         self.init_action(action_text)
 
     def init_rule(self, rule_text):
         self.rule_text = rule_text
-        parser = RuleParser(self.rule_text, self.variables)
+        parser = RuleParser(self.rule_text, self.scope.variables)
         self.rule = parser.parse_as_rule()
 
     def init_action(self, action_text):
         self.action_text = action_text
-        parser = ActionParser(self.action_text, defined_functions=self.functions)
+        parser = ActionParser(self.action_text, defined_functions=self.scope.functions)
         self.action = parser.parse()
 
     def perform_action(self, engine_result):

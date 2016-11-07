@@ -9,7 +9,7 @@ sys.path.append("..")
 # sys.path.append(r'C:\Users\evan\modules\osspeak\sprecgrammars')
 from osspeak import protocols, defaults
 import threading
-from client import cmdmodule, dispatcher, evtdispatch
+from client import cmwatcher, dispatcher, evtdispatch
 from communication import guimanager
 import pprint
 
@@ -22,7 +22,7 @@ def main():
     # try:
     #     # msg_dispatcher.gui_manager = guimanager.GuiManager()
     #     # msg_dispatcher.gui_manager.launch()
-    #     msg_dispatcher.cmd_module_loader = cmdmodule.CommandModuleWatcher()
+    #     msg_dispatcher.cmd_module_loader = cmwatcher.CommandModuleWatcher()
     #     msg_dispatcher.cmd_module_loader.load_command_json()
     #     msg_dispatcher.cmd_module_loader.create_grammar_nodes()
     #     grammar = msg_dispatcher.cmd_module_loader.build_srgs_xml_grammar()
