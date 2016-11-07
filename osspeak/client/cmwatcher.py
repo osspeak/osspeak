@@ -13,7 +13,7 @@ class CommandModuleWatcher:
 
     def __init__(self):
         self.cmd_modules = {}
-        self.active_scope = None
+        self.active_scope = scopes.Scope()
         # key is string id, val is Action instance
         self.command_map = {}
         self.scopes = set()
@@ -29,39 +29,39 @@ class CommandModuleWatcher:
                     cmd_module = commands.CommandModule(json.load(f))
                     self.cmd_modules[full_path] = cmd_module
 
-    def init_scopes(self):
+    def flag_active_modules(self):
         for path, cmd_module in self.cmd_modules.items():
             scope_config = cmd_module.config.get('scope', {})
-            scope = self.new_or_existing_scope(scope_config)
-            cmd_module.scope = scope
-            self.scopes.add(scope)
-            #TODO: fix later
-            self.active_scope = scope
+            cmd_module.is_active = self.is_command_module_active(scope_config)
+            if cmd_module.is_active:
+                cmd_module.scope = self.active_scope
 
     def create_grammar_nodes(self):
         for path, cmd_module in self.cmd_modules.items():
-            cmd_module.load_commands()
-            for cmd in cmd_module.commands:
-                cmd_module.scope.grammar_node.rules.append(cmd.rule)
-                self.command_map[cmd.id] = cmd
+            if cmd_module.is_active:
+                cmd_module.load_commands()
+                for cmd in cmd_module.commands:
+                    self.active_scope.grammar_node.rules.append(cmd.rule)
+                    self.command_map[cmd.id] = cmd
 
     def create_rule_grammar_nodes(self):
         for path, cmd_module in self.cmd_modules.items():
-            cmd_module.load_variables()
-            for var in cmd_module.variables:
-                cmd_module.scope.grammar_node.variables.append(var)
+            if cmd_module.is_active:
+                cmd_module.load_variables()
+                for var in cmd_module.variables:
+                    self.active_scope.grammar_node.variables.append(var)
+                    self.active_scope.variables[var.name] = var
 
     def load_functions(self):
         for path, cmd_module in self.cmd_modules.items():
-            cmd_module.load_functions()          
+            if cmd_module.is_active:
+                cmd_module.load_functions()
+                for func in cmd_module.functions:
+                    self.active_scope.functions[func.name] = func
 
-    def serialize_scope_xml(self, scope):
+    def serialize_scope_xml(self):
         converter = SrgsXmlConverter()
-        scope.grammar_xml = converter.convert_grammar(scope.grammar_node)
+        self.active_scope.grammar_xml = converter.convert_grammar(self.active_scope.grammar_node)
 
-    def new_or_existing_scope(self, config):
-        for scope in self.scopes:
-            if scope.config_matches(config):
-                return scope
-        return scopes.Scope(config)
-
+    def is_command_module_active(self, config):
+        return True

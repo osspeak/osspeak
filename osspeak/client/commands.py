@@ -13,6 +13,7 @@ class CommandModule:
     def __init__(self, config):
         self.config = config
         self.scope = None
+        self.is_active = False
         self.functions = []
         self.commands = []
         self.variables = []
