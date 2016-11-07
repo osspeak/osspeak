@@ -16,7 +16,6 @@ class CommandModuleWatcher:
         self.active_scope = scopes.Scope()
         # key is string id, val is Action instance
         self.command_map = {}
-        self.scopes = set()
 
     def load_command_json(self):
         command_dir = usersettings.command_directory()
@@ -31,7 +30,7 @@ class CommandModuleWatcher:
 
     def flag_active_modules(self):
         for path, cmd_module in self.cmd_modules.items():
-            scope_config = cmd_module.config.get('scope', {})
+            scope_config = cmd_module.config.get('Scope', {})
             cmd_module.is_active = self.is_command_module_active(scope_config)
             if cmd_module.is_active:
                 cmd_module.scope = self.active_scope
@@ -64,4 +63,7 @@ class CommandModuleWatcher:
         self.active_scope.grammar_xml = converter.convert_grammar(self.active_scope.grammar_node)
 
     def is_command_module_active(self, config):
+        title = config.get('title', '').lower()
+        if title and title not in self.active_scope.current_window_title:
+            return False
         return True
