@@ -15,12 +15,8 @@ class EventDispatcher:
         self.engine_process.start_stdout_listening()
 
     def start_module_watcher(self):
-        self.cmd_module_watcher.load_command_json()
-        self.cmd_module_watcher.flag_active_modules()
-        self.cmd_module_watcher.load_functions()
-        self.cmd_module_watcher.create_rule_grammar_nodes()
-        self.cmd_module_watcher.create_grammar_nodes()
-        self.cmd_module_watcher.serialize_scope_xml()
+        self.cmd_module_watcher.create_grammar_output()
+        self.cmd_module_watcher.start_watch_active_window(self.engine_process.start_engine_listening)
 
     def main_loop(self):
         menu.Menu(self).prompt_input()

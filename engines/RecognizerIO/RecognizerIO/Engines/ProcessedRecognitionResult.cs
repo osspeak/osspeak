@@ -20,7 +20,6 @@ namespace RecognizerIO.Engines
                 Commands.Add(new CommandRecognition(cmdPieces[0], cmdVars.Take(cmdVars.Length - 1).ToList()));
 
             }
-            var root = "4";
         }
     }
 

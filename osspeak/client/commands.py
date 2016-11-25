@@ -10,10 +10,10 @@ from sprecgrammars.formats import RuleParser, SrgsXmlConverter
 
 class CommandModule:
 
-    def __init__(self, config):
+    def __init__(self, config, path):
         self.config = config
+        self.path = path
         self.scope = None
-        self.is_active = False
         self.functions = []
         self.commands = []
         self.variables = []

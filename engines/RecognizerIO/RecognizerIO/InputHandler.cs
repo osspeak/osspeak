@@ -39,7 +39,7 @@ namespace RecognizerIO
                         string xml = item.Value;
                         string tmpPath = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".xml";
                         System.IO.File.WriteAllText(tmpPath, xml);
-                        EngManager.LoadGrammar(tmpPath);
+                        EngManager.LoadGrammar(tmpPath, item.Key);
                         //System.IO.File.Delete(tmpPath);
                     }
                     bool init = jsonMsg.Init;

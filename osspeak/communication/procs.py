@@ -45,15 +45,25 @@ class EngineProcessManager(ProcessManager):
             msg = json.dumps(msg)
         super().send_message(msg)
 
-    def start_engine_listening(self):
+    def start_engine_listening(self, init=True):
         scope = self.cmd_module_watcher.active_scope
         msg = {
             'Type': 'load grammars',
             'Grammars': {
-                'foo': ET.tostring(scope.grammar_xml).decode('utf8'),
-                # 'bar': ET.tostring(scope_info['variable grammar']['xml']).decode('utf8'),
+                id(scope): ET.tostring(scope.grammar_xml).decode('utf8'),
             },
-            'Init': True,
+            'Init': init,
+        }
+        self.send_message(msg)
+
+    def load_new_grammar(self):
+        scope = self.cmd_module_watcher.active_scope
+        msg = {
+            'Type': 'load grammars',
+            'Grammars': {
+                id(scope): ET.tostring(scope.grammar_xml).decode('utf8'),
+            },
+            'Init': False,
         }
         self.send_message(msg)
 

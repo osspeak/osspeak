@@ -12,25 +12,42 @@ namespace RecognizerIO.Engines
     class EngineManager
     {
         public SpeechRecognitionEngine Engine;
-        public Grammar RootGrammar;
-        private CommandLoader CmdLoader;
+        public Grammar ActiveGrammar;
+        public Dictionary<Grammar, string> AllGrammars = new Dictionary<Grammar, string>();
 
         public EngineManager()
         {
             Engine = new SpeechRecognitionEngine();
             Engine.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(recognizer_SpeechRecognized);
+            Engine.RecognizerUpdateReached += new EventHandler<RecognizerUpdateReachedEventArgs>(recognizer_RecognizerUpdateReached);
             Engine.SetInputToDefaultAudioDevice();
         }
 
-        public void LoadGrammar(string path)
+        public void LoadGrammar(string path, string gramId)
         {
             var gram = new Grammar(path);
-            Engine.LoadGrammar(gram);
+            AllGrammars[gram] = gramId;
+            if (ActiveGrammar != null)
+            {
+                Engine.RequestRecognizerUpdate();
+                ActiveGrammar = gram;
+            }
+            else
+            {
+                Engine.LoadGrammar(gram);
+                ActiveGrammar = gram;
+            }
         }
 
         void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
-        {   
+        {
             HandleRecognition(e.Result);
+        }
+
+        void recognizer_RecognizerUpdateReached(object sender, RecognizerUpdateReachedEventArgs e)
+        {
+            Engine.UnloadAllGrammars();
+            Engine.LoadGrammar(ActiveGrammar);
         }
 
         public void HandleRecognition(RecognitionResult srResult)
@@ -49,7 +66,7 @@ namespace RecognizerIO.Engines
 
         public void Stop()
         {
-            Engine.RecognizeAsyncCancel();
+            Engine.RecognizeAsyncStop();
         }
 
     }
