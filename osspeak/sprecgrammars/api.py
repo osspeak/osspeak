@@ -10,9 +10,9 @@ def action(text, defined_functions=None):
     parser = ActionParser(text, defined_functions=defined_functions)
     return parser.parse()
 
-def func_definition(func_signature, func_action=''):
+def func_definition(func_signature, func_action='', defined_functions=None):
     parser = FunctionDefinitionParser(func_signature)
     func_def = parser.parse()
-    action_parser = ActionParser(func_action)
+    action_parser = ActionParser(func_action, defined_functions=defined_functions)
     func_def.action = action_parser.parse()
     return func_def

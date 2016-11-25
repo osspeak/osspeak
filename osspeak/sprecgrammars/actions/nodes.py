@@ -81,9 +81,13 @@ class FunctionCall(Action):
         return args
 
     def perform(self, variables, arguments=None):
+        from sprecgrammars.api import action
         if isinstance(self.definition, types.FunctionType):
             args = [a.evaluate(variables, arguments) for a in self.arguments]
-            self.definition(*args)
+            result = self.definition(*args)
+            if result is not None:
+                call_action = action(str(result))
+                call_action.perform(variables)
         else:
             args = self.get_arguments(variables, arguments)
             self.definition.action.perform(variables, args)

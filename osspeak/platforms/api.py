@@ -23,6 +23,9 @@ def maximize_active_window():
 def transcribe_line(key_inputs, delay, direction):
     platform.transcribe_line(key_inputs, delay, direction)
 
+def get_mouse_location():
+	return platform.get_mouse_location()
+
 def mouse_click(button='left', direction='both', number=1):
 	platform.mouse_click(button, direction, number)
 

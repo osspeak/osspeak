@@ -4,6 +4,7 @@ import itertools
 from sprecgrammars.actions.parser import ActionParser
 from sprecgrammars.actions import nodes
 from sprecgrammars.functions.parser import FunctionDefinitionParser
+from sprecgrammars import api
 from client import commands, scopes
 from sprecgrammars.formats.rules import astree
 from sprecgrammars.formats import RuleParser, SrgsXmlConverter
@@ -32,12 +33,9 @@ class CommandModule:
 
     def load_functions(self):
         for func_signature, func_text in self.config.get('Functions', {}):
-            fparser = FunctionDefinitionParser(func_signature)
-            func = fparser.parse()
-            action_parser = ActionParser(func_text, defined_functions=self.scope.functions)
-            func.action = action_parser.parse()
-            self.scope._functions[func.name] = func
-            self.functions.append(func)
+            func_definition = api.func_definition(func_signature, func_text, defined_functions=self.scope.functions)
+            self.scope._functions[func_definition.name] = func_definition
+            self.functions.append(func_definition)
 
 class Command:
     
