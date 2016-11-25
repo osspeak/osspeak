@@ -59,7 +59,6 @@ class CommandModuleWatcher:
     def flag_active_modules(self):
         for path, cmd_module in self.get_active_modules():
             self.active_modules[path] = cmd_module
-            cmd_module.scope = self.active_scope
 
     def get_active_modules(self):
         for path, cmd_module in self.cmd_modules.items():

@@ -24,9 +24,10 @@ class CommandModule:
             self.commands.append(cmd)
 
     def load_variables(self):
+        print(self.scope)
         for varname, rule_text in self.config.get('Variables', {}):
             var = astree.VariableNode(varname, rule_text, self.scope.variables)
-            self.scope.variables[varname] = var
+            self.scope._variables[varname] = var
             self.variables.append(var)
 
     def load_functions(self):
@@ -35,7 +36,7 @@ class CommandModule:
             func = fparser.parse()
             action_parser = ActionParser(func_text, defined_functions=self.scope.functions)
             func.action = action_parser.parse()
-            self.scope.functions[func.name] = func
+            self.scope._functions[func.name] = func
             self.functions.append(func)
 
 class Command:
