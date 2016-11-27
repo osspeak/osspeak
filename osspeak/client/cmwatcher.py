@@ -61,17 +61,16 @@ class CommandModuleWatcher:
         for path, cmd_module in self.get_active_modules():
             self.active_modules[path] = cmd_module
 
-    def get_active_modules(self, condition_filter=None):
-        condition_filter = self.current_condition if condition_filter is None else condition_filter
+    def get_active_modules(self):
         for path, cmd_module in self.cmd_modules.items():
-            is_active = self.is_command_module_active(cmd_module, condition_filter)
+            is_active = self.is_command_module_active(cmd_module)
             if is_active:
                 yield path, cmd_module
 
-    def is_command_module_active(self, cmd_module, condition_filter):
+    def is_command_module_active(self, cmd_module):
         for title_filter, filtered_paths in self.conditions['titles'].items():
             if cmd_module.path in filtered_paths:
-                if title_filter in condition_filter.window_title:
+                if title_filter in self.current_condition.window_title:
                     return True
                 return False
         return True
