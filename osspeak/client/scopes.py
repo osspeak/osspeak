@@ -24,5 +24,5 @@ class Scope:
 class CurrentCondition:
 
     def __init__(self):
-        self.window_title = api.get_active_window_name()
+        self.window_title = api.get_active_window_name().lower()
         self.variables = {}

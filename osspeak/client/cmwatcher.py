@@ -61,16 +61,17 @@ class CommandModuleWatcher:
         for path, cmd_module in self.get_active_modules():
             self.active_modules[path] = cmd_module
 
-    def get_active_modules(self):
+    def get_active_modules(self, condition_filter=None):
+        condition_filter = self.current_condition if condition_filter is None else condition_filter
         for path, cmd_module in self.cmd_modules.items():
-            is_active = self.is_command_module_active(cmd_module)
+            is_active = self.is_command_module_active(cmd_module, condition_filter)
             if is_active:
                 yield path, cmd_module
 
-    def is_command_module_active(self, cmd_module):
+    def is_command_module_active(self, cmd_module, condition_filter):
         for title_filter, filtered_paths in self.conditions['titles'].items():
             if cmd_module.path in filtered_paths:
-                if title_filter in self.current_condition.window_title:
+                if title_filter in condition_filter.window_title:
                     return True
                 return False
         return True
@@ -121,5 +122,7 @@ class CommandModuleWatcher:
             active_window = api.get_active_window_name().lower()
             if active_window != self.current_condition.window_title:
                 self.current_condition.window_title = active_window
-                self.create_grammar_output()
-                on_change(init=False)
+                new_active_modules = dict(self.get_active_modules())
+                if new_active_modules != self.active_modules:
+                    self.create_grammar_output()
+                    on_change(init=False)
