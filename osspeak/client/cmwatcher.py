@@ -48,9 +48,10 @@ class CommandModuleWatcher:
         for root, dirs, filenames in os.walk(command_dir):
             for fname in filenames:
                 full_path = os.path.join(root, fname)
-                with open(full_path) as f:
-                    cmd_module = commands.CommandModule(json.load(f), full_path)
-                    self.cmd_modules[full_path] = cmd_module
+                if full_path.endswith('.json'):
+                    with open(full_path) as f:
+                        cmd_module = commands.CommandModule(json.load(f), full_path)
+                        self.cmd_modules[full_path] = cmd_module
 
     def load_scope_and_conditions(self):
         for path, cmd_module in self.cmd_modules.items():

@@ -1,4 +1,4 @@
-from sprecgrammars.functions.library import mouse, window, keys
+from sprecgrammars.functions.library import mouse, window, keys, system
 
 builtin_functions = {
     'hold': keys.hold,
@@ -12,4 +12,6 @@ builtin_functions = {
 
     'window.focus': window.focus,
     'window.close': window.close,
+
+    'wait': system.wait,
 }
