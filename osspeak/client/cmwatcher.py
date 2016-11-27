@@ -33,11 +33,11 @@ class CommandModuleWatcher:
             'variables': collections.defaultdict(set),
         }
         # start with global scope
-        self.scope_groupings = {'': scopes.Scope2()}
+        self.scope_groupings = {'': scopes.Scope()}
         self.cmd_modules = {}
         self.active_modules = {}
-        self.active_scope = scopes.Scope()
         self.grammar_node = astree.GrammarNode()
+        self.grammar_xml = None
         # key is string id, val is Action instance
         self.command_map = {}
 
@@ -67,6 +67,14 @@ class CommandModuleWatcher:
             if is_active:
                 yield path, cmd_module
 
+    def is_command_module_active(self, cmd_module):
+        for title_filter, filtered_paths in self.conditions['titles'].items():
+            if cmd_module.path in filtered_paths:
+                if title_filter in self.current_condition.window_title:
+                    return True
+                return False
+        return True
+
     def create_grammar_nodes(self):
         for path, cmd_module in self.active_modules.items():
             cmd_module.load_commands()
@@ -86,15 +94,7 @@ class CommandModuleWatcher:
 
     def serialize_scope_xml(self):
         converter = SrgsXmlConverter()
-        self.active_scope.grammar_xml = converter.convert_grammar(self.grammar_node)
-
-    def is_command_module_active(self, cmd_module):
-        for title_filter, filtered_paths in self.conditions['titles'].items():
-            if cmd_module.path in filtered_paths:
-                if title_filter in self.active_scope.current_window_title:
-                    return True
-                return False
-        return True
+        self.grammar_xml = converter.convert_grammar(self.grammar_node)
 
     def load_conditions(self, path, cmd_module):
         conditions_config = cmd_module.config.get('Conditions', {})
@@ -106,7 +106,7 @@ class CommandModuleWatcher:
         scope_name = cmd_module.config.get('Scope', '')
         if scope_name not in self.scope_groupings:
             global_scope = self.scope_groupings['']
-            self.scope_groupings[scope_name] = scopes.Scope2(global_scope)
+            self.scope_groupings[scope_name] = scopes.Scope(global_scope)
         self.scope_groupings[scope_name].cmd_modules[path] = cmd_module
         cmd_module.scope = self.scope_groupings[scope_name]
 
@@ -119,7 +119,7 @@ class CommandModuleWatcher:
         while True:
             time.sleep(2)
             active_window = api.get_active_window_name().lower()
-            if active_window != self.active_scope.current_window_title:
-                self.active_scope.current_window_title = active_window
+            if active_window != self.current_condition.window_title:
+                self.current_condition.window_title = active_window
                 self.create_grammar_output()
                 on_change(init=False)

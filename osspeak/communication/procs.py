@@ -46,22 +46,22 @@ class EngineProcessManager(ProcessManager):
         super().send_message(msg)
 
     def start_engine_listening(self, init=True):
-        scope = self.cmd_module_watcher.active_scope
+        grammar_xml = self.cmd_module_watcher.grammar_xml
         msg = {
             'Type': 'load grammars',
             'Grammars': {
-                id(scope): ET.tostring(scope.grammar_xml).decode('utf8'),
+                id(grammar_xml): ET.tostring(grammar_xml).decode('utf8'),
             },
             'Init': init,
         }
         self.send_message(msg)
 
     def load_new_grammar(self):
-        scope = self.cmd_module_watcher.active_scope
+        grammar_xml = self.cmd_module_watcher.grammar_xml
         msg = {
             'Type': 'load grammars',
             'Grammars': {
-                id(scope): ET.tostring(scope.grammar_xml).decode('utf8'),
+                id(grammar_xml): ET.tostring(grammar_xml).decode('utf8'),
             },
             'Init': False,
         }
