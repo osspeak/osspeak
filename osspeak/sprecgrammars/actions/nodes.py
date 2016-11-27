@@ -1,4 +1,5 @@
 import types
+import itertools
 
 from platforms import api
 
@@ -76,18 +77,22 @@ class FunctionCall(Action):
 
     def get_arguments(self, variables, arguments):
         args = {}
-        for (param, arg) in zip(self.definition.parameters, self.arguments):
-            args[param.name] = arg.evaluate(variables, arguments)
+        # use default action for any arg not passed by user
+        for param, arg in itertools.zip_longest(self.definition.parameters, self.arguments):
+            action = param.default_action if arg is None else arg
+            args[param.name] = action.evaluate(variables, arguments)
         return args
 
     def perform(self, variables, arguments=None):
         from sprecgrammars.api import action
+        # builtin functions
         if isinstance(self.definition, types.FunctionType):
             args = [a.evaluate(variables, arguments) for a in self.arguments]
             result = self.definition(*args)
             if result is not None:
                 call_action = action(str(result))
                 call_action.perform(variables)
+        # user defined functions
         else:
             args = self.get_arguments(variables, arguments)
             self.definition.action.perform(variables, args)

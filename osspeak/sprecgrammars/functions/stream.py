@@ -22,7 +22,8 @@ class FunctionDefinitionTokenStream(abstokenstream.AbstractTokenStream):
         return self.read_while(lambda ch: ch in ' \n\t')
 
     def read_word(self):
-        return tokens.WordToken(self._read_word())
+        word_text = self._read_word()
+        return tokens.WordToken(word_text)
 
     def read_paren_token(self):
         return tokens.ParenToken(self.stream.next())

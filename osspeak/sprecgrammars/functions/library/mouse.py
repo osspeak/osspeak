@@ -3,7 +3,7 @@ from platforms import api
 def click():
     api.mouse_click()
 
-def move():
+def move(x, y=600):
     print('asdasda')
 
 def x():
