@@ -14,7 +14,7 @@ from platforms import api
 class CommandModuleWatcher:
 
     def __init__(self):
-        pass
+        self.initial = True
 
     def create_grammar_output(self):
         self.init_fields()
