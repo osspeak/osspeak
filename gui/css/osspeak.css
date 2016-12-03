@@ -1,0 +1,9 @@
+.tree {
+    width: 250px;
+    height: 100%;
+}
+
+.fill-parent {
+    height: 100%;
+    width: 100%;
+}

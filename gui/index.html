@@ -3,14 +3,17 @@
   <head>
     <script src="node_modules/react/dist/react.js"></script>
     <script src="node_modules/react-dom/dist/react-dom.js"></script>
-    <script src="js/lib/osspeak.js"></script>
+    
+    <script src="js/lib/communicator.js"></script>
     <script src="js/lib/moduletree.js"></script>
     <script src="js/lib/application.js"></script>
+    <script src="js/lib/osspeak.js"></script>
+    <link href="css/osspeak.css" rel="stylesheet" type="text/css" />
     <meta charset="UTF-8">
     <title>Hello World!</title>
   </head>
   <body onload="init()">
-    <div id="root" />
+    <div id="root" class="fill-parent" />
     <h1>Hello World!</h1>
     We are using node <script>document.write(process.versions.node)</script>,
     Chrome <script>document.write(process.versions.chrome)</script>,

@@ -1,12 +1,4 @@
-let ws = new WebSocket('ws://localhost:8080/websocket');
-
-ws.onopen = function() {
-    ws.send('hello werld!');
-};
-
-ws.onmessage = function(msg) {
-    console.log(msg);
-};
+const communicator = new MainProcessCommunicator('ws://localhost:8080/websocket');
 
 function init() {
     ReactDOM.render(

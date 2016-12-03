@@ -13,21 +13,26 @@ from platforms import api
 
 class CommandModuleWatcher:
 
-    def __init__(self):
+    def __init__(self, event_dispatcher):
+        self.event_dispatcher = event_dispatcher
+        self.current_condition = scopes.CurrentCondition()
         self.initial = True
 
-    def create_grammar_output(self):
+    def initialize_modules(self):
         self.init_fields()
         self.load_command_json()
         self.load_scope_and_conditions()
         self.flag_active_modules()
+        self.display_module_tree()
+
+    def create_grammar_output(self):
+        self.initialize_modules()
         self.load_functions()
         self.create_rule_grammar_nodes()
         self.create_grammar_nodes()
         self.serialize_scope_xml()
 
     def init_fields(self):
-        self.current_condition = scopes.CurrentCondition()
         self.conditions = {
             'titles': collections.defaultdict(set),
             'variables': collections.defaultdict(set),
@@ -46,12 +51,14 @@ class CommandModuleWatcher:
         if not os.path.isdir(command_dir):
             os.makedirs(command_dir)
         for root, dirs, filenames in os.walk(command_dir):
+            dirs[:] = [d for d in dirs if not d.startswith('.')]
             for fname in filenames:
+                if not fname.endswith('.json'):
+                    continue
                 full_path = os.path.join(root, fname)
-                if full_path.endswith('.json'):
-                    with open(full_path) as f:
-                        cmd_module = commands.CommandModule(json.load(f), full_path)
-                        self.cmd_modules[full_path] = cmd_module
+                with open(full_path) as f:
+                    cmd_module = commands.CommandModule(json.load(f), full_path)
+                    self.cmd_modules[full_path] = cmd_module
 
     def load_scope_and_conditions(self):
         for path, cmd_module in self.cmd_modules.items():
@@ -125,4 +132,34 @@ class CommandModuleWatcher:
                 new_active_modules = dict(self.get_active_modules())
                 if new_active_modules != self.active_modules:
                     self.create_grammar_output()
-                    on_change(init=False)
+                    on_change(init=self.initial)
+                    self.initial = False
+
+    def display_module_tree(self):
+        tree = self.serialize_as_tree()
+        payload = {'tree': tree}
+        if self.initial:
+            self.event_dispatcher.gui_manager.send_message('display module tree', payload)
+
+    def serialize_as_tree(self):
+        node_map = {'': {'children': []}}
+        command_dir = usersettings.command_directory()
+        for path, cmd_module in self.cmd_modules.items():
+            local_path = path[len(command_dir) + 1:]
+            tree_path = list(os.path.split(local_path))
+            if tree_path[0] == '':
+                tree_path.pop(0)
+            self.add_tree_node(tree_path, node_map, cmd_module)
+        return node_map['']['children']
+
+    def add_tree_node(self, path, node_map, cmd_module):
+        parent = node_map['']['children']
+        partial_path = ''
+        for directory in path[:-1]:
+            partial_path += os.sep + directory
+            if partial_path not in node_map:
+                node = {'text': directory, 'children': [], 'id': partial_path}
+                node_map[partial_path] = node
+                parent.append(node)
+            parent = node_map[partial_path]['children']
+        parent.append({'text': path[-1], 'id': os.path.join(*path)})
