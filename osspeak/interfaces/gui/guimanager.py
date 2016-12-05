@@ -35,22 +35,20 @@ class GuiProcessManager(ProcessManager):
         with threading.Lock():
             for msg in self.message_queue:
                 self.ws.send_str(msg)
+            del self.message_queue[:]
         async for msg in self.ws:
             if msg.type == aiohttp.WSMsgType.TEXT:
                 if msg.data == 'close':
                     await self.ws.close()
-                else:
-                    self.send_message('foo')
-                    # self.ws.send_str(msg.data + '/answer')
             elif msg.type == aiohttp.WSMsgType.ERROR:
                 print('ws connection closed with exception %s' %
                     self.ws.exception())
         print('websocket connection closed')
         return self.ws
 
-    def send_message(self, name, payload=None):
+    def send_message(self, name, payload=None, encoder=None):
         payload = payload or {}
-        msg = json.dumps({'type': name, 'payload': payload})
+        msg = json.dumps({'type': name, 'payload': payload}, cls=encoder)
         if not self.websocket_established:
             with threading.Lock():
                 self.message_queue.append(msg)

@@ -10,8 +10,9 @@ let win
 
 function createWindow () {
   // Create the browser window.
-  win = new BrowserWindow({width: 800, height: 600})
-  //process.stdout.write('foobar');
+  const webPrefs = {nodeIntegration: false}
+  const options = {width: 8000, height: 6000, webPreferences: webPrefs}
+  win = new BrowserWindow(options)
   win.openDevTools();
 
   // and load the index.html of the app.

@@ -12,6 +12,10 @@ class MainProcessCommunicator {
         this.ws.onmessage = this.onmessage.bind(this);
     }
 
+    subscribe(name, func) {
+        this.subscriptions.set(name, func);
+    }
+
     onopen() {
         this.ws.send('sasdasdsad');
     }

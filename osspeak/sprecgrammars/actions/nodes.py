@@ -41,6 +41,7 @@ class RootAction(Action):
     def __init__(self):
         super().__init__()
         self.children = []
+        self.raw_text = None
 
     def add(self, child):
         self.children.append(child)

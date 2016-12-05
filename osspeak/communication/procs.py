@@ -56,17 +56,6 @@ class EngineProcessManager(ProcessManager):
         }
         self.send_message(msg)
 
-    def load_new_grammar(self):
-        grammar_xml = self.cmd_module_watcher.grammar_xml
-        msg = {
-            'Type': 'load grammars',
-            'Grammars': {
-                id(grammar_xml): ET.tostring(grammar_xml).decode('utf8'),
-            },
-            'Init': False,
-        }
-        self.send_message(msg)
-
     def on_engine_message(self, msg_string):
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition': 

@@ -6,10 +6,12 @@ import tempfile
 import xml.etree.ElementTree as ET
 from sprecgrammars.actions.parser import ActionParser
 from settings import usersettings
+from interfaces.gui import serializer
 from client import commands, scopes
 from sprecgrammars.formats.rules import astree
 from sprecgrammars.formats import RuleParser, SrgsXmlConverter
 from platforms import api
+import time
 
 class CommandModuleWatcher:
 
@@ -18,18 +20,24 @@ class CommandModuleWatcher:
         self.current_condition = scopes.CurrentCondition()
         self.initial = True
 
+    def load_modules(self):
+        self.initialize_modules()
+        self.display_module_tree()
+        self.create_grammar_output()
+        self.event_dispatcher.engine_process.start_engine_listening(init=self.initial)
+        self.initial = False
+
     def initialize_modules(self):
         self.init_fields()
         self.load_command_json()
         self.load_scope_and_conditions()
         self.flag_active_modules()
-        self.display_module_tree()
 
     def create_grammar_output(self):
-        self.initialize_modules()
         self.load_functions()
         self.create_rule_grammar_nodes()
         self.create_grammar_nodes()
+        self.send_module_information()
         self.serialize_scope_xml()
 
     def init_fields(self):
@@ -56,9 +64,10 @@ class CommandModuleWatcher:
                 if not fname.endswith('.json'):
                     continue
                 full_path = os.path.join(root, fname)
+                partial_path = full_path[len(command_dir) + 1:]
                 with open(full_path) as f:
-                    cmd_module = commands.CommandModule(json.load(f), full_path)
-                    self.cmd_modules[full_path] = cmd_module
+                    cmd_module = commands.CommandModule(json.load(f), partial_path)
+                    self.cmd_modules[partial_path] = cmd_module
 
     def load_scope_and_conditions(self):
         for path, cmd_module in self.cmd_modules.items():
@@ -118,11 +127,11 @@ class CommandModuleWatcher:
         self.scope_groupings[scope_name].cmd_modules[path] = cmd_module
         cmd_module.scope = self.scope_groupings[scope_name]
 
-    def start_watch_active_window(self, on_change):
-        t = threading.Thread(target=self.watch_active_window, args=(on_change,))
+    def start_watch_active_window(self):
+        t = threading.Thread(target=self.watch_active_window)
         t.start()
 
-    def watch_active_window(self, on_change):
+    def watch_active_window(self):
         import time
         while True:
             time.sleep(2)
@@ -130,23 +139,26 @@ class CommandModuleWatcher:
             if active_window != self.current_condition.window_title:
                 self.current_condition.window_title = active_window
                 new_active_modules = dict(self.get_active_modules())
-                if new_active_modules != self.active_modules:
-                    self.create_grammar_output()
-                    on_change(init=self.initial)
-                    self.initial = False
+                if new_active_modules != self.active_modules or self.initial:
+                    self.load_modules()
 
     def display_module_tree(self):
         tree = self.serialize_as_tree()
         payload = {'tree': tree}
         if self.initial:
-            self.event_dispatcher.gui_manager.send_message('display module tree', payload)
+            self.event_dispatcher.gui_manager.send_message('display module tree',
+                payload, encoder=serializer.GuiEncoder)
+
+    def send_module_information(self):
+        payload = {'modules': self.cmd_modules}
+        self.event_dispatcher.gui_manager.send_message('module map',
+            payload, encoder=serializer.GuiEncoder)
 
     def serialize_as_tree(self):
         node_map = {'': {'children': []}}
         command_dir = usersettings.command_directory()
         for path, cmd_module in self.cmd_modules.items():
-            local_path = path[len(command_dir) + 1:]
-            tree_path = list(os.path.split(local_path))
+            tree_path = list(os.path.split(path))
             if tree_path[0] == '':
                 tree_path.pop(0)
             self.add_tree_node(tree_path, node_map, cmd_module)
@@ -163,3 +175,9 @@ class CommandModuleWatcher:
                 parent.append(node)
             parent = node_map[partial_path]['children']
         parent.append({'text': path[-1], 'id': os.path.join(*path)})
+
+    def serialize_modules(self):
+        module_map = {}
+        for path, command_module in self.cmd_modules.items():
+            pass
+        return module_map

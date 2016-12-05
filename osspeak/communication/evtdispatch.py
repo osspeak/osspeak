@@ -29,7 +29,7 @@ class EventDispatcher:
 
     def start_module_watcher(self):
         self.cmd_module_watcher.initialize_modules()
-        self.cmd_module_watcher.start_watch_active_window(self.engine_process.start_engine_listening)
+        self.cmd_module_watcher.start_watch_active_window()
 
     def main_loop(self):
         menu.Menu(self).prompt_input()

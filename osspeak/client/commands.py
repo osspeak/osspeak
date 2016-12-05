@@ -26,7 +26,7 @@ class CommandModule:
 
     def load_variables(self):
         for varname, rule_text in self.config.get('Variables', {}):
-            var = astree.VariableNode(varname, rule_text, self.scope.variables)
+            var = api.variable(varname, rule_text, self.scope.variables)
             self.scope._variables[varname] = var
             self.variables.append(var)
 

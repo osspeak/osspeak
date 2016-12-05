@@ -40,13 +40,11 @@ class RuleParser(BaseParser):
             top_level_rule.grouping_variables[grouping.id] = grouping
             top_level_rule.grouping_variables_empty[grouping.id] = None
             grouping.child_ids = self.build_child_ids(grouping)
-            # grouping.child_ids = {c.id: c if isinstance(c, astree.VariableNode) else c.rule.id: c for c in grouping.children}
         return top_level_rule
 
     def build_child_ids(self, grouping):
         child_ids = {}
         for child in grouping.children:
-            # node = child.rule if isinstance(child, astree.VariableNode) else child
             node = child
             child_ids[node.id] = node
         return child_ids
