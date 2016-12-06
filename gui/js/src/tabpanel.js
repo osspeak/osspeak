@@ -13,7 +13,6 @@ class EditorTabPanel extends React.Component {
         const editors = [];
         for (let moduleName of this.state.openModules) {
             let active = moduleName === this.props.activeModule ? 'active' : '';
-            console.log('act', active)
             const moduleObj = this.props.moduleMap[moduleName];
             tabs.push(
                 <li className="nav-item">
