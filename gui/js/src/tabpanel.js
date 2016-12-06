@@ -37,10 +37,10 @@ class EditorTabPanel extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.selectedModule !== null &&
-            !this.state.openModules.includes(nextProps.selectedModule)) {
+        if (nextProps.activeModule !== null &&
+            !this.state.openModules.includes(nextProps.activeModule)) {
             this.setState({
-                openModules: this.state.openModules.concat([nextProps.selectedModule])
+                openModules: this.state.openModules.concat([nextProps.activeModule])
             });
         }
     }
