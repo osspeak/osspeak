@@ -10,7 +10,8 @@
     "react-dom": "^15.4.1"
   },
   "scripts": {
-    "build": "node node_modules\\babel-cli\\bin\\babel.js js\\src -d js\\lib"
+    "build": "node node_modules\\babel-cli\\bin\\babel.js js\\src -d js\\lib",
+    "watch": "node node_modules\\babel-cli\\bin\\babel.js --watch js\\src -d js\\lib"
   },
   "main": "main.js",
   "devDependencies": {

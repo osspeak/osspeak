@@ -10,6 +10,7 @@ class GuiEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, commands.CommandModule):
             return {
+                'title': obj.path,
                 'functions': obj.functions,
                 'commands': obj.commands,
                 'variables': obj.variables,

@@ -4,7 +4,7 @@ class Application extends React.Component {
         super(props, context);
         this.state = {
             tree: [],
-            selectedModules: null,
+            selectedModule: null,
             moduleMap: {}
         }
     }
@@ -14,8 +14,8 @@ class Application extends React.Component {
             <div className="fill-parent">
                 <div className="hbox">
                     <div className="vbox">
-                        <CommandModuleTree data={this.state.tree} onSelect={this.updateSelectedModules.bind(this)} />
-                        <CommandModuleEditor />
+                        <CommandModuleTree data={this.state.tree} onSelect={this.updateSelectedModule.bind(this)} />
+                        <EditorTabPanel moduleMap={this.state.moduleMap} selectedModule={this.state.selectedModule}/>
                     </div>
                 </div>
             </div>
@@ -30,7 +30,7 @@ class Application extends React.Component {
     updateTree(data) {
         this.setState({
             tree: data.tree,
-            selectedModules: this.state.selectedModules,
+            selectedModule: this.state.selectedModule,
             moduleMap: this.state.moduleMap,
         });
     }
@@ -38,18 +38,15 @@ class Application extends React.Component {
     updateModuleMap(data) {
         this.setState({
             tree: this.state.tree,
-            selectedModules: this.state.selectedModules,
+            selectedModule: this.state.selectedModule,
             moduleMap: data.modules,
         });
     }
     
-    updateSelectedModules(data) {
-        console.log(data.selected);
-        //if (data.selected.length === 1) return;
+    updateSelectedModule(moduleName) {
         this.setState({
             tree: this.state.tree,
-            selectedModules: data.selected,
-            //selectedModules: [],
+            selectedModule: moduleName,
             moduleMap: this.state.moduleMap,
         });
     }

@@ -28,7 +28,6 @@ class MainProcessCommunicator {
     onmessage(msg) {
         const msgObj = JSON.parse(msg.data);
         this.fireSubscription(msgObj.type, msgObj.payload);
-        console.log(msgObj);
     }
 
     sendMessage(msg, payload={}) {

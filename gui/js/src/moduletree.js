@@ -2,10 +2,8 @@ class CommandModuleTree extends React.Component {
 
     constructor(props, context) {
         super(props, context);
-        this.selectedData = [];
     }
     
-
     render() {
         return (
             <div id="command-module-tree" className="tree"/>
@@ -15,7 +13,8 @@ class CommandModuleTree extends React.Component {
     componentDidMount() {
         $('#command-module-tree').jstree({
             'core' : {
-                'data' : []
+                'data' : [],
+                'multiple': false,
             },
         });
         this.attachEvents();
@@ -25,7 +24,6 @@ class CommandModuleTree extends React.Component {
         return (nextProps.data !== this.props.data)
     }
     
-
     componentDidUpdate(prevProps, prevState) {
         const tree = this.tree;
         tree.settings.core.data = this.props.data;
@@ -39,10 +37,8 @@ class CommandModuleTree extends React.Component {
     attachEvents() {
         const treeDiv = $('#command-module-tree');
         treeDiv.bind("select_node.jstree", (evt, data) => {
-            this.selectedData = data;
-            setTimeout(() => { if (this.selectedData === data) this.props.onSelect(this.selectedData); }, 0);
-            }
-        );
+            this.props.onSelect(data.selected[0]);
+        });
     }
 
 }
