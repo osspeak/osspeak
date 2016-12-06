@@ -12,14 +12,16 @@ class EditorTabPanel extends React.Component {
         const tabs = [];
         const editors = [];
         for (let moduleName of this.state.openModules) {
+            let active = moduleName === this.props.activeModule ? 'active' : '';
+            console.log('act', active)
             const moduleObj = this.props.moduleMap[moduleName];
             tabs.push(
                 <li className="nav-item">
-                    <a className="nav-link active" data-toggle="tab" href={`#${moduleName}`} role="tab">{moduleName}</a>
+                    <a className={`nav-link ${active}`} data-toggle="tab" href={`#${moduleName}`} role="tab">{moduleName}</a>
                 </li>
             );
             editors.push(
-                <div className="tab-pane active" id={moduleName} role="tabpanel">
+                <div className={`tab-pane ${active}`} id={moduleName} role="tabpanel">
                     <CommandModuleEditor key={moduleName} obj={moduleObj} />
                 </div>
             );
