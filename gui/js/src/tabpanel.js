@@ -51,7 +51,7 @@ class EditorTabPanel extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         const el = ReactDOM.findDOMNode(this);
-        let linkItems = el.getElementsByClassName('nav-link');
+        const linkItems = el.getElementsByClassName('nav-link');
         for (let item of linkItems) {
             item.classList.remove('active');
         }
