@@ -28,27 +28,15 @@ class Application extends React.Component {
     }
 
     updateTree(data) {
-        this.setState({
-            tree: data.tree,
-            activeModule: this.state.activeModule,
-            moduleMap: this.state.moduleMap,
-        });
+        this.setState({tree: data.tree});
     }
 
     updateModuleMap(data) {
-        this.setState({
-            tree: this.state.tree,
-            activeModule: this.state.activeModule,
-            moduleMap: data.modules,
-        });
+        this.setState({moduleMap: data.modules});
     }
     
     updateActiveModule(moduleName) {
-        this.setState({
-            tree: this.state.tree,
-            activeModule: moduleName,
-            moduleMap: this.state.moduleMap,
-        });
+        this.setState({activeModule: moduleName});
     }
 
 }
