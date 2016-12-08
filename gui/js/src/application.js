@@ -14,8 +14,8 @@ class Application extends React.Component {
             <div className="fill-parent">
                 <div className="hbox">
                     <div className="vbox">
-                        <CommandModuleTree data={this.state.tree} onSelect={this.updateActiveModule.bind(this)} />
-                        <EditorTabPanel moduleMap={this.state.moduleMap} activeModule={this.state.activeModule}/>
+                        <CommandModuleTree selected={this.state.activeModule} data={this.state.tree} onSelect={this.updateActiveModule.bind(this)} />
+                        <EditorTabPanel onTabClick={this.updateActiveModule.bind(this)} moduleMap={this.state.moduleMap} activeModule={this.state.activeModule}/>
                     </div>
                 </div>
             </div>

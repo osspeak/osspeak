@@ -26,11 +26,7 @@ class EditorTabPanel extends React.Component {
         const tabs = [];
         for (let moduleName of this.state.openModules) {
             let active = moduleName === this.props.activeModule ? 'active' : '';
-            tabs.push(
-                <li key={moduleName} className="nav-item">
-                    <a className={`nav-link ${active}`} data-toggle="tab" href={`#${moduleName}`} role="tab">{moduleName}</a>
-                </li>
-            );
+            tabs.push(<Tab key={moduleName} onClick={this.props.onTabClick} title={moduleName} active={active} />);
         }
         return tabs;
     }

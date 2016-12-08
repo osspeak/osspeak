@@ -2,6 +2,7 @@ class CommandModuleTree extends React.Component {
 
     constructor(props, context) {
         super(props, context);
+        this.selected = null
     }
     
     render() {
@@ -20,8 +21,16 @@ class CommandModuleTree extends React.Component {
         this.attachEvents();
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (this.selected !== nextProps.selected) {
+            $('#command-module-tree').jstree("deselect_all");
+            $('#command-module-tree').jstree('select_node', nextProps.selected);
+        }
+    }
+    
+
     shouldComponentUpdate(nextProps, nextState) {
-        return (nextProps.data !== this.props.data)
+        return nextProps.data !== this.props.data;
     }
     
     componentDidUpdate(prevProps, prevState) {
@@ -37,6 +46,7 @@ class CommandModuleTree extends React.Component {
     attachEvents() {
         const treeDiv = $('#command-module-tree');
         treeDiv.bind("select_node.jstree", (evt, data) => {
+            this.selected = data.selected[0];
             this.props.onSelect(data.selected[0]);
         });
     }
