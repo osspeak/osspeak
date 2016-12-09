@@ -35,8 +35,8 @@ class CommandModuleWatcher:
 
     def create_grammar_output(self):
         self.load_functions()
-        self.create_rule_grammar_nodes()
-        self.create_grammar_nodes()
+        self.load_variables()
+        self.load_commands()
         self.send_module_information()
         self.serialize_scope_xml()
 
@@ -92,14 +92,14 @@ class CommandModuleWatcher:
                 return False
         return True
 
-    def create_grammar_nodes(self):
+    def load_commands(self):
         for path, cmd_module in self.active_modules.items():
             cmd_module.load_commands()
             for cmd in cmd_module.commands:
                 self.grammar_node.rules.append(cmd.rule)
                 self.command_map[cmd.id] = cmd
 
-    def create_rule_grammar_nodes(self):
+    def load_variables(self):
         for path, cmd_module in self.active_modules.items():
             cmd_module.load_variables()
             for var in cmd_module.variables:
@@ -107,7 +107,9 @@ class CommandModuleWatcher:
 
     def load_functions(self):
         for path, cmd_module in self.active_modules.items():
-            cmd_module.load_functions()
+            cmd_module.define_functions()
+        for path, cmd_module in self.active_modules.items():
+            cmd_module.set_function_actions()
 
     def serialize_scope_xml(self):
         converter = SrgsXmlConverter()

@@ -15,11 +15,18 @@ def action(text, defined_functions=None):
     action_obj.raw_text = text
     return action_obj
 
-def func_definition(func_signature, func_action='', defined_functions=None):
+def func_signature(signature_text, func_action='', defined_functions=None):
+    parser = FunctionDefinitionParser(signature_text)
+    func_def = parser.parse()
+    func_def.raw_text = signature_text
+    return func_def
+
+def func_definition(func_signature, func_action=None, defined_functions=None):
     parser = FunctionDefinitionParser(func_signature)
     func_def = parser.parse()
     func_def.raw_text = func_signature
-    func_def.action = action(func_action, defined_functions=defined_functions)
+    if func_action is not None:
+        func_def.action = action(func_action, defined_functions=defined_functions)
     return func_def
 
 def variable(varname, rule_text, varmap):

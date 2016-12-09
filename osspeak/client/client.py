@@ -24,7 +24,7 @@ def main():
     #     # msg_dispatcher.gui_manager.launch()
     #     msg_dispatcher.cmd_module_loader = cmwatcher.CommandModuleWatcher()
     #     msg_dispatcher.cmd_module_loader.load_command_json()
-    #     msg_dispatcher.cmd_module_loader.create_grammar_nodes()
+    #     msg_dispatcher.cmd_module_loader.load_commands()
     #     grammar = msg_dispatcher.cmd_module_loader.build_srgs_xml_grammar()
     #     msg = 'grammar_content {}'.format(ET.tostring(grammar).decode('utf8'))
     #     # messenger.send_message(msg)

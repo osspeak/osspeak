@@ -30,11 +30,17 @@ class CommandModule:
             self.scope._variables[varname] = var
             self.variables.append(var)
 
-    def load_functions(self):
+    def define_functions(self):
         for func_signature, func_text in self.config.get('Functions', {}):
-            func_definition = api.func_definition(func_signature, func_text, defined_functions=self.scope.functions)
+            func_definition = api.func_definition(func_signature, defined_functions=self.scope.functions)
             self.scope._functions[func_definition.name] = func_definition
             self.functions.append(func_definition)
+
+    def set_function_actions(self):
+        config_funcs = self.config.get('Functions', {})
+        for i, func in enumerate(self.functions):
+            action_text = config_funcs[i][1]
+            func.action = api.action(action_text, defined_functions=self.scope.functions)
 
 class Command:
     
