@@ -105,8 +105,6 @@ class CommandModuleWatcher:
             cmd_module.load_variables()
             for var in cmd_module.variables:
                 self.grammar_node.variables.append(var)
-        x=1
-
 
     def load_commands(self):
         for path, cmd_module in self.active_modules.items():

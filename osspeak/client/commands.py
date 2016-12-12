@@ -37,6 +37,7 @@ class CommandModule:
         for varname, rule_text in self.config.get('Variables', {}):
             current_var = self.scope._variables[varname]
             if isinstance(current_var, astree.VariableNode):
+                self.variables.append(current_var)
                 continue
             print(type(current_var))
             assert isinstance(current_var, str)
