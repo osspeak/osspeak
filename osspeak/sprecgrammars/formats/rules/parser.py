@@ -60,12 +60,17 @@ class RuleParser(BaseParser):
         self.top.children.append(or_node)
 
     def parse_variable_token(self, tok):
+        from sprecgrammars import api
         self.maybe_pop_top_grouping()
         # want a copy to avoid mutating original, ie repeat
-        var_node = copy.copy(self.variables[tok.name])
-        var_node._id = self.variables[tok.name]._id
-        self.groupings.extend(list(var_node.rule.grouping_variables.values()))
-        self.top.children.append(var_node)
+        var_node = self.variables[tok.name]
+        if isinstance(var_node, str):
+            self.variables[tok.name] = None
+            var_node = api.variable(tok.name, var_node, self.variables)
+            self.variables[tok.name] = var_node
+        var_copy = copy.copy(var_node)
+        self.groupings.extend(list(var_copy.rule.grouping_variables.values()))
+        self.top.children.append(var_copy)
 
     def parse_paren_token(self, tok):
         self.maybe_pop_top_grouping()

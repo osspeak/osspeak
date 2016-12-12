@@ -15,12 +15,6 @@ def action(text, defined_functions=None):
     action_obj.raw_text = text
     return action_obj
 
-def func_signature(signature_text, func_action='', defined_functions=None):
-    parser = FunctionDefinitionParser(signature_text)
-    func_def = parser.parse()
-    func_def.raw_text = signature_text
-    return func_def
-
 def func_definition(func_signature, func_action=None, defined_functions=None):
     parser = FunctionDefinitionParser(func_signature)
     func_def = parser.parse()
@@ -32,3 +26,12 @@ def func_definition(func_signature, func_action=None, defined_functions=None):
 def variable(varname, rule_text, varmap):
     return VariableNode(varname, rule_text, varmap)
     
+def variable2(varname, scope):
+    current_var = scope._variables[varname]
+    if current_var is None:
+        raise RuntimeError('circular variables')
+    if isinstance(current_var, str):
+        scope._variables[varname] = None
+        current_var = variable(varname, current_var, scope.variables)
+        scope._variables[varname] = current_var
+    return current_var
