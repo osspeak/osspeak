@@ -11,7 +11,7 @@ class EditorTabPanel extends React.Component {
         const tabs = this.tabItems;
         const editors = this.editorItems;
         return (
-            <div>
+            <div id="editor-panel">
                 <ul className="nav nav-tabs" role="tablist">
                     {tabs}
                 </ul>

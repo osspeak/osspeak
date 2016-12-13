@@ -27,7 +27,6 @@ class CommandModuleTree extends React.Component {
             $('#command-module-tree').jstree('select_node', nextProps.selected);
         }
     }
-    
 
     shouldComponentUpdate(nextProps, nextState) {
         return nextProps.data !== this.props.data;

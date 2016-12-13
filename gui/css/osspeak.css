@@ -28,7 +28,16 @@ html, body {
 }
 
 #editor-panel {
+    background-color: rgb(253, 246, 227);
+    flex-grow: 1;
+}
 
+#editor-panel .nav-item .nav-link:not(.active) {
+    border-color: transparent transparent #ddd transparent ;
+}
+
+#editor-panel .nav-item .nav-link {
+    background-color: rgb(253, 246, 227);
 }
 
 .editor-input {
