@@ -93,25 +93,27 @@ class CommandModuleWatcher:
         return True
 
     def load_functions(self):
-        for path, cmd_module in self.active_modules.items():
+        for path, cmd_module in self.cmd_modules.items():
             cmd_module.define_functions()
-        for path, cmd_module in self.active_modules.items():
+        for path, cmd_module in self.cmd_modules.items():
             cmd_module.set_function_actions()
 
     def load_variables(self):
-        for path, cmd_module in self.active_modules.items():
+        for path, cmd_module in self.cmd_modules.items():
             cmd_module.initialize_variables()
-        for path, cmd_module in self.active_modules.items():
+        for path, cmd_module in self.cmd_modules.items():
             cmd_module.load_variables()
             for var in cmd_module.variables:
-                self.grammar_node.variables.append(var)
+                if path in self.active_modules:
+                    self.grammar_node.variables.append(var)
 
     def load_commands(self):
-        for path, cmd_module in self.active_modules.items():
+        for path, cmd_module in self.cmd_modules.items():
             cmd_module.load_commands()
             for cmd in cmd_module.commands:
-                self.grammar_node.rules.append(cmd.rule)
                 self.command_map[cmd.id] = cmd
+                if path in self.active_modules:
+                    self.grammar_node.rules.append(cmd.rule)
 
     def serialize_scope_xml(self):
         converter = SrgsXmlConverter()

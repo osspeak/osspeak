@@ -16,10 +16,11 @@ class CommandModule:
         self.path = path
         self.scope = None
         self.functions = []
-        self.commands = []
         self.variables = []
+        self.commands = []
 
     def load_commands(self):
+        print(self.path, len(self.config.get('Commands', {})))
         for rule_text, action_text in self.config.get('Commands', {}):
             cmd = Command(rule_text, action_text, scope=self.scope)
             self.commands.append(cmd)
@@ -28,18 +29,12 @@ class CommandModule:
         for varname, rule_text in self.config.get('Variables', {}):
             self.scope._variables[varname] = rule_text
 
-    def bind_variables(self):
-        for varname, rule_text in self.config.get('Variables', {}):
-            var = api.variable2(varname, self.scope.variables)
-            self.variables.append(var)
-
     def load_variables(self):
         for varname, rule_text in self.config.get('Variables', {}):
             current_var = self.scope._variables[varname]
             if isinstance(current_var, astree.VariableNode):
                 self.variables.append(current_var)
                 continue
-            print(type(current_var))
             assert isinstance(current_var, str)
             self.scope._variables[varname] = None
             var = api.variable(varname, rule_text, self.scope._variables)
