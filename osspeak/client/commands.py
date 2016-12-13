@@ -20,7 +20,6 @@ class CommandModule:
         self.commands = []
 
     def load_commands(self):
-        print(self.path, len(self.config.get('Commands', {})))
         for rule_text, action_text in self.config.get('Commands', {}):
             cmd = Command(rule_text, action_text, scope=self.scope)
             self.commands.append(cmd)
