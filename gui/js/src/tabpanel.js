@@ -12,6 +12,7 @@ class EditorTabPanel extends React.Component {
         const editors = this.editorItems;
         return (
             <div id="editor-panel">
+                <StatusBar onSaveClick={this.props.onSaveClick}/>
                 <ul className="nav nav-tabs" role="tablist">
                     {tabs}
                 </ul>

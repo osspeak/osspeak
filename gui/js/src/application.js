@@ -20,6 +20,7 @@ class Application extends React.Component {
                     />
                     <EditorTabPanel
                         onTabClick={this.updateActiveModule.bind(this)}
+                        onSaveClick={this.saveModules.bind(this)}
                         moduleMap={this.state.moduleMap}
                         activeModule={this.state.activeModule}
                     />
@@ -43,6 +44,10 @@ class Application extends React.Component {
     
     updateActiveModule(moduleName) {
         this.setState({activeModule: moduleName});
+    }
+
+    saveModules() {
+        console.log('x');
     }
 
 }

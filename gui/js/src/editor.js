@@ -5,7 +5,6 @@ class CommandModuleEditor extends React.Component {
     }
 
     render() {
-        console.log(this.props)
         return (
             <div className="editor">
                 <ModuleGroup title='Variables' textObjs={this.props.module.variables} />
