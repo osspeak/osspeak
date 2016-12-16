@@ -3,7 +3,6 @@ class StatusBar extends React.Component {
         return (
             <div id="status-bar">
                 <i className="fa fa-camera-retro" id="refresh-icon"></i>
-                hello world i'm a bar
             </div>
         );
     }

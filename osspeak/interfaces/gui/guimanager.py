@@ -18,6 +18,12 @@ class GuiProcessManager(ProcessManager):
         self.event_dispatcher = event_dispatcher
         self.websocket_established = False
         self.message_queue = []
+        self.on_message = {
+            'save modules': self.save_modules
+        }
+
+    def save_modules(self, msg_data):
+        self.event_dispatcher.cmd_module_watcher.modules_to_save = msg_data['modules']
 
     async def hello(self, request):
         return web.Response(text="Hello, world")
@@ -38,6 +44,8 @@ class GuiProcessManager(ProcessManager):
             del self.message_queue[:]
         async for msg in self.ws:
             if msg.type == aiohttp.WSMsgType.TEXT:
+                msg_dict = json.loads(msg.data)
+                self.on_message[msg_dict['type']](msg_dict['payload'])
                 if msg.data == 'close':
                     await self.ws.close()
             elif msg.type == aiohttp.WSMsgType.ERROR:

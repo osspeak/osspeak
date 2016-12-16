@@ -1,10 +1,12 @@
 import collections
 import itertools
+import json
 
 from sprecgrammars.actions.parser import ActionParser
 from sprecgrammars.actions import nodes
 from sprecgrammars.functions.parser import FunctionDefinitionParser
 from sprecgrammars import api
+from interfaces.gui import serializer
 from client import commands, scopes
 from sprecgrammars.formats.rules import astree
 from sprecgrammars.formats import RuleParser, SrgsXmlConverter
@@ -51,6 +53,10 @@ class CommandModule:
         for i, func in enumerate(self.functions):
             action_text = config_funcs[i][1]
             func.action = api.action(action_text, defined_functions=self.scope.functions)
+
+    def to_dict(self):
+        jsonstr = json.dumps(self, cls=serializer.GuiEncoder)
+        return json.loads(jsonstr) 
 
 class Command:
     

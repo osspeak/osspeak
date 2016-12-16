@@ -7,7 +7,7 @@ class CommandModuleTree extends React.Component {
     
     render() {
         return (
-            <div id="command-module-tree" className="tree"/>
+            <div id="command-module-tree" className="tree" />
         );
     }
 

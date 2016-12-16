@@ -47,7 +47,7 @@ class Application extends React.Component {
     }
 
     saveModules() {
-        console.log('x');
+        communicator.sendMessage('save modules', {modules: this.state.moduleMap})
     }
 
 }

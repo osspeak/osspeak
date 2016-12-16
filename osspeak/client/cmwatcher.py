@@ -19,6 +19,7 @@ class CommandModuleWatcher:
         self.event_dispatcher = event_dispatcher
         self.current_condition = scopes.CurrentCondition()
         self.initial = True
+        self.modules_to_save = {}
 
     def load_modules(self):
         self.initialize_modules()
@@ -141,12 +142,23 @@ class CommandModuleWatcher:
         import time
         while True:
             time.sleep(2)
+            self.save_updated_modules()
             active_window = api.get_active_window_name().lower()
             if active_window != self.current_condition.window_title:
                 self.current_condition.window_title = active_window
                 new_active_modules = dict(self.get_active_modules())
                 if new_active_modules != self.active_modules or self.initial:
                     self.load_modules()
+
+    def save_updated_modules(self):
+        # should use a lock here
+        modules_to_save = self.modules_to_save
+        self.modules_to_save = {}
+        changed_modules = {}
+        for path, cmd_module_object in modules_to_save.items():
+            if cmd_module_object != self.cmd_modules[path].to_dict():
+                changed_modules[path] = cmd_module_object
+
 
     def display_module_tree(self):
         tree = self.serialize_as_tree()
@@ -182,7 +194,7 @@ class CommandModuleWatcher:
             parent = node_map[partial_path]['children']
         parent.append({'text': path[-1], 'id': os.path.join(*path)})
 
-    def serialize_modules(self):
+    def update_modules(self):
         module_map = {}
         for path, command_module in self.cmd_modules.items():
             pass

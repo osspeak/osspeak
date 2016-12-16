@@ -12,7 +12,7 @@ class EditorTabPanel extends React.Component {
         const editors = this.editorItems;
         return (
             <div id="editor-panel">
-                <StatusBar onSaveClick={this.props.onSaveClick}/>
+                <StatusBar onSaveClick={this.props.onSaveClick} />
                 <ul className="nav nav-tabs" role="tablist">
                     {tabs}
                 </ul>
@@ -27,7 +27,8 @@ class EditorTabPanel extends React.Component {
         const tabs = [];
         for (let moduleName of this.state.openModules) {
             let active = moduleName === this.props.activeModule ? 'active' : '';
-            tabs.push(<Tab key={moduleName} onClick={this.props.onTabClick} title={moduleName} active={active} />);
+            let tab = <Tab key={moduleName} onClick={this.props.onTabClick} title={moduleName} active={active} />;
+            tabs.push(tab);
         }
         return tabs;
     }
@@ -49,11 +50,8 @@ class EditorTabPanel extends React.Component {
     componentWillReceiveProps(nextProps) {
         const el = ReactDOM.findDOMNode(this);
         const linkItems = el.getElementsByClassName('nav-link');
-        for (let item of linkItems) {
-            item.classList.remove('active');
-        }
-        if (nextProps.activeModule !== null &&
-            !this.state.openModules.includes(nextProps.activeModule)) {
+        const newModule = nextProps.activeModule !== null && !this.state.openModules.includes(nextProps.activeModule);
+        if (newModule) {
             this.setState({
                 openModules: this.state.openModules.concat([nextProps.activeModule])
             });

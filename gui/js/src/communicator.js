@@ -17,7 +17,7 @@ class MainProcessCommunicator {
     }
 
     onopen() {
-        this.ws.send('sasdasdsad');
+
     }
 
     fireSubscription(name, payload) {
