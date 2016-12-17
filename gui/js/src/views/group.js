@@ -1,11 +1,9 @@
 class ModuleGroup extends React.Component {
 
-    changeItem(index, value) {
-        console.log(index,b,c)
-        const data = {index: index, type: this.state.type, value: value};
+    changeItem(index, value, fieldKey) {
+        const data = {index: index, type: this.props.groupType, value: value, fieldKey: fieldKey};
         this.props.onFieldInput('setItem', data);
     }
-
 
     render() {
         const fields = [];

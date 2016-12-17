@@ -45,7 +45,6 @@ class Application extends React.Component {
 
     mutateModuleMap(action, data={}) {
         let newModules;
-        console.log(this, action, data);
         switch (action) {
             case 'setItem':
                 newModules = modules.setItem(this.state.moduleMap, data)

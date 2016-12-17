@@ -16,7 +16,7 @@ class CommandModuleEditor extends React.Component {
             let textObjKeys = this.textObjKeys[groupType];
             groups.push(<ModuleGroup
                          groupType={groupType}
-                         onFieldInput={this.props.onFieldInput}
+                         onFieldInput={this.changeItem.bind(this)}
                          textObjs={textObjs}
                          textObjKeys={textObjKeys}
                          key={groupType}
@@ -29,16 +29,9 @@ class CommandModuleEditor extends React.Component {
         );
     }
 
-    firstName(type) {
-        if (type === 'variables') return 'name';
-        if (type === 'functions') return 'signature';
-        if (type === 'commands') return 'rule.text';
+    changeItem(action, data) {
+        data.modulePath = this.props.module.path;
+        this.props.onFieldInput(action, data);
     }
 
-    secondName(type) {
-        if (type === 'variables') return 'rule_text';
-        if (type === 'functions') return 'action';
-        if (type === 'commands') return 'action.text';
-    }
-    
 }

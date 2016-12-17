@@ -1,5 +1,12 @@
 let modules = {
-    setItem: function(moduleArray, data) {
-        console.log(moduleArray, data)
+
+    setItem: function(moduleMap, data) {
+        const moduleCopy = this.copy(moduleMap[data.modulePath]);
+        console.log(data);
+    },
+
+    copy: function(moduleObj) {
+        return jQuery.extend(true, {}, moduleObj);
     }
+
 }

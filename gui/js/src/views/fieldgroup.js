@@ -2,7 +2,6 @@ class FieldGroup extends React.Component {
 
     render() {
         const textArr = this.textArr;
-        console.log(textArr);
         return (
             <div className="hbox">
                 <InputField keyName={textArr[0].key} value={textArr[0].value} onInput={this.props.onFieldInput} />
