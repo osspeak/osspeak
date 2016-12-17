@@ -40,7 +40,7 @@ class EditorTabPanel extends React.Component {
             let moduleObj = this.props.moduleMap[moduleName];
             editors.push(
                 <div key={moduleName} className={`tab-pane ${active}`} id={moduleName} role="tabpanel">
-                    <CommandModuleEditor module={moduleObj} />
+                    <CommandModuleEditor module={moduleObj} onFieldInput={this.props.onFieldInput} />
                 </div>
             );
         }

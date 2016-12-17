@@ -16,13 +16,14 @@ class Application extends React.Component {
                     <CommandModuleTree
                         selected={this.state.activeModule}
                         data={this.state.tree}
-                        onSelect={this.updateActiveModule.bind(this)} 
+                        onSelect={this.updateActiveModule.bind(this)}
                     />
                     <EditorTabPanel
                         onTabClick={this.updateActiveModule.bind(this)}
                         onSaveClick={this.saveModules.bind(this)}
                         moduleMap={this.state.moduleMap}
                         activeModule={this.state.activeModule}
+                        onFieldInput={this.mutateModuleMap.bind(this)}
                     />
                 </div>
             </div>
@@ -40,6 +41,15 @@ class Application extends React.Component {
 
     updateModuleMap(data) {
         this.setState({moduleMap: data.modules});
+    }
+
+    mutateModuleMap(action, data={}) {
+        let newModules;
+        console.log(this, action, data);
+        switch (action) {
+            case 'setItem':
+                newModules = modules.setItem(this.state.moduleMap, data)
+        }
     }
     
     updateActiveModule(moduleName) {

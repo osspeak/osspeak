@@ -158,6 +158,7 @@ class CommandModuleWatcher:
         for path, cmd_module_object in modules_to_save.items():
             if cmd_module_object != self.cmd_modules[path].to_dict():
                 changed_modules[path] = cmd_module_object
+        print(changed_modules)
 
 
     def display_module_tree(self):
