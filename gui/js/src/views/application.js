@@ -33,6 +33,7 @@ class Application extends React.Component {
     componentDidMount() {
         communicator.subscribe('display module tree', this.updateTree.bind(this));
         communicator.subscribe('module map', this.updateModuleMap.bind(this));
+        document.onkeydown = this.keyPress.bind(this);
     }
 
     updateTree(data) {
@@ -48,11 +49,16 @@ class Application extends React.Component {
         switch (action) {
             case 'setItem':
                 newModules = modules.setItem(this.state.moduleMap, data)
+                this.setState({moduleMap: newModules});
         }
     }
     
     updateActiveModule(moduleName) {
         this.setState({activeModule: moduleName});
+    }
+
+    keyPress(evt) {
+        if (evt.key === 's' && evt.ctrlKey) this.saveModules();
     }
 
     saveModules() {
