@@ -24,7 +24,6 @@ class CommandModuleWatcher:
 
     def load_modules(self):
         self.initialize_modules()
-        self.display_module_tree()
         self.create_grammar_output()
         self.event_dispatcher.engine_process.start_engine_listening(init=self.initial)
         self.initial = False
@@ -178,36 +177,7 @@ class CommandModuleWatcher:
                 changed_modules[path] = cmd_module_config
         return changed_modules
 
-    def display_module_tree(self):
-        tree = self.serialize_as_tree()
-        payload = {'tree': tree}
-        if self.initial:
-            self.event_dispatcher.gui_manager.send_message('display module tree',
-                payload, encoder=serializer.GuiEncoder)
-
     def send_module_information(self):
         payload = {'modules': self.cmd_modules}
         self.event_dispatcher.gui_manager.send_message('module map',
             payload, encoder=serializer.GuiEncoder)
-
-    def serialize_as_tree(self):
-        node_map = {'': {'children': []}}
-        command_dir = usersettings.command_directory()
-        for path, cmd_module in self.cmd_modules.items():
-            tree_path = list(os.path.split(path))
-            if tree_path[0] == '':
-                tree_path.pop(0)
-            self.add_tree_node(tree_path, node_map, cmd_module)
-        return node_map['']['children']
-
-    def add_tree_node(self, path, node_map, cmd_module):
-        parent = node_map['']['children']
-        partial_path = ''
-        for directory in path[:-1]:
-            partial_path += os.sep + directory
-            if partial_path not in node_map:
-                node = {'text': directory, 'children': [], 'id': partial_path}
-                node_map[partial_path] = node
-                parent.append(node)
-            parent = node_map[partial_path]['children']
-        parent.append({'text': path[-1], 'id': os.path.join(*path)})

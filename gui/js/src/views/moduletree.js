@@ -22,6 +22,11 @@ class CommandModuleTree extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        if (!this.hasSameProps(this.props.moduleMap, nextProps.moduleMap)) {
+            const tree = this.tree;
+            tree.settings.core.data = this.data(nextProps.moduleMap);
+            tree.refresh();
+        }
         if (this.selected !== nextProps.selected) {
             $('#command-module-tree').jstree("deselect_all");
             $('#command-module-tree').jstree('select_node', nextProps.selected);
@@ -29,15 +34,9 @@ class CommandModuleTree extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return nextProps.data !== this.props.data;
+        return false;
     }
-    
-    componentDidUpdate(prevProps, prevState) {
-        const tree = this.tree;
-        tree.settings.core.data = this.props.data;
-        tree.refresh();
-    }
-    
+
     get tree() {
         return $('#command-module-tree').jstree(true);
     }
@@ -54,6 +53,41 @@ class CommandModuleTree extends React.Component {
                 this.selected = data.selected[0];
                 this.props.onSelect(data.selected[0]);
             }
+        });
+
+    }
+
+    data(moduleMap) {
+        const nodeMap = {'': {'children': []}};
+        for (let path of Object.keys(moduleMap)) {
+            let splitPath = path.split('\\');
+            this.addTreeNode(splitPath, nodeMap);
+        }
+        return nodeMap[''].children;
+    }
+
+    addTreeNode(path, nodeMap) {
+        let parent = nodeMap[''].children;
+        let partialPath = '';
+        for (var i = 0; i < path.length - 1; i++) {
+            let directory = path[i];
+            partialPath += '\\' + directory;
+            if (nodeMap[partialPath] === undefined) {
+                let node = {'text': directory, 'children': [], 'id': partialPath};
+                nodeMap[partialPath] = node;
+                parent.push(node);
+            }
+            parent = nodeMap[partialPath]['children'];
+        }
+        parent.push({'text': path[path.length - 1], 'id': path.join('\\')})
+    }
+
+    hasSameProps(obj1, obj2) {
+        const overlap1 = Object.keys(obj1).every(function(prop) {
+            return obj2.hasOwnProperty(prop);
+        });
+        return overlap1 && Object.keys(obj2).every(function(prop) {
+            return obj1.hasOwnProperty(prop);
         });
     }
 }

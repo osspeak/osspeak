@@ -15,6 +15,7 @@ class Application extends React.Component {
                 <div className="hbox">
                     <CommandModuleTree
                         selected={this.state.activeModule}
+                        moduleMap={this.state.moduleMap}
                         data={this.state.tree}
                         onSelect={this.updateActiveModule.bind(this)}
                     />
@@ -31,13 +32,8 @@ class Application extends React.Component {
     }
 
     componentDidMount() {
-        communicator.subscribe('display module tree', this.updateTree.bind(this));
         communicator.subscribe('module map', this.updateModuleMap.bind(this));
         document.onkeydown = this.keyPress.bind(this);
-    }
-
-    updateTree(data) {
-        this.setState({tree: data.tree});
     }
 
     updateModuleMap(data) {
