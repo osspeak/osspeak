@@ -161,8 +161,11 @@ class CommandModuleWatcher:
                     self.load_modules()
 
     def update_modules(self, modified_modules):
+        command_dir = usersettings.command_directory()
         for path, cmd_module_config in modified_modules.items():
             self.raw_command_text_files[path] = cmd_module_config
+            with open(os.path.join(command_dir, path), 'w') as outfile:
+                json.dump(cmd_module_config, outfile)
         self.load_modules()
 
     def save_updated_modules(self):

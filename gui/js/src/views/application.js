@@ -10,7 +10,6 @@ class Application extends React.Component {
     }
 
     render() {
-        console.log(this.state.moduleMap);
         return (
             <div className="vbox fill-parent">
                 <div className="hbox">
