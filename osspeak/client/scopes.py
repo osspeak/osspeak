@@ -3,8 +3,9 @@ from platforms import api
 
 class Scope:
 
-    def __init__(self, global_scope=None):
+    def __init__(self, global_scope=None, name=''):
         self.cmd_modules = {}
+        self.name = name
         self._variables = {}
         self._functions = {}
         self.global_scope = global_scope

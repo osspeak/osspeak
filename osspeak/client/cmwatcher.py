@@ -20,6 +20,7 @@ class CommandModuleWatcher:
         self.current_condition = scopes.CurrentCondition()
         self.initial = True
         self.modules_to_save = {}
+        self.raw_command_text_files = self.load_command_json()
 
     def load_modules(self):
         self.initialize_modules()
@@ -30,7 +31,7 @@ class CommandModuleWatcher:
 
     def initialize_modules(self):
         self.init_fields()
-        self.load_command_json()
+        self.load_command_modules()
         self.load_scope_and_conditions()
         self.flag_active_modules()
 
@@ -56,6 +57,7 @@ class CommandModuleWatcher:
         self.command_map = {}
 
     def load_command_json(self):
+        raw_command_text_files = {}
         command_dir = usersettings.command_directory()
         if not os.path.isdir(command_dir):
             os.makedirs(command_dir)
@@ -67,8 +69,13 @@ class CommandModuleWatcher:
                 full_path = os.path.join(root, fname)
                 partial_path = full_path[len(command_dir) + 1:]
                 with open(full_path) as f:
-                    cmd_module = commands.CommandModule(json.load(f), partial_path)
-                    self.cmd_modules[partial_path] = cmd_module
+                    raw_command_text_files[partial_path] = json.load(f)
+        return raw_command_text_files
+
+    def load_command_modules(self):
+        for path, config in self.raw_command_text_files.items():
+            cmd_module = commands.CommandModule(config, path)
+            self.cmd_modules[path] = cmd_module
 
     def load_scope_and_conditions(self):
         for path, cmd_module in self.cmd_modules.items():
@@ -130,7 +137,7 @@ class CommandModuleWatcher:
         scope_name = cmd_module.config.get('Scope', '')
         if scope_name not in self.scope_groupings:
             global_scope = self.scope_groupings['']
-            self.scope_groupings[scope_name] = scopes.Scope(global_scope)
+            self.scope_groupings[scope_name] = scopes.Scope(global_scope, name=scope_name)
         self.scope_groupings[scope_name].cmd_modules[path] = cmd_module
         cmd_module.scope = self.scope_groupings[scope_name]
 
@@ -142,7 +149,10 @@ class CommandModuleWatcher:
         import time
         while True:
             time.sleep(2)
-            self.save_updated_modules()
+            changed_modules = self.save_updated_modules()
+            if changed_modules:
+                self.update_modules(changed_modules)
+                continue
             active_window = api.get_active_window_name().lower()
             if active_window != self.current_condition.window_title:
                 self.current_condition.window_title = active_window
@@ -150,16 +160,20 @@ class CommandModuleWatcher:
                 if new_active_modules != self.active_modules or self.initial:
                     self.load_modules()
 
+    def update_modules(self, modified_modules):
+        for path, cmd_module_config in modified_modules.items():
+            self.raw_command_text_files[path] = cmd_module_config
+        self.load_modules()
+
     def save_updated_modules(self):
         # should use a lock here
         modules_to_save = self.modules_to_save
         self.modules_to_save = {}
         changed_modules = {}
-        for path, cmd_module_object in modules_to_save.items():
-            if cmd_module_object != self.cmd_modules[path].to_dict():
-                changed_modules[path] = cmd_module_object
-        print(changed_modules)
-
+        for path, cmd_module_config in modules_to_save.items():
+            if cmd_module_config != self.cmd_modules[path].config:
+                changed_modules[path] = cmd_module_config
+        return changed_modules
 
     def display_module_tree(self):
         tree = self.serialize_as_tree()
@@ -194,9 +208,3 @@ class CommandModuleWatcher:
                 parent.append(node)
             parent = node_map[partial_path]['children']
         parent.append({'text': path[-1], 'id': os.path.join(*path)})
-
-    def update_modules(self):
-        module_map = {}
-        for path, command_module in self.cmd_modules.items():
-            pass
-        return module_map

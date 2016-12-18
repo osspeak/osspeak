@@ -1,24 +1,13 @@
 class CommandModuleEditor extends React.Component {
 
-    constructor(props, context) {
-        super(props, context);
-        this.textObjKeys = {
-            variables: ['name', 'rule_text'],
-            functions: ['signature', 'action'],
-            commands: ['rule.text', 'action.text'],
-        }
-    }
-
     render() {
         const groups = [];
-        for (var groupType of ['variables', 'functions', 'commands']) {
+        for (var groupType of ['Variables', 'Functions', 'Commands']) {
             let textObjs = this.props.module[groupType];
-            let textObjKeys = this.textObjKeys[groupType];
             groups.push(<ModuleGroup
                          groupType={groupType}
                          onFieldInput={this.changeItem.bind(this)}
                          textObjs={textObjs}
-                         textObjKeys={textObjKeys}
                          key={groupType}
                         />);
         }
@@ -30,7 +19,7 @@ class CommandModuleEditor extends React.Component {
     }
 
     changeItem(action, data) {
-        data.modulePath = this.props.module.path;
+        data.modulePath = this.props.modulePath;
         this.props.onFieldInput(action, data);
     }
 

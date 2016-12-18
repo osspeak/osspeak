@@ -10,6 +10,7 @@ class Application extends React.Component {
     }
 
     render() {
+        console.log(this.state.moduleMap);
         return (
             <div className="vbox fill-parent">
                 <div className="hbox">
@@ -48,7 +49,7 @@ class Application extends React.Component {
         let newModules;
         switch (action) {
             case 'setItem':
-                newModules = modules.setItem(this.state.moduleMap, data)
+                newModules = modules.setItem(this.state.moduleMap, data);
                 this.setState({moduleMap: newModules});
         }
     }
@@ -62,7 +63,7 @@ class Application extends React.Component {
     }
 
     saveModules() {
-        communicator.sendMessage('save modules', {modules: this.state.moduleMap})
+        communicator.sendMessage('save modules', {modules: this.state.moduleMap});
     }
 
 }

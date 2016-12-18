@@ -7,12 +7,12 @@ class ModuleGroup extends React.Component {
 
     render() {
         const fields = [];
-        for (let [index, textObj] of this.props.textObjs.entries()) {
+        const textObjs = Array.isArray(this.props.textObjs) ? this.props.textObjs : [];
+        for (let [index, textObj] of textObjs.entries()) {
             let fg = <FieldGroup 
                       onFieldInput={this.changeItem.bind(this, index)}
                       type={this.props.groupType}
                       textObj={textObj}
-                      textObjKeys={this.props.textObjKeys}
                       key={index}
                      />
             fields.push(fg);

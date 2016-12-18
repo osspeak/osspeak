@@ -8,7 +8,7 @@ class InputField extends React.Component {
     componentDidMount() {
         const el = ReactDOM.findDOMNode(this);
         el.addEventListener('input', (evt) => {
-            this.props.onInput(el.value, this.props.keyName);
+            this.props.onInput(el.value, this.props.index);
         });
     }
 
