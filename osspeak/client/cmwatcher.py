@@ -8,8 +8,9 @@ from sprecgrammars.actions.parser import ActionParser
 from settings import usersettings
 from interfaces.gui import serializer
 from client import commands, scopes
-from sprecgrammars.formats.rules import astree
-from sprecgrammars.formats import RuleParser, SrgsXmlConverter
+from sprecgrammars.rules import astree
+from sprecgrammars.rules.parser import RuleParser
+from sprecgrammars.rules.converter import SrgsXmlConverter
 from platforms import api
 import time
 

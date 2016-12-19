@@ -75,7 +75,7 @@ class VariableNode(ASTNode):
         self.init_rule(varmap)
 
     def init_rule(self, varmap):
-        from sprecgrammars.formats import RuleParser
+        from sprecgrammars.rules.parser import RuleParser
         parser = RuleParser(self.rule_text, varmap)
         self.rule = parser.parse_as_rule()
         self.rule.is_variable = True

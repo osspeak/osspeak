@@ -8,8 +8,8 @@ from sprecgrammars.functions.parser import FunctionDefinitionParser
 from sprecgrammars import api
 from interfaces.gui import serializer
 from client import commands, scopes
-from sprecgrammars.formats.rules import astree
-from sprecgrammars.formats import RuleParser, SrgsXmlConverter
+from sprecgrammars.rules import astree
+from sprecgrammars.rules.parser import RuleParser
 
 class CommandModule:
 

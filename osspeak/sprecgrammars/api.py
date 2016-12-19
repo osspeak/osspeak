@@ -1,7 +1,7 @@
-from sprecgrammars.formats.rules.parser import RuleParser
+from sprecgrammars.rules.parser import RuleParser
 from sprecgrammars.actions.parser import ActionParser
 from sprecgrammars.functions.parser import FunctionDefinitionParser
-from sprecgrammars.formats.rules.astree import VariableNode
+from sprecgrammars.rules.astree import VariableNode
 
 def rule(text, variables=None):
     parser = RuleParser(text, variables=variables)

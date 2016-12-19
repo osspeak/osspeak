@@ -1,7 +1,7 @@
 import json
 from client import cmwatcher, commands
 from sprecgrammars.functions.astree import FunctionDefinition
-from sprecgrammars.formats.rules.astree import Rule, VariableNode
+from sprecgrammars.rules.astree import Rule, VariableNode
 from sprecgrammars.actions.nodes import RootAction
 from client import commands
 

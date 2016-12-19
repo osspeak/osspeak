@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from sprecgrammars.formats.rules import astree
+from sprecgrammars.rules import astree
 import uuid
 from pprint import pprint
 

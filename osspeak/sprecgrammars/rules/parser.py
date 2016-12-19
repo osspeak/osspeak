@@ -1,11 +1,10 @@
 import copy
 
 from sprecgrammars import tokens
-from sprecgrammars.formats.baseparser import BaseParser
-from sprecgrammars.formats.rules import ruletokstream, astree
+from sprecgrammars.rules import ruletokstream, astree
 
 
-class RuleParser(BaseParser):
+class RuleParser:
     '''
     Convert a rule string i.e. 'hello (world|universe) into
     an abstract syntax tree of nodes that can be serialized
@@ -13,7 +12,7 @@ class RuleParser(BaseParser):
     '''
 
     def __init__(self, text, variables=None, debug=False):
-        super().__init__(text)
+        self.text = text
         self.variables = {} if variables is None else variables
         self.debug = debug
         self.stream = ruletokstream.RuleTokenStream(self.text)

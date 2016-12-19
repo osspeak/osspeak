@@ -1,4 +1,4 @@
-from sprecgrammars.formats.rules import astree
+from sprecgrammars.rules import astree
 from platforms import api
 
 class Scope:

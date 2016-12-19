@@ -1,7 +1,7 @@
 import unittest
 
-from sprecgrammars.formats.rules import converter, parser 
-from sprecgrammars.formats.rules.astree import GroupingNode, OrNode, WordNode 
+from sprecgrammars.rules import converter, parser 
+from sprecgrammars.rules.astree import GroupingNode, OrNode, WordNode 
 from sprecgrammars.actions import nodes
 from tests.sprecgrammars.rules import strings
 

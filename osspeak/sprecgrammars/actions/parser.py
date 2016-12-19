@@ -1,4 +1,3 @@
-from sprecgrammars.formats.baseparser import BaseParser
 from sprecgrammars.actions import actionstream, nodes
 from sprecgrammars.actions import tokens
 from sprecgrammars.functions import library
