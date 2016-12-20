@@ -64,7 +64,7 @@ class GroupingNode(ASTNode):
         self.action_substitute = None
         self.child_ids = {}
 
-class VariableNode(ASTNode):
+class NamedRuleNode(ASTNode):
 
     def __init__(self, name, rule_text, varmap):
         super().__init__()

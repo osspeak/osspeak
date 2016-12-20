@@ -15,7 +15,7 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
         if ch in '()':
             return self.read_paren_token()
         if ch == '<':
-            return self.read_variable()
+            return self.read_named_rule()
         if ch == '=':
             return self.read_action_substitute()
         if ch == '_':
@@ -56,10 +56,10 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
     def read_digits(self):
         return self.read_while(lambda ch: ch.isdigit())
 
-    def read_variable(self):
+    def read_named_rule(self):
         var_name = self.read_while(lambda ch: ch != '>')
         self.stream.next()
-        return tokens.VariableToken(var_name[1:])
+        return tokens.NamedRuleToken(var_name[1:])
 
     def read_action_substitute(self):
         assert self.stream.next() == '='

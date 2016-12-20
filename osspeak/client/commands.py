@@ -33,7 +33,7 @@ class CommandModule:
     def load_variables(self):
         for varname, rule_text in self.config.get('Variables', {}):
             current_var = self.scope._variables[varname]
-            if isinstance(current_var, astree.VariableNode):
+            if isinstance(current_var, astree.NamedRuleNode):
                 self.variables.append(current_var)
                 continue
             assert isinstance(current_var, str)
@@ -124,7 +124,7 @@ class Command:
                 increment += remaining_increment
             else:
                 for child in parent_node.children:
-                    if isinstance(child, astree.VariableNode):
+                    if isinstance(child, astree.NamedRuleNode):
                         if remaining_id == child.rule.id:
                             parent_node = child.rule
                             child_ids = {c.id: c for c in parent_node.children}

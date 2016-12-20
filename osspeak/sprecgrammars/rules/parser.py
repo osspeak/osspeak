@@ -24,7 +24,7 @@ class RuleParser:
             tokens.OrToken: self.parse_or_token,
             tokens.ParenToken: self.parse_paren_token,
             tokens.RepetitionToken: self.parse_repetition_token,
-            tokens.VariableToken: self.parse_variable_token,
+            tokens.NamedRuleToken: self.parse_named_rule_token,
             tokens.ActionSubstituteToken: self.parse_action_substitute_token
         }
 
@@ -58,7 +58,7 @@ class RuleParser:
         or_node = astree.OrNode()
         self.top.children.append(or_node)
 
-    def parse_variable_token(self, tok):
+    def parse_named_rule_token(self, tok):
         from sprecgrammars import api
         self.maybe_pop_top_grouping()
         # want a copy to avoid mutating original, ie repeat

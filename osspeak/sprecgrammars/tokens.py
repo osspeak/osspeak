@@ -23,7 +23,7 @@ class BracketToken(BaseToken):
         assert char in '[]'
         self.is_open = char == '['
 
-class VariableToken(BaseToken):
+class NamedRuleToken(BaseToken):
     
     def __init__(self, name):
         self.name = name

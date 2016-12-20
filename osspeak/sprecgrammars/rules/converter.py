@@ -88,7 +88,7 @@ class SrgsXmlConverter:
                     self.add_text_to_item_elem(choices[-1], child, node)
             elif isinstance(child, astree.GroupingNode):
                 self.add_grouping(child, choices)
-            elif isinstance(child, astree.VariableNode):
+            elif isinstance(child, astree.NamedRuleNode):
                 text = 'out += "{}=|" + rules.latest();'.format(child.rule.id)
                 rritem = self.get_ruleref_item(child.rule.id, text=None, low=child.repeat_low, high=child.repeat_high)
                 choices[-1].append(rritem)
