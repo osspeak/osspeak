@@ -20,8 +20,9 @@ class GrammarNode(ASTNode):
 
 class Rule(ASTNode):
 
-    def __init__(self):
+    def __init__(self, name=None):
         super().__init__()
+        self.name = name
         self.children = []
         self.grouping_variables = collections.OrderedDict()
         # make a copy in perform_action to keep track of string values
@@ -79,4 +80,3 @@ class NamedRuleNode(ASTNode):
         parser = RuleParser(self.rule_text, varmap)
         self.rule = parser.parse_as_rule()
         self.rule.is_variable = True
-

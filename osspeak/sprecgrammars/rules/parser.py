@@ -1,8 +1,6 @@
 import copy
 
-from sprecgrammars import tokens
-from sprecgrammars.rules import ruletokstream, astree
-
+from sprecgrammars.rules import ruletokstream, astree, tokens
 
 class RuleParser:
     '''

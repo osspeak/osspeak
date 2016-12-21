@@ -1,5 +1,5 @@
 from sprecgrammars import abstokenstream
-from sprecgrammars import tokens
+from sprecgrammars.rules import tokens
 
 class RuleTokenStream(abstokenstream.AbstractTokenStream):
 
