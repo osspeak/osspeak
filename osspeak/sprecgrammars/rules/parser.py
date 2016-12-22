@@ -26,8 +26,8 @@ class RuleParser:
             tokens.ActionSubstituteToken: self.parse_action_substitute_token
         }
 
-    def parse_as_rule(self):
-        top_level_rule = astree.Rule()
+    def parse_as_rule(self, name=None):
+        top_level_rule = astree.Rule(name=name)
         self.grouping_stack = [top_level_rule]
         for tok in self.stream:
             self.token_list.append(tok)
@@ -60,8 +60,11 @@ class RuleParser:
         from sprecgrammars import api
         self.maybe_pop_top_grouping()
         rule_node = self.rules[tok.name]
+        # rule text -> None -> Rule object
         if isinstance(rule_node, str):
+            # rule node is currently rule text
             self.rules[tok.name] = None
+            rule_node = api.rule(rule_node, name=tok.name, rules=self.rules)
             rule_node = api.variable(tok.name, rule_node, self.rules)
             self.rules[tok.name] = rule_node
         # want a copy to avoid mutating original, ie repeat
