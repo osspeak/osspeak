@@ -6,15 +6,15 @@ class Scope:
     def __init__(self, global_scope=None, name=''):
         self.cmd_modules = {}
         self.name = name
-        self._variables = {}
+        self._rules = {}
         self._functions = {}
         self.global_scope = global_scope
 
     @property
-    def variables(self):
-        variables = {} if self.global_scope is None else self.global_scope._variables.copy()
-        variables.update(self._variables)
-        return variables
+    def rules(self):
+        rules = {} if self.global_scope is None else self.global_scope._rules.copy()
+        rules.update(self._rules)
+        return rules
 
     @property
     def functions(self):

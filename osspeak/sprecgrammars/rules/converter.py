@@ -92,6 +92,10 @@ class SrgsXmlConverter:
                 text = 'out += "{}=|" + rules.latest();'.format(child.rule.id)
                 rritem = self.get_ruleref_item(child.rule.id, text=None, low=child.repeat_low, high=child.repeat_high)
                 choices[-1].append(rritem)
+            elif isinstance(child, astree.Rule):
+                text = 'out += "{}=|" + rules.latest();'.format(child.id)
+                rritem = self.get_ruleref_item(child.id, text=None, low=child.repeat_low, high=child.repeat_high)
+                choices[-1].append(rritem)
 
     def add_grouping(self, child, choices):
         rule = ET.Element('rule', attrib={'id': child.id})

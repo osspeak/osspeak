@@ -9,9 +9,9 @@ class RuleParser:
     into speech recognition grammar formats like SRGS XML. 
     '''
 
-    def __init__(self, text, variables=None, debug=False):
+    def __init__(self, text, rules=None, debug=False):
         self.text = text
-        self.variables = {} if variables is None else variables
+        self.rules = {} if rules is None else rules
         self.debug = debug
         self.stream = ruletokstream.RuleTokenStream(self.text)
         self.grouping_stack = []
@@ -60,12 +60,12 @@ class RuleParser:
         from sprecgrammars import api
         self.maybe_pop_top_grouping()
         # want a copy to avoid mutating original, ie repeat
-        var_node = self.variables[tok.name]
-        if isinstance(var_node, str):
-            self.variables[tok.name] = None
-            var_node = api.variable(tok.name, var_node, self.variables)
-            self.variables[tok.name] = var_node
-        var_copy = copy.copy(var_node)
+        rule_node = self.rules[tok.name]
+        if isinstance(rule_node, str):
+            self.rules[tok.name] = None
+            rule_node = api.variable(tok.name, rule_node, self.rules)
+            self.rules[tok.name] = rule_node
+        var_copy = copy.copy(rule_node)
         self.groupings.extend(list(var_copy.rule.grouping_variables.values()))
         self.top.children.append(var_copy)
 

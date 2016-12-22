@@ -18,7 +18,7 @@ class CommandModule:
         self.path = path
         self.scope = None
         self.functions = []
-        self.variables = []
+        self.rules = []
         self.commands = []
 
     def load_commands(self):
@@ -26,21 +26,21 @@ class CommandModule:
             cmd = Command(rule_text, action_text, scope=self.scope)
             self.commands.append(cmd)
 
-    def initialize_variables(self):
+    def initialize_rules(self):
         for varname, rule_text in self.config.get('Variables', {}):
-            self.scope._variables[varname] = rule_text
+            self.scope._rules[varname] = rule_text
 
-    def load_variables(self):
+    def load_rules(self):
         for varname, rule_text in self.config.get('Variables', {}):
-            current_var = self.scope._variables[varname]
-            if isinstance(current_var, astree.NamedRuleNode):
-                self.variables.append(current_var)
+            current_var = self.scope._rules[varname]
+            if isinstance(current_var, (astree.NamedRuleNode, astree.Rule)):
+                self.rules.append(current_var)
                 continue
             assert isinstance(current_var, str)
-            self.scope._variables[varname] = None
-            var = api.variable(varname, rule_text, self.scope._variables)
-            self.scope._variables[varname] = var
-            self.variables.append(var)
+            self.scope._rules[varname] = None
+            var = api.variable(varname, rule_text, self.scope._rules)
+            self.scope._rules[varname] = var
+            self.rules.append(var)
 
     def define_functions(self):
         for func_signature, func_text in self.config.get('Functions', {}):
@@ -67,7 +67,7 @@ class Command:
 
     def init_rule(self, rule_text):
         self.rule_text = rule_text
-        self.rule = api.rule(rule_text, self.scope.variables)
+        self.rule = api.rule(rule_text, self.scope.rules)
 
     def init_action(self, action_text):
         self.action_text = action_text

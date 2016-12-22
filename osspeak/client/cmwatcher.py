@@ -37,7 +37,7 @@ class CommandModuleWatcher:
 
     def create_grammar_output(self):
         self.load_functions()
-        self.load_variables()
+        self.load_rules()
         self.load_commands()
         self.send_module_information()
         self.serialize_scope_xml()
@@ -106,14 +106,14 @@ class CommandModuleWatcher:
         for path, cmd_module in self.cmd_modules.items():
             cmd_module.set_function_actions()
 
-    def load_variables(self):
+    def load_rules(self):
         for path, cmd_module in self.cmd_modules.items():
-            cmd_module.initialize_variables()
+            cmd_module.initialize_rules()
         for path, cmd_module in self.cmd_modules.items():
-            cmd_module.load_variables()
-            for var in cmd_module.variables:
+            cmd_module.load_rules()
+            for rule in cmd_module.rules:
                 if path in self.active_modules:
-                    self.grammar_node.variables.append(var)
+                    self.grammar_node.variables.append(rule)
 
     def load_commands(self):
         for path, cmd_module in self.cmd_modules.items():

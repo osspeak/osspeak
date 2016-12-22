@@ -24,6 +24,8 @@ class Rule(ASTNode):
         super().__init__()
         self.name = name
         self.children = []
+        self.repeat_low = 1
+        self.repeat_high = 1
         self.grouping_variables = collections.OrderedDict()
         # make a copy in perform_action to keep track of string values
         self.grouping_variables_empty = collections.OrderedDict()
