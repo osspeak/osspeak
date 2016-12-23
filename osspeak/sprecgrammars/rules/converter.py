@@ -9,8 +9,6 @@ class SrgsXmlConverter:
         self.convert_map = {
             astree.Rule: self.convert_rule,
             astree.GrammarNode: self.convert_grammar,
-            # astree.OrNode: self.convert_or_node,
-            # astree.WordNode: self.convert_word_node,
         }
         self.grammar_attrib = {
             'version': '1.0',
@@ -123,13 +121,16 @@ class SrgsXmlConverter:
         (parent_elem[-1] and parent_elem[-1].find('ruleref') is not None) or
         not word_node.is_single):
             parent_elem.append(ET.Element('item'))
-            if not isinstance(parent_node, astree.Rule):
+            if self.is_not_named_rule(parent_node):
                 parent_elem[-1].append(ET.Element('tag'))
         self.apply_repeat_attrib(parent_elem[-1], word_node.repeat_low, word_node.repeat_high)
         self.append_text(parent_elem[-1], text)
-        if not isinstance(parent_node, astree.Rule):
+        if self.is_not_named_rule(parent_node):
             text_tag = parent_elem[-1].find('tag')
             text_tag.text = 'out += "literal-{}={}|";'.format(parent_node.id, parent_elem[-1].text)
+
+    def is_not_named_rule(self, node):
+        return not isinstance(node, astree.Rule) or node.name is None
 
     def apply_repeat_attrib(self, elem, low, high, low_default=0, high_default=99):
         elem.attrib.pop('repeat', None)
