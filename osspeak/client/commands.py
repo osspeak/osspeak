@@ -27,11 +27,11 @@ class CommandModule:
             self.commands.append(cmd)
 
     def initialize_rules(self):
-        for rule_name, rule_text in self.config.get('Variables', {}):
+        for rule_name, rule_text in self.config.get('Rules', {}):
             self.scope._rules[rule_name] = rule_text
 
     def load_rules(self):
-        for rule_name, rule_text in self.config.get('Variables', {}):
+        for rule_name, rule_text in self.config.get('Rules', {}):
             current_rule = self.scope._rules[rule_name]
             if isinstance(current_rule, astree.Rule):
                 assert current_rule.name is not None

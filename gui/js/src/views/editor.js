@@ -2,7 +2,7 @@ class CommandModuleEditor extends React.Component {
 
     render() {
         const groups = [];
-        for (var groupType of ['Variables', 'Functions', 'Commands']) {
+        for (var groupType of ['Rules', 'Functions', 'Commands']) {
             let textObjs = this.props.module[groupType];
             groups.push(<ModuleGroup
                          groupType={groupType}
