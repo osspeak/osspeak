@@ -96,3 +96,4 @@ ENV/
 .ropeproject
 
 gui/node_modules/
+.vscode
