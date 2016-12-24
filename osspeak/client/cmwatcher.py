@@ -56,20 +56,28 @@ class CommandModuleWatcher:
         self.command_map = {}
 
     def load_command_json(self):
-        raw_command_text_files = {}
+        json_module_dicts = {}
         command_dir = usersettings.command_directory()
         if not os.path.isdir(command_dir):
             os.makedirs(command_dir)
         for root, dirs, filenames in os.walk(command_dir):
+            # skip hidden directories such as .git
             dirs[:] = [d for d in dirs if not d.startswith('.')]
-            for fname in filenames:
-                if not fname.endswith('.json'):
-                    continue
-                full_path = os.path.join(root, fname)
-                partial_path = full_path[len(command_dir) + 1:]
-                with open(full_path) as f:
-                    raw_command_text_files[partial_path] = json.load(f)
-        return raw_command_text_files
+            self.load_json_directory(filenames, command_dir, root, json_module_dicts)
+        return json_module_dicts
+
+    def load_json_directory(self, filenames, command_dir, root, json_module_dicts):
+        for fname in filenames:
+            if not fname.endswith('.json'):
+                continue
+            full_path = os.path.join(root, fname)
+            partial_path = full_path[len(command_dir) + 1:]
+            with open(full_path) as f:
+                try:
+                    module_config = json.load(f)
+                except json.decoder.JSONDecodeError as e:
+                    module_config = {'Error': str(e)}
+                json_module_dicts[partial_path] = module_config
 
     def load_command_modules(self):
         for path, config in self.raw_command_text_files.items():
@@ -151,19 +159,23 @@ class CommandModuleWatcher:
             if changed_modules:
                 self.update_modules(changed_modules)
                 continue
-            active_window = api.get_active_window_name().lower()
-            if active_window != self.current_condition.window_title:
-                self.current_condition.window_title = active_window
-                new_active_modules = dict(self.get_active_modules())
-                if new_active_modules != self.active_modules or self.initial:
-                    self.load_modules()
+            self.maybe_load_modules()
+
+    def maybe_load_modules(self):
+        active_window = api.get_active_window_name().lower()
+        if active_window == self.current_condition.window_title:
+            return
+        self.current_condition.window_title = active_window
+        new_active_modules = dict(self.get_active_modules())
+        if new_active_modules != self.active_modules or self.initial:
+            self.load_modules()
 
     def update_modules(self, modified_modules):
         command_dir = usersettings.command_directory()
         for path, cmd_module_config in modified_modules.items():
             self.raw_command_text_files[path] = cmd_module_config
             with open(os.path.join(command_dir, path), 'w') as outfile:
-                json.dump(cmd_module_config, outfile)
+                json.dump(cmd_module_config, outfile, indent=4)
         self.load_modules()
 
     def save_updated_modules(self):

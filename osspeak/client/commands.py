@@ -17,8 +17,8 @@ class CommandModule:
         self.config = config
         self.path = path
         self.scope = None
-        self.functions = []
         self.rules = []
+        self.functions = []
         self.commands = []
 
     def load_commands(self):
@@ -106,7 +106,7 @@ class Command:
         child_ids = parent_node.child_ids
         while idx < len(semantic_variables):
             remaining_id, remaining_text = semantic_variables[idx]
-            if remaining_id == 'literal-{}'.format(var_id):
+            if remaining_id == 'literal-{}'.format(var_id): 
                 var_action.children.append(nodes.LiteralKeysAction(remaining_text))
                 idx += 1
                 increment += 1
