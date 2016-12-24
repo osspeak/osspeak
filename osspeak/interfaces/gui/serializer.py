@@ -1,7 +1,7 @@
 import json
 from client import cmwatcher, commands
 from sprecgrammars.functions.astree import FunctionDefinition
-from sprecgrammars.rules.astree import Rule, NamedRuleNode
+from sprecgrammars.rules.astree import Rule
 from sprecgrammars.actions.nodes import RootAction
 from client import commands
 
@@ -18,6 +18,4 @@ class GuiEncoder(json.JSONEncoder):
             return {'text': obj.raw_text}
         if isinstance(obj, Rule):
             return {'text': obj.raw_text}
-        if isinstance(obj, NamedRuleNode):
-            return {'name': obj.name, 'rule_text': obj.rule_text}
         return super().default(obj)

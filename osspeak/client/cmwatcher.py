@@ -3,7 +3,6 @@ import json
 import threading
 import collections
 import tempfile
-import xml.etree.ElementTree as ET
 from sprecgrammars.actions.parser import ActionParser
 from settings import usersettings
 from interfaces.gui import serializer
@@ -113,7 +112,7 @@ class CommandModuleWatcher:
             cmd_module.load_rules()
             for rule in cmd_module.rules:
                 if path in self.active_modules:
-                    self.grammar_node.variables.append(rule)
+                    self.grammar_node.rules.append(rule)
 
     def load_commands(self):
         for path, cmd_module in self.cmd_modules.items():
@@ -146,7 +145,6 @@ class CommandModuleWatcher:
         t.start()
 
     def watch_active_window(self):
-        import time
         while True:
             time.sleep(2)
             changed_modules = self.save_updated_modules()

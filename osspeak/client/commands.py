@@ -27,20 +27,21 @@ class CommandModule:
             self.commands.append(cmd)
 
     def initialize_rules(self):
-        for varname, rule_text in self.config.get('Variables', {}):
-            self.scope._rules[varname] = rule_text
+        for rule_name, rule_text in self.config.get('Variables', {}):
+            self.scope._rules[rule_name] = rule_text
 
     def load_rules(self):
-        for varname, rule_text in self.config.get('Variables', {}):
-            current_var = self.scope._rules[varname]
-            if isinstance(current_var, (astree.NamedRuleNode, astree.Rule)):
-                self.rules.append(current_var)
+        for rule_name, rule_text in self.config.get('Variables', {}):
+            current_rule = self.scope._rules[rule_name]
+            if isinstance(current_rule, astree.Rule):
+                assert current_rule.name is not None
+                self.rules.append(current_rule)
                 continue
-            assert isinstance(current_var, str)
-            self.scope._rules[varname] = None
-            var = api.variable(varname, rule_text, self.scope._rules)
-            self.scope._rules[varname] = var
-            self.rules.append(var)
+            assert isinstance(current_rule, str)
+            self.scope._rules[rule_name] = None
+            rule = api.rule(rule_text, name=rule_name, rules=self.scope._rules)
+            self.scope._rules[rule_name] = rule
+            self.rules.append(rule)
 
     def define_functions(self):
         for func_signature, func_text in self.config.get('Functions', {}):
@@ -124,9 +125,10 @@ class Command:
                 increment += remaining_increment
             else:
                 for child in parent_node.children:
-                    if isinstance(child, astree.NamedRuleNode):
+                    if isinstance(child, astree.Rule):
+                        assert child.name is not None
                         if remaining_id == child.rule.id:
-                            parent_node = child.rule
+                            parent_node = child
                             child_ids = {c.id: c for c in parent_node.children}
                             idx += 1
                             increment += 1

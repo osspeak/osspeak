@@ -1,7 +1,6 @@
 from sprecgrammars.rules.parser import RuleParser
 from sprecgrammars.actions.parser import ActionParser
 from sprecgrammars.functions.parser import FunctionDefinitionParser
-from sprecgrammars.rules.astree import NamedRuleNode
 
 def rule(text, name=None, rules=None):
     parser = RuleParser(text, rules=rules)
@@ -22,7 +21,3 @@ def func_definition(func_signature, func_action=None, defined_functions=None):
     if func_action is not None:
         func_def.action = action(func_action, defined_functions=defined_functions)
     return func_def
-
-def variable(varname, rule_text, varmap):
-    return NamedRuleNode(varname, rule_text, varmap)
-    

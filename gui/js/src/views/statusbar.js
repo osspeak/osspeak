@@ -2,7 +2,7 @@ class StatusBar extends React.Component {
     render() {
         return (
             <div id="status-bar">
-                <i className="fa fa-camera-retro" id="refresh-icon"></i>
+                <i className="fa fa-refresh" id="refresh-icon"></i>
             </div>
         );
     }

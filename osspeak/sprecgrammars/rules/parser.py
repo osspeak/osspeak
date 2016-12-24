@@ -65,11 +65,10 @@ class RuleParser:
             # rule node is currently rule text
             self.rules[tok.name] = None
             rule_node = api.rule(rule_node, name=tok.name, rules=self.rules)
-            rule_node = api.variable(tok.name, rule_node, self.rules)
             self.rules[tok.name] = rule_node
         # want a copy to avoid mutating original, ie repeat
         rule_copy = copy.copy(rule_node)
-        self.groupings.extend(list(rule_copy.rule.grouping_variables.values()))
+        self.groupings.extend(list(rule_copy.grouping_variables.values()))
         self.top.children.append(rule_copy)
 
     def parse_paren_token(self, tok):

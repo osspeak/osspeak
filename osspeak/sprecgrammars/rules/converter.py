@@ -30,14 +30,13 @@ class SrgsXmlConverter:
         top_level_choices = self.build_top_level_choices()
         for rule_node in grammar_node.rules:
             self.append_rule_node(rule_node, top_level_choices)
-        for rule_node in (var.rule for var in grammar_node.variables):
-            self.append_rule_node(rule_node, top_level_choices)
         return self.root
 
     def append_rule_node(self, rule_node, top_level_choices):
         rule = self.convert_rule(rule_node)
         self.root.append(rule)
-        if not rule_node.is_variable:
+        if rule_node.name is None:
+        # if not rule_node.is_variable:
             tag_text = 'out += "-command-{}:" + rules.latest();'.format(rule_node.id)
             top_level_choices.append(self.get_ruleref_item(rule_node.id, text=tag_text))
 
@@ -86,10 +85,6 @@ class SrgsXmlConverter:
                     self.add_text_to_item_elem(choices[-1], child, node)
             elif isinstance(child, astree.GroupingNode):
                 self.add_grouping(child, choices)
-            elif isinstance(child, astree.NamedRuleNode):
-                text = 'out += "{}=|" + rules.latest();'.format(child.rule.id)
-                rritem = self.get_ruleref_item(child.rule.id, text=None, low=child.repeat_low, high=child.repeat_high)
-                choices[-1].append(rritem)
             elif isinstance(child, astree.Rule):
                 text = 'out += "{}=|" + rules.latest();'.format(child.id)
                 rritem = self.get_ruleref_item(child.id, text=None, low=child.repeat_low, high=child.repeat_high)

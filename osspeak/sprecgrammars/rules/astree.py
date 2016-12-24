@@ -32,9 +32,9 @@ class Rule(ASTNode):
         self.open = True
         self.is_variable = False
 
-    @property
-    def id(self):
-        return '{}{}'.format('v' if self.is_variable else 'r', self._id)
+    # @property
+    # def id(self):
+    #     return '{}{}'.format('v' if self.is_variable else 'r', self._id)
 
 class WordNode(ASTNode):
 
@@ -66,19 +66,3 @@ class GroupingNode(ASTNode):
         self.repeat_high = 1
         self.action_substitute = None
         self.child_ids = {}
-
-class NamedRuleNode(ASTNode):
-
-    def __init__(self, name, rule_text, varmap):
-        super().__init__()
-        self.name = name
-        self.repeat_low = 1
-        self.repeat_high = 1
-        self.rule_text = rule_text
-        self.init_rule(varmap)
-
-    def init_rule(self, varmap):
-        from sprecgrammars.rules.parser import RuleParser
-        parser = RuleParser(self.rule_text, varmap)
-        self.rule = parser.parse_as_rule()
-        self.rule.is_variable = True

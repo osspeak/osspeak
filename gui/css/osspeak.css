@@ -18,6 +18,10 @@ html, body {
     flex-grow: 1;
 }
 
+.fg-arrow {
+    margin-top: 20px;
+}
+
 .hbox {
     display: flex;
     flex-grow: 1;
