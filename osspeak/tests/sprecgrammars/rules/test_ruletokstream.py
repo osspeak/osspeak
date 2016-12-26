@@ -13,4 +13,3 @@ class TestRuleParser(unittest.TestCase):
     def test_substitute1(self):
         tokens = self.tokenize_rule(strings.SUBSTITUTE1)
         self.assertEqual(len(tokens), 9)
-        print(tokens, len(tokens))

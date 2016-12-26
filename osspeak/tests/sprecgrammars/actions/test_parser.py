@@ -43,3 +43,11 @@ class TestActionParser(unittest.TestCase):
         self.assertIsInstance(action.children[0], nodes.FunctionCall)
         self.assertEqual(action.children[0].func_name, 'mouse.click')
         self.assertEqual(action.children[0].arguments, [])
+
+    def test_extensions_function(self):
+        action = self.parse_action_string(strings.EXTENSIONS_FUNCTION)
+
+    def test_extensions_args_function(self):
+        action = self.parse_action_string(strings.EXTENSIONS_FUNCTION_WITH_ARGS)
+        print(action)
+        

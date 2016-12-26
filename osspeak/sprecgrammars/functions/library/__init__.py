@@ -1,9 +1,12 @@
-from sprecgrammars.functions.library import mouse, window, keys, system
+from sprecgrammars.functions.library import mouse, window, keys, system, extensions
 
 builtin_functions = {
     'hold': keys.hold,
     'release': keys.release,
     'start': window.start,
+
+    'extensions.run': extensions.run,
+    'extensions.message': extensions.send_message,
 
     'mouse.click': mouse.click,
     'mouse.move': mouse.move,
