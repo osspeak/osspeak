@@ -5,6 +5,7 @@ import json
 from aiohttp import web
 import aiohttp
 from communication.procs import ProcessManager
+from interfaces.gui import serializer
 
 if getattr(sys, 'frozen', False):
     ELECTRON_PATH = r'engines\wsr\RecognizerIO.exe'
@@ -23,7 +24,23 @@ class GuiProcessManager(ProcessManager):
         }
 
     def save_modules(self, msg_data):
-        self.event_dispatcher.cmd_module_watcher.modules_to_save = msg_data['modules']
+        module_configurations = {k: self.to_module_config(v) for (k, v) in msg_data['modules'].items()}
+        self.event_dispatcher.cmd_module_watcher.modules_to_save = module_configurations
+
+    def to_module_config(self, gui_module):
+        module_config = {}
+        for k, config in gui_module.items():
+            if k in ('path', 'error'):
+                continue
+            elif k == 'functions':
+                module_config[k] = [[c['signature']['value'], c['action']['value']] for c in config]
+            elif k == 'rules':
+                module_config[k] = [[c['name']['value'], c['value']['value']] for c in config]
+            elif k == 'commands':
+                module_config[k] = [[c['rule']['value']['value'], c['action']['value']] for c in config]
+            else:
+                module_config[k] = config
+        return module_config
 
     async def hello(self, request):
         return web.Response(text="Hello, world")

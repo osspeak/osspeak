@@ -9,13 +9,21 @@ class GuiEncoder(json.JSONEncoder):
 
     def default(self, obj):
         if isinstance(obj, commands.CommandModule):
-            return obj.config
+            return {
+                'rules': obj.rules,
+                'functions': obj.functions,
+                'commands': obj.commands,
+                'path': obj.path,
+                'scope': getattr(obj.scope, 'name', None),
+                'conditions': obj.conditions,
+                'error': None,
+            }
         if isinstance(obj, FunctionDefinition):
-            return {'signature': obj.raw_text, 'action': obj.action.raw_text}
+            return {'signature': {'value': obj.raw_text, 'errors': []}, 'action': obj.action}
         if isinstance(obj, commands.Command):
-            return {'action': obj.action, 'rule': obj.rule}
+            return {'rule': obj.rule, 'action': obj.action}
         if isinstance(obj, RootAction):
-            return {'text': obj.raw_text}
+            return {'value': obj.raw_text, 'errors': []}
         if isinstance(obj, Rule):
-            return {'text': obj.raw_text}
+            return {'name': {'value': obj.name, 'errors': []}, 'value': {'value': obj.raw_text, 'errors': []}}
         return super().default(obj)

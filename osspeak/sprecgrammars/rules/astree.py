@@ -32,10 +32,6 @@ class Rule(ASTNode):
         self.open = True
         self.is_variable = False
 
-    # @property
-    # def id(self):
-    #     return '{}{}'.format('v' if self.is_variable else 'r', self._id)
-
 class WordNode(ASTNode):
 
     def __init__(self, text):

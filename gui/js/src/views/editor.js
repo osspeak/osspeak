@@ -14,10 +14,9 @@ class CommandModuleEditor extends React.Component {
         this.props.onFieldInput(action, data);
     }
 
-
     get moduleContent() {
         const groups = [];
-        for (let groupType of ['Rules', 'Functions', 'Commands']) {
+        for (let groupType of ['rules', 'functions', 'commands']) {
             let textObjs = this.props.module[groupType];
             groups.push(<ModuleGroup
                          groupType={groupType}

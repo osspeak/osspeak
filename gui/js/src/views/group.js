@@ -7,8 +7,8 @@ class ModuleGroup extends React.Component {
 
     render() {
         const fields = [];
-        const textObjs = Array.isArray(this.props.textObjs) ? this.props.textObjs : [];
-        for (let [index, textObj] of textObjs.entries()) {
+        const fieldObjects = this.fieldGroupObjects;
+        for (let [index, textObj] of fieldObjects.entries()) {
             let fg = <FieldGroup 
                       onFieldInput={this.changeItem.bind(this, index)}
                       type={this.props.groupType}
@@ -17,11 +17,33 @@ class ModuleGroup extends React.Component {
                      />
             fields.push(fg);
         }
+        const title = this.props.groupType[0].toUpperCase() + this.props.groupType.substring(1, this.props.groupType.length);
         return (
             <div>
-                <h1>{this.props.groupType.toUpperCase()}</h1>
+                <h3>{title}</h3>
                 {fields}
             </div>
         );
     }
+
+    get fieldGroupObjects() {
+        const textObjs = Array.isArray(this.props.textObjs) ? this.props.textObjs : [];
+        const groupObjects = [];
+        for (let textObj of textObjs) {
+            groupObjects.push(this.getTextTypes(textObj));
+        }
+        return groupObjects;
+    }
+
+    getTextTypes(textObj) {
+        switch (this.props.groupType) {
+            case 'rules':
+                return [textObj.name, textObj.value];
+            case 'functions':
+                return [textObj.signature, textObj.action];
+            case 'commands':
+                return [textObj.rule.value, textObj.action];
+        }
+    }
+
 }

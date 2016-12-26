@@ -37,6 +37,7 @@ class Application extends React.Component {
     }
 
     updateModuleMap(data) {
+        console.log(data.modules);
         this.setState({moduleMap: data.modules});
     }
 

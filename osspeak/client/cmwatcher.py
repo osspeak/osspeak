@@ -20,7 +20,7 @@ class CommandModuleWatcher:
         self.current_condition = scopes.CurrentCondition()
         self.initial = True
         self.modules_to_save = {}
-        self.raw_command_text_files = self.load_command_json()
+        self.command_module_json = self.load_command_json()
 
     def load_modules(self):
         self.initialize_modules()
@@ -80,7 +80,7 @@ class CommandModuleWatcher:
                 json_module_dicts[partial_path] = module_config
 
     def load_command_modules(self):
-        for path, config in self.raw_command_text_files.items():
+        for path, config in self.command_module_json.items():
             cmd_module = commands.CommandModule(config, path)
             self.cmd_modules[path] = cmd_module
 
@@ -135,13 +135,13 @@ class CommandModuleWatcher:
         self.grammar_xml = converter.convert_grammar(self.grammar_node)
 
     def load_conditions(self, path, cmd_module):
-        conditions_config = cmd_module.config.get('Conditions', {})
-        title = conditions_config.get('Title', '').lower()
+        conditions_config = cmd_module.conditions
+        title = conditions_config.get('title', '').lower()
         if title:
             self.conditions['titles'][title].add(path)
 
     def load_scope(self, path, cmd_module):
-        scope_name = cmd_module.config.get('Scope', '')
+        scope_name = cmd_module.config.get('scope', '')
         if scope_name not in self.scope_groupings:
             global_scope = self.scope_groupings['']
             self.scope_groupings[scope_name] = scopes.Scope(global_scope, name=scope_name)
@@ -173,7 +173,7 @@ class CommandModuleWatcher:
     def update_modules(self, modified_modules):
         command_dir = usersettings.command_directory()
         for path, cmd_module_config in modified_modules.items():
-            self.raw_command_text_files[path] = cmd_module_config
+            self.command_module_json[path] = cmd_module_config
             with open(os.path.join(command_dir, path), 'w') as outfile:
                 json.dump(cmd_module_config, outfile, indent=4)
         self.load_modules()
@@ -184,9 +184,17 @@ class CommandModuleWatcher:
         self.modules_to_save = {}
         changed_modules = {}
         for path, cmd_module_config in modules_to_save.items():
+            # if self.is_superset(cmd_module_config, self.cmd_modules[path].config):
             if cmd_module_config != self.cmd_modules[path].config:
                 changed_modules[path] = cmd_module_config
         return changed_modules
+
+    def is_superset(self, smalldict, bigdict):
+        return any('foo' for (k, v) in smalldict.items() if v != bigdict.get(k))
+        for k, v in smalldict.items():
+            if v != bigdict.get(k):
+                return False
+        return True 
 
     def send_module_information(self):
         payload = {'modules': self.cmd_modules}

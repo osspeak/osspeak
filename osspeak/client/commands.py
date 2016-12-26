@@ -22,16 +22,16 @@ class CommandModule:
         self.commands = []
 
     def load_commands(self):
-        for rule_text, action_text in self.config.get('Commands', {}):
+        for rule_text, action_text in self.config.get('commands', {}):
             cmd = Command(rule_text, action_text, scope=self.scope)
             self.commands.append(cmd)
 
     def initialize_rules(self):
-        for rule_name, rule_text in self.config.get('Rules', {}):
+        for rule_name, rule_text in self.config.get('rules', {}):
             self.scope._rules[rule_name] = rule_text
 
     def load_rules(self):
-        for rule_name, rule_text in self.config.get('Rules', {}):
+        for rule_name, rule_text in self.config.get('rules', {}):
             current_rule = self.scope._rules[rule_name]
             if isinstance(current_rule, astree.Rule):
                 assert current_rule.name is not None
@@ -44,16 +44,20 @@ class CommandModule:
             self.rules.append(rule)
 
     def define_functions(self):
-        for func_signature, func_text in self.config.get('Functions', {}):
+        for func_signature, func_text in self.config.get('functions', {}):
             func_definition = api.func_definition(func_signature, defined_functions=self.scope.functions)
             self.scope._functions[func_definition.name] = func_definition
             self.functions.append(func_definition)
 
     def set_function_actions(self):
-        config_funcs = self.config.get('Functions', {})
+        config_funcs = self.config.get('functions', {})
         for i, func in enumerate(self.functions):
             action_text = config_funcs[i][1]
             func.action = api.action(action_text, defined_functions=self.scope.functions)
+
+    @property
+    def conditions(self):
+        return self.config.get('conditions', {})
 
     def to_dict(self):
         jsonstr = json.dumps(self, cls=serializer.GuiEncoder)

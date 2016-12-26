@@ -36,7 +36,6 @@ class SrgsXmlConverter:
         rule = self.convert_rule(rule_node)
         self.root.append(rule)
         if rule_node.name is None:
-        # if not rule_node.is_variable:
             tag_text = 'out += "-command-{}:" + rules.latest();'.format(rule_node.id)
             top_level_choices.append(self.get_ruleref_item(rule_node.id, text=tag_text))
 
