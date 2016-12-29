@@ -12,7 +12,6 @@ def run(path):
     extension_threads[runpath] = ExtensionThread(runpath)
 
 def send_message(path, msg):
-    print(path, msg)
     runpath = get_runpath(path)
     extension_threads[runpath].module.osspeak_queue.put(msg)
 
@@ -27,6 +26,7 @@ class ExtensionThread:
 
     def __init__(self, runpath):
         self.runpath = runpath
+        # prepare to load module from paths
         self.spec = importlib.util.spec_from_file_location('main', runpath)
         self.module = importlib.util.module_from_spec(self.spec)
         self.module.osspeak_queue = queue.Queue()
