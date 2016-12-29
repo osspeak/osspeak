@@ -32,7 +32,7 @@ class RuleParser:
         for tok in self.stream:
             self.token_list.append(tok)
             self.parse_map[type(tok)](tok)
-        assert len(self.grouping_stack) == 1
+        assert len(self.grouping_stack) == 1 and self.grouping_stack[0] is top_level_rule
         for grouping in self.groupings:
             top_level_rule.grouping_variables[grouping.id] = grouping
             top_level_rule.grouping_variables_empty[grouping.id] = None

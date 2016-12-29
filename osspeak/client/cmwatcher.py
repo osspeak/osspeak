@@ -107,6 +107,7 @@ class CommandModuleWatcher:
                 return False
         return True
 
+
     def load_functions(self):
         for path, cmd_module in self.cmd_modules.items():
             cmd_module.define_functions()
@@ -129,6 +130,9 @@ class CommandModuleWatcher:
                 self.command_map[cmd.id] = cmd
                 if path in self.active_modules:
                     self.grammar_node.rules.append(cmd.rule)
+    
+    def load_builtin_functions(self):
+        global_scope = self.scope_groupings['']
 
     def serialize_scope_xml(self):
         converter = SrgsXmlConverter()
@@ -184,17 +188,9 @@ class CommandModuleWatcher:
         self.modules_to_save = {}
         changed_modules = {}
         for path, cmd_module_config in modules_to_save.items():
-            # if self.is_superset(cmd_module_config, self.cmd_modules[path].config):
             if cmd_module_config != self.cmd_modules[path].config:
                 changed_modules[path] = cmd_module_config
         return changed_modules
-
-    def is_superset(self, smalldict, bigdict):
-        return any('foo' for (k, v) in smalldict.items() if v != bigdict.get(k))
-        for k, v in smalldict.items():
-            if v != bigdict.get(k):
-                return False
-        return True 
 
     def send_module_information(self):
         payload = {'modules': self.cmd_modules}
