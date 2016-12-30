@@ -106,7 +106,7 @@ class Command:
         return increment
 
     def bind_child_variables(self, idx, var_id, bound_variables, semantic_variables, parent_node):
-        # parent node stats as grouping node, can become rule node when
+        # parent node starts as grouping node, can become rule node when
         # a variable is encountered
         var_action = bound_variables[var_id]
         idx += 1
@@ -114,7 +114,7 @@ class Command:
         child_ids = parent_node.child_ids
         while idx < len(semantic_variables):
             remaining_id, remaining_text = semantic_variables[idx]
-            if remaining_id == 'literal-{}'.format(var_id): 
+            if remaining_id == 'literal-{}'.format(var_id) or remaining_id.startswith('dictation'): 
                 var_action.children.append(nodes.LiteralKeysAction(remaining_text))
                 idx += 1
                 increment += 1

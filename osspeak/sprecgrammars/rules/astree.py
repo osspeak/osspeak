@@ -9,7 +9,7 @@ class ASTNode:
 
     @property
     def id(self):
-        return 'r{}'.format(self._id)
+        return f'r{self._id}'
 
 class GrammarNode(ASTNode):
      
