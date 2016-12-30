@@ -91,6 +91,10 @@ class Command:
     def bind_variable(self, bound_variables, semantic_variables, idx):
         var_id, var_text = semantic_variables[idx]
         increment = 1
+        if var_id.startswith('dictation'):
+            bound_variables[var_id] = nodes.RootAction()
+            bound_variables[var_id].children.append(nodes.LiteralKeysAction(var_text))
+            return increment
         grouping_node = self.rule.grouping_variables.get(var_id)
         if grouping_node is None:
             return increment

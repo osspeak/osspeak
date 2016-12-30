@@ -23,10 +23,10 @@ namespace RecognizerIO
         public bool ProcessIncomingInput(string input)
         {
             /*
-            EngManager.LoadGrammar(@"C:\Users\evan\AppData\Local\Temp\d9a9a9fd-e3f6-410f-a679-c930650cf956.xml");
+            EngManager.LoadGrammar(@"C:\Users\evan\AppData\Local\Temp\6dc6c34e-addc-4478-88b8-58c099a2f9f7.xml", "foo");
             EngManager.Begin();
-            return false;
-            */
+            return false;*/
+
             dynamic jsonMsg = JsonConvert.DeserializeObject(input);
             string msgType = jsonMsg.Type;
             bool shutdown = false;

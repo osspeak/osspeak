@@ -17,7 +17,7 @@ namespace RecognizerIO.Engines
             {
                 string[] cmdPieces = cmd.Split(':');
                 string[] cmdVars = cmdPieces[1].Split('|');
-                Commands.Add(new CommandRecognition(cmdPieces[0], cmdVars.Take(cmdVars.Length - 1).ToList()));
+                Commands.Add(new CommandRecognition(cmdPieces[0], cmdVars.Take(cmdVars.Length - 0).ToList()));
 
             }
         }

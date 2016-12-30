@@ -109,6 +109,7 @@ class CommandModuleWatcher:
 
 
     def load_functions(self):
+        self.load_builtin_functions()
         for path, cmd_module in self.cmd_modules.items():
             cmd_module.define_functions()
         for path, cmd_module in self.cmd_modules.items():
@@ -132,7 +133,10 @@ class CommandModuleWatcher:
                     self.grammar_node.rules.append(cmd.rule)
     
     def load_builtin_functions(self):
+        from sprecgrammars.api import rule
         global_scope = self.scope_groupings['']
+        global_scope._rules['_dictate'] = rule('', '_dictate')
+        print(global_scope.rules)
 
     def serialize_scope_xml(self):
         converter = SrgsXmlConverter()

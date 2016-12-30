@@ -85,9 +85,21 @@ class SrgsXmlConverter:
             elif isinstance(child, astree.GroupingNode):
                 self.add_grouping(child, choices)
             elif isinstance(child, astree.Rule):
-                text = 'out += "{}=|" + rules.latest();'.format(child.id)
-                rritem = self.get_ruleref_item(child.id, text=None, low=child.repeat_low, high=child.repeat_high)
-                choices[-1].append(rritem)
+                self.add_rule(child, choices)
+
+    def add_rule(self, rule_node, choices):
+        if rule_node.name == '_dictate':
+            # '<ruleref uri="grammar:dictation" type="application/srgs+xml"/><tag>out.SpokenText=rules.latest();</tag>'
+            ruleref = ET.Element('ruleref', attrib={'uri': 'grammar:dictation', 'type': 'application/srgs+xml'})
+            choices[-1].append(ruleref)
+            tag = ET.Element('tag')
+            tag.text = 'out += "dictation-{}=" + rules.latest(); + "|"'.format(rule_node.id)
+            choices[-1].append(tag)
+            return
+        text = 'out += "{}=|" + rules.latest();'.format(rule_node.id)
+        rritem = self.get_ruleref_item(rule_node.id, text=None, low=rule_node.repeat_low, high=rule_node.repeat_high)
+        choices[-1].append(rritem)
+        
 
     def add_grouping(self, child, choices):
         rule = ET.Element('rule', attrib={'id': child.id})
