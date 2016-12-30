@@ -89,8 +89,11 @@ class Command:
         self.action.perform(var_list)
 
     def bind_variable(self, bound_variables, semantic_variables, idx):
-        var_id, var_text = semantic_variables[idx]
         increment = 1
+        try:
+            var_id, var_text = semantic_variables[idx]
+        except ValueError:
+            return increment
         if var_id.startswith('dictation'):
             bound_variables[var_id] = nodes.RootAction()
             bound_variables[var_id].children.append(nodes.LiteralKeysAction(var_text))
@@ -114,7 +117,7 @@ class Command:
         child_ids = parent_node.child_ids
         while idx < len(semantic_variables):
             remaining_id, remaining_text = semantic_variables[idx]
-            if remaining_id == 'literal-{}'.format(var_id) or remaining_id.startswith('dictation'): 
+            if remaining_id == f'literal-{var_id}': 
                 var_action.children.append(nodes.LiteralKeysAction(remaining_text))
                 idx += 1
                 increment += 1

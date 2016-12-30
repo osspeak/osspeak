@@ -7,7 +7,7 @@ def load_platform_module():
 	elif sys.platform == 'linux':
 		from platforms import linux
 		return linux
-	raise RuntimeError('Unsupported platform: {}'.format(sys.platform))
+	raise RuntimeError(f'Unsupported platform: {sys.platform}')
 
 platform = load_platform_module()
 

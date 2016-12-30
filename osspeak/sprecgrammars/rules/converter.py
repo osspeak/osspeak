@@ -36,7 +36,7 @@ class SrgsXmlConverter:
         rule = self.convert_rule(rule_node)
         self.root.append(rule)
         if rule_node.name is None:
-            tag_text = 'out += "-command-{}:" + rules.latest();'.format(rule_node.id)
+            tag_text = f'out += "-command-{rule_node.id}:" + rules.latest();'
             top_level_choices.append(self.get_ruleref_item(rule_node.id, text=tag_text))
 
     def build_root_rule(self):
@@ -57,11 +57,11 @@ class SrgsXmlConverter:
     
     def get_ruleref_item(self, ruleid, text=None, low=1, high=1):
         ruleref_item = ET.Element('item')
-        ruleref = ET.Element('ruleref', attrib={'uri': '#{}'.format(ruleid)})
+        ruleref = ET.Element('ruleref', attrib={'uri': f'#{ruleid}'})
         self.apply_repeat_attrib(ruleref_item, low, high)
         ruleref_item.append(ruleref)
         tag = ET.Element('tag')
-        tag.text = 'out += "{}=|" + rules.latest();'.format(ruleid) if text is None else text
+        tag.text = f'out += "{ruleid}=|" + rules.latest();' if text is None else text
         ruleref_item.append(tag)
         return ruleref_item
 
@@ -93,10 +93,10 @@ class SrgsXmlConverter:
             ruleref = ET.Element('ruleref', attrib={'uri': 'grammar:dictation', 'type': 'application/srgs+xml'})
             choices[-1].append(ruleref)
             tag = ET.Element('tag')
-            tag.text = 'out += "dictation-{}=" + rules.latest(); + "|"'.format(rule_node.id)
+            tag.text = f'out += "dictation-{rule_node.id}=" + rules.latest(); + "|"'
             choices[-1].append(tag)
             return
-        text = 'out += "{}=|" + rules.latest();'.format(rule_node.id)
+        text = f'out += "{rule_node.id}=|" + rules.latest();'
         rritem = self.get_ruleref_item(rule_node.id, text=None, low=rule_node.repeat_low, high=rule_node.repeat_high)
         choices[-1].append(rritem)
         
@@ -116,7 +116,7 @@ class SrgsXmlConverter:
         word_item = ET.Element('item')
         word_item.text = child.text
         rule.append(word_item)
-        text = 'out += "{}=" + rules.latest() + "|";'.format(child.id)
+        text = f'out += "{child.id}=" + rules.latest() + "|";'
         rritem = self.get_ruleref_item(child.id, text=text)
         choices[-1].append(rritem)
 
@@ -133,7 +133,7 @@ class SrgsXmlConverter:
         self.append_text(parent_elem[-1], text)
         if self.is_not_named_rule(parent_node):
             text_tag = parent_elem[-1].find('tag')
-            text_tag.text = 'out += "literal-{}={}|";'.format(parent_node.id, parent_elem[-1].text)
+            text_tag.text = f'out += "literal-{parent_node.id}={parent_elem[-1].text}|";'
 
     def is_not_named_rule(self, node):
         return not isinstance(node, astree.Rule) or node.name is None
@@ -143,10 +143,10 @@ class SrgsXmlConverter:
         low = low_default if low is None else low
         high = high_default if high is None else high
         if (low, high) != (1, 1):
-            elem.attrib['repeat'] = '{}-{}'.format(low, high)
+            elem.attrib['repeat'] = f'{low}-{high}'
 
     def append_text(self, elem, text):
-        elem.text = text if elem.text is None else '{} {}'.format(elem.text, text)
+        elem.text = text if elem.text is None else f'{elem.text} {text}'
 
     def get_repeat_vals(self, elem):
         repeat_str = elem.attrib.get('repeat', '1-1')
