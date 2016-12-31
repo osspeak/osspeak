@@ -5,28 +5,28 @@ WORD_DELIMITERS = set(['{', '}', '(', ')', ',', ' ', '\n', '\t', '+', ','])
 
 class ActionTokenStream(abstokenstream.AbstractTokenStream):
 
+    def __init__(self, text):
+        super().__init__(text)
+        self.tokenize_functions = {
+            '\t': self.read_whitespace,
+            '\n': self.read_whitespace,
+            "'": self.read_literal,
+            tokens.LiteralTemplateToken.DELIMITER: self.read_template_literal,
+            '(': self.read_paren_token,
+            ')': self.read_paren_token,
+            '{': self.read_brace_token,
+            '}': self.read_brace_token,
+            '+': self.read_plus_token,
+            ',': self.read_comma_token,
+            '$': self.read_variable_token,
+            '_': self.read_underscore,
+        }
+
     def read_next(self):
         if self.stream.eof():
             return
         ch = self.stream.peek()
-        if ch in ' \t\n':
-            return self.read_whitespace()
-        if ch == "'":
-            return self.read_literal()
-        if ch in '()':
-            return self.read_paren_token()
-        if ch in '{}':
-            return self.read_brace_token()
-        if ch == '+':
-            return self.read_plus_token()
-        if ch == ',':
-            return self.read_comma_token()
-        if ch == '$':
-            return self.read_variable_token()
-        if ch == '_':
-            return self.read_underscore()
-        # self.croak('Invalid character: {}'.format(ch))
-        return self.read_word()
+        return self.tokenize_functions.get(ch, self.read_word)()
 
     def read_whitespace(self):
         text = self.read_while(lambda ch: ch in ' \n\t')
@@ -43,6 +43,16 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         # skip last apostrophe
         self.stream.next()
         return tokens.LiteralToken(literal_text)
+
+    def read_template_literal(self):
+        text = ''
+        self.stream.next()
+        while self.stream.peek() != tokens.LiteralTemplateToken.DELIMITER:
+            if not self.stream.peek():
+                self.croak(f"Missing closing {tokens.LiteralTemplateToken.DELIMITER} character")
+            text += self.stream.next()        
+        self.stream.next()
+        return tokens.LiteralTemplateToken(text)
 
     def read_word(self):
         text = self._read_word()

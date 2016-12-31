@@ -1,5 +1,7 @@
+import re
 import types
 import itertools
+import functools
 
 from platforms import api
 
@@ -54,16 +56,37 @@ class RootAction(Action):
             subaction.perform(variables, arguments=arguments)
 
 class LiteralKeysAction(Action):
+
+    # $3, $-2 etc.
+    var_pattern = re.compile(r'\$-?\d+')
     
-    def __init__(self, text):
+    def __init__(self, text, is_template=False):
         super().__init__()
         self.text = text
+        self.is_template = is_template
+
+    def evaluate_text(self, variables, arguments):
+        if not self.is_template:
+            return self.text
+        matchfunc = functools.partial(self.var_replace, variables, arguments)
+        search_result = re.sub(self.var_pattern, matchfunc, self.text)
+        return search_result
+
+    def var_replace(self, variables, arguments, matchobj):
+        match_index = int(matchobj.string[1:])
+        if match_index > 0:
+            match_index -= 1
+        try:
+            var = variables[match_index]
+        except IndexError:
+            return ''
+        return var.evaluate(variables, arguments)
 
     def perform(self, variables, arguments=None):
-        api.type_literal(self.text)
+        api.type_literal(self.evaluate_text(variables, arguments))
 
     def evaluate(self, variables, arguments=None):
-        return self.text
+        return self.evaluate_text(variables, arguments)
 
 class FunctionCall(Action):
 

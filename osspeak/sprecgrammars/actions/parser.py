@@ -14,6 +14,7 @@ class ActionParser:
         self.action_to_modify = None
         self.parse_map = {
             tokens.LiteralToken: self.parse_literal_token,
+            tokens.LiteralTemplateToken: self.parse_literal_template_token,
             tokens.WordToken: self.parse_word_token,
             tokens.ParenToken: self.parse_paren,
             tokens.BraceToken: self.parse_curly_brace,
@@ -112,6 +113,10 @@ class ActionParser:
         
     def parse_literal_token(self, tok):
         literal_action = nodes.LiteralKeysAction(tok.text)
+        self.add_action(literal_action)
+
+    def parse_literal_template_token(self, tok):
+        literal_action = nodes.LiteralKeysAction(tok.text, is_template=True)
         self.add_action(literal_action)
 
     def add_action(self, action, grouped=False):

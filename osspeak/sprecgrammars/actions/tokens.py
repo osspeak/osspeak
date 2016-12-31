@@ -11,7 +11,16 @@ class LiteralToken(ActionToken):
     def __init__(self, text):
         self.text = text
 
+class LiteralTemplateToken(ActionToken):
+
+    DELIMITER = '`'
+    
+    def __init__(self, text):
+        self.text = text
+
 class ParenToken(ActionToken):
+
+    OPENING_CHARACTER = '('
     
     def __init__(self, ch):
         self.is_open = ch == '('
