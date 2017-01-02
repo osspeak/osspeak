@@ -116,22 +116,21 @@ class FunctionCall(Action):
         return args
 
     def perform(self, variables, arguments=None):
+        evaluation = self.evaluate(variables, arguments)
+        if evaluation is not None:
+            api.type_literal(str(evaluation))
+
+    def evaluate(self, variables, arguments=None):
         from sprecgrammars.api import action
         # builtin functions
         if isinstance(self.definition, types.FunctionType):
             args = [a.evaluate(variables, arguments) for a in self.arguments]
             result = self.definition(*args)
-            if result is not None:
-                call_action = action(str(result))
-                call_action.perform(variables)
+            return result
         # user defined functions
         else:
             args = self.get_arguments(variables, arguments)
-            self.definition.action.perform(variables, args)
-
-    def evaluate(self, variables, arguments=None):
-        args = self.get_arguments(variables, arguments)
-        return self.definition.action.evaluate(variables, args)
+            return self.definition.action.evaluate(variables, args)
 
 class KeySequence(Action):
 

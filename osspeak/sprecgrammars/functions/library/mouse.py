@@ -3,8 +3,11 @@ from platforms import api
 def click():
     api.mouse_click()
 
-def move(x, y=600):
-    print('asdasda')
+def move(x=None, y=None):
+    currentx, currenty = api.get_mouse_location()
+    x = currentx if x is None else int(x)
+    y = currenty if y is None else int(y)
+    api.mouse_move(x, y, False)
 
 def x():
     return api.get_mouse_location()[0]

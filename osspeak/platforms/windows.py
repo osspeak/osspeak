@@ -122,7 +122,7 @@ def activate_window(title):
 def get_mouse_location():
     pt = winconstants.POINT()
     ctypes.windll.user32.GetCursorPos(ctypes.byref(pt))
-    return (pt.x, pt.y)
+    return pt.x, pt.y
 
 def mouse_click(button, direction, number):
     event_nums = get_mouse_event_nums(button, direction)
@@ -135,10 +135,12 @@ def mouse_move(x=None, y=None, relative=False):
     if not relative:
         if x is None: x = startx
         if y is None: y = starty
+        print(x,y)
         ctypes.windll.user32.SetCursorPos(x, y)
         return
     if x is None: x = 0
     if y is None: y = 0
+    print('moise move')
     ctypes.windll.user32.SetCursorPos(startx + x, starty + y)
 
 def get_clipboard_contents():
