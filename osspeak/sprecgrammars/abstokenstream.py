@@ -9,6 +9,7 @@ class AbstractTokenStream:
 
     def __init__(self, text):
         self.stream = inputstream.InputStream(text)
+        self.word_delimiters = WORD_DELIMITERS
         self.current = None
 
     def next(self):
@@ -18,7 +19,7 @@ class AbstractTokenStream:
 
     def _read_word(self):
         literal_text = ''
-        while not self.stream.eof() and self.stream.peek() not in WORD_DELIMITERS:
+        while not self.stream.eof() and self.stream.peek() not in self.word_delimiters:
             literal_text += self.stream.next()
         return literal_text
 

@@ -10,6 +10,7 @@ class Action:
     def __init__(self):
         # what follows an underscore, ie {left_2_down}
         self.modifiers = []
+        self.slices = []
 
     def evaluate(self, variables):
         raise NotImplementedError
@@ -36,6 +37,11 @@ class Action:
                     self.error('multiple nums')
                 applied_modifiers['direction'] = modifier
         return applied_modifiers
+
+    def apply_slices(self, val, variables, arguments):
+        for action_slice in self.slices:
+            val = action_slice.apply(val, variables, arguments)
+        return val
 
 
 class RootAction(Action):
@@ -67,10 +73,12 @@ class LiteralKeysAction(Action):
 
     def evaluate_text(self, variables, arguments):
         if not self.is_template:
-            return self.text
-        matchfunc = functools.partial(self.var_replace, variables, arguments)
-        search_result = re.sub(self.var_pattern, matchfunc, self.text)
-        return search_result
+            text = self.text
+        else:
+            matchfunc = functools.partial(self.var_replace, variables, arguments)
+            text = re.sub(self.var_pattern, matchfunc, self.text)
+        text = self.apply_slices(text, variables, arguments)
+        return text
 
     def var_replace(self, variables, arguments, matchobj):
         match_index = int(matchobj.string[1:])

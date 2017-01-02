@@ -116,7 +116,12 @@ class Command:
         increment = 0
         child_ids = parent_node.child_ids
         while idx < len(semantic_variables):
-            remaining_id, remaining_text = semantic_variables[idx]
+            try:
+                remaining_id, remaining_text = semantic_variables[idx]
+            except ValueError:
+                idx += 1
+                increment += 1
+                continue
             if remaining_id == f'literal-{var_id}': 
                 var_action.children.append(nodes.LiteralKeysAction(remaining_text))
                 idx += 1

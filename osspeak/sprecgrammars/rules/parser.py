@@ -82,20 +82,12 @@ class RuleParser:
             self.maybe_pop_top_grouping()
 
     def parse_repetition_token(self, tok):
-        if not self.top.open:
-            repeated_node = self.top
-        elif self.top.children:
-            repeated_node = self.top.children[-1]
-        else:
-            self.croak('Invalid repetition')
+        repeated_node = self.modifiable_node
         repeated_node.repeat_low = tok.low
         repeated_node.repeat_high = tok.high
 
     def parse_action_substitute_token(self, tok):
-        if self.top.open:
-            self.top.children[-1].action_substitute = tok.action
-        else:
-            self.top.action_substitute = tok.action
+        self.modifiable_node.action_substitute = tok.action
 
     def apply_repetition(self, node, low=0, high=None):
         if low is not None:
@@ -109,3 +101,11 @@ class RuleParser:
     @property
     def top(self):
         return self.grouping_stack[-1]
+
+    @property
+    def modifiable_node(self):
+        if not self.top.open:
+            return self.top
+        if self.top.children:
+            return self.top.children[-1]
+        self.croak('No modifiable rule node exists')

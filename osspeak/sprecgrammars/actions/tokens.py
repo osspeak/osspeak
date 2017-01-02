@@ -59,3 +59,11 @@ class WhitespaceToken(ActionToken):
 
     def __init__(self, text):
         self.text = text
+
+class SliceToken(ActionToken):
+
+    OPENING_DELIMITER = '['
+    CLOSING_DELIMITER = ']'
+
+    def __init__(self, pieces):
+        self.pieces = pieces

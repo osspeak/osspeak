@@ -1,17 +1,24 @@
 from sprecgrammars import abstokenstream
 from sprecgrammars.actions import tokens
 
-WORD_DELIMITERS = set(['{', '}', '(', ')', ',', ' ', '\n', '\t', '+', ','])
+WORD_DELIMITERS = set([
+    '{', '}', '(', ')', ',', ' ', '\n', '\t', '+', ',', '|', '=',
+    tokens.SliceToken.OPENING_DELIMITER,
+    tokens.SliceToken.CLOSING_DELIMITER,
+])
 
 class ActionTokenStream(abstokenstream.AbstractTokenStream):
 
     def __init__(self, text):
         super().__init__(text)
+        self.word_delimiters = WORD_DELIMITERS
         self.tokenize_functions = {
             '\t': self.read_whitespace,
             '\n': self.read_whitespace,
+            ' ': self.read_whitespace,
             "'": self.read_literal,
             tokens.LiteralTemplateToken.DELIMITER: self.read_template_literal,
+            tokens.SliceToken.OPENING_DELIMITER: self.read_slice_token,
             '(': self.read_paren_token,
             ')': self.read_paren_token,
             '{': self.read_brace_token,
@@ -99,3 +106,9 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         self.read_while(lambda ch: ch == '_')
         return tokens.UnderscoreToken()
         
+    def read_slice_token(self):
+        self.stream.next()
+        slice_text = self.read_while(lambda ch: ch != tokens.SliceToken.CLOSING_DELIMITER)
+        slice_pieces = slice_text.split(':')
+        self.stream.next()
+        return tokens.SliceToken(slice_pieces)

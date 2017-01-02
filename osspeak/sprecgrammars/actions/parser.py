@@ -1,5 +1,4 @@
-from sprecgrammars.actions import actionstream, nodes
-from sprecgrammars.actions import tokens
+from sprecgrammars.actions import actionstream, nodes, tokens
 from sprecgrammars.functions import library
 from platforms.actions import mappings
 
@@ -24,6 +23,7 @@ class ActionParser:
             tokens.NamedVariableToken: self.parse_named_variable_token,
             tokens.WhitespaceToken: self.parse_whitespace_token,
             tokens.UnderscoreToken: self.parse_underscore_token,
+            tokens.SliceToken: self.parse_slice_token,
         }
 
     def parse(self):
@@ -144,3 +144,30 @@ class ActionParser:
     
     def parse_underscore_token(self, tok):
         self.append_modifier_flag = True
+
+    def parse_slice_token(self, tok):
+        from sprecgrammars import api
+        slice_actions = [0, None, 1]
+        for i, action_text in enumerate(tok.pieces):
+            if not action_text:
+                continue
+            slice_actions[i] = api.action(action_text, self.defined_functions)
+        is_single = len(tok.pieces) == 1
+        action_slice = ActionSlice(slice_actions, is_single)
+        self.action_to_modify.slices.append(action_slice)
+
+class ActionSlice:
+
+    def __init__(self, slice_actions, is_single):
+        assert len(slice_actions) == 3
+        self.slice_actions = slice_actions
+        self.is_single = is_single
+
+    def apply(self, sliceable, variables, arguments):
+        slice_pieces = [a.evaluate(variables, arguments) if isinstance (a, nodes.Action) else a for a in self.slice_actions]
+        slice_pieces = [a if a is None else int(a) for a in slice_pieces]
+        if self.is_single:
+            return sliceable[slice_pieces[0]]
+        sliceobj = slice(*slice_pieces)
+        return sliceable[sliceobj]
+        
