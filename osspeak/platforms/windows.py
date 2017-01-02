@@ -135,7 +135,6 @@ def mouse_move(x=None, y=None, relative=False):
     if not relative:
         if x is None: x = startx
         if y is None: y = starty
-        print(x,y)
         ctypes.windll.user32.SetCursorPos(x, y)
         return
     if x is None: x = 0
