@@ -4,6 +4,7 @@ from sprecgrammars.rules import tokens
 class RuleTokenStream(abstokenstream.AbstractTokenStream):
 
     def read_next(self):
+        # TODO: use a dict, put read_word at end?
         whitespace = self.read_whitespace()
         if self.stream.eof():
             return
@@ -12,8 +13,10 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
             return self.read_word()
         if ch == '|':
             return self.read_ortoken()
-        if ch in '()':
-            return self.read_paren_token()
+        if ch == tokens.GroupingOpeningToken.CHARACTER:
+            return self.read_grouping_opening_token()
+        if ch == tokens.GroupingClosingToken.CHARACTER:
+            return self.read_grouping_closing_token()
         if ch == '<':
             return self.read_named_rule()
         if ch == '=':
@@ -50,8 +53,13 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
             high = self.read_digits() or None
         return tokens.RepetitionToken(low=low, high=high)
 
-    def read_paren_token(self):
-        return tokens.ParenToken(self.stream.next())
+    def read_grouping_opening_token(self):
+        self.stream.next()
+        return tokens.GroupingOpeningToken()
+
+    def read_grouping_closing_token(self):
+        self.stream.next()
+        return tokens.GroupingClosingToken()
 
     def read_digits(self):
         return self.read_while(lambda ch: ch.isdigit())

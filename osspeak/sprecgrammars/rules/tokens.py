@@ -11,11 +11,11 @@ class WordToken(BaseToken):
 class OrToken(BaseToken):
     pass
 
-class ParenToken(BaseToken):
+class GroupingOpeningToken(BaseToken):
+    CHARACTER = '('
 
-    def __init__(self, char):
-        assert char in '()'
-        self.is_open = char == '('
+class GroupingClosingToken(BaseToken):
+    CHARACTER = ')'    
 
 class BracketToken(BaseToken):
 

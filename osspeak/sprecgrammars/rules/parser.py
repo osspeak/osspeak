@@ -20,7 +20,8 @@ class RuleParser:
         self.parse_map = {
             tokens.WordToken: self.parse_word_token,
             tokens.OrToken: self.parse_or_token,
-            tokens.ParenToken: self.parse_paren_token,
+            tokens.GroupingOpeningToken: self.parse_grouping_opening_token,
+            tokens.GroupingClosingToken: self.parse_grouping_closing_token,
             tokens.RepetitionToken: self.parse_repetition_token,
             tokens.NamedRuleToken: self.parse_named_rule_token,
             tokens.ActionSubstituteToken: self.parse_action_substitute_token
@@ -71,15 +72,15 @@ class RuleParser:
         self.groupings.extend(list(rule_copy.grouping_variables.values()))
         self.top.children.append(rule_copy)
 
-    def parse_paren_token(self, tok):
+    def parse_grouping_opening_token(self, tok):
         self.maybe_pop_top_grouping()
-        if tok.is_open:
-            grouping_node = astree.GroupingNode()
-            self.top.children.append(grouping_node)
-            self.grouping_stack.append(grouping_node)
-        else:
-            self.top.open = False
-            self.maybe_pop_top_grouping()
+        grouping_node = astree.GroupingNode()
+        self.top.children.append(grouping_node)
+        self.grouping_stack.append(grouping_node)
+
+    def parse_grouping_closing_token(self, tok):
+        self.top.open = False
+        self.maybe_pop_top_grouping()
 
     def parse_repetition_token(self, tok):
         repeated_node = self.modifiable_node
