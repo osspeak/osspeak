@@ -4,7 +4,7 @@ class Menu:
         self.init_options()
         self.event_dispatcher = event_dispatcher
 
-    def prompt_input(self, display_options=True):
+    def main_loop(self, display_options=True):
         self.print_options()
         user_input = input("\nEnter an option or 'q' to quit: ").strip().lower()
         if user_input == 'q':
@@ -13,11 +13,11 @@ class Menu:
             option = self.options[int(user_input) - 1]
         except (ValueError, IndexError):
             print('Did not understand input\n')
-            self.prompt_input(display_options=False)
+            self.main_loop(display_options=False)
         else:
             result = option['on_select']()
             if result:
-                self.prompt_input()
+                self.main_loop()
 
     def init_options(self):
         self.options = [
@@ -36,6 +36,9 @@ class Menu:
     def print_options(self):
         for i, option in enumerate(self.options, start=1):
             print('{}. {}'.format(i, option['text']))
+
+    def send_message(self, msgkey, payload):
+        pass
 
 class MenuOption:
     pass

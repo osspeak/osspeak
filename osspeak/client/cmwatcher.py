@@ -136,7 +136,6 @@ class CommandModuleWatcher:
         from sprecgrammars.api import rule
         global_scope = self.scope_groupings['']
         global_scope._rules['_dictate'] = rule('', '_dictate')
-        print(global_scope.rules)
 
     def serialize_scope_xml(self):
         converter = SrgsXmlConverter()
@@ -161,13 +160,13 @@ class CommandModuleWatcher:
         t.start()
 
     def watch_active_window(self):
-        while True:
-            time.sleep(2)
+        while not self.event_dispatcher.shutdown.isSet():
             changed_modules = self.save_updated_modules()
             if changed_modules:
                 self.update_modules(changed_modules)
                 continue
             self.maybe_load_modules()
+            self.event_dispatcher.shutdown.wait(timeout=2)
 
     def maybe_load_modules(self):
         active_window = api.get_active_window_name().lower()
@@ -198,5 +197,6 @@ class CommandModuleWatcher:
 
     def send_module_information(self):
         payload = {'modules': self.cmd_modules}
-        self.event_dispatcher.gui_manager.send_message('module map',
-            payload, encoder=serializer.GuiEncoder)
+        self.event_dispatcher.route_message('ui', 'module map', payload)
+        # self.event_dispatcher.ui_manager.send_message('module map',
+        #     payload, encoder=serializer.GuiEncoder)

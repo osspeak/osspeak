@@ -73,7 +73,7 @@ class GuiProcessManager(ProcessManager):
 
     def send_message(self, name, payload=None, encoder=None):
         payload = payload or {}
-        msg = json.dumps({'type': name, 'payload': payload}, cls=encoder)
+        msg = json.dumps({'type': name, 'payload': payload}, cls=serializer.GuiEncoder)
         if not self.websocket_established:
             with threading.Lock():
                 self.message_queue.append(msg)

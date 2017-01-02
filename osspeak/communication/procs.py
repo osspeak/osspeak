@@ -23,7 +23,10 @@ class ProcessManager:
         if not msg.endswith(b'\n'):
             msg += b'\n'
         self.process.stdin.write(msg)
-        self.process.stdin.flush()
+        try:
+            self.process.stdin.flush()
+        except OSError:
+            print(f'Process {self} already closed')
 
     def dispatch_process_output(self):
         for line in self.process.stdout:
@@ -36,9 +39,15 @@ class ProcessManager:
 
 class EngineProcessManager(ProcessManager):
 
-    def __init__(self, cmd_module_watcher):
+    def __init__(self, event_dispatcher):
         super().__init__(ENGINE_PATH, on_output=self.on_engine_message)
-        self.cmd_module_watcher = cmd_module_watcher
+        self.event_dispatcher = event_dispatcher
+        t = threading.Thread(target=self.watch_shutdown_event)
+        t.start()
+
+    def watch_shutdown_event(self):
+        self.event_dispatcher.shutdown.wait()
+        self.shutdown()
         
     def send_message(self, msg):
         if isinstance(msg, dict):
@@ -46,7 +55,7 @@ class EngineProcessManager(ProcessManager):
         super().send_message(msg)
 
     def start_engine_listening(self, init=True):
-        grammar_xml = self.cmd_module_watcher.grammar_xml
+        grammar_xml = self.event_dispatcher.cmd_module_watcher.grammar_xml
         msg = {
             'Type': 'load grammars',
             'Grammars': {
@@ -61,14 +70,14 @@ class EngineProcessManager(ProcessManager):
         if msg['Type'] == 'recognition': 
             print(msg)
             for cmd_recognition in msg['Commands']:
-                cmd = self.cmd_module_watcher.command_map[cmd_recognition['RuleId']]
+                cmd = self.event_dispatcher.cmd_module_watcher.command_map[cmd_recognition['RuleId']]
                 cmd.perform_action(cmd_recognition)
         elif msg['Type'] == 'error':
             print('error!')
             print(msg['Message'])
 
     def send_simple_message(self, msg_type):
-        self.send_message({'Type': msg_type})        
+        self.send_message({'Type': msg_type})
 
     def shutdown(self):
         self.send_simple_message('shutdown')
