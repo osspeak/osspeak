@@ -78,81 +78,48 @@ class Command:
         self.action_text = action_text
         self.action = api.action(action_text, self.scope.functions)
 
-    def perform_action(self, engine_result):
-        # empty variables dict, gets filled based on result
-        bound_variables = self.rule.grouping_variables_empty.copy()
-        idx = 0
-        while idx < len(engine_result['Variables']):
-            increment = self.bind_variable(bound_variables, engine_result['Variables'], idx)
-            idx += increment
-        var_list = list(bound_variables.values())
-        self.action.perform(var_list)
-
-    def bind_variable(self, bound_variables, semantic_variables, idx):
-        increment = 1
-        try:
-            var_id, var_text = semantic_variables[idx]
-        except ValueError:
-            return increment
-        if var_id.startswith('dictation'):
-            bound_variables[var_id] = nodes.RootAction()
-            bound_variables[var_id].children.append(nodes.LiteralKeysAction(var_text))
-            return increment
-        grouping_node = self.rule.grouping_variables.get(var_id)
-        if grouping_node is None:
-            return increment
-        if bound_variables[var_id] is None:
-            bound_variables[var_id] = nodes.RootAction()
-        increment += self.bind_child_variables(idx, var_id, bound_variables, semantic_variables, grouping_node)
-        if grouping_node.action_substitute is not None:
-            bound_variables[var_id] = grouping_node.action_substitute
-        return increment
-
-    def bind_child_variables(self, idx, var_id, bound_variables, semantic_variables, parent_node):
-        # parent node starts as grouping node, can become rule node when
-        # a variable is encountered
-        var_action = bound_variables[var_id]
-        idx += 1
-        increment = 0
-        child_ids = parent_node.child_ids
-        while idx < len(semantic_variables):
-            try:
-                remaining_id, remaining_text = semantic_variables[idx]
-            except ValueError:
-                idx += 1
-                increment += 1
-                continue
-            if remaining_id == f'literal-{var_id}': 
-                var_action.children.append(nodes.LiteralKeysAction(remaining_text))
-                idx += 1
-                increment += 1
-            elif remaining_id in child_ids:
-                child_node = child_ids[remaining_id]
-                if isinstance(child_node, astree.WordNode):
-                    assert remaining_id.startswith('s')
-                    var_action.children.append(child_node.action_substitute)
-                    idx += 1
-                    increment += 1
-                    continue
-                # assuming we have a child grouping here
-                remaining_increment = self.bind_variable(bound_variables, semantic_variables, idx)
-                var_action.children.append(bound_variables[remaining_id])
-                idx += remaining_increment
-                increment += remaining_increment
-            else:
-                for child in parent_node.children:
-                    if isinstance(child, astree.Rule):
-                        assert child.name is not None
-                        if remaining_id == child.rule.id:
-                            parent_node = child
-                            child_ids = {c.id: c for c in parent_node.children}
-                            idx += 1
-                            increment += 1
-                            break
-                else:
-                    break
-        return increment
-
     @property
     def id(self):
         return self.rule.id
+
+    def perform_action(self, engine_result):
+        # empty variables dict, gets filled based on result
+        bound_variables = collections.OrderedDict()
+        engine_variables = {var[0]: var[1] for var in engine_result['Variables'] if len(var) == 2}
+        for rule_node in self.rule.children:
+            self.add_var_action(rule_node, engine_variables, bound_variables)
+        var_list = list(bound_variables.values())
+        self.action.perform(var_list)
+        
+    def add_var_action(self, rule_node, engine_variables, bound_variables):
+        if not isinstance(rule_node, (astree.Rule, astree.GroupingNode)):
+            return
+        matched_children = self.get_matched_children(rule_node, engine_variables)
+        if not matched_children:
+            return
+        action = nodes.RootAction()
+        for child in matched_children:
+            if getattr(child, 'action_substitute', None):
+                action.children.append(child.action_substitute)
+            elif isinstance(child, astree.WordNode):
+                action.children.append(nodes.LiteralKeysAction(child.text))
+            elif isinstance(child, (astree.Rule, astree.GroupingNode)):
+                child_action = self.add_var_action(child, engine_variables, bound_variables)
+                action.children.append(child_action)
+        if isinstance(rule_node, astree.GroupingNode):
+            bound_variables[rule_node.id] = action
+        return action
+
+    def get_matched_children(self, parent_node, engine_variables):
+        matched_children = []
+        is_match = False
+        for child in parent_node.children:
+            if isinstance(child, astree.OrNode):
+                if is_match:
+                    break
+                matched_children = []
+            if child.id in engine_variables:
+                is_match = True
+            matched_children.append(child)
+        return matched_children
+            

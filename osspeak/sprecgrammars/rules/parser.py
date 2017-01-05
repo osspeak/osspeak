@@ -15,7 +15,6 @@ class RuleParser:
         self.debug = debug
         self.stream = ruletokstream.RuleTokenStream(self.text)
         self.grouping_stack = []
-        self.groupings = []
         self.token_list = []
         self.parse_map = {
             tokens.WordToken: self.parse_word_token,
@@ -34,18 +33,7 @@ class RuleParser:
             self.token_list.append(tok)
             self.parse_map[type(tok)](tok)
         assert len(self.grouping_stack) == 1 and self.grouping_stack[0] is top_level_rule
-        for grouping in self.groupings:
-            top_level_rule.grouping_variables[grouping.id] = grouping
-            top_level_rule.grouping_variables_empty[grouping.id] = None
-            grouping.child_ids = self.build_child_ids(grouping)
         return top_level_rule
-
-    def build_child_ids(self, grouping):
-        child_ids = {}
-        for child in grouping.children:
-            node = child
-            child_ids[node.id] = node
-        return child_ids
 
     def parse_word_token(self, tok):
         self.maybe_pop_top_grouping()
@@ -69,7 +57,6 @@ class RuleParser:
             self.rules[tok.name] = rule_node
         # want a copy to avoid mutating original, ie repeat
         rule_copy = copy.copy(rule_node)
-        self.groupings.extend(list(rule_copy.grouping_variables.values()))
         self.top.children.append(rule_copy)
 
     def parse_grouping_opening_token(self, tok):
@@ -96,8 +83,7 @@ class RuleParser:
 
     def maybe_pop_top_grouping(self):
         if not self.top.open:
-            grouping = self.grouping_stack.pop()
-            self.groupings.append(grouping)
+            self.grouping_stack.pop()
 
     @property
     def top(self):

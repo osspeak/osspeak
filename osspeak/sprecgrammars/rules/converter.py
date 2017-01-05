@@ -133,7 +133,8 @@ class SrgsXmlConverter:
         self.append_text(parent_elem[-1], text)
         if self.is_not_named_rule(parent_node):
             text_tag = parent_elem[-1].find('tag')
-            text_tag.text = f'out += "literal-{parent_node.id}={parent_elem[-1].text}|";'
+            # text_tag.text = f'out += "literal-{parent_node.id}={parent_elem[-1].text}|";'
+            text_tag.text = f'out += "{word_node.id}={parent_elem[-1].text}|";'
 
     def is_not_named_rule(self, node):
         return not isinstance(node, astree.Rule) or node.name is None

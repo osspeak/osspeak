@@ -26,9 +26,6 @@ class Rule(ASTNode):
         self.children = []
         self.repeat_low = 1
         self.repeat_high = 1
-        self.grouping_variables = collections.OrderedDict()
-        # make a copy in perform_action to keep track of string values
-        self.grouping_variables_empty = collections.OrderedDict()
         self.open = True
         self.is_variable = False
 
@@ -47,7 +44,8 @@ class WordNode(ASTNode):
 
     @property
     def id(self):
-        return '{}{}'.format('' if self.action_substitute is None else 's', self._id)
+        prefix = 'w-' if self.action_substitute is None else 's'
+        return f'{prefix}{self._id}'
 
 class OrNode(ASTNode):
     pass
@@ -61,4 +59,3 @@ class GroupingNode(ASTNode):
         self.repeat_low = 1
         self.repeat_high = 1
         self.action_substitute = None
-        self.child_ids = {}
