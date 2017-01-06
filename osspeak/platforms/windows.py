@@ -29,6 +29,10 @@ def maximize_active_window():
     hwnd = ctypes.windll.user32.GetForegroundWindow()
     ctypes.windll.user32.ShowWindow(hwnd, 3)
 
+def minimize_active_window():
+    hwnd = ctypes.windll.user32.GetForegroundWindow()
+    ctypes.windll.user32.ShowWindow(hwnd, 6)
+
 def get_window_title(hwnd):
     length = GetWindowTextLength(hwnd)
     buff = ctypes.create_unicode_buffer(length + 1)
@@ -114,10 +118,39 @@ def get_matching_windows(title_list):
 def activate_window(title):
     matches = get_matching_windows(title)
     for key in sorted(matches, key=len):
-        ctypes.windll.user32.AllowSetForegroundWindow(winconstants.ASFW_ANY)
-        ctypes.windll.user32.ShowWindow(matches[key], 3)
-        ctypes.windll.user32.SetForegroundWindow(matches[key])
-        return
+        hwnd = matches[key]
+        # magic incantations to activate window consistently
+        IsIconic = ctypes.windll.user32.IsIconic
+        ShowWindow = ctypes.windll.user32.ShowWindow
+        GetForegroundWindow = ctypes.windll.user32.GetForegroundWindow
+        GetWindowThreadProcessId = ctypes.windll.user32.GetWindowThreadProcessId
+        BringWindowToTop = ctypes.windll.user32.BringWindowToTop
+        AttachThreadInput = ctypes.windll.user32.AttachThreadInput
+        SetForegroundWindow = ctypes.windll.user32.SetForegroundWindow
+        SystemParametersInfo = ctypes.windll.user32.SystemParametersInfoA
+        
+        if IsIconic(hwnd):
+            ShowWindow(hwnd, winconstants.SW_RESTORE)
+        if GetForegroundWindow() == hwnd:
+            return True
+        ForegroundThreadID = GetWindowThreadProcessId(GetForegroundWindow(), None)
+        ThisThreadID = GetWindowThreadProcessId(hwnd, None)
+        if AttachThreadInput(ThisThreadID, ForegroundThreadID, True):
+            BringWindowToTop(hwnd)
+            SetForegroundWindow(hwnd)
+            AttachThreadInput(ThisThreadID, ForegroundThreadID, False)
+            if GetForegroundWindow() == hwnd:
+                return True
+        timeout = ctypes.c_int()
+        zero = ctypes.c_int(0)
+        SystemParametersInfo(winconstants.SPI_GETFOREGROUNDLOCKTIMEOUT, 0, ctypes.byref(timeout), 0)
+        (winconstants.SPI_SETFOREGROUNDLOCKTIMEOUT, 0, ctypes.byref(zero), winconstants.SPIF_SENDCHANGE)
+        BringWindowToTop(hwnd)
+        SetForegroundWindow(hwnd)
+        SystemParametersInfo(winconstants.SPI_SETFOREGROUNDLOCKTIMEOUT, 0, ctypes.byref(timeout), winconstants.SPIF_SENDCHANGE); 
+        if GetForegroundWindow() == hwnd:
+            return True
+        return False
 
 def get_mouse_location():
     pt = winconstants.POINT()

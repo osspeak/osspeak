@@ -36,18 +36,18 @@ class RuleParser:
         return top_level_rule
 
     def parse_word_token(self, tok):
-        self.maybe_pop_top_grouping()
+        self.pop_top_grouping_if_closed()
         word_node = astree.WordNode(tok.text)
         self.top.children.append(word_node)
 
     def parse_or_token(self, tok):
-        self.maybe_pop_top_grouping()
+        self.pop_top_grouping_if_closed()
         or_node = astree.OrNode()
         self.top.children.append(or_node)
 
     def parse_named_rule_token(self, tok):
         from sprecgrammars import api
-        self.maybe_pop_top_grouping()
+        self.pop_top_grouping_if_closed()
         rule_node = self.rules[tok.name]
         # rule text -> None -> Rule object
         if isinstance(rule_node, str):
@@ -60,14 +60,14 @@ class RuleParser:
         self.top.children.append(rule_copy)
 
     def parse_grouping_opening_token(self, tok):
-        self.maybe_pop_top_grouping()
+        self.pop_top_grouping_if_closed()
         grouping_node = astree.GroupingNode()
         self.top.children.append(grouping_node)
         self.grouping_stack.append(grouping_node)
 
     def parse_grouping_closing_token(self, tok):
         self.top.open = False
-        self.maybe_pop_top_grouping()
+        self.grouping_stack.pop()
 
     def parse_repetition_token(self, tok):
         repeated_node = self.modifiable_node
@@ -81,7 +81,7 @@ class RuleParser:
         if low is not None:
             node.low = low
 
-    def maybe_pop_top_grouping(self):
+    def pop_top_grouping_if_closed(self):
         if not self.top.open:
             self.grouping_stack.pop()
 

@@ -59,10 +59,6 @@ class CommandModule:
     def conditions(self):
         return self.config.get('conditions', {})
 
-    def to_dict(self):
-        jsonstr = json.dumps(self, cls=serializer.GuiEncoder)
-        return json.loads(jsonstr) 
-
 class Command:
     
     def __init__(self, rule_text, action_text, scope=None):
@@ -122,4 +118,3 @@ class Command:
                 is_match = True
             matched_children.append(child)
         return matched_children
-            

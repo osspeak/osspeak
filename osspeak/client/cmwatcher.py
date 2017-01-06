@@ -160,15 +160,13 @@ class CommandModuleWatcher:
         t.start()
 
     def watch_active_window(self):
-        while True:
-            # while not self.event_dispatcher.shutdown.isSet():
-            time.sleep(2)
+        while not self.event_dispatcher.shutdown.isSet():
             changed_modules = self.save_updated_modules()
             if changed_modules:
                 self.update_modules(changed_modules)
                 continue
             self.maybe_load_modules()
-            # self.event_dispatcher.shutdown.wait(timeout=2)
+            self.event_dispatcher.shutdown.wait(timeout=2)
 
     def maybe_load_modules(self):
         active_window = api.get_active_window_name().lower()
