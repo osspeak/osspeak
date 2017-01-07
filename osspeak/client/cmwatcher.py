@@ -19,11 +19,16 @@ class CommandModuleWatcher:
         self.event_dispatcher = event_dispatcher
         self.current_condition = scopes.CurrentCondition()
         self.initial = True
+        self.not_loading_modules = threading.Event()
         self.modules_to_save = {}
+        self.last_changeset = {}
         self.command_module_json = self.load_command_json()
 
-    def load_modules(self):
+    def load_modules(self, previous_active_modules=None):
         self.initialize_modules()
+        self.flag_active_modules()
+        self.load_command_module_information()
+        self.fire_activation_events(previous_active_modules)
         self.create_grammar_output()
         self.event_dispatcher.engine_process.start_engine_listening(init=self.initial)
         self.initial = False
@@ -32,13 +37,12 @@ class CommandModuleWatcher:
         self.init_fields()
         self.load_command_modules()
         self.load_scope_and_conditions()
-        self.flag_active_modules()
+
+    def fire_activation_events(self, previous_active_modules):
+        print('reel pam', previous_active_modules)
 
     def create_grammar_output(self):
-        self.load_functions()
-        self.load_rules()
-        self.load_commands()
-        self.send_module_information()
+        self.send_module_information_to_ui()
         self.serialize_scope_xml()
 
     def init_fields(self):
@@ -107,6 +111,11 @@ class CommandModuleWatcher:
                 return False
         return True
 
+    def load_command_module_information(self):
+        self.load_functions()
+        self.load_rules()
+        self.load_commands()
+        self.load_events()
 
     def load_functions(self):
         self.load_builtin_functions()
@@ -136,6 +145,10 @@ class CommandModuleWatcher:
         from sprecgrammars.api import rule
         global_scope = self.scope_groupings['']
         global_scope._rules['_dictate'] = rule('', '_dictate')
+
+    def load_events(self):
+        for path, cmd_module in self.cmd_modules.items():
+            cmd_module.load_events()
 
     def serialize_scope_xml(self):
         converter = SrgsXmlConverter()
@@ -168,14 +181,24 @@ class CommandModuleWatcher:
             self.maybe_load_modules()
             self.event_dispatcher.shutdown.wait(timeout=2)
 
+    def save_updated_modules(self):
+        # should use a lock here
+        modules_to_save = self.modules_to_save
+        self.modules_to_save = {}
+        changed_modules = {}
+        for path, cmd_module_config in modules_to_save.items():
+            if cmd_module_config != self.cmd_modules[path].config:
+                changed_modules[path] = cmd_module_config
+        return changed_modules
+
     def maybe_load_modules(self):
         active_window = api.get_active_window_name().lower()
         if active_window == self.current_condition.window_title:
             return
         self.current_condition.window_title = active_window
         new_active_modules = dict(self.get_active_modules())
-        if new_active_modules != self.active_modules or self.initial:
-            self.load_modules()
+        if new_active_modules != self.active_modules:
+            self.load_modules(self.active_modules)
 
     def update_modules(self, modified_modules):
         command_dir = usersettings.command_directory()
@@ -195,8 +218,9 @@ class CommandModuleWatcher:
                 changed_modules[path] = cmd_module_config
         return changed_modules
 
-    def send_module_information(self):
+    def save_changed_modules(self):
+        self.changed_modules = {'created': {}, 'edited': {}, 'deleted': {}, 'all': self.cmd_modules}
+
+    def send_module_information_to_ui(self):
         payload = {'modules': self.cmd_modules}
         self.event_dispatcher.route_message('ui', 'module map', payload)
-        # self.event_dispatcher.ui_manager.send_message('module map',
-        #     payload, encoder=serializer.GuiEncoder)

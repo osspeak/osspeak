@@ -20,6 +20,8 @@ class CommandModule:
         self.rules = []
         self.functions = []
         self.commands = []
+        # currently activate and deactivate
+        self.events = {}
 
     def load_commands(self):
         for rule_text, action_text in self.config.get('commands', {}):
@@ -54,6 +56,10 @@ class CommandModule:
         for i, func in enumerate(self.functions):
             action_text = config_funcs[i][1]
             func.action = api.action(action_text, defined_functions=self.scope.functions)
+
+    def load_events(self):
+        for event_name, event_text in self.config.get('events', {}).items():
+            self.events[event_name] = api.action(event_text, defined_functions=self.scope.functions)
 
     @property
     def conditions(self):

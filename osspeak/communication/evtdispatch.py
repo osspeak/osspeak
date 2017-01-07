@@ -23,7 +23,6 @@ class EventDispatcher:
             self.ui_manager = menu.Menu(self)
             self.ui_manager.main_loop()
             self.shutdown.set()
-            # self.engine_process.shutdown()
 
     def start_engine_process(self):
         self.engine_process = EngineProcessManager(self)
@@ -40,5 +39,6 @@ class EventDispatcher:
         menu.Menu(self).prompt_input()
 
     def route_message(self, recepient, msgkey, payload):
+        # TODO: necessary? Any recepient other than ui?
         if recepient == 'ui':
             self.ui_manager.send_message(msgkey, payload)
