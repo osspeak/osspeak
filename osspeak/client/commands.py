@@ -96,8 +96,13 @@ class Command:
     def add_var_action(self, rule_node, engine_variables, bound_variables):
         if not isinstance(rule_node, (astree.Rule, astree.GroupingNode)):
             return
-        matched_children = self.get_matched_children(rule_node, engine_variables)
         action = nodes.RootAction()
+        rule_dictation = self.get_rule_dictation(rule_node, engine_variables)
+        if rule_dictation is not None:
+            action.children.append(nodes.LiteralKeysAction(rule_dictation))
+            bound_variables[rule_node.id] = action
+            return action
+        matched_children = self.get_matched_children(rule_node, engine_variables)
         for child in matched_children:
             if getattr(child, 'action_substitute', None):
                 action.children.append(child.action_substitute)
@@ -118,3 +123,11 @@ class Command:
             if var_id in child_id_map:
                 matched_children.append(child_id_map[var_id])
         return matched_children
+
+    def get_rule_dictation(self, rule_node, engine_variables):
+        if not isinstance(rule_node, (astree.Rule)) or rule_node.name != '_dictate':
+            return
+        match_id = f'dictation-{rule_node.id}'
+        for var_id, var_text in engine_variables:
+            if var_id == match_id:
+                return var_text

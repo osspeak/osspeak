@@ -58,6 +58,8 @@ class RuleParser:
         # want a copy to avoid mutating original, ie repeat
         rule_copy = copy.copy(rule_node)
         self.grouping_stack[0].groupings.update(rule_copy.groupings)
+        if rule_copy.name == '_dictate':
+            self.grouping_stack[0].groupings[rule_copy.id] = None
         self.top.children.append(rule_copy)
 
     def parse_grouping_opening_token(self, tok):
