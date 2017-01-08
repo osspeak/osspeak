@@ -39,7 +39,15 @@ class CommandModuleWatcher:
         self.load_scope_and_conditions()
 
     def fire_activation_events(self, previous_active_modules):
-        print('reel pam', previous_active_modules)
+        previous_names, current_names = set(previous_active_modules), set(self.active_modules)
+        for deactivated_name in previous_names - current_names:
+            cmd_module = previous_active_modules[deactivated_name]
+            if 'deactivate' in cmd_module.events:
+                cmd_module.events['deactivate'].perform(variables=[])
+        for activated_name in current_names - previous_names:
+            cmd_module = self.active_modules[activated_name]
+            if 'activate' in cmd_module.events:
+                cmd_module.events['activate'].perform(variables=[])
 
     def create_grammar_output(self):
         self.send_module_information_to_ui()
@@ -66,7 +74,7 @@ class CommandModuleWatcher:
             os.makedirs(command_dir)
         for root, dirs, filenames in os.walk(command_dir):
             # skip hidden directories such as .git
-            dirs[:] = [d for d in dirs if not d.startswith('.')]
+            dirs[:] = sorted([d for d in dirs if not d.startswith('.')])
             self.load_json_directory(filenames, command_dir, root, json_module_dicts)
         return json_module_dicts
 
@@ -179,7 +187,7 @@ class CommandModuleWatcher:
                 self.update_modules(changed_modules)
                 continue
             self.maybe_load_modules()
-            self.event_dispatcher.shutdown.wait(timeout=2)
+            self.event_dispatcher.shutdown.wait(timeout=1)
 
     def save_updated_modules(self):
         # should use a lock here

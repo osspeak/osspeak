@@ -57,6 +57,7 @@ class RuleParser:
             self.rules[tok.name] = rule_node
         # want a copy to avoid mutating original, ie repeat
         rule_copy = copy.copy(rule_node)
+        self.grouping_stack[0].groupings.update(rule_copy.groupings)
         self.top.children.append(rule_copy)
 
     def parse_grouping_opening_token(self, tok):
@@ -67,7 +68,7 @@ class RuleParser:
 
     def parse_grouping_closing_token(self, tok):
         self.top.open = False
-        self.grouping_stack.pop()
+        self.pop_top_grouping_if_closed()
 
     def parse_repetition_token(self, tok):
         repeated_node = self.modifiable_node
@@ -83,7 +84,8 @@ class RuleParser:
 
     def pop_top_grouping_if_closed(self):
         if not self.top.open:
-            self.grouping_stack.pop()
+            grouping = self.grouping_stack.pop()
+            self.grouping_stack[0].groupings[grouping.id] = None
 
     @property
     def top(self):

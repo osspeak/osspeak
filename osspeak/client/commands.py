@@ -86,19 +86,17 @@ class Command:
 
     def perform_action(self, engine_result):
         # empty variables dict, gets filled based on result
-        bound_variables = collections.OrderedDict()
+        bound_variables = self.rule.groupings.copy()
         engine_variables = {var[0]: var[1] for var in engine_result['Variables'] if len(var) == 2}
         for rule_node in self.rule.children:
             self.add_var_action(rule_node, engine_variables, bound_variables)
-        var_list = list(bound_variables.values())
+        var_list = [nodes.RootAction() if a is None else a for a in bound_variables.values()]
         self.action.perform(var_list)
         
     def add_var_action(self, rule_node, engine_variables, bound_variables):
         if not isinstance(rule_node, (astree.Rule, astree.GroupingNode)):
             return
         matched_children = self.get_matched_children(rule_node, engine_variables)
-        if not matched_children:
-            return
         action = nodes.RootAction()
         for child in matched_children:
             if getattr(child, 'action_substitute', None):
@@ -123,4 +121,4 @@ class Command:
             if child.id in engine_variables:
                 is_match = True
             matched_children.append(child)
-        return matched_children
+        return matched_children if is_match else []

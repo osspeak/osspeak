@@ -28,6 +28,7 @@ class Rule(ASTNode):
         self.repeat_high = 1
         self.open = True
         self.is_variable = False
+        self.groupings = collections.OrderedDict()
 
 class WordNode(ASTNode):
 

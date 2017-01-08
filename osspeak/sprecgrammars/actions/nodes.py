@@ -55,7 +55,8 @@ class RootAction(Action):
         self.children.append(child)
 
     def evaluate(self, variables, arguments=None):
-        return ''.join((child.evaluate(variables, arguments=arguments) for child in self.children))
+        evaluated_children = [child.evaluate(variables, arguments=arguments) for child in self.children]
+        return ''.join(evaluated_children)
 
     def perform(self, variables, arguments=None):
         for subaction in self.children:
@@ -116,9 +117,18 @@ class FunctionCall(Action):
         return args
 
     def perform(self, variables, arguments=None):
-        evaluation = self.evaluate(variables, arguments)
-        if evaluation is not None:
-            api.type_literal(str(evaluation))
+        from sprecgrammars.api import action
+        # builtin functions
+        if isinstance(self.definition, types.FunctionType):
+            args = [a.evaluate(variables, arguments) for a in self.arguments]
+            result = self.definition(*args)
+            if result is not None:
+                api.type_literal(str(result))
+        # user defined functions
+        else:
+            args = self.get_arguments(variables, arguments)
+            for child in self.definition.action.children:
+                child.perform(variables, args)
 
     def evaluate(self, variables, arguments=None):
         from sprecgrammars.api import action
