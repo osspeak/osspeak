@@ -87,7 +87,7 @@ class Command:
     def perform_action(self, engine_result):
         # empty variables dict, gets filled based on result
         bound_variables = self.rule.groupings.copy()
-        engine_variables = {var[0]: var[1] for var in engine_result['Variables'] if len(var) == 2}
+        engine_variables = tuple(v for v in engine_result['Variables'] if len(v) == 2)
         for rule_node in self.rule.children:
             self.add_var_action(rule_node, engine_variables, bound_variables)
         var_list = [nodes.RootAction() if a is None else a for a in bound_variables.values()]
@@ -111,14 +111,10 @@ class Command:
         return action
 
     def get_matched_children(self, parent_node, engine_variables):
+        # inefficient, but probably doesn't matter
         matched_children = []
-        is_match = False
-        for child in parent_node.children:
-            if isinstance(child, astree.OrNode):
-                if is_match:
-                    break
-                matched_children = []
-            if child.id in engine_variables:
-                is_match = True
-            matched_children.append(child)
-        return matched_children if is_match else []
+        child_id_map = {c.id: c for c in parent_node.children}
+        for var_id, var_text in engine_variables:
+            if var_id in child_id_map:
+                matched_children.append(child_id_map[var_id])
+        return matched_children
