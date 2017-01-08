@@ -9,9 +9,11 @@ namespace RecognizerIO.Engines
     {
         public List<CommandRecognition> Commands = new List<CommandRecognition>();
         public string Type = "recognition";
+        public string GrammarId;
 
-        public ProcessedRecognitionResult(string semantics)
+        public ProcessedRecognitionResult(string semantics, string grammarId)
         {
+            GrammarId = grammarId;
             string[] splitCmds = semantics.Split(new[] { "-command-" }, StringSplitOptions.None).Skip(1).ToArray();
             foreach(var cmd in splitCmds)
             {

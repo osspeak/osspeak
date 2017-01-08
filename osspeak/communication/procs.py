@@ -56,10 +56,11 @@ class EngineProcessManager(ProcessManager):
 
     def start_engine_listening(self, init=True):
         grammar_xml = self.event_dispatcher.cmd_module_watcher.grammar_xml
+        grammar_id = self.event_dispatcher.cmd_module_watcher.grammar_node.id
         msg = {
             'Type': 'load grammars',
             'Grammars': {
-                id(grammar_xml): ET.tostring(grammar_xml).decode('utf8'),
+                grammar_id: ET.tostring(grammar_xml).decode('utf8'),
             },
             'Init': init,
         }
@@ -68,6 +69,8 @@ class EngineProcessManager(ProcessManager):
     def on_engine_message(self, msg_string):
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition': 
+            if msg['GrammarId'] != event_dispatcher.cmd_module_watcher.grammar_node.id:
+                return
             print(msg)
             for cmd_recognition in msg['Commands']:
                 cmd = self.event_dispatcher.cmd_module_watcher.command_map[cmd_recognition['RuleId']]

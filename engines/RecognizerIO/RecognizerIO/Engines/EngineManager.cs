@@ -41,7 +41,7 @@ namespace RecognizerIO.Engines
 
         void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            HandleRecognition(e.Result);
+            HandleRecognition(e.Result, AllGrammars[ActiveGrammar]);
         }
 
         void recognizer_RecognizerUpdateReached(object sender, RecognizerUpdateReachedEventArgs e)
@@ -50,11 +50,11 @@ namespace RecognizerIO.Engines
             Engine.LoadGrammar(ActiveGrammar);
         }
 
-        public void HandleRecognition(RecognitionResult srResult)
+        public void HandleRecognition(RecognitionResult srResult, string grammarId)
         {
             if (srResult == null || srResult.Confidence <= .5) return;
             var resultText = srResult.Semantics.Value.ToString().Replace("[object Object]", "");
-            var result = new ProcessedRecognitionResult(resultText);
+            var result = new ProcessedRecognitionResult(resultText, grammarId);
             string serializedResult = JsonConvert.SerializeObject(result);
             Console.WriteLine(serializedResult);
         }
