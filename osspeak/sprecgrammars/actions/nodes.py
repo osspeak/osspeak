@@ -4,6 +4,7 @@ import itertools
 import functools
 
 from platforms import api
+from sprecgrammars.actions import evaluation
 
 class Action:
 
@@ -13,9 +14,6 @@ class Action:
         self.slices = []
 
     def evaluate(self, variables):
-        raise NotImplementedError
-
-    def perform(self, variables):
         raise NotImplementedError
 
     def add(self, *a, **k):
@@ -56,11 +54,26 @@ class RootAction(Action):
 
     def evaluate(self, variables, arguments=None):
         evaluated_children = [child.evaluate(variables, arguments=arguments) for child in self.children]
-        return ''.join(evaluated_children)
+        if all(isinstance(item, str) for item in evaluated_children):
+            return ''.join(evaluated_children)
+        children = []
+        for child in evaluated_children:
+            if isinstance(child, (str, list)):
+                children.append(child)
+            elif isinstance(child, evaluation.RootActionEvaluation):
+                children.extend(child.literals)
+        return evaluation.RootActionEvaluation(children)
 
     def perform(self, variables, arguments=None):
-        for subaction in self.children:
-            subaction.perform(variables, arguments=arguments)
+        root_action_evaluation = self.evaluate(variables, arguments)
+        evaluated_item_list = [root_action_evaluation] if isinstance(root_action_evaluation, str) else root_action_evaluation.literals
+        for item in evaluated_item_list:
+            if isinstance(item, str):
+                api.type_literal(item)
+            elif isinstance(item, list):
+                api.type_keypresses(item)
+            else:
+                raise TypeError
 
 class LiteralKeysAction(Action):
 
@@ -91,9 +104,6 @@ class LiteralKeysAction(Action):
             return ''
         return var.evaluate(variables, arguments)
 
-    def perform(self, variables, arguments=None):
-        api.type_literal(self.evaluate_text(variables, arguments))
-
     def evaluate(self, variables, arguments=None):
         return self.evaluate_text(variables, arguments)
 
@@ -116,31 +126,17 @@ class FunctionCall(Action):
             args[param.name] = action.evaluate(variables, arguments)
         return args
 
-    def perform(self, variables, arguments=None):
-        from sprecgrammars.api import action
-        # builtin functions
-        if isinstance(self.definition, types.FunctionType):
-            args = [a.evaluate(variables, arguments) for a in self.arguments]
-            result = self.definition(*args)
-            if result is not None:
-                api.type_literal(str(result))
-        # user defined functions
-        else:
-            args = self.get_arguments(variables, arguments)
-            for child in self.definition.action.children:
-                child.perform(variables, args)
-
     def evaluate(self, variables, arguments=None):
         from sprecgrammars.api import action
         # builtin functions
         if isinstance(self.definition, types.FunctionType):
             args = [a.evaluate(variables, arguments) for a in self.arguments]
             result = self.definition(*args)
-            return result
         # user defined functions
         else:
             args = self.get_arguments(variables, arguments)
-            return self.definition.action.evaluate(variables, args)
+            result = self.definition.action.evaluate(variables, args)
+        return self.apply_slices(result, variables, arguments)
 
 class KeySequence(Action):
 
@@ -150,10 +146,6 @@ class KeySequence(Action):
 
     def add(self, node):
         self.keys.append(node)
-
-    def perform(self, variables, arguments=None):
-        keypresses = self.evaluate(variables, arguments)
-        api.type_keypresses(keypresses)
 
     def evaluate(self, variables, arguments=None):
         modifiers = self.apply_modifiers(variables)
@@ -169,14 +161,7 @@ class PositionalVariable(Action):
         var = variables[self.pos - 1]
         modifiers = self.apply_modifiers(variables)
         result = '' if var is None else var.evaluate(variables, arguments)
-        return result * modifiers.get('repeat', 1)
-
-    def perform(self, variables, arguments=None):
-        var = variables[self.pos - 1]
-        modifiers = self.apply_modifiers(variables)
-        if var is not None:
-            for i in range(modifiers.get('repeat', 1)):
-                var.perform(variables, arguments)
+        return self.apply_slices(result * modifiers.get('repeat', 1), variables, arguments)
 
 class WhitespaceNode(Action):
 
@@ -185,9 +170,6 @@ class WhitespaceNode(Action):
         self.text = text
 
     def evaluate(self, variables, arguments=None):
-        pass
-
-    def perform(self, variables, arguments=None):
         pass
 
 class Argument(Action):
@@ -199,9 +181,3 @@ class Argument(Action):
     def evaluate(self, variables, arguments=None):
         arguments = {} if arguments is None else arguments
         return arguments.get(self.name, '')
-
-    def perform(self, variables, arguments=None):
-        arguments = {} if arguments is None else arguments
-        # TODO: add function calls, probably needs extra work
-        action = arguments.get(self.name, '')
-        api.type_literal(action)
