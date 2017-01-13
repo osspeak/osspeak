@@ -36,42 +36,6 @@ import collections
 import sys
 import time
 
-
-try:
-    import pytweening
-    from pytweening import (easeInQuad, easeOutQuad, easeInOutQuad,
-        easeInCubic, easeOutCubic, easeInOutCubic, easeInQuart, easeOutQuart,
-        easeInOutQuart, easeInQuint, easeOutQuint, easeInOutQuint, easeInSine,
-        easeOutSine, easeInOutSine, easeInExpo, easeOutExpo, easeInOutExpo,
-        easeInCirc, easeOutCirc, easeInOutCirc, easeInElastic, easeOutElastic,
-        easeInOutElastic, easeInBack, easeOutBack, easeInOutBack, easeInBounce,
-        easeOutBounce, easeInOutBounce)
-    # getLine is not needed.
-    # getPointOnLine has been redefined in this file, to avoid dependency on pytweening.
-    # linear has also been redefined in this file.
-except ImportError:
-    pass
-
-
-try:
-    import pymsgbox
-    from pymsgbox import alert, confirm, prompt, password
-except ImportError:
-    # If pymsgbox module is not found, those methods will not be available.
-    pass
-
-
-try:
-    import pyscreeze
-    from pyscreeze import (center, grab, locate, locateAll, locateAllOnScreen,
-        locateCenterOnScreen, locateOnScreen, pixel, pixelMatchesColor,
-        screenshot)
-except ImportError:
-    # If pyscreeze module is not found, screenshot-related features will simply
-    # not work.
-    pass
-
-
 KEY_NAMES = ['\t', '\n', '\r', ' ', '!', '"', '#', '$', '%', '&', "'", '(',
      ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5', '6', '7',
      '8', '9', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`',

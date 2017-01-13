@@ -79,7 +79,7 @@ def press_key(key_input, direction):
 
 def press_key_combination(keys, direction):
     import pyautogui
-    pyautogui.hotkey('alt', 'up')
+    pyautogui.hotkey(*keys)
     return
     if direction in ('both', 'down'):
         for key_stroke in keys:

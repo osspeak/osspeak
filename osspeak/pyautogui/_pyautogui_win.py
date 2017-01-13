@@ -104,7 +104,7 @@ The *KB dictionaries in pyautogui map a string that can be passed to keyDown(),
 keyUp(), or press() into the code used for the OS-specific keyboard function.
 
 They should always be lowercase, and the same keys should be used across all OSes."""
-keyboardMapping = dict([(key, None) for key in pyautogui.KEY_NAMES])
+keyboardMapping = {key: None for key in pyautogui.KEY_NAMES}
 keyboardMapping.update({
     'backspace': 0x08, # VK_BACK
     '\b': 0x08, # VK_BACK
@@ -270,7 +270,7 @@ def _keyDown(key):
     Returns:
       None
     """
-    if key not in keyboardMapping or keyboardMapping[key] is None:
+    if keyboardMapping.get(key) is None:
         return
 
     needsShift = pyautogui.isShiftCharacter(key)
@@ -299,7 +299,6 @@ def _keyDown(key):
     ctypes.windll.user32.keybd_event(vkCode, 0, 0, 0)
     if needsShift:
         ctypes.windll.user32.keybd_event(0x10, 0, KEYEVENTF_KEYUP, 0) # 0x10 is VK_SHIFT
-
 
 def _keyUp(key):
     """Performs a keyboard key release (without the press down beforehand).
@@ -339,7 +338,6 @@ def _keyUp(key):
     if needsShift:
         ctypes.windll.user32.keybd_event(0x10, 0, KEYEVENTF_KEYUP, 0) # 0x10 is VK_SHIFT
 
-
 def _position():
     """Returns the current xy coordinates of the mouse cursor as a two-integer
     tuple by calling the GetCursorPos() win32 function.
@@ -350,8 +348,7 @@ def _position():
 
     cursor = POINT()
     ctypes.windll.user32.GetCursorPos(ctypes.byref(cursor))
-    return (cursor.x, cursor.y)
-
+    return cursor.x, cursor.y
 
 def _size():
     """Returns the width and height of the screen as a two-integer tuple.
@@ -360,7 +357,6 @@ def _size():
       (width, height) tuple of the screen size, in pixels.
     """
     return (ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
-
 
 def _moveTo(x, y):
     """Send the mouse move event to Windows by calling SetCursorPos() win32
@@ -375,7 +371,6 @@ def _moveTo(x, y):
       None
     """
     ctypes.windll.user32.SetCursorPos(x, y)
-
 
 def _mouseDown(x, y, button):
     """Send the mouse down event to Windows by calling the mouse_event() win32
@@ -396,8 +391,7 @@ def _mouseDown(x, y, button):
     elif button == 'right':
         _sendMouseEvent(MOUSEEVENTF_RIGHTDOWN, x, y)
     else:
-        assert False, "button argument not in ('left', 'middle', 'right')"
-
+        raise ValueError("button argument not in ('left', 'middle', 'right')")
 
 def _mouseUp(x, y, button):
     """Send the mouse up event to Windows by calling the mouse_event() win32
@@ -418,8 +412,7 @@ def _mouseUp(x, y, button):
     elif button == 'right':
         _sendMouseEvent(MOUSEEVENTF_RIGHTUP, x, y)
     else:
-        assert False, "button argument not in ('left', 'middle', 'right')"
-
+        raise ValueError("button argument not in ('left', 'middle', 'right')")
 
 def _click(x, y, button):
     """Send the mouse click event to Windows by calling the mouse_event() win32
@@ -440,8 +433,7 @@ def _click(x, y, button):
     elif button == 'right':
         _sendMouseEvent(MOUSEEVENTF_RIGHTCLICK, x, y)
     else:
-        assert False, "button argument not in ('left', 'middle', 'right')"
-
+        raise ValueError("button argument not in ('left', 'middle', 'right')")
 
 def _sendMouseEvent(ev, x, y, dwData=0):
     """The helper function that actually makes the call to the mouse_event()
