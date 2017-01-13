@@ -78,6 +78,9 @@ def press_key(key_input, direction):
             keyup(winconstants.WINDOWS_KEYCODES['shift'])
 
 def press_key_combination(keys, direction):
+    import pyautogui
+    pyautogui.hotkey('alt', 'up')
+    return
     if direction in ('both', 'down'):
         for key_stroke in keys:
             keydown(winconstants.WINDOWS_KEYCODES[key_stroke])
@@ -91,6 +94,7 @@ def keydown(hex_key_code):
     ii_ = winconstants.INPUT_I()
     ii_.ki = winconstants.KEYBOARD_INPUT(hex_key_code, 0x48, 0, 0, ctypes.pointer(extra))
     x = winconstants.INPUT(ctypes.c_ulong(1), ii_)
+    print(x)
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
 def keyup(hex_key_code):
