@@ -158,7 +158,8 @@ class PositionalVariable(Action):
         self.pos = pos
 
     def evaluate(self, variables, arguments=None):
-        var = variables[self.pos - 1]
+        pos = self.pos - 1 if self.pos > 0 else self.pos
+        var = variables[pos]
         modifiers = self.apply_modifiers(variables)
         result = '' if var is None else var.evaluate(variables, arguments)
         return self.apply_slices(result * modifiers.get('repeat', 1), variables, arguments)

@@ -94,7 +94,6 @@ def keydown(hex_key_code):
     ii_ = winconstants.INPUT_I()
     ii_.ki = winconstants.KEYBOARD_INPUT(hex_key_code, 0x48, 0, 0, ctypes.pointer(extra))
     x = winconstants.INPUT(ctypes.c_ulong(1), ii_)
-    print(x)
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
 def keyup(hex_key_code):
