@@ -7,7 +7,7 @@ from sprecgrammars.actions import nodes
 from sprecgrammars.functions.parser import FunctionDefinitionParser
 from sprecgrammars import api
 from interfaces.gui import serializer
-from client import commands, scopes
+from client import commands, scopes, variables
 from sprecgrammars.rules import astree
 from sprecgrammars.rules.parser import RuleParser
 
@@ -86,16 +86,17 @@ class Command:
 
     def perform_action(self, engine_result):
         # empty variables dict, gets filled based on result
-        bound_variables = self.rule.groupings.copy()
+        bound_variables = variables.build_grouping_map(self.rule)
         engine_variables = tuple(v for v in engine_result['Variables'] if len(v) == 2)
         for rule_node in self.rule.children:
-            self.add_var_action(rule_node, engine_variables, bound_variables)
+            self.add_var_action(rule_node, engine_variables, bound_variables, [self.rule.id])
         var_list = [nodes.RootAction() if a is None else a for a in bound_variables.values()]
         self.action.perform(var_list)
         
-    def add_var_action(self, rule_node, engine_variables, bound_variables):
+    def add_var_action(self, rule_node, engine_variables, bound_variables, ancestor_ids):
         if not isinstance(rule_node, (astree.Rule, astree.GroupingNode)):
             return
+        ancestor_ids = [rule_node.id] if ancestor_ids is None else ancestor_ids + [rule_node.id]
         action = nodes.RootAction()
         rule_dictation = self.get_rule_dictation(rule_node, engine_variables)
         if rule_dictation is not None:
@@ -109,17 +110,24 @@ class Command:
             elif isinstance(child, astree.WordNode):
                 action.children.append(nodes.LiteralKeysAction(child.text))
             elif isinstance(child, (astree.Rule, astree.GroupingNode)):
-                child_action = self.add_var_action(child, engine_variables, bound_variables)
+                child_action = self.add_var_action(child, engine_variables, bound_variables, ancestor_ids)
                 action.children.append(child_action)
         if isinstance(rule_node, astree.GroupingNode):
-            bound_variables[rule_node.id] = action
+            node_path = tuple(ancestor_ids)
+            assert bound_variables.get(node_path, False) is None
+            bound_variables[node_path] = action
         return action
 
     def get_matched_children(self, parent_node, engine_variables):
         # inefficient, but probably doesn't matter
+        if not parent_node.children:
+            return []
         matched_children = []
         child_id_map = {c.id: c for c in parent_node.children}
+        descendant_ids = set(variables.get_descendant_ids(parent_node))
         for var_id, var_text in engine_variables:
+            if matched_children and var_id not in descendant_ids:
+                break
             if var_id in child_id_map:
                 matched_children.append(child_id_map[var_id])
         return matched_children

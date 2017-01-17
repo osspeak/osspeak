@@ -1,6 +1,6 @@
 import collections
 import uuid
-
+import copy
 
 class ASTNode:
     def __init__(self):
@@ -24,11 +24,16 @@ class Rule(ASTNode):
         super().__init__()
         self.name = name
         self.children = []
+        self.base_rule = None
         self.repeat_low = 1
         self.repeat_high = 1
         self.open = True
-        self.is_variable = False
-        self.groupings = collections.OrderedDict()
+
+    def create_reference(self):
+        reference_rule = copy.copy(self)
+        reference_rule.base_rule = self
+        reference_rule._id = str(uuid.uuid4()).replace('-', '')
+        return reference_rule
 
 class WordNode(ASTNode):
 

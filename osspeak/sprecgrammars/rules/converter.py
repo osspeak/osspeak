@@ -55,13 +55,14 @@ class SrgsXmlConverter:
         ruleref_container.append(repeat_item)
         return top_level_choices
     
-    def get_ruleref_item(self, ruleid, text=None, low=1, high=1):
+    def get_ruleref_item(self, ruleid, outid=None, text=None, low=1, high=1):
+        outid = ruleid if outid is None else outid
         ruleref_item = ET.Element('item')
         ruleref = ET.Element('ruleref', attrib={'uri': f'#{ruleid}'})
         self.apply_repeat_attrib(ruleref_item, low, high)
         ruleref_item.append(ruleref)
         tag = ET.Element('tag')
-        tag.text = f'out += "{ruleid}=|" + rules.latest();' if text is None else text
+        tag.text = f'out += "{outid}=|" + rules.latest();' if text is None else text
         ruleref_item.append(tag)
         return ruleref_item
 
@@ -96,11 +97,11 @@ class SrgsXmlConverter:
             tag.text = f'out += "dictation-{rule_node.id}=" + rules.latest(); + "|"'
             choices[-1].append(tag)
             return
-        text = f'out += "{rule_node.id}=|" + rules.latest();'
-        rritem = self.get_ruleref_item(rule_node.id, text=None, low=rule_node.repeat_low, high=rule_node.repeat_high)
+        # all rule nodes here should be copies that refer to base rule
+        rritem = self.get_ruleref_item(rule_node.base_rule.id, outid=rule_node.id, text=None,
+                low=rule_node.repeat_low, high=rule_node.repeat_high)
         choices[-1].append(rritem)
         
-
     def add_grouping(self, child, choices):
         rule = ET.Element('rule', attrib={'id': child.id})
         self.root.append(rule)

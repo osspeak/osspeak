@@ -11,7 +11,7 @@ def main():
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--interface', default='gui')
+    parser.add_argument('--interface', default='cli')
     return parser.parse_args()
 
 if __name__ == "__main__":

@@ -56,10 +56,9 @@ class RuleParser:
             rule_node = api.rule(rule_node, name=tok.name, rules=self.rules)
             self.rules[tok.name] = rule_node
         # want a copy to avoid mutating original, ie repeat
-        rule_copy = copy.copy(rule_node)
-        self.grouping_stack[0].groupings.update(rule_copy.groupings)
-        if rule_copy.name == '_dictate':
-            self.grouping_stack[0].groupings[rule_copy.id] = None
+        # Need to figure out a way to make unique ids that
+        # still point to rulerefs
+        rule_copy = rule_node.create_reference()
         self.top.children.append(rule_copy)
 
     def parse_grouping_opening_token(self, tok):
@@ -87,7 +86,6 @@ class RuleParser:
     def pop_top_grouping_if_closed(self):
         if not self.top.open:
             grouping = self.grouping_stack.pop()
-            self.grouping_stack[0].groupings[grouping.id] = None
 
     @property
     def top(self):
