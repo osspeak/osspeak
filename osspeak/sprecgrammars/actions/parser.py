@@ -38,8 +38,9 @@ class ActionParser:
         for tok in self.stream:
             tok_type = type(tok)
             self.parse_map[tok_type](tok)
-            if tok_type is not tokens.WhitespaceToken:
+            if len(self.grouped_action_stack) == 1:
                 break
+        assert len(self.grouped_action_stack) == 1
         return self.grouped_action_stack[0]
 
     def init_grouped_action_stack(self):

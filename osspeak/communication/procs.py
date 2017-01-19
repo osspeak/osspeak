@@ -13,8 +13,7 @@ class ProcessManager:
 
     def __init__(self, path, on_output=lambda x: None):
         self.process = subprocess.Popen(path, stdin=subprocess.PIPE,
-            stderr=subprocess.PIPE, stdout=subprocess.PIPE,
-            creationflags=subprocess.CREATE_NEW_CONSOLE)
+            stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         self.on_output = on_output
         
     def send_message(self, msg):

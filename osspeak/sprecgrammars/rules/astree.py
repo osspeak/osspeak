@@ -65,3 +65,7 @@ class GroupingNode(ASTNode):
         self.repeat_low = 1
         self.repeat_high = 1
         self.action_substitute = None
+
+    @property
+    def id(self):
+        return f'g{self._id}'
