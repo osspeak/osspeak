@@ -86,11 +86,14 @@ class Command:
 
     def perform_action(self, engine_result):
         # empty variables dict, gets filled based on result
-        bound_variables = variables.build_grouping_map(self.rule)
+        # bound_variables = variables.build_grouping_map(self.rule)
         engine_variables = tuple(v for v in engine_result['Variables'] if len(v) == 2)
-        for rule_node in self.rule.children:
-            self.add_var_action(rule_node, engine_variables, bound_variables, [self.rule.id])
-        var_list = [nodes.RootAction() if a is None else a for a in bound_variables.values()]
+        variable_tree = variables.RecognitionResultsTree(engine_variables, self.rule)
+        var_list = variable_tree.action_variables
+        print('asdasda', var_list, end=' ')
+        # for rule_node in self.rule.children:
+        #     self.add_var_action(rule_node, engine_variables, bound_variables, [self.rule.id])
+        # var_list = [nodes.RootAction() if a is None else a for a in bound_variables.values()]
         self.action.perform(var_list)
         
     def add_var_action(self, rule_node, engine_variables, bound_variables, ancestor_ids):
