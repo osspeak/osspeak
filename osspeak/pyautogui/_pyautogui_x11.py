@@ -160,9 +160,8 @@ keyUp(), or press() into the code used for the OS-specific keyboard function.
 
 They should always be lowercase, and the same keys should be used across all OSes."""
 keyboardMapping = {key: None for key in pyautogui.KEY_NAMES}
-print(keyboardMapping)
 keyboardMapping.update({
-    'back':         _display.keysym_to_keycode(Xlib.XK.string_to_keysym('BackSpace')),
+    'back':              _display.keysym_to_keycode(Xlib.XK.string_to_keysym('BackSpace')),
     'backspace':         _display.keysym_to_keycode(Xlib.XK.string_to_keysym('BackSpace')),
     '\b':                _display.keysym_to_keycode(Xlib.XK.string_to_keysym('BackSpace')),
     'tab':               _display.keysym_to_keycode(Xlib.XK.string_to_keysym('Tab')),
