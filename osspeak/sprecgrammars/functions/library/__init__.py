@@ -15,6 +15,7 @@ builtin_functions = {
 
     'state.set': state.set_state,
     'state.delete': state.delete_state,
+    'state.get': state.get_state,
 
     'window.focus': window.focus,
     'window.close': window.close,
