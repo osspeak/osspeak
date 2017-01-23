@@ -106,6 +106,7 @@ keyUp(), or press() into the code used for the OS-specific keyboard function.
 They should always be lowercase, and the same keys should be used across all OSes."""
 keyboardMapping = {key: None for key in pyautogui.KEY_NAMES}
 keyboardMapping.update({
+    'back': 0x08, # VK_BACK
     'backspace': 0x08, # VK_BACK
     '\b': 0x08, # VK_BACK
     'super': 0x5B, #VK_LWIN

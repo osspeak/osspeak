@@ -97,6 +97,7 @@ keyboardMapping.update({
     'return': 0x24, # kVK_Return
     '\t': 0x30, # kVK_Tab
     'tab': 0x30, # kVK_Tab
+    'back': 0x33, # kVK_Delete, which is "Backspace" on OS X.
     'backspace': 0x33, # kVK_Delete, which is "Backspace" on OS X.
     '\b': 0x33, # kVK_Delete, which is "Backspace" on OS X.
     'esc': 0x35, # kVK_Escape
