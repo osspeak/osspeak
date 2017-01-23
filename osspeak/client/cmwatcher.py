@@ -4,6 +4,7 @@ import threading
 import collections
 import tempfile
 from sprecgrammars.actions.parser import ActionParser
+import sprecgrammars.functions.library.state
 from settings import usersettings
 from interfaces.gui import serializer
 from client import commands, scopes
@@ -56,7 +57,7 @@ class CommandModuleWatcher:
     def init_fields(self):
         self.conditions = {
             'titles': collections.defaultdict(set),
-            'variables': collections.defaultdict(set),
+            'state': None,
         }
         # start with global scope
         self.scope_groupings = {'': scopes.Scope()}
@@ -101,6 +102,11 @@ class CommandModuleWatcher:
             self.load_conditions(path, cmd_module)
             self.load_scope(path, cmd_module)
 
+    def load_initial_user_state(self):
+        for path, cmd_module in self.cmd_modules.items():
+            initial_state = {k: eval(v) for k, v in cmd_module.initial_state.items()}
+            sprecgrammars.functions.library.state.USER_DEFINED_STATE.update(initial_state)
+
     def flag_active_modules(self):
         for path, cmd_module in self.get_active_modules():
             self.active_modules[path] = cmd_module
@@ -112,6 +118,9 @@ class CommandModuleWatcher:
                 yield path, cmd_module
 
     def is_command_module_active(self, cmd_module):
+        return self.current_window_matches(cmd_module) and cmd_module.state
+
+    def current_window_matches(self, cmd_module):
         for title_filter, filtered_paths in self.conditions['titles'].items():
             if cmd_module.path in filtered_paths:
                 if title_filter in self.current_condition.window_title:
@@ -177,16 +186,18 @@ class CommandModuleWatcher:
         cmd_module.scope = self.scope_groupings[scope_name]
 
     def start_watch_active_window(self):
+        self.load_initial_user_state()
         t = threading.Thread(target=self.watch_active_window)
         t.start()
 
     def watch_active_window(self):
+        current_user_state = sprecgrammars.functions.library.state.USER_DEFINED_STATE.copy()
         while not self.event_dispatcher.shutdown.isSet():
             changed_modules = self.save_updated_modules()
             if changed_modules:
                 self.update_modules(changed_modules)
                 continue
-            self.maybe_load_modules()
+            current_user_state = self.maybe_load_modules(current_user_state)
             self.event_dispatcher.shutdown.wait(timeout=1)
 
     def save_updated_modules(self):
@@ -199,14 +210,16 @@ class CommandModuleWatcher:
                 changed_modules[path] = cmd_module_config
         return changed_modules
 
-    def maybe_load_modules(self):
+    def maybe_load_modules(self, current_user_state):
         active_window = api.get_active_window_name().lower()
-        if active_window == self.current_condition.window_title:
-            return
+        if active_window == self.current_condition.window_title and current_user_state == sprecgrammars.functions.library.state.USER_DEFINED_STATE:
+            return current_user_state
+        current_user_state = sprecgrammars.functions.library.state.USER_DEFINED_STATE.copy()
         self.current_condition.window_title = active_window
         new_active_modules = dict(self.get_active_modules())
         if new_active_modules != self.active_modules:
             self.load_modules(self.active_modules)
+        return current_user_state
 
     def update_modules(self, modified_modules):
         command_dir = usersettings.command_directory()

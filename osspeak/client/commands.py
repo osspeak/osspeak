@@ -5,6 +5,7 @@ import json
 from sprecgrammars.actions.parser import ActionParser
 from sprecgrammars.actions import nodes
 from sprecgrammars.functions.parser import FunctionDefinitionParser
+from sprecgrammars.functions.library import state
 from sprecgrammars import api
 from interfaces.gui import serializer
 from client import commands, scopes, variables
@@ -64,6 +65,14 @@ class CommandModule:
     @property
     def conditions(self):
         return self.config.get('conditions', {})
+
+    @property
+    def initial_state(self):
+        return self.config.get('initialState', {})
+
+    @property
+    def state(self):
+        return 'state' not in self.conditions or eval(self.conditions['state'], {}, state.USER_DEFINED_STATE)
 
 class Command:
     
