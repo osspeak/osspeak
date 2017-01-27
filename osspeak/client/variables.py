@@ -45,8 +45,9 @@ class RecognitionResultsTree:
             # go up until we find containing rule
             while var_id not in current_rule_wrapper.descendant_ids:
                 assert current_rule_wrapper.node is not self.root_rule_node
-                current_rule_wrapper = self.rule_paths[current_rule_wrapper.path[:-1]]
-            full_path = self.rule_children[current_rule_wrapper.path][var_id]
+                current_rule_wrapper = self.rule_paths[current_rule_wrapper.rule_path]
+            full_rule_path = current_rule_wrapper.rule_path + (current_rule_wrapper.node.id,)
+            full_path = self.rule_children[full_rule_path][var_id]
             full_path_engine_variables.append([full_path, var_val])
         return full_path_engine_variables
 
