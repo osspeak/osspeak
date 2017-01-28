@@ -3,6 +3,7 @@ import threading
 import json
 import sys
 import xml.etree.ElementTree as ET
+from communication import cmdmodule
 
 if getattr(sys, 'frozen', False):
     ENGINE_PATH = r'engines\wsr\RecognizerIO.exe'
@@ -38,8 +39,9 @@ class ProcessManager:
 
 class EngineProcessManager(ProcessManager):
 
-    def __init__(self, event_dispatcher):
+    def __init__(self, event_dispatcher, remote=False):
         super().__init__(ENGINE_PATH, on_output=self.on_engine_message)
+        self.command_module_interface = cmdmodule.RemoteCommandModuleInterface() if remote else cmdmodule.LocalCommandModuleInterface()
         self.event_dispatcher = event_dispatcher
         t = threading.Thread(target=self.watch_shutdown_event)
         t.start()
