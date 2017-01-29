@@ -4,10 +4,13 @@ import collections
 
 _subscriptions = collections.defaultdict(list)
 
-def dispatch(message_name, payload=None):
-    payload = {} if payload is None else payload
+def dispatch(message_name, *args, **kwargs):
     for sub in _subscriptions[message_name]:
-        sub.payload_queue.put(payload)
+        sub.payload_queue.put((args, kwargs))
+
+def dispatch_sync(message_name, *args, **kwargs):
+    for sub in _subscriptions[message_name]:
+        sub.callback(*args, **kwargs)
 
 def subscribe(message_name, callback):
     sub = Subscription(callback)
@@ -23,5 +26,5 @@ class Subscription:
 
     def run(self):
         while True:
-            payload = self.payload_queue.get()
-            self.callback(payload)
+            args, kwargs = self.payload_queue.get()
+            self.callback(*args, **kwargs)

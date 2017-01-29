@@ -1,8 +1,9 @@
+from communication import messages
+
 class Menu:
 
-    def __init__(self, event_dispatcher):
+    def __init__(self):
         self.init_options()
-        self.event_dispatcher = event_dispatcher
 
     def main_loop(self, display_options=True):
         self.print_options()
@@ -25,11 +26,11 @@ class Menu:
         ]
 
     def on_debug_commands(self):
-        self.event_dispatcher.engine_process.stop()
+        messages.dispatch('engine stop')
         while True:
             user_input = input('Enter text to test or press enter to go back: ')
             if user_input:
-                self.event_dispatcher.engine_process.emulate_recognition(user_input)
+                 messages.dispatch('emulate recognition', user_input)
             else:
                 return
 

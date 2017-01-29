@@ -3,7 +3,7 @@ import threading
 import json
 import sys
 import xml.etree.ElementTree as ET
-from communication import cmdmodule
+from communication import cmdmodule, messages
 
 if getattr(sys, 'frozen', False):
     ENGINE_PATH = r'engines\wsr\RecognizerIO.exe'
@@ -39,25 +39,20 @@ class ProcessManager:
 
 class EngineProcessManager(ProcessManager):
 
-    def __init__(self, event_dispatcher, remote=False):
+    def __init__(self, remote=False):
         super().__init__(ENGINE_PATH, on_output=self.on_engine_message)
-        self.command_module_interface = cmdmodule.RemoteCommandModuleInterface() if remote else cmdmodule.LocalCommandModuleInterface()
-        self.event_dispatcher = event_dispatcher
-        t = threading.Thread(target=self.watch_shutdown_event)
-        t.start()
-
-    def watch_shutdown_event(self):
-        self.event_dispatcher.shutdown.wait()
-        self.shutdown()
+        # self.command_module_interface = cmdmodule.RemoteCommandModuleInterface() if remote else cmdmodule.LocalCommandModuleInterface()
+        messages.subscribe('start engine listening', self.start_engine_listening)
+        messages.subscribe('engine stop', self.stop)
+        messages.subscribe('shutdown', self.shutdown)
+        messages.subscribe('emulate recognition', self.emulate_recognition)
         
     def send_message(self, msg):
         if isinstance(msg, dict):
             msg = json.dumps(msg)
         super().send_message(msg)
 
-    def start_engine_listening(self, init=True):
-        grammar_xml = self.event_dispatcher.cmd_module_watcher.grammar_xml
-        grammar_id = self.event_dispatcher.cmd_module_watcher.grammar_node.id
+    def start_engine_listening(self, init, grammar_xml, grammar_id):
         msg = {
             'Type': 'load grammars',
             'Grammars': {
@@ -69,13 +64,8 @@ class EngineProcessManager(ProcessManager):
 
     def on_engine_message(self, msg_string):
         msg = json.loads(msg_string)
-        if msg['Type'] == 'recognition': 
-            if msg['GrammarId'] != self.event_dispatcher.cmd_module_watcher.grammar_node.id:
-                return
-            print(msg)
-            for cmd_recognition in msg['Commands']:
-                cmd = self.event_dispatcher.cmd_module_watcher.command_map[cmd_recognition['RuleId']]
-                cmd.perform_action(cmd_recognition)
+        if msg['Type'] == 'recognition':
+            messages.dispatch('perform commands', msg['GrammarId'], msg['Commands'])
         elif msg['Type'] == 'error':
             print('error!')
             print(msg['Message'])

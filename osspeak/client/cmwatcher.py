@@ -12,18 +12,22 @@ from sprecgrammars.rules import astree
 from sprecgrammars.rules.parser import RuleParser
 from sprecgrammars.rules.converter import SrgsXmlConverter
 from platforms import api
+from communication import messages
 import time
 
 class CommandModuleWatcher:
 
-    def __init__(self, event_dispatcher):
-        self.event_dispatcher = event_dispatcher
+    def __init__(self):
         self.current_condition = scopes.CurrentCondition()
         self.initial = True
         self.not_loading_modules = threading.Event()
         self.modules_to_save = {}
         self.last_changeset = {}
         self.command_module_json = self.load_command_json()
+        self.shutdown = threading.Event()
+        messages.subscribe('shutdown', lambda: self.shutdown.set())
+        messages.subscribe('perform commands', self.perform_commands)
+        messages.subscribe('set saved modules', self.set_saved_modules)
 
     def load_modules(self, previous_active_modules=None):
         self.initialize_modules()
@@ -31,7 +35,10 @@ class CommandModuleWatcher:
         self.load_command_module_information()
         self.fire_activation_events(previous_active_modules)
         self.create_grammar_output()
-        self.event_dispatcher.engine_process.start_engine_listening(init=self.initial)
+        messages.dispatch('start engine listening',
+                          self.initial,
+                          self.grammar_xml,
+                          self.grammar_node.id)
         self.initial = False
 
     def initialize_modules(self):
@@ -192,13 +199,13 @@ class CommandModuleWatcher:
 
     def watch_active_window(self):
         current_user_state = sprecgrammars.functions.library.state.USER_DEFINED_STATE.copy()
-        while not self.event_dispatcher.shutdown.isSet():
+        while not self.shutdown.isSet():
             changed_modules = self.save_updated_modules()
             if changed_modules:
                 self.update_modules(changed_modules)
                 continue
             current_user_state = self.maybe_load_modules(current_user_state)
-            self.event_dispatcher.shutdown.wait(timeout=1)
+            self.shutdown.wait(timeout=1)
 
     def save_updated_modules(self):
         # should use a lock here
@@ -244,4 +251,14 @@ class CommandModuleWatcher:
 
     def send_module_information_to_ui(self):
         payload = {'modules': self.cmd_modules}
-        self.event_dispatcher.route_message('ui', 'module map', payload)
+        messages.dispatch('load module map', payload)
+
+    def set_saved_modules(self, modules_to_save):
+        self.modules_to_save = modules_to_save
+
+    def perform_commands(self, grammar_id, commands):
+        if grammar_id != self.grammar_node.id:
+            return
+        for cmd_recognition in commands:
+            cmd = self.command_map[cmd_recognition['RuleId']]
+            cmd.perform_action(cmd_recognition)

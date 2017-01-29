@@ -5,6 +5,7 @@ import json
 from aiohttp import web
 import aiohttp
 from communication.procs import ProcessManager
+from communication import messages
 from interfaces.gui import serializer
 
 if getattr(sys, 'frozen', False):
@@ -14,9 +15,8 @@ else:
 
 class GuiProcessManager(ProcessManager):
 
-    def __init__(self, event_dispatcher):
+    def __init__(self):
         super().__init__(ELECTRON_PATH)
-        self.event_dispatcher = event_dispatcher
         self.websocket_established = False
         self.message_queue = []
         self.on_message = {
@@ -25,7 +25,7 @@ class GuiProcessManager(ProcessManager):
 
     def save_modules(self, msg_data):
         module_configurations = {k: self.to_module_config(v) for (k, v) in msg_data['modules'].items()}
-        self.event_dispatcher.cmd_module_watcher.modules_to_save = module_configurations
+        messages.dispatch('set saved modules', module_configurations)
 
     def to_module_config(self, gui_module):
         module_config = {}
@@ -68,7 +68,7 @@ class GuiProcessManager(ProcessManager):
             elif msg.type == aiohttp.WSMsgType.ERROR:
                 print('ws connection closed with exception %s' %
                     self.ws.exception())
-        self.event_dispatcher.shutdown.set()
+        messages.dispatch('shutdown')
         print('websocket connection closed')
         return self.ws
 
