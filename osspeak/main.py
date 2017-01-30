@@ -3,11 +3,15 @@ import argparse
 from client import dispatcher
 from communication import server, client, messages
 from interfaces.cli import menu
+from settings import usersettings
 from interfaces.gui.guimanager import GuiProcessManager
 from client import cmwatcher
 from communication.procs import EngineProcessManager
 
 def main():
+    user_settings = usersettings.load_user_config()
+    print(user_settings)
+    return
     clargs = get_args()
     if clargs.engine_server:
         server.RemoteEngineServer().loop_forever()
