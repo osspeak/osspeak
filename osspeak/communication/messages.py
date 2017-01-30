@@ -12,17 +12,19 @@ def dispatch_sync(message_name, *args, **kwargs):
     for sub in _subscriptions[message_name]:
         sub.callback(*args, **kwargs)
 
-def subscribe(message_name, callback):
-    sub = Subscription(callback)
-    _subscriptions[message_name].append(sub)
+def subscribe(message_names, callback):
+    if isinstance(message_names, str):
+        message_names = [message_names]
+    for name in message_names:
+        sub = Subscription(callback)
+        _subscriptions[name].append(sub)
 
 class Subscription:
 
     def __init__(self, callback):
-        self.thread = threading.Thread(target=self.run, daemon=True)
         self.callback = callback
         self.payload_queue = queue.Queue()
-        self.thread.start()
+        threading.Thread(target=self.run, daemon=True).start()
 
     def run(self):
         while True:

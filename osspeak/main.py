@@ -11,16 +11,16 @@ def main():
     clargs = get_args()
     if clargs.engine_server:
         server.RemoteEngineServer().loop_forever()
-        # client.RemoteEngineClient().loop_forever()
-        return
-    if clargs.interface == 'remote':
         return
     bootup(clargs)
 
 def bootup(clargs):
-    ui_manager = GuiProcessManager() if clargs == 'gui' else menu.Menu()
+    ui_manager = GuiProcessManager() if clargs.interface == 'gui' else menu.Menu()
     cmw = cmwatcher.CommandModuleWatcher()
-    EngineProcessManager().start_stdout_listening()
+    if clargs.engine_location == 'local':
+        EngineProcessManager()
+    else:
+        client.RemoteEngineClient().loop_forever()
     cmw.initialize_modules()
     cmw.start_watch_active_window()
     ui_manager.main_loop()
@@ -28,7 +28,8 @@ def bootup(clargs):
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--interface', default='cli')
+    parser.add_argument('--interface', default='remote')
+    parser.add_argument('--engine_location', default='local') # or remote
     parser.add_argument('--engine_server', action='store_true')
     return parser.parse_args()
 

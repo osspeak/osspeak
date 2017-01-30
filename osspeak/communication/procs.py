@@ -16,6 +16,7 @@ class ProcessManager:
         self.process = subprocess.Popen(path, stdin=subprocess.PIPE,
             stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         self.on_output = on_output
+        self.start_stdout_listening()
         
     def send_message(self, msg):
         if not isinstance(msg, bytes):
@@ -41,7 +42,6 @@ class EngineProcessManager(ProcessManager):
 
     def __init__(self, remote=False):
         super().__init__(ENGINE_PATH, on_output=self.on_engine_message)
-        # self.command_module_interface = cmdmodule.RemoteCommandModuleInterface() if remote else cmdmodule.LocalCommandModuleInterface()
         messages.subscribe('start engine listening', self.start_engine_listening)
         messages.subscribe('engine stop', self.stop)
         messages.subscribe('shutdown', self.shutdown)
