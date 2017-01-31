@@ -3,6 +3,7 @@ import socket
 import asyncio
 import time
 import socketserver
+import functools
 import json
 from communication import procs, messages, common
 
@@ -31,19 +32,9 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         # self.request is the TCP socket connected to the client
-        threading.Thread(target=self.receive_loop, daemon=True).start()
         self.request.setblocking(1)
+        cb = functools.partial(common.send_message, self.request, 'perform commands')
+        messages.subscribe('perform commands', cb) 
+        threading.Thread(target=common.receive_loop, daemon=True, args=(self.request,)).start()
         while True:
             time.sleep(2)
-
-    def receive_loop(self):
-        while True:
-            self.data = self.request.recv(65536).strip()
-            if self.data:
-                self.handle_message(self.data)
-            print('eff')
-            time.sleep(1)
-
-    def handle_message(self, msg):
-        json_message = json.loads(msg)
-        messages.dispatch(json_message['name'], *json_message['args'], **json_message['kwargs'])

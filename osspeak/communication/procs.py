@@ -35,7 +35,7 @@ class ProcessManager:
             self.on_output(line)
 
     def start_stdout_listening(self):
-        t = threading.Thread(target=self.dispatch_process_output)
+        t = threading.Thread(target=self.dispatch_process_output, daemon=True)
         t.start()
 
 class EngineProcessManager(ProcessManager):
@@ -56,7 +56,7 @@ class EngineProcessManager(ProcessManager):
         msg = {
             'Type': 'load grammars',
             'Grammars': {
-                grammar_id: ET.tostring(grammar_xml).decode('utf8'),
+                grammar_id: grammar_xml,
             },
             'Init': init,
         }

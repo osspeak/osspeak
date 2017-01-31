@@ -10,8 +10,6 @@ from communication.procs import EngineProcessManager
 
 def main():
     user_settings = usersettings.load_user_config()
-    print(user_settings)
-    return
     clargs = get_args()
     if clargs.engine_server:
         server.RemoteEngineServer().loop_forever()
@@ -20,20 +18,21 @@ def main():
 
 def bootup(clargs):
     ui_manager = GuiProcessManager() if clargs.interface == 'gui' else menu.Menu()
-    cmw = cmwatcher.CommandModuleWatcher()
-    if clargs.engine_location == 'local':
-        EngineProcessManager()
+    if clargs.network == 'local':
+        ref = EngineProcessManager()
     else:
-        client.RemoteEngineClient().loop_forever()
+        ref = client.RemoteEngineClient().connect()
+    cmw = cmwatcher.CommandModuleWatcher()
     cmw.initialize_modules()
     cmw.start_watch_active_window()
     ui_manager.main_loop()
+    ref.socket.close()
     messages.dispatch('shutdown')
 
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--interface', default='remote')
-    parser.add_argument('--engine_location', default='local') # or remote
+    parser.add_argument('--network', default='local') # or remote
     parser.add_argument('--engine_server', action='store_true')
     return parser.parse_args()
 

@@ -12,6 +12,7 @@ from sprecgrammars.rules import astree
 from sprecgrammars.rules.parser import RuleParser
 from sprecgrammars.rules.converter import SrgsXmlConverter
 from platforms import api
+import xml.etree.ElementTree as ET
 from communication import messages
 import time
 
@@ -36,9 +37,9 @@ class CommandModuleWatcher:
         self.fire_activation_events(previous_active_modules)
         self.create_grammar_output()
         messages.dispatch('start engine listening',
-                          self.initial,
-                          self.grammar_xml,
-                          self.grammar_node.id)
+                        self.initial,
+                        ET.tostring(self.grammar_xml).decode('utf8'),
+                        self.grammar_node.id)
         self.initial = False
 
     def initialize_modules(self):
@@ -194,7 +195,7 @@ class CommandModuleWatcher:
 
     def start_watch_active_window(self):
         self.load_initial_user_state()
-        t = threading.Thread(target=self.watch_active_window)
+        t = threading.Thread(target=self.watch_active_window, daemon=True)
         t.start()
 
     def watch_active_window(self):

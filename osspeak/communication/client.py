@@ -20,22 +20,9 @@ class RemoteEngineClient:
             cb = functools.partial(common.send_message, self.socket, message)
             messages.subscribe(message, cb) 
 
-    def loop_forever(self):
+    def connect(self):
     # Create a socket (SOCK_STREAM means a TCP socket)
         # Connect to server and send data
         self.socket.connect((HOST, PORT))
-        threading.Thread(target=self.listen, daemon=True).start()
-        while True:
-            time.sleep(2)
-        self.socket.close()
-
-    def listen(self):
-        while True:
-            received = str(self.socket.recv(65536), "utf-8")
-            if received:
-                self.on_message_received(received)
-
-    def on_message_received(self, msg):
-        json_message = json.loads(msg)
-        messages.dispatch(json_message['name'], *json_message['args'], **json_message['kwargs'])
+        threading.Thread(target=common.receive_loop, daemon=True, args=(self.socket,)).start()
 
