@@ -10,7 +10,10 @@ from platforms import linuxconstants
 def flush_io_buffer():
     termios.tcflush(sys.stdin, termios.TCIFLUSH)
 
-def transcribe_line(key_inputs, delay, direction):
+def type_literal(keys, delay=0):
+    transcribe_line([keys], delay)
+
+def transcribe_line(key_inputs, delay=0, direction=''):
     delay = delay/1000 # seconds to milliseconds
     for key_input in key_inputs:
         if isinstance(key_input, str):
