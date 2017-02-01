@@ -16,7 +16,7 @@ class RemoteEngineServer:
 
     def loop_forever(self):
         host, port = user_settings['server_address']['host'], user_settings['server_address']['port']
-        logger.info(f'Hosting engine server at {host}:{port}')
+        logger.debug(f'Hosting engine server at {host}:{port}')
         with socketserver.TCPServer((host, port), MyTCPHandler) as server:
             # Activate the server; this will keep running until you
             # interrupt the program with Ctrl-C
@@ -34,6 +34,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     def handle(self):
         # self.request is the TCP socket connected to the client
         self.request.setblocking(1)
+        logger.info(f'Connection established with {self.request.getpeername()}')
         cb = functools.partial(common.send_message, self.request, 'perform commands')
         messages.subscribe('perform commands', cb) 
         threading.Thread(target=common.receive_loop, daemon=True, args=(self.request,)).start()
