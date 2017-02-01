@@ -13,6 +13,9 @@ def flush_io_buffer():
 def type_literal(keys, delay=0):
     transcribe_line([keys], delay)
 
+def type_keypresses(keys, direction='both'):
+    press_key_combination(keys, 0)
+
 def transcribe_line(key_inputs, delay=0, direction=''):
     delay = delay/1000 # seconds to milliseconds
     for key_input in key_inputs:
