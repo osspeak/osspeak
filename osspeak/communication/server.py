@@ -6,6 +6,8 @@ import socketserver
 import functools
 import json
 from communication import procs, messages, common
+from user.settings import user_settings
+from log import logger
 
 class RemoteEngineServer:
 
@@ -13,10 +15,9 @@ class RemoteEngineServer:
         self.engine = procs.EngineProcessManager()
 
     def loop_forever(self):
-        HOST, PORT = "localhost", 8888
-
-        # Create the server, binding to localhost on port 9999
-        with socketserver.TCPServer((HOST, PORT), MyTCPHandler) as server:
+        host, port = user_settings['server_address']['host'], user_settings['server_address']['port']
+        logger.info(f'Hosting engine server at {host}:{port}')
+        with socketserver.TCPServer((host, port), MyTCPHandler) as server:
             # Activate the server; this will keep running until you
             # interrupt the program with Ctrl-C
             server.serve_forever()

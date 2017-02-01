@@ -1,24 +1,25 @@
 import argparse
 
+import log
 from client import dispatcher
 from communication import server, client, messages
 from interfaces.cli import menu
-from settings import usersettings
+from user import settings
 from interfaces.gui.guimanager import GuiProcessManager
 from client import cmwatcher
 from communication.procs import EngineProcessManager
 
 def main():
-    user_settings = usersettings.load_user_config()
+    print(settings.user_settings)
     clargs = get_args()
-    if clargs.engine_server:
+    if settings.user_settings['engine_server']:
         server.RemoteEngineServer().loop_forever()
         return
     bootup(clargs)
 
 def bootup(clargs):
     ui_manager = GuiProcessManager() if clargs.interface == 'gui' else menu.Menu()
-    if clargs.network == 'local':
+    if settings.user_settings['network'] == 'local':
         ref = EngineProcessManager()
     else:
         ref = client.RemoteEngineClient().connect()

@@ -23,6 +23,10 @@ class RemoteEngineClient:
     def connect(self):
     # Create a socket (SOCK_STREAM means a TCP socket)
         # Connect to server and send data
-        self.socket.connect((HOST, PORT))
+        from user.settings import user_settings
+        from log import logger
+        host, port = user_settings['server_address']['host'], user_settings['server_address']['port']
+        logger.info(f'Connecting to engine server at {host}:{port}')
+        self.socket.connect((host, port))
         threading.Thread(target=common.receive_loop, daemon=True, args=(self.socket,)).start()
 

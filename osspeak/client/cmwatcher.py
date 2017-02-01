@@ -3,9 +3,10 @@ import json
 import threading
 import collections
 import tempfile
+import log
 from sprecgrammars.actions.parser import ActionParser
 import sprecgrammars.functions.library.state
-from settings import usersettings
+from user import settings
 from interfaces.gui import serializer
 from client import commands, scopes
 from sprecgrammars.rules import astree
@@ -78,7 +79,7 @@ class CommandModuleWatcher:
 
     def load_command_json(self):
         json_module_dicts = {}
-        command_dir = usersettings.command_directory()
+        command_dir = settings.COMMAND_DIRECTORY
         if not os.path.isdir(command_dir):
             os.makedirs(command_dir)
         for root, dirs, filenames in os.walk(command_dir):
@@ -230,7 +231,7 @@ class CommandModuleWatcher:
         return current_user_state
 
     def update_modules(self, modified_modules):
-        command_dir = usersettings.command_directory()
+        command_dir = user.command_directory()
         for path, cmd_module_config in modified_modules.items():
             self.command_module_json[path] = cmd_module_config
             with open(os.path.join(command_dir, path), 'w') as outfile:
@@ -258,6 +259,7 @@ class CommandModuleWatcher:
         self.modules_to_save = modules_to_save
 
     def perform_commands(self, grammar_id, commands):
+        log.logger.info(f'Got commands: {commands}')
         if grammar_id != self.grammar_node.id:
             return
         for cmd_recognition in commands:

@@ -3,7 +3,7 @@ import queue
 import threading
 import importlib.util
 
-from settings import usersettings
+import user.settings
 
 extension_threads = {}
 
@@ -19,8 +19,7 @@ def get_runpath(path):
     if path.endswith('.py'):
         path = path[:-3]
     filepath = path.replace('.', os.sep) + '.py'
-    command_directory = usersettings.command_directory()
-    return os.path.join(command_directory, filepath)
+    return os.path.join(user.settings.COMMAND_DIRECTORY, filepath)
 
 class ExtensionThread:
 
