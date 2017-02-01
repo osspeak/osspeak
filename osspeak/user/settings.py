@@ -16,6 +16,8 @@ DEFAULT_CONFIG = {
 
 def load_user_settings():
     # from log import logger
+    if not os.path.isdir(OSSPEAK_DIRECTORY):
+        os.mkdir(OSSPEAK_DIRECTORY)
     config_file_path = os.path.join(OSSPEAK_DIRECTORY, 'config.json')
     try:
         if not os.path.exists(config_file_path):
