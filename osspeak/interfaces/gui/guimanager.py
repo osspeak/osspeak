@@ -2,8 +2,8 @@ import subprocess
 import sys
 import threading
 import json
-from aiohttp import web
-import aiohttp
+# from aiohttp import web
+# import aiohttp
 from communication.procs import ProcessManager
 from communication import messages
 from interfaces.gui import serializer
