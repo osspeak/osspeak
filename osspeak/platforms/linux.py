@@ -5,7 +5,7 @@ Collection of linux-specific I/O functions
 import subprocess
 import sys
 import termios
-from pynhost.platforms import linuxconstants
+from api.platforms import linuxconstants
 
 def flush_io_buffer():
     termios.tcflush(sys.stdin, termios.TCIFLUSH)
