@@ -95,7 +95,8 @@ class LiteralKeysAction(Action):
         return text
 
     def var_replace(self, variables, arguments, matchobj):
-        match_index = int(matchobj.string[1:])
+        grouping_start, grouping_end = matchobj.regs[0]
+        match_index = int(matchobj.string[grouping_start + 1: grouping_end])
         if match_index > 0:
             match_index -= 1
         try:
