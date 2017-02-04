@@ -29,7 +29,7 @@ class ExtensionThread:
         self.spec = importlib.util.spec_from_file_location('main', runpath)
         self.module = importlib.util.module_from_spec(self.spec)
         self.module.osspeak_queue = queue.Queue()
-        self.thread = threading.Thread(target=self.run)
+        self.thread = threading.Thread(target=self.run, daemon=True)
         self.thread.start()
 
     def run(self):

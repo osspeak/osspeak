@@ -1,9 +1,11 @@
-from sprecgrammars.functions.library import mouse, window, keys, state, system, extensions
+from sprecgrammars.functions.library import mouse, window, keys, state, system, extensions, general
 
 builtin_functions = {
     'hold': keys.hold,
     'release': keys.release,
     'start': window.start,
+
+    'eval': general.python_evaluate,
 
     'extensions.run': extensions.run,
     'extensions.message': extensions.send_message,
