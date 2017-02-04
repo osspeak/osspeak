@@ -7,7 +7,7 @@ TERMINATION_SEQUENCE = 'f1a5238b-ec60-430e-a0a8-5fe7442273a0'
 def receive_loop(sock, socket_broken_event=None):
     leftover = ''
     while True:
-        msg = sock.recv(656536).strip()
+        msg = sock.recv(656536)
         if msg:
             leftover = receive_message(leftover, msg)
         else:
