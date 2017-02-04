@@ -11,7 +11,8 @@ def receive_loop(sock, socket_broken_event=None):
         if msg:
             leftover = receive_message(leftover, msg)
         else:
-            socket_broken_event.set()
+            if socket_broken_event is not None:
+                socket_broken_event.set()
             return
 
 def receive_message(prefix, message_bytes):
