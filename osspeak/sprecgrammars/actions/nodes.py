@@ -67,13 +67,7 @@ class RootAction(Action):
     def perform(self, variables, arguments=None):
         root_action_evaluation = self.evaluate(variables, arguments)
         evaluated_item_list = [root_action_evaluation] if isinstance(root_action_evaluation, str) else root_action_evaluation.literals
-        for item in evaluated_item_list:
-            if isinstance(item, str):
-                api.type_literal(item)
-            elif isinstance(item, list):
-                api.type_keypresses(item)
-            else:
-                raise TypeError
+        api.type_line(evaluated_item_list)
 
 class LiteralKeysAction(Action):
 

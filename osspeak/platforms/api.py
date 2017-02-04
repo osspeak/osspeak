@@ -44,6 +44,15 @@ def get_clipboard_contents():
 def set_clipboard_contents(text):
     platform.set_clipboard_contents(text)
 
+def type_line(evaluated_item_list):
+	for item in evaluated_item_list:
+		if isinstance(item, str):
+			type_literal(item)
+		elif isinstance(item, list):
+			type_keypresses(item)
+		else:
+			raise TypeError
+
 def type_literal(text):
 	platform.type_literal(text)
 
