@@ -1,3 +1,4 @@
+from log import logger
 import queue
 import threading
 import collections
@@ -5,6 +6,7 @@ import collections
 _subscriptions = collections.defaultdict(list)
 
 def dispatch(message_name, *args, **kwargs):
+    logger.debug(f"Dispatching message: '{message_name}'")
     for sub in _subscriptions[message_name]:
         sub.payload_queue.put((args, kwargs))
 

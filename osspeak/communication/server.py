@@ -37,6 +37,12 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         logger.info(f'Connection established with {self.request.getpeername()}')
         cb = functools.partial(common.send_message, self.request, 'perform commands')
         messages.subscribe('perform commands', cb) 
-        threading.Thread(target=common.receive_loop, daemon=True, args=(self.request,)).start()
-        while True:
-            time.sleep(2)
+        socket_broken = threading.Event()
+        threading.Thread(target=common.receive_loop, daemon=True, args=(self.request,),
+            kwargs={'socket_broken_event': socket_broken}).start()
+        socket_broken.wait()
+        logger.info(f'Connection closed with {self.request.getpeername()}')
+        messages.dispatch('engine stop')
+
+    def on_error(self):
+        self.foo = False

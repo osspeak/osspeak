@@ -4,12 +4,15 @@ from communication import messages
 
 TERMINATION_SEQUENCE = 'f1a5238b-ec60-430e-a0a8-5fe7442273a0'
 
-def receive_loop(sock):
+def receive_loop(sock, socket_broken_event=None):
     leftover = ''
     while True:
         msg = sock.recv(65536).strip()
         if msg:
             leftover = receive_message(leftover, msg)
+        else:
+            socket_broken_event.set()
+            return
 
 def receive_message(prefix, message_bytes):
     message_text = message_bytes.decode('utf-8')
