@@ -2,8 +2,7 @@ from communication import messages
 
 class Menu:
 
-    def __init__(self):
-        self.init_options()
+    is_main_menu = True
 
     def main_loop(self, display_options=True):
         self.print_options()
@@ -17,12 +16,20 @@ class Menu:
             self.main_loop(display_options=False)
         else:
             result = option['on_select']()
+            if result == 'quit':
+                return
             if result:
                 self.main_loop()
 
-    def init_options(self):
+    def print_options(self):
+        for i, option in enumerate(self.options, start=1):
+            print(f'{i}. {option["text"]}')
+
+class MainMenu(Menu):
+    def __init__(self):
         self.options = [
-            {'text': 'Debug commands', 'on_select': self.on_debug_commands}
+            {'text': 'Debug commands', 'on_select': self.on_debug_commands},
+            {'text': 'Adjust settings', 'on_select': self.on_adjust_settings}
         ]
 
     def on_debug_commands(self):
@@ -34,12 +41,17 @@ class Menu:
             else:
                 return
 
-    def print_options(self):
-        for i, option in enumerate(self.options, start=1):
-            print('{}. {}'.format(i, option['text']))
+    def on_adjust_settings(self):
+        messages.dispatch('engine stop')
+        SettingsMenu().main_loop()
 
-    def send_message(self, msgkey, payload):
-        pass
 
-class MenuOption:
-    pass
+class SettingsMenu(Menu):
+    
+    def __init__(self):
+        self.options = [
+            {'text': 'Change remote server address', 'on_select': self.change_server_address},
+        ]
+
+    def change_server_address(self):
+        print('csa')

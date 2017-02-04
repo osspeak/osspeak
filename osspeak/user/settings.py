@@ -15,16 +15,9 @@ DEFAULT_CONFIG = {
 }
 
 def load_user_settings():
-    # from log import logger
-    if not os.path.isdir(OSSPEAK_DIRECTORY):
-        os.mkdir(OSSPEAK_DIRECTORY)
     config_file_path = os.path.join(OSSPEAK_DIRECTORY, 'config.json')
-    try:
-        if not os.path.exists(config_file_path):
-            with open(config_file_path, 'w') as f:
-                json.dump(DEFAULT_CONFIG, f)
-    except IndexError:
-        pass
+    if not os.path.exists(config_file_path):
+        save_settings(DEFAULT_CONFIG)
     try:
         with open(config_file_path) as f:
             user_settings = json.load(f)
@@ -36,6 +29,13 @@ def load_user_settings():
     return user_settings
 
 user_settings = load_user_settings()
+
+def save_settings(settings):
+    if not os.path.isdir(OSSPEAK_DIRECTORY):
+        os.makedirs(OSSPEAK_DIRECTORY)
+    config_file_path = os.path.join(OSSPEAK_DIRECTORY, 'config.json')
+    with open(config_file_path, 'w') as f:
+        json.dump(settings, f, indent=4)
 
 def command_directory():
     return defaults.COMMAND_DIRECTORY

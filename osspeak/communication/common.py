@@ -1,5 +1,6 @@
 import json
 import time
+from log import logger
 from communication import messages
 
 TERMINATION_SEQUENCE = 'f1a5238b-ec60-430e-a0a8-5fe7442273a0'
@@ -33,5 +34,8 @@ def send_message(socket, msg_name, *args, **kwargs):
     }
     encoded_message = json.dumps(msg)
     msg_bytes = bytes(f'{encoded_message}{TERMINATION_SEQUENCE}', 'utf-8')
-    socket.sendall(msg_bytes)
+    try:
+        socket.sendall(msg_bytes)
+    except BrokenPipeError:
+        logger.error(f"Socket connection is broken. Cannot send message: '{msg_name}'")
 

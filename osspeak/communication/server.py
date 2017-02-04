@@ -43,6 +43,3 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         socket_broken.wait()
         logger.info(f'Connection closed with {self.request.getpeername()}')
         messages.dispatch('engine stop')
-
-    def on_error(self):
-        self.foo = False

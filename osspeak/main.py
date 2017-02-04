@@ -17,7 +17,7 @@ def main():
     bootup(clargs)
 
 def bootup(clargs):
-    ui_manager = GuiProcessManager() if clargs.interface == 'gui' else menu.Menu()
+    ui_manager = GuiProcessManager() if clargs.interface == 'gui' else menu.MainMenu()
     if settings.user_settings['network'] == 'local':
         ref = EngineProcessManager()
     else:
