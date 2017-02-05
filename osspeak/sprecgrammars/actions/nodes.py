@@ -86,7 +86,8 @@ class LiteralKeysAction(Action):
             matchfunc = functools.partial(self.var_replace, variables, arguments)
             text = re.sub(self.var_pattern, matchfunc, self.text)
         text = self.apply_slices(text, variables, arguments)
-        return text
+        modifiers = self.apply_modifiers(variables)
+        return text * modifiers.get('repeat', 1)
 
     def var_replace(self, variables, arguments, matchobj):
         grouping_start, grouping_end = matchobj.regs[0]
