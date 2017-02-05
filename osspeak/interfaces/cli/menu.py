@@ -1,32 +1,38 @@
 from communication import messages
+from user import settings
 
 class Menu:
 
-    is_main_menu = True
-
     def main_loop(self, display_options=True):
+        self.print_title()
         self.print_options()
         user_input = input("\nEnter an option or 'q' to quit: ").strip().lower()
         if user_input == 'q':
             return
+        if not user_input:
+            return True
         try:
             option = self.options[int(user_input) - 1]
         except (ValueError, IndexError):
-            print('Did not understand input\n')
+            print('Did not understand input')
             self.main_loop(display_options=False)
         else:
             result = option['on_select']()
-            if result == 'quit':
-                return
             if result:
-                self.main_loop()
+                return self.main_loop()
+
+    def print_title(self):
+        print('\n' + self.title)
+        print('==============')
 
     def print_options(self):
+        print('')
         for i, option in enumerate(self.options, start=1):
             print(f'{i}. {option["text"]}')
 
 class MainMenu(Menu):
     def __init__(self):
+        self.title = 'Main Menu'
         self.options = [
             {'text': 'Debug commands', 'on_select': self.on_debug_commands},
             {'text': 'Adjust settings', 'on_select': self.on_adjust_settings}
@@ -39,19 +45,45 @@ class MainMenu(Menu):
             if user_input:
                  messages.dispatch('emulate recognition', user_input)
             else:
-                return
+                return True
 
     def on_adjust_settings(self):
         messages.dispatch('engine stop')
-        SettingsMenu().main_loop()
-
+        return SettingsMenu().main_loop()
 
 class SettingsMenu(Menu):
     
     def __init__(self):
+        self.title = 'Settings'
         self.options = [
+            {'text': 'Display current settings', 'on_select': self.display_current_settings},
+            {'text': 'Change interface', 'on_select': self.change_server_address},
+            {'text': 'Change network mode', 'on_select': self.change_server_address},
             {'text': 'Change remote server address', 'on_select': self.change_server_address},
         ]
 
     def change_server_address(self):
-        print('csa')
+        address_input = input('Enter new remote server address: ')
+        if address_input:
+            # address:port
+            split_input = address_input.split(':')
+            if len(split_input) != 2 or '' in split_input:
+                print('invalid host:port combination')
+            else:
+                host, port = split_input
+                settings.user_settings['server_address'] = {'host': host, 'port': port}
+                print(f'Saving new remote server address: {host}:{port}')
+                settings.save_settings(settings.user_settings)
+        return True
+
+    def display_current_settings(self):
+        print('\nCurrent settings: ')
+        ui = 'command line' if settings.user_settings['interface'] else 'GUI'
+        print(f'User interface: {ui}')
+        network_mode = {'server': 'Speech engine server', 'remote': 'Remote client'}.get(settings.user_settings['network'], 'Local')
+        print(f'Network mode: {network_mode}')
+        engine_server = settings.parse_server_address(settings.user_settings['server_address'])
+        if engine_server is None:
+            engine_server = 'Invalid'
+        print (f'Speech engine server address (not used in local mode): {engine_server}')
+        return True

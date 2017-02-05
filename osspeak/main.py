@@ -11,7 +11,7 @@ from communication.procs import EngineProcessManager
 
 def main():
     clargs = get_args()
-    if settings.user_settings['engine_server']:
+    if settings.user_settings['network'] == 'server':
         server.RemoteEngineServer().loop_forever()
         return
     bootup(clargs)

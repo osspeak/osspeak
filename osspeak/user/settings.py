@@ -6,7 +6,6 @@ USER_DIRECTORY = os.path.join(OSSPEAK_DIRECTORY, 'user')
 COMMAND_DIRECTORY = os.path.join(USER_DIRECTORY, 'commands')
 DEFAULT_CONFIG = {
     'interface': 'cli',
-    'engine_server': False,
     'network': 'local',
     'server_address': {
         'host': '127.0.0.1',
@@ -39,3 +38,9 @@ def save_settings(settings):
 
 def command_directory():
     return defaults.COMMAND_DIRECTORY
+
+def parse_server_address(address):
+    if isinstance(address, str):
+        return address
+    if isinstance(address, dict) and 'host' in address and 'port' in address:
+        return f'{address["host"]}:{address["port"]}'

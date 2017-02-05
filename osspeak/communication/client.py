@@ -23,6 +23,7 @@ class RemoteEngineClient:
         host, port = user_settings['server_address']['host'], user_settings['server_address']['port']
         logger.debug(f'Connecting to engine server at {host}:{port}')
         try:
+            return
             self.socket.connect((host, port))
             threading.Thread(target=common.receive_loop, daemon=True, args=(self.socket,)).start()
         except OSError:

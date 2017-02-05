@@ -37,5 +37,5 @@ def send_message(socket, msg_name, *args, **kwargs):
     try:
         socket.sendall(msg_bytes)
     except BrokenPipeError:
-        logger.error(f"Socket connection is broken. Cannot send message: '{msg_name}'")
+        logger.warning(f"Socket connection is broken. Cannot send message: '{msg_name}'")
 
