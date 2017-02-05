@@ -83,8 +83,8 @@ def activate_window(title):
         else:
             matches.append(open_window_name)
     if matches:
-        matches.sort(key=len)
-        pid = str(int(name_dict[matches[0]], 16))
+        shortest_matching_name = min(matches, key=len)
+        pid = str(int(name_dict[shortest_matching_name], 16))
         subprocess.call(['xdotool', 'windowfocus', pid])
         subprocess.call(['xdotool', 'windowactivate', pid])
 
