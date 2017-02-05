@@ -98,3 +98,7 @@ def get_clipboard_contents():
 def set_clipboard_contents(text):
     p = subprocess.Popen(['xclip', '-selection', 'c'], stdin=subprocess.PIPE)
     p.communicate(input=bytes(text, 'utf-8'))
+
+def close_active_window():
+    # subprocess.check_output(['xkill', '-id', 'xprop', '-root', '_NET_ACTIVE_WINDOW', '|', 'cut', '-d\#', '-f2'])
+    proc = subprocess.check_output(['xdotool', 'getactivewindow', 'windowkill'])
