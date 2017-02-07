@@ -14,20 +14,25 @@ def main():
     if settings.user_settings['network'] == 'server':
         server.RemoteEngineServer().loop_forever()
         return
-    bootup(clargs)
-
-def bootup(clargs):
     ui_manager = GuiProcessManager() if clargs.interface == 'gui' else menu.MainMenu()
+    io_obj = get_io()
+    try:
+        cmw = cmwatcher.CommandModuleWatcher()
+        cmw.initialize_modules()
+        cmw.start_watch_active_window()
+        ui_manager.main_loop()
+    finally:
+        messages.dispatch_sync('engine stop')
+        io_obj.socket.close()
+
+
+def get_io():
     if settings.user_settings['network'] == 'local':
-        ref = EngineProcessManager()
+        return EngineProcessManager()
     else:
-        ref = client.RemoteEngineClient().connect()
-    cmw = cmwatcher.CommandModuleWatcher()
-    cmw.initialize_modules()
-    cmw.start_watch_active_window()
-    ui_manager.main_loop()
-    ref.socket.close()
-    messages.dispatch('shutdown')
+        engine_client = client.RemoteEngineClient()
+        engine_client.connect()
+        return engine_client
 
 def get_args():
     parser = argparse.ArgumentParser()
