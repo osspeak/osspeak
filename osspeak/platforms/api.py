@@ -49,7 +49,9 @@ def type_line(evaluated_item_list):
 		if isinstance(item, str):
 			type_literal(item)
 		elif isinstance(item, list):
-			type_keypresses(item)
+			for key_combination in item:
+				assert isinstance(key_combination, list)
+				type_keypresses(key_combination)
 		else:
 			raise TypeError
 

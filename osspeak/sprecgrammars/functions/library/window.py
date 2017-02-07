@@ -10,3 +10,6 @@ def close():
 
 def start(name):
     os.startfile(name)
+
+def shell(text):
+    return os.system(text)

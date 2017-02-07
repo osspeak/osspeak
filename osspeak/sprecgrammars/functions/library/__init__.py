@@ -4,6 +4,7 @@ builtin_functions = {
     'hold': keys.hold,
     'release': keys.release,
     'start': window.start,
+    'shell': window.shell,
 
     'eval': general.python_evaluate,
 
