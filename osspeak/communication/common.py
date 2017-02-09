@@ -1,20 +1,24 @@
 import json
 import time
+import threading
 from log import logger
 from communication import messages
 
 TERMINATION_SEQUENCE = 'f1a5238b-ec60-430e-a0a8-5fe7442273a0'
 
 def receive_loop(sock, socket_broken_event=None):
+    socket_broken_event = threading.Event() if socket_broken_event is None else socket_broken_event
     leftover = ''
     while True:
-        msg = sock.recv(656536)
+        try:
+            msg = sock.recv(656536)
+        except Exception as e:
+            print('erer', e)
+            return socket_broken_event.set()
         if msg:
             leftover = receive_message(leftover, msg)
         else:
-            if socket_broken_event is not None:
-                socket_broken_event.set()
-            return
+            return socket_broken_event.set()
 
 def receive_message(prefix, message_bytes):
     message_text = message_bytes.decode('utf-8')
