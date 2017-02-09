@@ -40,6 +40,6 @@ def send_message(socket, msg_name, *args, **kwargs):
     msg_bytes = bytes(f'{encoded_message}{TERMINATION_SEQUENCE}', 'utf-8')
     try:
         socket.sendall(msg_bytes)
-    except BrokenPipeError, OSError:
+    except (BrokenPipeError, OSError):
         logger.warning(f"Socket connection is broken. Cannot send message: '{msg_name}'")
 
