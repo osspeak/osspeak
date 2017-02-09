@@ -102,3 +102,6 @@ def set_clipboard_contents(text):
 def close_active_window():
     # subprocess.check_output(['xkill', '-id', 'xprop', '-root', '_NET_ACTIVE_WINDOW', '|', 'cut', '-d\#', '-f2'])
     proc = subprocess.check_output(['xdotool', 'getactivewindow', 'windowkill'])
+
+def maximize_active_window():
+    subprocess.check_output(['xdotool', 'windowsize', '$(xdotool getactivewindow)', '100%', '100%'])

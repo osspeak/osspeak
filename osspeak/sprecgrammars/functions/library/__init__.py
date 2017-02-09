@@ -22,6 +22,7 @@ builtin_functions = {
 
     'window.focus': window.focus,
     'window.close': window.close,
+    'window.maximizeActive': window.maximise_active,
 
     'wait': system.wait,
 }

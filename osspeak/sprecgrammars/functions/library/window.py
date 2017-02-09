@@ -8,6 +8,9 @@ def focus(title):
 def close():
     api.close_active_window()
 
+def maximise_active():
+    api.maximize_active_window()
+
 def start(name):
     os.startfile(name)
 
