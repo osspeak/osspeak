@@ -42,7 +42,7 @@ class RemoteEngineTCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         # self.request is the TCP socket connected to the client
-        self.request.settimeout(1)
+        self.request.settimeout(20)
         logger.info(f'Connection established with {self.request.getpeername()}')
         cb = functools.partial(common.send_message, self.request, 'perform commands')
         sub = messages.subscribe('perform commands', cb) 
@@ -55,7 +55,7 @@ class RemoteEngineTCPHandler(socketserver.BaseRequestHandler):
         while True:
             try:
                 msg = self.request.recv(1024)
-            except IndexError as e:
+            except socket.timeout as e:
                 logger.info(f'Connection closed with {self.request.getpeername()}')
                 return
             if msg:
