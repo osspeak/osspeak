@@ -11,7 +11,7 @@ def receive_loop(sock, socket_broken_event=None):
     leftover = ''
     while True:
         try:
-            msg = sock.recv(656536)
+            msg = sock.recv(1024)
         except Exception as e:
             print('erer', e)
             return socket_broken_event.set()

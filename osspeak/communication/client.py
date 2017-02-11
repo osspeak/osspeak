@@ -10,6 +10,7 @@ class RemoteEngineClient:
 
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.setblocking(1)
         self.shutdown_event = threading.Event()
         messages.subscribe('heartbeat', lambda: self.shutdown_event.set())
         message_subscriptions = ('start engine listening', 'engine stop', 'shutdown', 'emulate recognition', 'hearbeat')
