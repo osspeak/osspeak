@@ -99,6 +99,7 @@ class CommandModuleWatcher:
                     module_config = json.load(f)
                 except json.decoder.JSONDecodeError as e:
                     module_config = {'Error': str(e)}
+                    log.logger.warning(f"JSON error loading command module '{partial_path}':\n{e}")
                 json_module_dicts[partial_path] = module_config
 
     def load_command_modules(self):
