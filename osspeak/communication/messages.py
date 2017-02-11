@@ -11,6 +11,7 @@ def dispatch(message_name, *args, **kwargs):
         sub.payload_queue.put((args, kwargs))
 
 def dispatch_sync(message_name, *args, **kwargs):
+    logger.debug(f"Dispatching sync message: '{message_name}'")
     for sub in _subscriptions[message_name]:
         sub.callback(*args, **kwargs)
 

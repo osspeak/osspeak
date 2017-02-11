@@ -18,12 +18,20 @@ class RemoteEngineServer:
     def loop_forever(self):
         host, port = user_settings['server_address']['host'], user_settings['server_address']['port']
         logger.debug(f'Hosting engine server at {host}:{port}')
-        with socketserver.TCPServer((host, port), MyTCPHandler) as server:
-            # Activate the server; this will keep running until you
-            # interrupt the program with Ctrl-C
-            server.serve_forever()
+        try:
+            server = socketserver.TCPServer((host, port), RemoteEngineTCPHandler) 
+        except OSError as e:
+            logger.error(f'Unable to host at {host}:{port}:\n{e}\nShutting down...')
+            self.shutdown()
+            return
+        server.serve_forever()
+        server.server_close()
+        self.shutdown()
 
-class MyTCPHandler(socketserver.BaseRequestHandler):
+    def shutdown(self):
+        messages.dispatch_sync('shutdown')
+
+class RemoteEngineTCPHandler(socketserver.BaseRequestHandler):
     """
     The request handler class for our server.
 
