@@ -12,8 +12,8 @@ class RemoteEngineClient:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setblocking(1)
         self.shutdown_event = threading.Event()
-        messages.subscribe('heartbeat', lambda: self.shutdown_event.set())
-        message_subscriptions = ('start engine listening', 'engine stop', 'shutdown', 'emulate recognition', 'hearbeat')
+        messages.subscribe('shutdown', lambda: self.shutdown_event.set())
+        message_subscriptions = ('start engine listening', 'engine stop', 'shutdown', 'emulate recognition', 'heartbeat')
         for message in message_subscriptions:
             cb = functools.partial(common.send_message, self.socket, message)
             messages.subscribe(message, cb) 
@@ -26,11 +26,14 @@ class RemoteEngineClient:
         try:
             self.socket.connect((host, int(port)))
             threading.Thread(target=common.receive_loop, daemon=True, args=(self.socket,)).start()
+            threading.Thread(target=self.heartbeat, daemon=True).start()
         except OSError as e:
             logger.warning(f'Unable to connect to {host}:{port}: \n{e}')
 
     def heartbeat(self):
+        print('starting heartbeat')
         while not self.shutdown_event.is_set():
             messages.dispatch('heartbeat')
             self.shutdown_event.wait(timeout=1)
+        print('ending heartbeat')
 
