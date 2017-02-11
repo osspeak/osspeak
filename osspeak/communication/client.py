@@ -31,9 +31,7 @@ class RemoteEngineClient:
             logger.warning(f'Unable to connect to {host}:{port}: \n{e}')
 
     def heartbeat(self):
-        print('starting heartbeat')
         while not self.shutdown_event.is_set():
             messages.dispatch('heartbeat')
             self.shutdown_event.wait(timeout=1)
-        print('ending heartbeat')
 

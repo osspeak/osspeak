@@ -1,6 +1,7 @@
 import argparse
 
 import log
+import clargs
 from client import dispatcher
 from communication import server, client, messages
 from interfaces.cli import menu
@@ -10,11 +11,11 @@ from client import cmwatcher
 from communication.procs import EngineProcessManager
 
 def main():
-    clargs = get_args()
+    args = clargs.args
     if settings.user_settings['network'] == 'server':
         server.RemoteEngineServer().loop_forever()
         return
-    ui_manager = GuiProcessManager() if clargs.interface == 'gui' else menu.MainMenu()
+    ui_manager = GuiProcessManager() if args.interface == 'gui' else menu.MainMenu()
     io_obj = get_io()
     try:
         cmw = cmwatcher.CommandModuleWatcher()
@@ -33,13 +34,6 @@ def get_io():
         engine_client = client.RemoteEngineClient()
         engine_client.connect()
         return engine_client
-
-def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--interface', default='remote')
-    parser.add_argument('--network', default='local') # or remote
-    parser.add_argument('--engine_server', action='store_true')
-    return parser.parse_args()
 
 if __name__ == "__main__":
     main()
