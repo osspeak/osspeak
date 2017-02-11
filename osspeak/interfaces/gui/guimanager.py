@@ -25,7 +25,7 @@ class GuiProcessManager(ProcessManager):
 
     def save_modules(self, msg_data):
         module_configurations = {k: self.to_module_config(v) for (k, v) in msg_data['modules'].items()}
-        messages.dispatch('set saved modules', module_configurations)
+        messages.dispatch(messages.SET_SAVED_MODULES, module_configurations)
 
     def to_module_config(self, gui_module):
         module_config = {}
@@ -68,7 +68,7 @@ class GuiProcessManager(ProcessManager):
             elif msg.type == aiohttp.WSMsgType.ERROR:
                 print('ws connection closed with exception %s' %
                     self.ws.exception())
-        messages.dispatch('shutdown')
+        messages.dispatch(messages.SHUTDOWN)
         print('websocket connection closed')
         return self.ws
 

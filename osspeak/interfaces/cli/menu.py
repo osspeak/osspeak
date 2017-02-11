@@ -39,16 +39,16 @@ class MainMenu(Menu):
         ]
 
     def on_debug_commands(self):
-        messages.dispatch('engine stop')
+        messages.dispatch(messages.ENGINE_STOP)
         while True:
             user_input = input('Enter text to test or press enter to go back: ')
             if user_input:
-                 messages.dispatch('emulate recognition', user_input)
+                 messages.dispatch(messages.EMULATE_RECOGNITION, user_input)
             else:
                 return True
 
     def on_adjust_settings(self):
-        messages.dispatch('engine stop')
+        messages.dispatch(messages.ENGINE_STOP)
         return SettingsMenu().main_loop()
 
 class SettingsMenu(Menu):

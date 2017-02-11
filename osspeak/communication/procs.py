@@ -42,10 +42,10 @@ class EngineProcessManager(ProcessManager):
 
     def __init__(self, remote=False):
         super().__init__(ENGINE_PATH, on_output=self.on_engine_message)
-        messages.subscribe('start engine listening', self.start_engine_listening)
-        messages.subscribe('engine stop', self.stop)
-        messages.subscribe('shutdown', self.shutdown)
-        messages.subscribe('emulate recognition', self.emulate_recognition)
+        messages.subscribe(messages.START_ENGINE_LISTENING, self.start_engine_listening)
+        messages.subscribe(messages.ENGINE_STOP, self.stop)
+        messages.subscribe(messages.SHUTDOWN, self.shutdown)
+        messages.subscribe(messages.EMULATE_RECOGNITION, self.emulate_recognition)
         
     def send_message(self, msg):
         if isinstance(msg, dict):
@@ -65,7 +65,7 @@ class EngineProcessManager(ProcessManager):
     def on_engine_message(self, msg_string):
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition':
-            messages.dispatch('perform commands', msg['GrammarId'], msg['Commands'])
+            messages.dispatch(messages.PERFORM_COMMANDS, msg['GrammarId'], msg['Commands'])
         elif msg['Type'] == 'error':
             print('error!')
             print(msg['Message'])

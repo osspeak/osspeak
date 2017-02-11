@@ -3,6 +3,15 @@ import queue
 import threading
 import collections
 
+ENGINE_STOP = 'engine stop'
+HEARTBEAT = 'heartbeat'
+EMULATE_RECOGNITION = 'emulate recognition'
+START_ENGINE_LISTENING = 'start engine listening'
+SHUTDOWN = 'shutdown'
+SET_SAVED_MODULES = 'set saved modules'
+PERFORM_COMMANDS = 'perform commands'
+LOAD_MODULE_MAP = 'load module map'
+
 _subscriptions = collections.defaultdict(list)
 
 def dispatch(message_name, *args, **kwargs):

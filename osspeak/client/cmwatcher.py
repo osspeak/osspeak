@@ -27,9 +27,9 @@ class CommandModuleWatcher:
         self.last_changeset = {}
         self.command_module_json = self.load_command_json()
         self.shutdown = threading.Event()
-        messages.subscribe('shutdown', lambda: self.shutdown.set())
-        messages.subscribe('perform commands', self.perform_commands)
-        messages.subscribe('set saved modules', self.set_saved_modules)
+        messages.subscribe(messages.SHUTDOWN, lambda: self.shutdown.set())
+        messages.subscribe(messages.PERFORM_COMMANDS, self.perform_commands)
+        messages.subscribe(messages.SET_SAVED_MODULES, self.set_saved_modules)
 
     def load_modules(self, previous_active_modules=None):
         self.initialize_modules()
@@ -37,7 +37,7 @@ class CommandModuleWatcher:
         self.load_command_module_information()
         self.fire_activation_events(previous_active_modules)
         self.create_grammar_output()
-        messages.dispatch('start engine listening',
+        messages.dispatch(messages.START_ENGINE_LISTENING,
                         self.initial,
                         ET.tostring(self.grammar_xml).decode('utf8'),
                         self.grammar_node.id)
@@ -253,7 +253,7 @@ class CommandModuleWatcher:
 
     def send_module_information_to_ui(self):
         payload = {'modules': self.cmd_modules}
-        messages.dispatch('load module map', payload)
+        messages.dispatch(messages.LOAD_MODULE_MAP, payload)
 
     def set_saved_modules(self, modules_to_save):
         self.modules_to_save = modules_to_save

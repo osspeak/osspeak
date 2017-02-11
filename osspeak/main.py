@@ -23,7 +23,7 @@ def main():
         cmw.start_watch_active_window()
         ui_manager.main_loop()
     finally:
-        messages.dispatch_sync('engine stop')
+        messages.dispatch_sync(messages.ENGINE_STOP)
         io_obj.socket.close()
 
 

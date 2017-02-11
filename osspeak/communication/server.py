@@ -29,7 +29,7 @@ class RemoteEngineServer:
         self.shutdown()
 
     def shutdown(self):
-        messages.dispatch_sync('shutdown')
+        messages.dispatch_sync(messages.SHUTDOWN)
 
 class RemoteEngineTCPHandler(socketserver.BaseRequestHandler):
     """
@@ -44,11 +44,11 @@ class RemoteEngineTCPHandler(socketserver.BaseRequestHandler):
         # self.request is the TCP socket connected to the client
         self.request.settimeout(20)
         logger.info(f'Connection established with {self.request.getpeername()}')
-        cb = functools.partial(common.send_message, self.request, 'perform commands')
-        sub = messages.subscribe('perform commands', cb) 
+        cb = functools.partial(common.send_message, self.request, messages.PERFORM_COMMANDS)
+        sub = messages.subscribe(messages.PERFORM_COMMANDS, cb) 
         self.receive_loop()
         messages.unsubscribe(sub)
-        messages.dispatch('engine stop')
+        messages.dispatch(messages.ENGINE_STOP)
 
     def receive_loop(self):
         leftover = ''
