@@ -1,3 +1,4 @@
+import datetime
 import threading
 import socket
 import asyncio
@@ -33,13 +34,25 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         # self.request is the TCP socket connected to the client
-        self.request.setblocking(1)
+        self.request.settimeout(1)
         logger.info(f'Connection established with {self.request.getpeername()}')
         cb = functools.partial(common.send_message, self.request, 'perform commands')
-        messages.subscribe('perform commands', cb) 
-        socket_broken = threading.Event()
-        threading.Thread(target=common.receive_loop, daemon=True, args=(self.request,),
-            kwargs={'socket_broken_event': socket_broken}).start()
-        socket_broken.wait()
-        logger.info(f'Connection closed with {self.request.getpeername()}')
+        sub = messages.subscribe('perform commands', cb) 
+        self.receive_loop()
+        messages.unsubscribe(sub)
         messages.dispatch('engine stop')
+
+    def receive_loop(self):
+        leftover = ''
+        while True:
+            try:
+                msg = self.request.recv(1024)
+            except IndexError as e:
+                logger.info(f'Connection closed with {self.request.getpeername()}')
+                return
+            if msg:
+                leftover = common.receive_message(leftover, msg)
+                last_message_received = time.clock()
+            else:
+                logger.info(f'Connection closed with {self.request.getpeername()}')
+                return
