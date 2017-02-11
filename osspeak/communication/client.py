@@ -26,8 +26,8 @@ class RemoteEngineClient:
         try:
             self.socket.connect((host, int(port)))
             threading.Thread(target=common.receive_loop, daemon=True, args=(self.socket,)).start()
-        except OSError:
-            logger.warning(f'Unable to connect to {host}:{port}')
+        except OSError as e:
+            logger.warning(f'Unable to connect to {host}:{port}: \n{e}')
 
     def heartbeat(self):
         while not self.shutdown_event.is_set():
