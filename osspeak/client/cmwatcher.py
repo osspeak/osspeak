@@ -94,6 +94,7 @@ class CommandModuleWatcher:
                 continue
             full_path = os.path.join(root, fname)
             partial_path = full_path[len(command_dir) + 1:]
+            log.logger.debug(f"Loading command module '{partial_path}'...")
             with open(full_path) as f:
                 try:
                     module_config = json.load(f)
