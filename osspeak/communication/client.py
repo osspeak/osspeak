@@ -38,6 +38,6 @@ class RemoteEngineClient:
 
     def heartbeat(self):
         while not self.shutdown_event.is_set():
-            messages.dispatch(messages.HEARTBEAT)
+            messages.dispatch_sync(messages.HEARTBEAT)
             self.shutdown_event.wait(timeout=1)
 

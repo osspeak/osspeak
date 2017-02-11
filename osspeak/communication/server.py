@@ -32,13 +32,6 @@ class RemoteEngineServer:
         messages.dispatch_sync(messages.SHUTDOWN)
 
 class RemoteEngineTCPHandler(socketserver.BaseRequestHandler):
-    """
-    The request handler class for our server.
-
-    It is instantiated once per connection to the server, and must
-    override the handle() method to implement communication to the
-    client.
-    """
 
     def handle(self):
         # self.request is the TCP socket connected to the client
@@ -60,7 +53,6 @@ class RemoteEngineTCPHandler(socketserver.BaseRequestHandler):
                 return
             if msg:
                 leftover = common.receive_message(leftover, msg)
-                last_message_received = time.clock()
             else:
                 logger.info(f'Connection closed with {self.request.getpeername()}')
                 return
