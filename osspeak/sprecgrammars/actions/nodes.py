@@ -54,8 +54,8 @@ class RootAction(Action):
 
     def evaluate(self, variables, arguments=None):
         evaluated_children = [child.evaluate(variables, arguments=arguments) for child in self.children]
-        if all(isinstance(item, str) for item in evaluated_children):
-            return ''.join(evaluated_children)
+        if all(isinstance(item, (str, int, float)) for item in evaluated_children):
+            return ''.join(str(i) for i in evaluated_children)
         children = []
         for child in evaluated_children:
             if isinstance(child, (str, list)):

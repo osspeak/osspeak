@@ -1,7 +1,8 @@
-from sprecgrammars.functions.library import mouse, window, keys, state, system, extensions, general
+from sprecgrammars.functions.library import mouse, window, keys, state, system, extensions, general, text
 
 builtin_functions = {
     'hold': keys.hold,
+    'length': text.length,
     'release': keys.release,
     'start': window.start,
     'shell': window.shell,
