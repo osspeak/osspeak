@@ -5,7 +5,7 @@ Collection of Windows-specific I/O functions
 import msvcrt
 import time
 import ctypes
-from platforms import winconstants
+from platforms import winconstants, winclipboard
 
 EnumWindows = ctypes.windll.user32.EnumWindows
 EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
@@ -179,22 +179,10 @@ def mouse_move(x=None, y=None, relative=False):
     ctypes.windll.user32.SetCursorPos(startx + x, starty + y)
 
 def get_clipboard_contents():
-    ctypes.windll.user32.OpenClipboard(None)
-    pcontents = ctypes.windll.user32.GetClipboardData(1)
-    text = ctypes.c_char_p(pcontents).value
-    ctypes.windll.user32.CloseClipboard()
-    return text
+    return winclipboard.init_windows_clipboard()[1]()
 
 def set_clipboard_contents(text):
-    text = text.encode('ascii')
-    ctypes.windll.user32.OpenClipboard(None)
-    ecb = ctypes.windll.user32.EmptyClipboard()
-    hCd = ctypes.windll.kernel32.GlobalAlloc(winconstants.GMEM_DDESHARE, len(text) + 1)
-    pchData = ctypes.windll.kernel32.GlobalLock(hCd)
-    ctypes.cdll.msvcrt.strcpy(ctypes.c_char_p(pchData), text)
-    ctypes.windll.kernel32.GlobalUnlock(hCd)
-    ctypes.windll.user32.SetClipboardData(1, hCd)
-    ctypes.windll.user32.CloseClipboard()
+    return winclipboard.init_windows_clipboard()[0](str(text))
 
 def get_mouse_event_nums(button, direction):
     if button == 'left' and direction == 'down': return [2]

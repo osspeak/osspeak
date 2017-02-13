@@ -1,13 +1,15 @@
-from sprecgrammars.functions.library import mouse, window, keys, state, system, extensions, general, text
+from sprecgrammars.functions.library import mouse, window, keys, state, system, extensions, general, text, clipboard
 
 builtin_functions = {
+    'eval': general.python_evaluate,
     'hold': keys.hold,
     'length': text.length,
     'release': keys.release,
     'start': window.start,
     'shell': window.shell,
 
-    'eval': general.python_evaluate,
+    'clipboard.get': clipboard.get,
+    'clipboard.set': clipboard.set,
 
     'extensions.run': extensions.run,
     'extensions.message': extensions.send_message,
