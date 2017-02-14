@@ -26,7 +26,7 @@ class Action:
         applied_modifiers = {}
         evaluated_modifiers = [action.evaluate(variables) for action in self.modifiers]
         for modifier in evaluated_modifiers:
-            if modifier.isdigit():
+            if str(modifier).isdigit():
                 if 'repeat' in applied_modifiers:
                     self.error('multiple nums')
                 applied_modifiers['repeat'] = int(modifier)

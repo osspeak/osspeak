@@ -6,6 +6,7 @@ import msvcrt
 import time
 import ctypes
 from platforms import winconstants, winclipboard
+import pyautogui
 
 EnumWindows = ctypes.windll.user32.EnumWindows
 EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
@@ -55,7 +56,9 @@ def type_literal(text, direction='both'):
 def type_keypresses(keys, direction='both'):
     press_key_combination([k.lower() for k in keys], direction)
 
-def press_key(key_input, direction):
+def press_key(key_input, direction, delay=.03):
+    pyautogui.typewrite(key_input, pause=delay)
+    return
     if len(key_input) == 1 and key_input.isupper():
         press_shift = True
         key_input = key_input.lower()
@@ -77,17 +80,9 @@ def press_key(key_input, direction):
         if press_shift:
             keyup(winconstants.WINDOWS_KEYCODES['shift'])
 
-def press_key_combination(keys, direction):
-    import pyautogui
-    pyautogui.hotkey(*keys)
-    return
-    if direction in ('both', 'down'):
-        for key_stroke in keys:
-            keydown(winconstants.WINDOWS_KEYCODES[key_stroke])
-        time.sleep(.01)
-    if direction in ('both', 'up'):
-        for key_stroke in keys:
-            keyup(winconstants.WINDOWS_KEYCODES[key_stroke])
+def press_key_combination(keys, direction, delay=.02):
+    time.sleep(delay)
+    pyautogui.hotkey(*keys, pause=delay)
 
 def keydown(hex_key_code):
     extra = ctypes.c_ulong(0)
