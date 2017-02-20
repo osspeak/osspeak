@@ -11,6 +11,8 @@ SHUTDOWN = 'shutdown'
 SET_SAVED_MODULES = 'set saved modules'
 PERFORM_COMMANDS = 'perform commands'
 LOAD_MODULE_MAP = 'load module map'
+RELOAD_COMMAND_MODULE_FILES = 'reload command module files'
+
 
 _subscriptions = collections.defaultdict(list)
 

@@ -22,16 +22,22 @@ class CommandModuleWatcher:
     def __init__(self):
         self.current_condition = scopes.CurrentCondition()
         self.initial = True
-        self.not_loading_modules = threading.Event()
         self.modules_to_save = {}
-        self.last_changeset = {}
         self.command_module_json = self.load_command_json()
         self.shutdown = threading.Event()
+        self.current_user_state = sprecgrammars.functions.library.state.USER_DEFINED_STATE.copy()
+        self.loading_lock = threading.Lock()
         messages.subscribe(messages.SHUTDOWN, lambda: self.shutdown.set())
         messages.subscribe(messages.PERFORM_COMMANDS, self.perform_commands)
         messages.subscribe(messages.SET_SAVED_MODULES, self.set_saved_modules)
+        messages.subscribe(messages.RELOAD_COMMAND_MODULE_FILES,
+            lambda: self.maybe_load_modules(force_load=True))
 
-    def load_modules(self, previous_active_modules=None):
+    def load_modules(self, previous_active_modules=None, reload_files=False):
+        if reload_files:
+            self.load_initial_user_state()
+            self.current_condition = scopes.CurrentCondition()
+            self.command_module_json = self.load_command_json()
         self.initialize_modules()
         self.flag_active_modules()
         self.load_command_module_information()
@@ -42,6 +48,7 @@ class CommandModuleWatcher:
                         ET.tostring(self.grammar_xml).decode('utf8'),
                         self.grammar_node.id)
         self.initial = False
+        self.current_user_state = sprecgrammars.functions.library.state.USER_DEFINED_STATE.copy()
 
     def initialize_modules(self):
         self.init_fields()
@@ -114,6 +121,7 @@ class CommandModuleWatcher:
             self.load_scope(path, cmd_module)
 
     def load_initial_user_state(self):
+        sprecgrammars.functions.library.state.USER_DEFINED_STATE = {}
         for path, cmd_module in self.cmd_modules.items():
             initial_state = {k: eval(v) for k, v in cmd_module.initial_state.items()}
             sprecgrammars.functions.library.state.USER_DEFINED_STATE.update(initial_state)
@@ -202,13 +210,12 @@ class CommandModuleWatcher:
         t.start()
 
     def watch_active_window(self):
-        current_user_state = sprecgrammars.functions.library.state.USER_DEFINED_STATE.copy()
         while not self.shutdown.isSet():
             changed_modules = self.save_updated_modules()
             if changed_modules:
                 self.update_modules(changed_modules)
                 continue
-            current_user_state = self.maybe_load_modules(current_user_state)
+            self.maybe_load_modules()
             self.shutdown.wait(timeout=1)
 
     def save_updated_modules(self):
@@ -221,16 +228,20 @@ class CommandModuleWatcher:
                 changed_modules[path] = cmd_module_config
         return changed_modules
 
-    def maybe_load_modules(self, current_user_state):
-        active_window = api.get_active_window_name().lower()
-        if active_window == self.current_condition.window_title and current_user_state == sprecgrammars.functions.library.state.USER_DEFINED_STATE:
-            return current_user_state
-        current_user_state = sprecgrammars.functions.library.state.USER_DEFINED_STATE.copy()
-        self.current_condition.window_title = active_window
-        new_active_modules = dict(self.get_active_modules())
-        if new_active_modules != self.active_modules:
-            self.load_modules(self.active_modules)
-        return current_user_state
+    def maybe_load_modules(self, force_load=False):
+        with self.loading_lock:
+            active_window = api.get_active_window_name().lower()
+            if force_load:
+                self.load_modules(self.active_modules, reload_files=True)
+                return
+            same_window = active_window == self.current_condition.window_title
+            same_user_state = self.current_user_state == sprecgrammars.functions.library.state.USER_DEFINED_STATE
+            if same_window and same_user_state:
+                return self.current_user_state
+            self.current_condition.window_title = active_window
+            new_active_modules = dict(self.get_active_modules())
+            if new_active_modules != self.active_modules:
+                self.load_modules(self.active_modules)
 
     def update_modules(self, modified_modules):
         command_dir = user.command_directory()
@@ -260,10 +271,15 @@ class CommandModuleWatcher:
     def set_saved_modules(self, modules_to_save):
         self.modules_to_save = modules_to_save
 
-    def perform_commands(self, grammar_id, commands):
-        log.logger.info(f'Got commands: {commands}')
+    def perform_commands(self, grammar_id, command_results):
+        log.logger.debug(f'Got commands: {command_results}')
         if grammar_id != self.grammar_node.id:
             return
-        for cmd_recognition in commands:
-            cmd = self.command_map[cmd_recognition['RuleId']]
-            cmd.perform_action(cmd_recognition)
+        commands = []
+        for result in command_results:
+            try:
+                commands.append([self.command_map[result['RuleId']], result])
+            except KeyError:
+                logger.warning(f'Command {result} no longer exists')
+        for cmd, result in commands:
+            cmd.perform_action(result)

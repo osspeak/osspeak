@@ -35,7 +35,8 @@ class MainMenu(Menu):
         self.title = 'Main Menu'
         self.options = [
             {'text': 'Debug commands', 'on_select': self.on_debug_commands},
-            {'text': 'Adjust settings', 'on_select': self.on_adjust_settings}
+            {'text': 'Adjust settings', 'on_select': self.on_adjust_settings},
+            {'text': 'Reload command modules', 'on_select': self.reload_command_modules},
         ]
 
     def on_debug_commands(self):
@@ -50,6 +51,12 @@ class MainMenu(Menu):
     def on_adjust_settings(self):
         messages.dispatch(messages.ENGINE_STOP)
         return SettingsMenu().main_loop()
+
+    def reload_command_modules(self):
+        print('Reloading command modules...')
+        messages.dispatch_sync(messages.RELOAD_COMMAND_MODULE_FILES)
+        print('Done!')
+        return True
 
 class SettingsMenu(Menu):
     
