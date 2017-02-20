@@ -1,9 +1,11 @@
-from sprecgrammars.functions.library import mouse, window, keys, state, system, extensions, general, text, clipboard
+from sprecgrammars.functions.library import mouse, window, keys, state, system, extensions, general, text, clipboard, osspeak
 
 builtin_functions = {
     'eval': general.python_evaluate,
     'hold': keys.hold,
     'length': text.length,
+    'lower': text.lower,
+    'upper': text.upper,
     'release': keys.release,
     'start': window.start,
     'shell': window.shell,
@@ -18,6 +20,8 @@ builtin_functions = {
     'mouse.move': mouse.move,
     'mouse.x': mouse.x,
     'mouse.y': mouse.y,
+
+    'osspeak.reload': osspeak.reload,
 
     'state.set': state.set_state,
     'state.delete': state.delete_state,
