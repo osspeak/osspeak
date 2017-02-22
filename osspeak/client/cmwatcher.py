@@ -280,6 +280,6 @@ class CommandModuleWatcher:
             try:
                 commands.append([self.command_map[result['RuleId']], result])
             except KeyError:
-                logger.warning(f'Command {result} no longer exists')
+                log.logger.warning(f'Command {result} no longer exists')
         for cmd, result in commands:
             cmd.perform_action(result)
