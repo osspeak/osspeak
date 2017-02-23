@@ -15,7 +15,8 @@ def main():
     if settings.user_settings['network'] == 'server':
         server.RemoteEngineServer().loop_forever()
         return
-    ui_manager = GuiProcessManager() if args.interface == 'gui' else menu.MainMenu()
+    use_gui = settings.user_settings['interface'] == 'gui'
+    ui_manager = GuiProcessManager() if use_gui else menu.MainMenu()
     io_obj = get_io()
     try:
         cmw = cmwatcher.CommandModuleWatcher()

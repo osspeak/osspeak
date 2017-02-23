@@ -2,8 +2,8 @@ import subprocess
 import sys
 import threading
 import json
-# from aiohttp import web
-# import aiohttp
+from aiohttp import web
+import aiohttp
 from communication.procs import ProcessManager
 from communication import messages
 from interfaces.gui import serializer
@@ -19,6 +19,7 @@ class GuiProcessManager(ProcessManager):
         super().__init__(ELECTRON_PATH)
         self.websocket_established = False
         self.message_queue = []
+        self.message_queue_lock = threading.Lock()
         self.on_message = {
             'save modules': self.save_modules
         }
@@ -45,7 +46,7 @@ class GuiProcessManager(ProcessManager):
     async def hello(self, request):
         return web.Response(text="Hello, world")
     
-    def start_server(self):
+    def main_loop(self):
         self.app = web.Application()
         self.app.router.add_get('/', self.hello)
         self.app.router.add_get('/websocket', self.websocket_handler)
