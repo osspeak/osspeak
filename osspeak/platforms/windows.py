@@ -7,6 +7,7 @@ import time
 import ctypes
 from platforms import winconstants, winclipboard
 import pyautogui
+from platforms.vocolakeys import send_input
 
 EnumWindows = ctypes.windll.user32.EnumWindows
 EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
@@ -81,8 +82,8 @@ def press_key(key_input, direction, delay=.03):
             keyup(winconstants.WINDOWS_KEYCODES['shift'])
 
 def press_key_combination(keys, direction, delay=.02):
-    time.sleep(delay)
-    pyautogui.hotkey(*keys, pause=delay)
+    input_text = '{' + '+'.join(keys) + '}'
+    send_input(input_text)
 
 def keydown(hex_key_code):
     extra = ctypes.c_ulong(0)
