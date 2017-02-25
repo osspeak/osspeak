@@ -1,4 +1,4 @@
-class Application extends React.Component {
+export default class Application extends React.Component {
 
     constructor(props, context) {
         super(props, context);

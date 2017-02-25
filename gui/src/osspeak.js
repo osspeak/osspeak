@@ -1,6 +1,10 @@
-const communicator = new MainProcessCommunicator('ws://localhost:8080/websocket');
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+import Application from './application';
 
-function init() {
+export const communicator = new MainProcessCommunicator('ws://localhost:8080/websocket');
+
+window.onload = function() {
     ReactDOM.render(
         <Application />,
         document.getElementById('root')
