@@ -15,7 +15,8 @@ class ActionParser:
             tokens.LiteralToken: self.parse_literal_token,
             tokens.LiteralTemplateToken: self.parse_literal_template_token,
             tokens.WordToken: self.parse_word_token,
-            tokens.ParenToken: self.parse_paren,
+            tokens.GroupingOpeningToken: self.parse_open_grouping_token,
+            tokens.GroupingClosingToken: self.parse_closing_grouping_token,
             tokens.BraceToken: self.parse_curly_brace,
             tokens.PlusToken: self.parse_plus_sign,
             tokens.CommaToken: self.parse_comma_token,
@@ -60,12 +61,18 @@ class ActionParser:
         func.definition = definition
         self.add_action(func, grouped=True)
         next_token = self.peek()
-        if not isinstance(next_token, tokens.ParenToken) or not next_token.is_open:
+        if not isinstance(next_token, tokens.GroupingOpeningToken):
             self.stream.croak('missing paren')
 
     def parse_paren(self, tok):
         if tok.is_open:
             return
+        self.pop_grouped_action()
+
+    def parse_open_grouping_token(self, tok):
+        pass
+
+    def parse_closing_grouping_token(self, tok):
         self.pop_grouped_action()
 
     def parse_curly_brace(self, tok):

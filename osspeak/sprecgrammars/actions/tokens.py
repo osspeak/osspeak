@@ -18,12 +18,11 @@ class LiteralTemplateToken(ActionToken):
     def __init__(self, text):
         self.text = text
 
-class ParenToken(ActionToken):
+class GroupingOpeningToken(ActionToken):
+    CHARACTER = '('
 
-    OPENING_CHARACTER = '('
-    
-    def __init__(self, ch):
-        self.is_open = ch == '('
+class GroupingClosingToken(ActionToken):
+    CHARACTER = ')'
 
 class BraceToken(ActionToken):
     

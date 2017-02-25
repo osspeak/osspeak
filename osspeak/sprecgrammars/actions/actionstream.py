@@ -2,9 +2,11 @@ from sprecgrammars import abstokenstream
 from sprecgrammars.actions import tokens
 
 WORD_DELIMITERS = set([
-    '{', '}', '(', ')', ',', ' ', '\n', '\t', '+', ',', '|', '=',
+    '{', '}', ',', ' ', '\n', '\t', '+', ',', '|', '=',
     tokens.SliceToken.OPENING_DELIMITER,
     tokens.SliceToken.CLOSING_DELIMITER,
+    tokens.GroupingOpeningToken.CHARACTER,
+    tokens.GroupingClosingToken.CHARACTER,
 ])
 
 class ActionTokenStream(abstokenstream.AbstractTokenStream):
@@ -19,8 +21,8 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
             "'": self.read_literal,
             tokens.LiteralTemplateToken.DELIMITER: self.read_template_literal,
             tokens.SliceToken.OPENING_DELIMITER: self.read_slice_token,
-            '(': self.read_paren_token,
-            ')': self.read_paren_token,
+            tokens.GroupingOpeningToken.CHARACTER: self.read_grouping_opening_token,
+            tokens.GroupingClosingToken.CHARACTER: self.read_grouping_closing_token,
             '{': self.read_brace_token,
             '}': self.read_brace_token,
             '+': self.read_plus_token,
@@ -65,8 +67,13 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         text = self._read_word()
         return tokens.WordToken(text)
 
-    def read_paren_token(self):
-        return tokens.ParenToken(self.stream.next())
+    def read_grouping_opening_token(self):
+        self.stream.next()
+        return tokens.GroupingOpeningToken()
+
+    def read_grouping_closing_token(self):
+        self.stream.next()
+        return tokens.GroupingClosingToken()
 
     def read_brace_token(self):
         return tokens.BraceToken(self.stream.next())
