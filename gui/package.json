@@ -4,20 +4,25 @@
   "license": "MIT",
   "dependencies": {
     "bootstrap": "^4.0.0-alpha.6",
-    "electron": "1.4.13",
+    "electron": "1.4.15",
     "jquery": "^3.1.1",
     "react": "^15.4.2",
-    "react-dom": "^15.4.2"
+    "react-dom": "^15.4.2",
+    "react-redux": "^5.0.3",
+    "redux": "^3.6.0"
   },
   "scripts": {
     "build": "node node_modules\\babel-cli\\bin\\babel.js js\\src -d js\\lib",
-    "watch": "node node_modules\\babel-cli\\bin\\babel.js --watch js\\src -d js\\lib"
+    "watch": "node node_modules\\babel-cli\\bin\\babel.js --watch js\\src -d js\\lib",
+    "wp": "node node_modules\\webpack\\bin\\webpack.js --watch"
   },
   "main": "main.js",
   "devDependencies": {
-    "babel-cli": "^6.18.0",
-    "babel-plugin-transform-react-jsx": "^6.8.0",
+    "babel-cli": "^6.23.0",
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.3.2",
+    "babel-plugin-transform-react-jsx": "^6.23.0",
     "jstree": "^3.3.3",
-    "webpack": "^2.1.0-beta.27"
+    "webpack": "^2.2.1"
   }
 }

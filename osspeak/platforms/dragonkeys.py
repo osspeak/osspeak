@@ -179,6 +179,7 @@ Key_name = {
     # 
     
     "alt"         : VK_MENU,
+    "back"        : VK_BACK,
     "backspace"   : VK_BACK,
     "break"       : VK_CANCEL,
     "capslock"    : VK_CAPITAL,
@@ -189,10 +190,13 @@ Key_name = {
     "end"         : VK_END,
     "enter"       : VK_RETURN,
     "esc"         : VK_ESCAPE,
+    "escape"      : VK_ESCAPE,
     "home"        : VK_HOME,
     "ins"         : VK_INSERT,
     "left"        : VK_LEFT,
     "numlock"     : VK_NUMLOCK,
+    "pagedown"    : VK_NEXT,
+    "pageup"      : VK_PRIOR,
     "pgdn"        : VK_NEXT,
     "pgup"        : VK_PRIOR,
     "pause"       : VK_PAUSE,

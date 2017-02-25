@@ -23,6 +23,7 @@ class GuiProcessManager(ProcessManager):
         self.on_message = {
             'save modules': self.save_modules
         }
+        messages.subscribe(messages.LOAD_MODULE_MAP, lambda payload: self.send_message('module map', payload))
 
     def save_modules(self, msg_data):
         module_configurations = {k: self.to_module_config(v) for (k, v) in msg_data['modules'].items()}
