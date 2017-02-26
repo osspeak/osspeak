@@ -39,5 +39,5 @@ class ActionSubstituteToken(BaseToken):
     def __init__(self, text):
         self.text = text
         action_parser = parser.ActionParser(text)
-        self.action = action_parser.parse_substitute_action()
-        self.consumed_char_count = action_parser.stream.stream.pos
+        self.action = action_parser.parse(substitute=True)
+        self.consumed_char_count = sum(t.character_count for t in action_parser.parsed_tokens)

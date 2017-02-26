@@ -198,6 +198,9 @@ class CommandModuleWatcher:
 
     def load_scope(self, path, cmd_module):
         scope_name = cmd_module.config.get('scope', '')
+        print(path, scope_name)
+        if path == r'osspeak_modules\vscode\shortcuts.json':
+            x=4
         if scope_name not in self.scope_groupings:
             global_scope = self.scope_groupings['']
             self.scope_groupings[scope_name] = scopes.Scope(global_scope, name=scope_name)

@@ -11,12 +11,13 @@ class ActionParser:
         self.grouping_delimiter_flags = {}
         self.append_modifier_flag = False
         self.action_to_modify = None
+        self.parsed_tokens = []
         self.parse_map = {
             tokens.LiteralToken: self.parse_literal_token,
             tokens.LiteralTemplateToken: self.parse_literal_template_token,
             tokens.WordToken: self.parse_word_token,
-            tokens.GroupingOpeningToken: self.parse_open_grouping_token,
-            tokens.GroupingClosingToken: self.parse_closing_grouping_token,
+            tokens.GroupingOpeningToken: self.parse_open_grouping_token, # (
+            tokens.GroupingClosingToken: self.parse_closing_grouping_token, # )
             tokens.BraceToken: self.parse_curly_brace,
             tokens.PlusToken: self.parse_plus_sign,
             tokens.CommaToken: self.parse_comma_token,
@@ -27,32 +28,37 @@ class ActionParser:
             tokens.SliceToken: self.parse_slice_token,
         }
 
-    def parse(self):
-        self.init_grouped_action_stack()
+    def parse(self, substitute=False):
+        tok_types = set()
+        self.add_grouped_action()
         for tok in self.stream:
             tok_type = type(tok)
             self.parse_map[tok_type](tok)
-        return self.grouped_action_stack[0]
-
-    def parse_substitute_action(self):
-        self.init_grouped_action_stack()
-        for tok in self.stream:
-            tok_type = type(tok)
-            self.parse_map[tok_type](tok)
-            if len(self.grouped_action_stack) == 1:
-                break
+            self.parsed_tokens.append(tok)
+            tok_types.add(tok_type)
+            if substitute:
+                if isinstance(tok, tokens.WhitespaceToken) and len(tok_types) == 1:
+                    # ignore initial whitespace
+                    continue
+                if len(self.grouped_action_stack) == 1:
+                    break
         assert len(self.grouped_action_stack) == 1
         return self.grouped_action_stack[0]
 
-    def init_grouped_action_stack(self):
+    def add_grouped_action(self):
         root_action = nodes.RootAction()
-        self.grouped_action_stack = [root_action]
+        self.grouped_action_stack.append(root_action)
 
     def parse_word_token(self, tok):
-        if tok.text in library.builtin_functions:
-            self.parse_function(tok.text, library.builtin_functions[tok.text]) 
-        elif tok.text in self.defined_functions:
-            self.parse_function(tok.text, self.defined_functions[tok.text]) 
+        next_token = self.peek()
+        if isinstance(next_token, tokens.GroupingOpeningToken):
+            # assume it's a function if next char is '(' with no whitespace first
+            if tok.text in library.builtin_functions:
+                self.parse_function(tok.text, library.builtin_functions[tok.text]) 
+            elif tok.text in self.defined_functions:
+                self.parse_function(tok.text, self.defined_functions[tok.text])
+            else:
+                self.stream.croak(f'Invalid function name {tok.text}')
         else:
             return self.parse_literal_token(tok)
 
@@ -60,17 +66,13 @@ class ActionParser:
         func = nodes.FunctionCall(func_name)
         func.definition = definition
         self.add_action(func, grouped=True)
-        next_token = self.peek()
-        if not isinstance(next_token, tokens.GroupingOpeningToken):
-            self.stream.croak('missing paren')
-
-    def parse_paren(self, tok):
-        if tok.is_open:
-            return
-        self.pop_grouped_action()
 
     def parse_open_grouping_token(self, tok):
-        pass
+        if self.parsed_tokens and isinstance(self.parsed_tokens[-1], tokens.WordToken):
+            # opening paren of a function call, okay to ignore
+            return
+        self.add_grouped_action()
+        
 
     def parse_closing_grouping_token(self, tok):
         self.pop_grouped_action()
@@ -84,7 +86,7 @@ class ActionParser:
 
     def pop_grouped_action(self):
         if len(self.grouped_action_stack) < 2:
-            self.error('too many closing arens')
+            self.error('too many closing parens')
         self.action_to_modify = self.grouped_action_stack.pop()        
 
     def parse_plus_sign(self, tok):
@@ -129,6 +131,7 @@ class ActionParser:
 
     def add_action(self, action, grouped=False):
         if self.append_modifier_flag:
+            # _, currently just for repeat 
             self.action_to_modify.modifiers.append(action)
             self.append_modifier_flag = False
         else:

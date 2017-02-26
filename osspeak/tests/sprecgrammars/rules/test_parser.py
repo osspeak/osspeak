@@ -51,3 +51,13 @@ class TestRuleSubstitute1(TestRuleParserBase):
         self.assertIsInstance(second_action, nodes.RootAction)
         self.assertIsInstance(second_action.children[0], nodes.LiteralKeysAction)
         self.assertEqual(second_action.children[0].text, 'right')
+
+class TestRuleSubstitute2(TestRuleParserBase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.text = strings.SUBSTITUTE2
+
+    def test_first_action(self):
+        print(self.text)
+        rule = self.rule

@@ -10,11 +10,11 @@ class AbstractTokenStream:
     def __init__(self, text):
         self.stream = inputstream.InputStream(text)
         self.word_delimiters = WORD_DELIMITERS
-        self.current = None
+        self.peeked_token = None
 
     def next(self):
-        tok = self.current
-        self.current = None
+        tok = self.peeked_token
+        self.peeked_token = None
         return self.read_next() if tok is None else tok
 
     def _read_word(self):
@@ -24,10 +24,10 @@ class AbstractTokenStream:
         return literal_text
 
     def peek(self):
-        if self.current is not None:
-            return self.current
-        self.current = self.read_next()
-        return self.current
+        if self.peeked_token is not None:
+            return self.peeked_token
+        self.peeked_token = self.read_next()
+        return self.peeked_token
 
     def eof(self):
         return self.peek() is None
