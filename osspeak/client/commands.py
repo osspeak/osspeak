@@ -32,25 +32,25 @@ class CommandModule:
 
     def initialize_rules(self):
         for rule_name, rule_text in self.config.get('rules', {}):
-            self.scope._rules[rule_name] = rule_text
+            self.scope.rules[rule_name] = rule_text
 
     def load_rules(self):
         for rule_name, rule_text in self.config.get('rules', {}):
-            current_rule = self.scope._rules[rule_name]
+            current_rule = self.scope.rules[rule_name]
             if isinstance(current_rule, astree.Rule):
                 assert current_rule.name is not None
                 self.rules.append(current_rule)
                 continue
             assert isinstance(current_rule, str)
-            self.scope._rules[rule_name] = None
-            rule = api.rule(rule_text, name=rule_name, rules=self.scope._rules)
-            self.scope._rules[rule_name] = rule
+            self.scope.rules[rule_name] = None
+            rule = api.rule(rule_text, name=rule_name, rules=self.scope.rules, defined_functions=self.scope.functions)
+            self.scope.rules[rule_name] = rule
             self.rules.append(rule)
 
     def define_functions(self):
         for func_signature, func_text in self.config.get('functions', {}):
             func_definition = api.func_definition(func_signature, defined_functions=self.scope.functions)
-            self.scope._functions[func_definition.name] = func_definition
+            self.scope.functions[func_definition.name] = func_definition
             self.functions.append(func_definition)
 
     def set_function_actions(self):

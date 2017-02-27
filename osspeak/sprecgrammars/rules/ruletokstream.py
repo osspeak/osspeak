@@ -3,6 +3,10 @@ from sprecgrammars.rules import tokens
 
 class RuleTokenStream(abstokenstream.AbstractTokenStream):
 
+    def __init__(self, text, defined_functions=None):
+        super().__init__(text)
+        self.defined_functions = {} if defined_functions is None else defined_functions
+
     def read_next(self):
         # TODO: use a dict, put read_word at end?
         whitespace = self.read_whitespace()
@@ -72,7 +76,7 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
     def read_action_substitute(self):
         assert self.stream.next() == '='
         remaining_text = self.stream.text[self.stream.pos:]
-        tok = tokens.ActionSubstituteToken(remaining_text)
+        tok = tokens.ActionSubstituteToken(remaining_text, self.defined_functions)
         # could increase self.stream.stream.pos, but better to use
         # stream interface
         for i in range(tok.consumed_char_count):

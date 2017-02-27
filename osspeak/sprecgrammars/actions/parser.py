@@ -144,8 +144,8 @@ class ActionParser:
 
     def set_delimiter_flag(self):
         # if top level action is expecting a delimiter (, or +), raise an error
-        if len(self.grouped_action_stack) > 1:
-            last_action = self.grouped_action_stack[-1]
+        last_action = self.grouped_action_stack[-1]
+        if last_action in self.grouping_delimiter_flags:
             if self.grouping_delimiter_flags[last_action]:
                 self.error('foobar')
             self.grouping_delimiter_flags[last_action] = True
