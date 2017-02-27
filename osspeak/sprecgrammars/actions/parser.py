@@ -71,8 +71,9 @@ class ActionParser:
         if self.parsed_tokens and isinstance(self.parsed_tokens[-1], tokens.WordToken):
             # opening paren of a function call, okay to ignore
             return
-        self.add_grouped_action()
-        
+        root_action = nodes.RootAction()
+        self.add_action(root_action, grouped=True)
+        del self.grouping_delimiter_flags[root_action]        
 
     def parse_closing_grouping_token(self, tok):
         self.pop_grouped_action()
