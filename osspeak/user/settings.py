@@ -10,7 +10,8 @@ DEFAULT_CONFIG = {
     'server_address': {
         'host': '127.0.0.1',
         'port': 8888,
-    }
+    },
+    "type_delay": .05,
 }
 
 def load_user_settings():

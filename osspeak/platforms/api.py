@@ -1,4 +1,6 @@
 import sys
+import time
+from user import settings
 
 def load_platform_module():
 	if sys.platform == 'win32':
@@ -45,7 +47,9 @@ def set_clipboard_contents(text):
     platform.set_clipboard_contents(text)
 
 def type_line(evaluated_item_list):
-	for item in evaluated_item_list:
+	for i, item in enumerate(evaluated_item_list):
+		if i > 0:
+			time.sleep(settings.user_settings['type_delay'])
 		if isinstance(item, str):
 			type_literal(item)
 		elif isinstance(item, list):
