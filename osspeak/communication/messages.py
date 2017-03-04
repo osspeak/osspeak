@@ -38,6 +38,7 @@ def unsubscribe(subscription):
     with _subscription_lock:
         if subscription.name in _subscriptions:
             _subscriptions[subscription.name] = [s for s in _subscriptions[subscription.name] if s is not subscription]
+        subscription.stop()
 
 class Subscription:
 
@@ -49,5 +50,10 @@ class Subscription:
 
     def run(self):
         while True:
-            args, kwargs = self.payload_queue.get()
-            self.callback(*args, **kwargs)
+            payload = self.payload_queue.get()
+            if payload is None:
+                return
+            self.callback(*payload[0], **payload[1])
+
+    def stop(self):
+        self.payload_queue.put(None)
