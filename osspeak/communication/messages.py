@@ -14,15 +14,19 @@ LOAD_MODULE_MAP = 'load module map'
 RELOAD_COMMAND_MODULE_FILES = 'reload command module files'
 
 _subscriptions = collections.defaultdict(list)
+_subscription_lock = threading.Lock()
 
 def dispatch(message_name, *args, **kwargs):
     logger.debug(f"Dispatching message: '{message_name}'")
-    for sub in _subscriptions[message_name]:
-        sub.payload_queue.put((args, kwargs))
+    with _subscription_lock:
+        for sub in _subscriptions[message_name]:
+            sub.payload_queue.put((args, kwargs))
 
 def dispatch_sync(message_name, *args, **kwargs):
     logger.debug(f"Dispatching sync message: '{message_name}'")
-    for sub in _subscriptions[message_name]:
+    with _subscription_lock:
+        subscriptions = _subscriptions[message_name].copy()
+    for sub in subscriptions:
         sub.callback(*args, **kwargs)
 
 def subscribe(message_name, callback):
@@ -31,8 +35,9 @@ def subscribe(message_name, callback):
     return sub
 
 def unsubscribe(subscription):
-    if subscription.name in _subscriptions:
-        _subscriptions[subscription.name] = [s for s in _subscriptions[subscription.name] if s is not subscription]
+    with _subscription_lock:
+        if subscription.name in _subscriptions:
+            _subscriptions[subscription.name] = [s for s in _subscriptions[subscription.name] if s is not subscription]
 
 class Subscription:
 
