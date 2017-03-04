@@ -12,17 +12,18 @@ class RemoteEngineClient:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setblocking(1)
         self.shutdown_event = threading.Event()
-        messages.subscribe(messages.SHUTDOWN, lambda: self.shutdown_event.set())
+        messages.subscribe(messages.STOP_MAIN_PROCESS , lambda: self.shutdown_event.set())
         message_subscriptions = (
             messages.START_ENGINE_LISTENING,
             messages.ENGINE_STOP,
-            messages.SHUTDOWN,
+            messages.STOP_MAIN_PROCESS,
             messages.EMULATE_RECOGNITION,
             messages.HEARTBEAT,
         )
         for message in message_subscriptions:
             cb = functools.partial(common.send_message, self.socket, message)
-            messages.subscribe(message, cb) 
+            messages.subscribe(message, cb)
+        messages.subscribe(STOP_MAIN_PROCESS, lambda: self.socket.close())
 
     def connect(self):
         from user.settings import user_settings

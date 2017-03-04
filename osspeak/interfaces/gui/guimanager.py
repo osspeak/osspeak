@@ -70,7 +70,7 @@ class GuiProcessManager(ProcessManager):
             elif msg.type == aiohttp.WSMsgType.ERROR:
                 print('ws connection closed with exception %s' %
                     self.ws.exception())
-        messages.dispatch(messages.SHUTDOWN)
+        messages.dispatch(messages.STOP_MAIN_PROCESS )
         print('websocket connection closed')
         return self.ws
 

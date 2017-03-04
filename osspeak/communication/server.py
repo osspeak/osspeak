@@ -29,7 +29,7 @@ class RemoteEngineServer:
         self.shutdown()
 
     def shutdown(self):
-        messages.dispatch_sync(messages.SHUTDOWN)
+        messages.dispatch_sync(messages.STOP_MAIN_PROCESS )
 
 class RemoteEngineTCPHandler(socketserver.BaseRequestHandler):
 

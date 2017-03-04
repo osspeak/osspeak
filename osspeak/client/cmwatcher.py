@@ -27,7 +27,7 @@ class CommandModuleWatcher:
         self.shutdown = threading.Event()
         self.current_user_state = sprecgrammars.functions.library.state.USER_DEFINED_STATE.copy()
         self.loading_lock = threading.Lock()
-        messages.subscribe(messages.SHUTDOWN, lambda: self.shutdown.set())
+        messages.subscribe(messages.STOP_MAIN_PROCESS , lambda: self.shutdown.set())
         messages.subscribe(messages.PERFORM_COMMANDS, self.perform_commands)
         messages.subscribe(messages.SET_SAVED_MODULES, self.set_saved_modules)
         messages.subscribe(messages.RELOAD_COMMAND_MODULE_FILES,

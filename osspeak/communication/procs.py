@@ -44,7 +44,7 @@ class EngineProcessManager(ProcessManager):
         super().__init__(ENGINE_PATH, on_output=self.on_engine_message)
         messages.subscribe(messages.START_ENGINE_LISTENING, self.start_engine_listening)
         messages.subscribe(messages.ENGINE_STOP, self.stop)
-        messages.subscribe(messages.SHUTDOWN, self.shutdown)
+        messages.subscribe(messages.STOP_MAIN_PROCESS , self.shutdown)
         messages.subscribe(messages.EMULATE_RECOGNITION, self.emulate_recognition)
         
     def send_message(self, msg):

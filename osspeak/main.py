@@ -17,18 +17,16 @@ def main():
         return
     use_gui = settings.user_settings['interface'] == 'gui'
     ui_manager = GuiProcessManager() if use_gui else menu.MainMenu()
-    io_obj = get_io()
+    engine = initialize_speech_engine_client()
     try:
         cmw = cmwatcher.CommandModuleWatcher()
         cmw.initialize_modules()
         cmw.start_watch_active_window()
         ui_manager.main_loop()
     finally:
-        messages.dispatch_sync(messages.ENGINE_STOP)
-        io_obj.socket.close()
+        messages.dispatch_sync(messages.STOP_MAIN_PROCESS)
 
-
-def get_io():
+def initialize_speech_engine_client():
     if settings.user_settings['network'] == 'local':
         return EngineProcessManager()
     else:
