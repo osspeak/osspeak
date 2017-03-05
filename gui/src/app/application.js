@@ -1,3 +1,5 @@
+import { communicator } from './osspeak';
+
 export default class Application extends React.Component {
 
     constructor(props, context) {
