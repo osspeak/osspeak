@@ -8,6 +8,7 @@ WORD_DELIMITERS = set([
     tokens.GroupingOpeningToken.CHARACTER,
     tokens.GroupingClosingToken.CHARACTER,
 ])
+NUMBER_CHARACTERS = set([str(n) for n in list(range(10))] + ['-', '.'])
 
 class ActionTokenStream(abstokenstream.AbstractTokenStream):
 
@@ -35,7 +36,11 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         if self.stream.eof():
             return
         ch = self.stream.peek()
-        return self.tokenize_functions.get(ch, self.read_word)()
+        if ch in self.tokenize_functions:
+            return self.tokenize_functions[ch]()
+        if ch in NUMBER_CHARACTERS:
+            return self.read_number()
+        return self.read_word()
 
     def read_whitespace(self):
         text = self.read_while(lambda ch: ch in ' \n\t')
@@ -119,3 +124,16 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         slice_pieces = slice_text.split(':')
         self.stream.next()
         return tokens.SliceToken(slice_pieces)
+
+    def read_number(self):
+        text = ''
+        ch = self.stream.peek()
+        while ch in NUMBER_CHARACTERS:
+            if ch == '.' and ch in text:
+                break
+            elif ch == '-' and text:
+                break
+            text += ch
+            self.stream.next() 
+            ch = self.stream.peek()   
+        return tokens.NumberToken(text)

@@ -21,6 +21,7 @@ class ActionParser:
             tokens.BraceToken: self.parse_curly_brace,
             tokens.PlusToken: self.parse_plus_sign,
             tokens.CommaToken: self.parse_comma_token,
+            tokens.NumberToken: self.parse_number_token,
             tokens.PositionalVariableToken: self.parse_positional_variable_token,
             tokens.NamedVariableToken: self.parse_named_variable_token,
             tokens.WhitespaceToken: self.parse_whitespace_token,
@@ -84,6 +85,10 @@ class ActionParser:
             self.add_action(seq, grouped=True)
             return
         self.pop_grouped_action()
+
+    def parse_number_token(self, tok):
+        number_action = nodes.NumberNode(tok.number)
+        self.add_action(number_action)
 
     def pop_grouped_action(self):
         if len(self.grouped_action_stack) < 2:

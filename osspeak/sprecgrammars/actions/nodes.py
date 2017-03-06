@@ -170,6 +170,16 @@ class WhitespaceNode(Action):
     def evaluate(self, variables, arguments=None):
         pass
 
+class NumberNode(Action):
+
+    def __init__(self, number):
+        super().__init__()
+        self.number = number
+
+    def evaluate(self, variables, arguments=None):
+        modifiers = self.apply_modifiers(variables)
+        return self.number
+
 class Argument(Action):
 
     def __init__(self, name):

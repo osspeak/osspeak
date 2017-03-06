@@ -21,7 +21,7 @@ def load_user_settings():
     try:
         with open(config_file_path) as f:
             user_settings = json.load(f)
-    except IndexError:
+    except json.decoder.JSONDecodeError:
         # logger.warning('Invalid settings configuration. Loading default settings.')
         user_settings = DEFAULT_CONFIG
     for setting_name in DEFAULT_CONFIG:

@@ -89,3 +89,13 @@ class SliceToken(ActionToken):
     @property
     def character_count(self):
         return sum((p for p in self.pieces), key=len) + len(self.pieces) + 1
+
+class NumberToken(ActionToken):
+
+    def __init__(self, text):
+        self.text = text
+        self.number = float(text) if '.' in text else int(text)
+
+    @property
+    def character_count(self):
+        return len(self.text)
