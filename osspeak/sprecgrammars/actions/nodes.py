@@ -96,7 +96,7 @@ class LiteralKeysAction(Action):
     def evaluate(self, variables, arguments=None, type_result=False):
         result = self.evaluate_text(variables, arguments)
         if type_result:
-            api.type_line([result])
+            api.type_line(result)
         return result
 
 class FunctionCall(Action):
@@ -184,7 +184,7 @@ class NumberNode(Action):
     def evaluate(self, variables, arguments=None, type_result=False):
         modifiers = self.apply_modifiers(variables)
         if type_result:
-            api.type_line([self.number])
+            api.type_line(self.number)
         return self.number
 
 class Argument(Action):
@@ -195,4 +195,7 @@ class Argument(Action):
 
     def evaluate(self, variables, arguments=None, type_result=False):
         arguments = {} if arguments is None else arguments
-        return arguments.get(self.name, '')
+        result = arguments.get(self.name, '')
+        if type_result:
+            api.type_line(result)
+        return result
