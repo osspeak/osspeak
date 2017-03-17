@@ -55,8 +55,8 @@ class RootAction(Action):
         result = ''
         for child in self.children:
             child_result = child.evaluate(variables, arguments=arguments, type_result=type_result)
-            if isinstance(child_result, str):
-                result += child_result
+            if isinstance(child_result, (str, int, float)):
+                result += str(child_result)
         return result
 
     def perform(self, variables, arguments=None):
@@ -159,12 +159,15 @@ class PositionalVariable(Action):
         pos = self.pos - 1 if self.pos > 0 else self.pos
         var = variables[pos]
         modifiers = self.apply_modifiers(variables)
-        result = var.evaluate(variables, arguments, type_result=type_result)
+        result = var.evaluate(variables, arguments)
         try:
             result = result * modifiers.get('repeat', 1)
         except TypeError:
             pass
-        return self.apply_slices(result, variables, arguments)
+        sliced_result = self.apply_slices(result, variables, arguments)
+        if type_result:
+            api.type_line(sliced_result)
+        return sliced_result
 
 class WhitespaceNode(Action):
 
