@@ -1,4 +1,4 @@
-from sprecgrammars.functions.library import mouse, window, keys, state, system, extensions, general, text, clipboard, osspeak
+from sprecgrammars.functions.library import mouse, window, keys, state, system, extensions, general, text, clipboard, osspeak, conditionals
 
 builtin_functions = {
     'eval': general.python_evaluate,
@@ -12,6 +12,8 @@ builtin_functions = {
 
     'clipboard.get': clipboard.get,
     'clipboard.set': clipboard.set,
+
+    'if': conditionals.osspeak_if,
 
     'extensions.run': extensions.run,
     'extensions.message': extensions.send_message,
@@ -33,3 +35,7 @@ builtin_functions = {
 
     'wait': system.wait,
 }
+
+builtin_functions_custom_evaluation = set([
+    'if'
+])

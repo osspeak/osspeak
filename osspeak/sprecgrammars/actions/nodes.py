@@ -3,6 +3,7 @@ import types
 import itertools
 import functools
 
+from sprecgrammars.functions import library
 from platforms import api
 
 class Action:
@@ -122,7 +123,10 @@ class FunctionCall(Action):
         from sprecgrammars.api import action
         # builtin functions
         if isinstance(self.definition, types.FunctionType):
-            args = [a.evaluate(variables, arguments) for a in self.arguments]
+            if self.func_name in library.builtin_functions_custom_evaluation:
+                args = [self, variables, arguments]
+            else:
+                args = [a.evaluate(variables, arguments) for a in self.arguments]
             result = self.definition(*args)
         # user defined functions
         else:

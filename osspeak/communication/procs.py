@@ -3,7 +3,7 @@ import threading
 import json
 import sys
 import xml.etree.ElementTree as ET
-from communication import cmdmodule, messages
+from communication import messages
 
 if getattr(sys, 'frozen', False):
     ENGINE_PATH = r'engines\wsr\RecognizerIO.exe'
