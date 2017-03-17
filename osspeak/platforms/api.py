@@ -47,9 +47,13 @@ def set_clipboard_contents(text):
     platform.set_clipboard_contents(text)
 
 def type_line(evaluated_item_list):
+	if not isinstance(evaluated_item_list, (list, tuple)):
+		evaluated_item_list = [evaluated_item_list]
 	for i, item in enumerate(evaluated_item_list):
 		if i > 0:
 			time.sleep(settings.user_settings['type_delay'])
+		if isinstance(item, (int, float)):
+			item = str(item)
 		if isinstance(item, str):
 			type_literal(item)
 		elif isinstance(item, list):
@@ -57,7 +61,7 @@ def type_line(evaluated_item_list):
 				key_combination = [key_combination] if isinstance(key_combination, str) else key_combination
 				type_keypresses(key_combination)
 		else:
-			raise TypeError
+			pass
 
 def type_literal(text):
 	platform.type_literal(text)

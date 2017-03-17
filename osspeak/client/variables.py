@@ -88,6 +88,7 @@ class RecognitionResultsTree:
                     results[partial_path].append(action)
         variables = []
         for grouping_path in self.ambiguities:
+            # variables need to be root actions because they can contain multiple other variables
             action = nodes.RootAction()
             action.children = results.get(grouping_path, [])
             variables.append(action)
