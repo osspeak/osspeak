@@ -34,11 +34,11 @@ def mouse_click(button='left', direction='both', number=1):
 def mouse_move(x, y, relative):
 	platform.mouse_move(x, y, relative)
 
-def activate_window(title):
+def activate_window(title, position=1):
     if isinstance(title, str):
         title = [title]
     title = [name.lower() for name in title]
-    platform.activate_window(title)
+    platform.activate_window(title, position=position)
 
 def get_clipboard_contents():
     return platform.get_clipboard_contents()

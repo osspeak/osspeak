@@ -2,8 +2,10 @@ import os
 
 from platforms import api
 
-def focus(title):
-    api.activate_window(title)
+def focus(title, result_number=None):
+    if not result_number:
+        result_number = 1
+    api.activate_window(title, int(result_number))
 
 def close():
     api.close_active_window()
