@@ -150,8 +150,8 @@ class KeySequence(Action):
         modifiers = self.apply_modifiers(variables)
         keys = [node.evaluate(variables, arguments) for node in self.keys]
         result = [[keys for i in range(modifiers.get('repeat', 1))]]
-        if type_result:
-            api.type_line(result)
+        api.type_line(result)
+        return result
 
 class PositionalVariable(Action):
 
