@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Speech;
-using TextToSRG;
 
 namespace RecognizerIO
 {

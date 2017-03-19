@@ -49,24 +49,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionParser.cs" />
-    <Compile Include="Action.cs" />
-    <Compile Include="ActionTokenStream.cs" />
-    <Compile Include="CommandLoader.cs" />
     <Compile Include="Engines\EngineManager.cs" />
     <Compile Include="Engines\ProcessedRecognitionResult.cs" />
     <Compile Include="Error.cs" />
     <Compile Include="InputHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TextToSRG\AbstractTokenStream.cs" />
-    <Compile Include="TextToSRG\Api.cs" />
-    <Compile Include="TextToSRG\AstNode.cs" />
-    <Compile Include="TextToSRG\Expression.cs" />
-    <Compile Include="TextToSRG\InputStream.cs" />
-    <Compile Include="TextToSRG\Parser.cs" />
-    <Compile Include="TextToSRG\Token.cs" />
-    <Compile Include="TextToSRG\TokenStream.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
