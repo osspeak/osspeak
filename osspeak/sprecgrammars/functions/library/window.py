@@ -18,3 +18,6 @@ def start(name):
 
 def shell(text):
     return os.system(text)
+
+def get_active_window_name():
+    return api.get_active_window_name()

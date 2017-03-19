@@ -27,6 +27,12 @@ class MainProcessCommunicator {
 
     onmessage(msg) {
         const msgObj = JSON.parse(msg.data);
+        switch (msgObj.type) {
+            case 'foo':
+                break;
+            default:
+                break;
+        }
         this.fireSubscription(msgObj.type, msgObj.payload);
     }
 

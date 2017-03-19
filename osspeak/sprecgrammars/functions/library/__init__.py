@@ -3,9 +3,6 @@ from sprecgrammars.functions.library import mouse, window, keys, state, system, 
 builtin_functions = {
     'eval': general.python_evaluate,
     'hold': keys.hold,
-    'length': text.length,
-    'lower': text.lower,
-    'upper': text.upper,
     'release': keys.release,
     'start': window.start,
     'shell': window.shell,
@@ -29,9 +26,18 @@ builtin_functions = {
     'state.delete': state.delete_state,
     'state.get': state.get_state,
 
-    'window.focus': window.focus,
+    'text.contains': text.contains,
+    'text.join': text.join,
+    'text.length': text.length,
+    'text.lower': text.lower,
+    'text.replace': text.replace,
+    'text.split': text.split,
+    'text.upper': text.upper,
+
     'window.close': window.close,
+    'window.focus': window.focus,
     'window.maximizeActive': window.maximise_active,
+    'window.title': window.get_active_window_name,
 
     'wait': system.wait,
 }
