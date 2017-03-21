@@ -1,8 +1,13 @@
+import { actionCreators } from './actions';
+
 class MainProcessCommunicator {
 
     constructor(address) {
         this.address = address;
         this.subscriptions = new Map();
+        this.actionCreators = {
+
+        };
         this.startWebSocket();
     }
 
@@ -27,6 +32,7 @@ class MainProcessCommunicator {
 
     onmessage(msg) {
         const msgObj = JSON.parse(msg.data);
+        console.log(msgObj.type);
         switch (msgObj.type) {
             case 'foo':
                 break;
@@ -42,3 +48,6 @@ class MainProcessCommunicator {
     }
 
 }
+
+const communicator = new MainProcessCommunicator('ws://localhost:8080/websocket');
+export default communicator;

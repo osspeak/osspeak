@@ -1,4 +1,4 @@
-import { communicator } from './osspeak';
+import communicator from './communicator';
 
 export default class Application extends React.Component {
 

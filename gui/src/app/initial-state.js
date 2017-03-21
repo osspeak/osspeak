@@ -1,3 +1,10 @@
 export const initialState = {
-    commandModules: {},
+    commandModules: {
+        actionPieces: {},
+        commands: {},
+        rules: {},
+        actions: {},
+        openIds: [],
+        focusedId: null,
+    },
 }
