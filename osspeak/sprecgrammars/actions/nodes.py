@@ -54,11 +54,17 @@ class RootAction(Action):
 
     def evaluate(self, variables, arguments=None, type_result=False):
         result = ''
+        return_last_evaluation = False
+        evaluations = []
         for child in self.children:
             child_result = child.evaluate(variables, arguments=arguments, type_result=type_result)
+            evaluations.append(child_result)
             if isinstance(child_result, (str, int, float)):
                 result += str(child_result)
-        return result
+            elif result is None:
+                continue
+            return_last_evaluation = True
+        return evaluations[-1] if return_last_evaluation else result
 
     def perform(self, variables, arguments=None):
         self.evaluate(variables, arguments, type_result=True)

@@ -102,5 +102,5 @@ class Command:
         var_list = self.variable_tree.action_variables(engine_variables)
         try:
             self.action.perform(var_list)
-        except Exception as e:
+        except KeyError as e:
             logger.error(f'Action {self.action.raw_text} errored: {str(e)}') 

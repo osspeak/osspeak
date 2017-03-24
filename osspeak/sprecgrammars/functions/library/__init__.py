@@ -1,8 +1,10 @@
 from sprecgrammars.functions.library import mouse, window, keys, state, system, extensions, general, text, clipboard, osspeak, conditionals
-
+print
 builtin_functions = {
     'eval': general.python_evaluate,
+    'list': general.python_list,
     'hold': keys.hold,
+    'print': general.python_print,
     'release': keys.release,
     'start': window.start,
     'shell': window.shell,
