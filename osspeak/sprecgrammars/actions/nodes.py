@@ -63,7 +63,8 @@ class RootAction(Action):
                 result += str(child_result)
             elif result is None:
                 continue
-            return_last_evaluation = True
+            else:
+                return_last_evaluation = True
         return evaluations[-1] if return_last_evaluation else result
 
     def perform(self, variables, arguments=None):
@@ -209,6 +210,7 @@ class Argument(Action):
     def evaluate(self, variables, arguments=None, type_result=False):
         arguments = {} if arguments is None else arguments
         result = arguments.get(self.name, '')
+        result = self.apply_slices(result, variables, arguments)
         if type_result:
             api.type_line(result)
         return result
