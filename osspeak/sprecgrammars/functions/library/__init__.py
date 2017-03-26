@@ -13,6 +13,7 @@ builtin_functions = {
     'clipboard.set': clipboard.set,
 
     'if': conditionals.osspeak_if,
+    'repeat': conditionals.repeat,
 
     'extensions.run': extensions.run,
     'extensions.message': extensions.send_message,
@@ -45,5 +46,6 @@ builtin_functions = {
 }
 
 builtin_functions_custom_evaluation = set([
-    'if'
+    'if',
+    'repeat'
 ])

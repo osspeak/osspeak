@@ -26,8 +26,11 @@ class LiteralTemplateToken(ActionToken):
 
     DELIMITER = '`'
     
-    def __init__(self, text):
+    def __init__(self, text, chunks=None):
         self.text = text
+        # list of strings, even indices == literal text, odd indices
+        # parsed as RootAction
+        self.chunks = chunks
 
     @property
     def character_count(self):

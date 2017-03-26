@@ -22,19 +22,6 @@ class Action:
     def error(self, msg):
         raise RuntimeError(msg)
 
-    def apply_modifiers(self, variables):
-        applied_modifiers = {}
-        evaluated_modifiers = [action.evaluate(variables) for action in self.modifiers]
-        for modifier in evaluated_modifiers:
-            if str(modifier).isdigit():
-                if 'repeat' in applied_modifiers:
-                    self.error('multiple nums')
-                applied_modifiers['repeat'] = int(modifier)
-            else:
-                if 'direction' in applied_modifiers:
-                    self.error('multiple nums')
-                applied_modifiers['direction'] = modifier
-        return applied_modifiers
 
     def apply_slices(self, val, variables, arguments):
         for action_slice in self.slices:
@@ -87,8 +74,7 @@ class LiteralKeysAction(Action):
             matchfunc = functools.partial(self.var_replace, variables, arguments)
             text = re.sub(self.var_pattern, matchfunc, self.text)
         text = self.apply_slices(text, variables, arguments)
-        modifiers = self.apply_modifiers(variables)
-        return text * modifiers.get('repeat', 1)
+        return text
 
     def var_replace(self, variables, arguments, matchobj):
         grouping_start, grouping_end = matchobj.regs[0]
@@ -131,7 +117,9 @@ class FunctionCall(Action):
         # builtin functions
         if isinstance(self.definition, types.FunctionType):
             if self.func_name in library.builtin_functions_custom_evaluation:
-                args = [self, variables, arguments]
+                args = [self, variables, arguments, type_result]
+                # gets taken care of in function call
+                type_result = False
             else:
                 args = [a.evaluate(variables, arguments) for a in self.arguments]
             result = self.definition(*args)
@@ -154,9 +142,8 @@ class KeySequence(Action):
         self.keys.append(node)
 
     def evaluate(self, variables, arguments=None, type_result=False):
-        modifiers = self.apply_modifiers(variables)
         keys = [node.evaluate(variables, arguments) for node in self.keys]
-        result = [[keys for i in range(modifiers.get('repeat', 1))]]
+        result = [[keys for i in range(1)]]
         api.type_line(result)
         return result
 
@@ -169,15 +156,8 @@ class PositionalVariable(Action):
     def evaluate(self, variables, arguments=None, type_result=False):
         pos = self.pos - 1 if self.pos > 0 else self.pos
         var = variables[pos]
-        modifiers = self.apply_modifiers(variables)
-        result = var.evaluate(variables, arguments)
-        try:
-            result = result * modifiers.get('repeat', 1)
-        except TypeError:
-            pass
+        result = var.evaluate(variables, arguments, type_result=type_result)
         sliced_result = self.apply_slices(result, variables, arguments)
-        if type_result:
-            api.type_line(sliced_result)
         return sliced_result
 
 class WhitespaceNode(Action):
@@ -196,7 +176,6 @@ class NumberNode(Action):
         self.number = number
 
     def evaluate(self, variables, arguments=None, type_result=False):
-        modifiers = self.apply_modifiers(variables)
         if type_result:
             api.type_line(self.number)
         return self.number
