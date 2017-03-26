@@ -59,5 +59,4 @@ class TestRuleSubstitute2(TestRuleParserBase):
         cls.text = strings.SUBSTITUTE2
 
     def test_first_action(self):
-        print(self.text)
         rule = self.rule
