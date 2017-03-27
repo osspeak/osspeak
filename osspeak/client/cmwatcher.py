@@ -22,6 +22,7 @@ class CommandModuleWatcher:
     def __init__(self):
         self.current_condition = scopes.CurrentCondition()
         self.initial = True
+        self.command_map = {}
         self.modules_to_save = {}
         self.command_module_json = self.load_command_json()
         self.shutdown = threading.Event()
@@ -81,6 +82,7 @@ class CommandModuleWatcher:
         self.active_modules = {}
         self.grammar_node = astree.GrammarNode()
         self.grammar_xml = None
+        self.previous_command_map = self.command_map
         # key is string id, val is Action instance
         self.command_map = {}
 
@@ -279,6 +281,10 @@ class CommandModuleWatcher:
         commands = []
         for result in command_results:
             try:
+                if result['RuleId'] in self.command_map:
+                    commands.append([self.command_map[result['RuleId']], result])
+                else:
+                    commands.append([self.previous_command_map[result['RuleId']], result])
                 commands.append([self.command_map[result['RuleId']], result])
             except KeyError:
                 log.logger.warning(f'Command {result} no longer exists')
