@@ -5,7 +5,7 @@ import json
 from sprecgrammars.actions.parser import ActionParser
 from sprecgrammars.actions import nodes
 from sprecgrammars.functions.parser import FunctionDefinitionParser
-from sprecgrammars.functions.library import state
+from sprecgrammars.functions.library import state, history
 from sprecgrammars import api
 from interfaces.gui import serializer
 from client import commands, scopes, variables
@@ -101,6 +101,9 @@ class Command:
         engine_variables = tuple(v for v in engine_result['Variables'] if len(v) == 2)
         var_list = self.variable_tree.action_variables(engine_variables)
         try:
-            self.action.perform(var_list)
-        except KeyError as e:
-            logger.error(f'Action {self.action.raw_text} errored: {str(e)}') 
+            result = self.action.perform(var_list)
+            # if result['store in history']:
+            #     history.command_history.append({'action': self.action, 'variables': var_list})
+            return {'result': result, 'action': self.action, 'variables': var_list}
+        except Exception as e:
+            logger.error(f'Action {self.action.raw_text} errored: {str(e)}')

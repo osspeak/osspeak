@@ -39,12 +39,12 @@ class RootAction(Action):
     def add(self, child):
         self.children.append(child)
 
-    def evaluate(self, variables, arguments=None, type_result=False):
+    def evaluate(self, variables, arguments=None, type_result=False, result_state=None):
         result = ''
         return_last_evaluation = False
         evaluations = []
         for child in self.children:
-            child_result = child.evaluate(variables, arguments=arguments, type_result=type_result)
+            child_result = child.evaluate(variables, arguments=arguments, type_result=type_result, result_state=result_state)
             evaluations.append(child_result)
             if isinstance(child_result, (str, int, float)):
                 result += str(child_result)
@@ -55,7 +55,9 @@ class RootAction(Action):
         return evaluations[-1] if return_last_evaluation else result
 
     def perform(self, variables, arguments=None):
-        self.evaluate(variables, arguments, type_result=True)
+        result_state = {'store in history': True}
+        self.evaluate(variables, arguments, type_result=True, result_state=result_state)
+        return result_state
 
 class LiteralKeysAction(Action):
 
@@ -85,9 +87,9 @@ class LiteralKeysAction(Action):
             var = variables[match_index]
         except IndexError:
             return ''
-        return var.evaluate(variables, arguments)
+        return var.evaluate(variables, arguments, result_state=result_state)
 
-    def evaluate(self, variables, arguments=None, type_result=False):
+    def evaluate(self, variables, arguments=None, type_result=False, result_state=None):
         result = self.evaluate_text(variables, arguments)
         if type_result:
             api.type_line(result)
@@ -104,29 +106,31 @@ class FunctionCall(Action):
     def add(self, node):
         self.arguments.append(node)
 
-    def get_arguments(self, variables, arguments):
+    def get_arguments(self, variables, arguments, result_state=None):
         args = {}
         # use default action for any arg not passed by user
         for param, arg in itertools.zip_longest(self.definition.parameters, self.arguments):
             action = param.default_action if arg is None else arg
-            args[param.name] = action.evaluate(variables, arguments)
+            args[param.name] = action.evaluate(variables, arguments, result_state=result_state)
         return args
 
-    def evaluate(self, variables, arguments=None, type_result=False):
+    def evaluate(self, variables, arguments=None, type_result=False, result_state=None):
         from sprecgrammars.api import action
         # builtin functions
         if isinstance(self.definition, types.FunctionType):
             if self.func_name in library.builtin_functions_custom_evaluation:
-                args = [self, variables, arguments, type_result]
+                args = [self, variables, arguments, type_result, result_state]
                 # gets taken care of in function call
                 type_result = False
             else:
-                args = [a.evaluate(variables, arguments) for a in self.arguments]
+                args = [a.evaluate(variables, arguments, result_state=result_state) for a in self.arguments]
             result = self.definition(*args)
+            if self.func_name == 'history.last':
+                result_state['store in history'] = False
         # user defined functions
         else:
-            args = self.get_arguments(variables, arguments)
-            result = self.definition.action.evaluate(variables, args, type_result=type_result)
+            args = self.get_arguments(variables, arguments, result_state=result_state)
+            result = self.definition.action.evaluate(variables, args, type_result=type_result, result_state=result_state)
             type_result = False
         if type_result:
             api.type_line(result)
@@ -141,8 +145,8 @@ class KeySequence(Action):
     def add(self, node):
         self.keys.append(node)
 
-    def evaluate(self, variables, arguments=None, type_result=False):
-        keys = [node.evaluate(variables, arguments) for node in self.keys]
+    def evaluate(self, variables, arguments=None, type_result=False, result_state=None):
+        keys = [node.evaluate(variables, arguments, result_state=result_state) for node in self.keys]
         result = [[keys]]
         if type_result:
             api.type_line(result)
@@ -154,10 +158,10 @@ class PositionalVariable(Action):
         super().__init__()
         self.pos = pos
 
-    def evaluate(self, variables, arguments=None, type_result=False):
+    def evaluate(self, variables, arguments=None, type_result=False, result_state=None):
         pos = self.pos - 1 if self.pos > 0 else self.pos
         var = variables[pos]
-        result = var.evaluate(variables, arguments, type_result=type_result)
+        result = var.evaluate(variables, arguments, type_result=type_result, result_state=result_state)
         sliced_result = self.apply_slices(result, variables, arguments)
         return sliced_result
 
@@ -167,7 +171,7 @@ class WhitespaceNode(Action):
         super().__init__()
         self.text = text
 
-    def evaluate(self, variables, arguments=None, type_result=False):
+    def evaluate(self, variables, arguments=None, type_result=False, result_state=None):
         pass
 
 class NumberNode(Action):
@@ -176,7 +180,7 @@ class NumberNode(Action):
         super().__init__()
         self.number = number
 
-    def evaluate(self, variables, arguments=None, type_result=False):
+    def evaluate(self, variables, arguments=None, type_result=False, result_state=None):
         if type_result:
             api.type_line(self.number)
         return self.number
@@ -187,7 +191,7 @@ class Argument(Action):
         super().__init__()
         self.name = name
 
-    def evaluate(self, variables, arguments=None, type_result=False):
+    def evaluate(self, variables, arguments=None, type_result=False, result_state=None):
         arguments = {} if arguments is None else arguments
         result = arguments.get(self.name, '')
         result = self.apply_slices(result, variables, arguments)

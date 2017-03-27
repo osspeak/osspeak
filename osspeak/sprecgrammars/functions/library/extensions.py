@@ -23,9 +23,11 @@ def get_runpath(path):
     return os.path.join(user.settings.COMMAND_DIRECTORY, filepath)
 
 def call(path, function, *args):
-    runpath = get_runpath(path)
     module = extension_threads[path].module
     getattr(module, function)(*args)
+
+def close(path):
+    extension_threads[path].shutdown_message_queue.put(None)
 
 class ExtensionThread:
 

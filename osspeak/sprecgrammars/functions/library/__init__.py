@@ -1,5 +1,6 @@
-from sprecgrammars.functions.library import mouse, window, keys, state, system, extensions, general, text, clipboard, osspeak, conditionals
-print
+from sprecgrammars.functions.library import (mouse, window, keys, state, system,
+extensions, general, text, clipboard, osspeak, conditionals, history)
+
 builtin_functions = {
     'eval': general.python_evaluate,
     'list': general.python_list,
@@ -18,6 +19,8 @@ builtin_functions = {
     'extensions.call': extensions.call,
     'extensions.message': extensions.send_message,
     'extensions.run': extensions.run,
+
+    'history.last': history.last,
 
     'mouse.click': mouse.click,
     'mouse.move': mouse.move,
