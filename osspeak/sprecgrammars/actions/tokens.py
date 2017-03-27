@@ -25,6 +25,8 @@ class LiteralToken(ActionToken):
 class LiteralTemplateToken(ActionToken):
 
     DELIMITER = '`'
+    ACTION_OPENER = '{'
+    ACTION_CLOSER = '}'
     
     def __init__(self, text, chunks=None):
         self.text = text

@@ -15,8 +15,9 @@ builtin_functions = {
     'if': conditionals.osspeak_if,
     'repeat': conditionals.repeat,
 
-    'extensions.run': extensions.run,
+    'extensions.call': extensions.call,
     'extensions.message': extensions.send_message,
+    'extensions.run': extensions.run,
 
     'mouse.click': mouse.click,
     'mouse.move': mouse.move,
