@@ -1,20 +1,6 @@
-import os
-import json
-import threading
-import collections
-import tempfile
 import log
-from sprecgrammars.actions.parser import ActionParser
-import sprecgrammars.functions.library.state
-from user import settings
 from sprecgrammars.functions.library import history
-from interfaces.gui import serializer
-from client import commands, scopes, action
-from sprecgrammars.rules import astree
-from sprecgrammars.rules.parser import RuleParser
-from platforms import api
-from communication import messages
-import time
+from client import action
 
 def perform_action(command, engine_result):
     # empty variables dict, gets filled based on result
