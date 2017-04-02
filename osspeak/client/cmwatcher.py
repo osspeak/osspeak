@@ -274,24 +274,4 @@ class CommandModuleWatcher:
         self.modules_to_save = modules_to_save
 
     def perform_commands(self, grammar_id, command_results):
-        from sprecgrammars.functions.library import history
-        log.logger.debug(f'Got commands: {command_results}')
-        if grammar_id != self.grammar_node.id:
-            return
-        commands = []
-        for result in command_results:
-            try:
-                if result['RuleId'] in self.command_map:
-                    commands.append([self.command_map[result['RuleId']], result])
-                else:
-                    commands.append([self.previous_command_map[result['RuleId']], result])
-            except KeyError:
-                log.logger.warning(f'Command {result} no longer exists')
-        action_results = []
-        for cmd, result in commands:
-            action_result = cmd.perform_action(result)
-            if action_result is not None:
-                action_results.append(action_result)
-        if all(r['result']['store in history'] for r in action_results):
-            history.command_history.append(action_results)
-        
+        action.perform_commands(command_results, self.command_map, self.previous_command_map)        

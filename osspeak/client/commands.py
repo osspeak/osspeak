@@ -94,16 +94,3 @@ class Command:
     @property
     def id(self):
         return self.rule.id
-
-    def perform_action(self, engine_result):
-        # empty variables dict, gets filled based on result
-        logger.info(f'Matched rule: {self.rule.raw_text}')
-        engine_variables = tuple(v for v in engine_result['Variables'] if len(v) == 2)
-        var_list = self.variable_tree.action_variables(engine_variables)
-        try:
-            result = self.action.perform(var_list)
-            # if result['store in history']:
-            #     history.command_history.append({'action': self.action, 'variables': var_list})
-            return {'result': result, 'action': self.action, 'variables': var_list}
-        except Exception as e:
-            logger.error(f'Action {self.action.raw_text} errored: {str(e)}')
