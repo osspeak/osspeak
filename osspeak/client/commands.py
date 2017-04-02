@@ -8,7 +8,7 @@ from sprecgrammars.functions.parser import FunctionDefinitionParser
 from sprecgrammars.functions.library import state, history
 from sprecgrammars import api
 from interfaces.gui import serializer
-from client import commands, scopes, variables
+from client import commands, scopes, variables, action
 from sprecgrammars.rules import astree
 from sprecgrammars.rules.parser import RuleParser
 from log import logger

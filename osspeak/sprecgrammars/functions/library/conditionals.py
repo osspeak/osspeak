@@ -1,3 +1,5 @@
+import threading
+
 def osspeak_if(action, variables, arguments, type_result, result_state):
     print(action, variables, arguments)
     if_result = action.arguments[0].evaluate(variables, arguments, result_state=result_state)
@@ -30,3 +32,12 @@ def repeat(action, variables, arguments, type_result, result_state):
             except:
                 pass
     return total_result
+
+def execute_async(action, variables, arguments, type_result, result_state):
+    thread = threading.Thread(target=execute_async_thread, args=[action, variables, arguments, type_result, result_state])
+    result_state['threads'] = result_state.get('threads', []) + [thread]
+    thread.start()
+
+def execute_async_thread(action, variables, arguments, type_result, result_state):
+    for action_arg in action.arguments:
+        action_arg.evaluate(variables, arguments, type_result=type_result, result_state=result_state)

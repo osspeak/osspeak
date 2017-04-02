@@ -13,6 +13,7 @@ builtin_functions = {
     'clipboard.get': clipboard.get,
     'clipboard.set': clipboard.set,
 
+    'async': conditionals.execute_async,
     'if': conditionals.osspeak_if,
     'repeat': conditionals.repeat,
 
@@ -50,6 +51,7 @@ builtin_functions = {
 }
 
 builtin_functions_custom_evaluation = set([
+    'async',
     'if',
     'repeat'
 ])

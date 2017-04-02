@@ -8,7 +8,7 @@ from sprecgrammars.actions.parser import ActionParser
 import sprecgrammars.functions.library.state
 from user import settings
 from interfaces.gui import serializer
-from client import commands, scopes
+from client import commands, scopes, action
 from sprecgrammars.rules import astree
 from sprecgrammars.rules.parser import RuleParser
 from sprecgrammars.rules.converter import SrgsXmlConverter
