@@ -69,16 +69,16 @@ class LiteralKeysAction(Action):
         self.text = text
         self.is_template = is_template
 
-    def evaluate_text(self, variables, arguments):
+    def evaluate_text(self, variables, arguments, result_state):
         if not self.is_template:
             text = self.text
         else:
-            matchfunc = functools.partial(self.var_replace, variables, arguments)
+            matchfunc = functools.partial(self.var_replace, variables, arguments, result_state)
             text = re.sub(self.var_pattern, matchfunc, self.text)
         text = self.apply_slices(text, variables, arguments)
         return text
 
-    def var_replace(self, variables, arguments, matchobj):
+    def var_replace(self, variables, arguments, matchobj, result_state):
         grouping_start, grouping_end = matchobj.regs[0]
         match_index = int(matchobj.string[grouping_start + 1: grouping_end])
         if match_index > 0:
@@ -90,7 +90,7 @@ class LiteralKeysAction(Action):
         return var.evaluate(variables, arguments, result_state=result_state)
 
     def evaluate(self, variables, arguments=None, type_result=False, result_state=None):
-        result = self.evaluate_text(variables, arguments)
+        result = self.evaluate_text(variables, arguments, result_state)
         if type_result:
             api.type_line(result)
         return result
