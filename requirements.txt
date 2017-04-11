@@ -1,5 +1,9 @@
-aiohttp==1.2.0
-async-timeout==1.1.0
-chardet==2.3.0
+aiohttp==2.0.6
+async-timeout==1.2.0
+chardet==3.0.1
 multidict==2.1.4
-yarl==0.8.1
+olefile==0.44
+PyMsgBox==1.0.3
+PyScreeze==0.1.8
+PyTweening==1.0.3
+yarl==0.10.0
