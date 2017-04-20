@@ -27,8 +27,6 @@ class RemoteEngineClient:
             cb = functools.partial(self.dispatch_message, message)
             messages.subscribe(message, cb)
 
-    def main_loop(self):
-
     def dispatch_message(message_name, *args, **kwargs):
         common.send_message(self.ws, message_name, args, kwargs)
 
