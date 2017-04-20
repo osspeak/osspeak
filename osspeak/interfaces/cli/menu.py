@@ -78,8 +78,8 @@ class SettingsMenu(Menu):
                 print('invalid host:port combination')
             else:
                 host, port = split_input
-                settings.user_settings['server_address'] = {'host': host, 'port': port}
-                print(f'Saving new remote server address: {host}:{port}')
+                settings.user_settings['server_address'] = address_input
+                print(f'Saving new remote server address: {address_input}')
                 settings.save_settings(settings.user_settings)
         return True
 

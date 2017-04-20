@@ -1,45 +1,16 @@
 import json
-import time
-import threading
 from log import logger
 from communication import messages
 
-TERMINATION_SEQUENCE = 'f1a5238b-ec60-430e-a0a8-5fe7442273a0'
+def receive_message(msg):
+    message_object = json.loads(msg)
+    messages.dispatch(message_object['name'], *message_object['args'], **message_object['kwargs'])
 
-def receive_loop(sock, socket_broken_event=None):
-    socket_broken_event = threading.Event() if socket_broken_event is None else socket_broken_event
-    leftover = ''
-    while True:
-        try:
-            msg = sock.recv(1024)
-        except Exception as e:
-            print('erer', e)
-            return socket_broken_event.set()
-        if msg:
-            leftover = receive_message(leftover, msg)
-        else:
-            return socket_broken_event.set()
-
-def receive_message(prefix, message_bytes):
-    message_text = message_bytes.decode('utf-8')
-    message_list = message_text.split(TERMINATION_SEQUENCE)
-    message_list[0] = f'{prefix}{message_list[0]}'
-    leftover_text = message_list.pop()
-    for msg in message_list:
-        message_object = json.loads(msg)
-        messages.dispatch(message_object['name'], *message_object['args'], **message_object['kwargs'])
-    return leftover_text
-
-def send_message(socket, msg_name, *args, **kwargs):
+def send_message(ws, msg_name, *args, **kwargs):
     msg = {
         'name': msg_name,
         'args': args,
         'kwargs': kwargs,
     }
-    encoded_message = json.dumps(msg)
-    msg_bytes = bytes(f'{encoded_message}{TERMINATION_SEQUENCE}', 'utf-8')
-    try:
-        socket.sendall(msg_bytes)
-    except (BrokenPipeError, OSError):
-        logger.warning(f"Socket connection is broken. Cannot send message: '{msg_name}'")
+    ws.send_str(json.dumps(msg))
 

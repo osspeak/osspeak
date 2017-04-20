@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 
 import log
 import clargs
@@ -29,7 +30,7 @@ def main():
 def initialize_speech_engine_client():
     if settings.user_settings['network'] == 'remote':
         engine_client = client.RemoteEngineClient()
-        engine_client.connect()
+        engine_client.establish_websocket_connection()
         return engine_client
     else:
         return EngineProcessManager()

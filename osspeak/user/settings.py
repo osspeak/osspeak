@@ -7,10 +7,7 @@ COMMAND_DIRECTORY = os.path.join(USER_DIRECTORY, 'commands')
 DEFAULT_CONFIG = {
     'interface': 'cli',
     'network': 'local',
-    'server_address': {
-        'host': '127.0.0.1',
-        'port': 8888,
-    },
+    'server_address': '127.0.0.1:8888',
     "type_delay": .05,
 }
 
