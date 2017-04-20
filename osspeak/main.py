@@ -27,12 +27,12 @@ def main():
         messages.dispatch_sync(messages.STOP_MAIN_PROCESS)
 
 def initialize_speech_engine_client():
-    if settings.user_settings['network'] == 'local':
-        return EngineProcessManager()
-    else:
+    if settings.user_settings['network'] == 'remote':
         engine_client = client.RemoteEngineClient()
         engine_client.connect()
         return engine_client
+    else:
+        return EngineProcessManager()
 
 if __name__ == "__main__":
     main()
