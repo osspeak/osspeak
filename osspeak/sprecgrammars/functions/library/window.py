@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 from platforms import api
 
@@ -17,7 +18,7 @@ def start(name):
     os.startfile(name)
 
 def shell(text):
-    return os.system(text)
+    subprocess.run(text.split(), shell=True)
 
 def get_active_window_name():
     return api.get_active_window_name()

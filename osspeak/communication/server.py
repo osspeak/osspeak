@@ -6,6 +6,7 @@ import time
 import socketserver
 import functools
 import json
+from aiohttp import web
 from communication import procs, messages, common
 from user.settings import user_settings
 from log import logger
@@ -14,6 +15,10 @@ class RemoteEngineServer:
 
     def __init__(self):
         self.engine = procs.EngineProcessManager()
+        self.app = web.Application()
+        self.app.router.add_get('/', hello)
+        self.app.router.add_get('/ws', self.websocket_handler)
+        # web.run_app(self.app)
 
     def loop_forever(self):
         host, port = user_settings['server_address']['host'], user_settings['server_address']['port']
@@ -27,9 +32,24 @@ class RemoteEngineServer:
         server.serve_forever()
         server.server_close()
         self.shutdown()
+        
+    async def websocket_handler(self, request):
+        self.ws = web.WebSocketResponse()
+        await self.ws.prepare(request)
+        async for msg in self.ws:
+            if msg.type == aiohttp.WSMsgType.TEXT:
+                if msg.data == 'close':
+                    await self.ws.close()
+                else:
+                    self.ws.send_str(msg.data + '/answer')
+            elif msg.type == aiohttp.self.WSMsgType.ERROR:
+                print('ws connection closed with exception %s' %
+                    self.ws.exception())
+        print('websocket connection closed')
+        return self.ws
 
     def shutdown(self):
-        messages.dispatch_sync(messages.STOP_MAIN_PROCESS )
+        messages.dispatch_sync(messages.STOP_MAIN_PROCESS)
 
 class RemoteEngineTCPHandler(socketserver.BaseRequestHandler):
 
@@ -56,3 +76,6 @@ class RemoteEngineTCPHandler(socketserver.BaseRequestHandler):
             else:
                 logger.info(f'Connection closed with {self.request.getpeername()}')
                 return
+
+async def hello(request):
+    return web.Response(text="Hello, world")
