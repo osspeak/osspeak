@@ -16,8 +16,7 @@ class RemoteEngineServer:
     def __init__(self):
         self.engine = procs.EngineProcessManager()
         self.app = web.Application()
-        self.app.router.add_get('/', hello)
-        self.app.router.add_get('/ws', self.websocket_handler)
+        self.app.router.add_get('/', self.websocket_handler)
 
     def loop_forever(self):
         address = user_settings['server_address'].split(':')
@@ -28,6 +27,7 @@ class RemoteEngineServer:
         
     async def websocket_handler(self, request):
         self.ws = web.WebSocketResponse()
+        logger.debug(f'Hosting engine server at')
         cb = functools.partial(common.send_message, self.ws, messages.PERFORM_COMMANDS)
         sub = messages.subscribe(messages.PERFORM_COMMANDS, cb) 
         await self.ws.prepare(request)
