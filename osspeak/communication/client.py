@@ -33,7 +33,7 @@ class RemoteEngineClient:
     def establish_websocket_connection(self):
         event_loop = asyncio.get_event_loop()
         event_loop.run_until_complete(self.run_websocket_client())
-        messages.subscribe(STOP_MAIN_PROCESS, lambda: None)
+        messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: None)
 
     async def run_websocket_client(self):
         session = aiohttp.ClientSession()
