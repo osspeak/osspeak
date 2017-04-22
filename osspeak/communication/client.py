@@ -27,7 +27,7 @@ class RemoteEngineClient:
             cb = functools.partial(self.dispatch_message, message)
             messages.subscribe(message, cb)
 
-    def dispatch_message(message_name, *args, **kwargs):
+    def dispatch_message(self, message_name, *args, **kwargs):
         common.send_message(self.ws, message_name, args, kwargs)
 
     def establish_websocket_connection(self):
