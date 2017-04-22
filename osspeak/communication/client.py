@@ -46,15 +46,10 @@ class RemoteEngineClient:
             else:
                 break
 
-    def receive_websocket_messages(self):
+    async def receive_websocket_messages(self):
         async for msg in self.ws:
             if msg.type == aiohttp.WSMsgType.TEXT:
-                common.send_message(msg)
-                if msg.data == 'close cmd':
-                    await ws.close()
-                    break
-                else:
-                    ws.send_str(msg.data + '/answer')
+                common.receive_message(msg)
             elif msg.type == aiohttp.WSMsgType.CLOSED:
                 break
             elif msg.type == aiohttp.WSMsgType.ERROR:

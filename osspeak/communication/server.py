@@ -18,33 +18,26 @@ class RemoteEngineServer:
         self.app = web.Application()
         self.app.router.add_get('/', hello)
         self.app.router.add_get('/ws', self.websocket_handler)
-        # web.run_app(self.app)
 
     def loop_forever(self):
-        host, port = user_settings['server_address']['host'], user_settings['server_address']['port']
+        address = user_settings['server_address'].split(':')
+        host, port = (address[0], 8080) if len(address) == 1 else address
         logger.debug(f'Hosting engine server at {host}:{port}')
-        try:
-            server = socketserver.TCPServer((host, port), RemoteEngineTCPHandler) 
-        except OSError as e:
-            logger.error(f'Unable to host at {host}:{port}:\n{e}\nShutting down...')
-            self.shutdown()
-            return
-        server.serve_forever()
-        server.server_close()
-        self.shutdown()
+        print(host, port)
+        web.run_app(self.app, host=host, port=int(port))
         
     async def websocket_handler(self, request):
         self.ws = web.WebSocketResponse()
+        cb = functools.partial(common.send_message, self.ws, messages.PERFORM_COMMANDS)
+        sub = messages.subscribe(messages.PERFORM_COMMANDS, cb) 
         await self.ws.prepare(request)
         async for msg in self.ws:
             if msg.type == aiohttp.WSMsgType.TEXT:
-                if msg.data == 'close':
-                    await self.ws.close()
-                else:
-                    self.ws.send_str(msg.data + '/answer')
+                common.receive_message(msg)
             elif msg.type == aiohttp.self.WSMsgType.ERROR:
                 print('ws connection closed with exception %s' %
                     self.ws.exception())
+        messages.unsubscribe(sub)
         print('websocket connection closed')
         return self.ws
 
