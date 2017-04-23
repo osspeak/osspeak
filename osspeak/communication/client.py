@@ -43,7 +43,7 @@ class RemoteEngineClient:
             try:
                 self.ws = await session.ws_connect(address)
             except aiohttp.client_exceptions.ClientOSError:
-                loggers.debug(f'Could not connect to {address}, trying again in 5 seconds')
+                logger.debug(f'Could not connect to {address}, trying again in 5 seconds')
                 time.sleep(5)
             else:
                 break
