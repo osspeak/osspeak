@@ -6,6 +6,7 @@ import socket
 import aiohttp
 import time
 import sys
+from log import logger
 from user.settings import user_settings
 from communication import messages, common
 
@@ -42,7 +43,7 @@ class RemoteEngineClient:
             try:
                 self.ws = await session.ws_connect(address)
             except aiohttp.client_exceptions.ClientOSError:
-                log.debug(f'Could not connect to {address}, trying again in 5 seconds')
+                loggers.debug(f'Could not connect to {address}, trying again in 5 seconds')
                 time.sleep(5)
             else:
                 break
