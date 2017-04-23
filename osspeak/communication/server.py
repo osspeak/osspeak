@@ -69,6 +69,3 @@ class RemoteEngineTCPHandler(socketserver.BaseRequestHandler):
             else:
                 logger.info(f'Connection closed with {self.request.getpeername()}')
                 return
-
-async def hello(request):
-    return web.Response(text="Hello, world")

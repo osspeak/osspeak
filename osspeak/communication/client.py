@@ -37,12 +37,13 @@ class RemoteEngineClient:
 
     async def run_websocket_client(self):
         session = aiohttp.ClientSession()
+        address = 'http://' + self.server_address
         while True:
             try:
-                self.ws = await session.ws_connect('http://' + self.server_address)
-            except aiohttp.errors.ClientOSError:
-                print('err')
-                pass
+                self.ws = await session.ws_connect(address)
+            except aiohttp.client_exceptions.ClientOSError:
+                log.debug(f'Could not connect to {address}, trying again in 5 seconds')
+                time.sleep(5)
             else:
                 break
 

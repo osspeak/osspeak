@@ -11,6 +11,13 @@ DEFAULT_CONFIG = {
     "type_delay": .05,
 }
 
+def save_settings(settings):
+    if not os.path.isdir(OSSPEAK_DIRECTORY):
+        os.makedirs(OSSPEAK_DIRECTORY)
+    config_file_path = os.path.join(OSSPEAK_DIRECTORY, 'config.json')
+    with open(config_file_path, 'w') as f:
+        json.dump(settings, f, indent=4)
+
 def load_user_settings():
     config_file_path = os.path.join(OSSPEAK_DIRECTORY, 'config.json')
     if not os.path.exists(config_file_path):
@@ -26,13 +33,6 @@ def load_user_settings():
     return user_settings
 
 user_settings = load_user_settings()
-
-def save_settings(settings):
-    if not os.path.isdir(OSSPEAK_DIRECTORY):
-        os.makedirs(OSSPEAK_DIRECTORY)
-    config_file_path = os.path.join(OSSPEAK_DIRECTORY, 'config.json')
-    with open(config_file_path, 'w') as f:
-        json.dump(settings, f, indent=4)
 
 def command_directory():
     return defaults.COMMAND_DIRECTORY
