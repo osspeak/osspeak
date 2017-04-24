@@ -14,9 +14,7 @@ class RemoteEngineClient:
 
     def __init__(self):
         self.server_address = user_settings['server_address']
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.setblocking(1)
-        messages.subscribe(messages.STOP_MAIN_PROCESS , lambda: None)
+        messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: None)
         message_subscriptions = (
             messages.START_ENGINE_LISTENING,
             messages.ENGINE_STOP,
@@ -33,23 +31,39 @@ class RemoteEngineClient:
 
     def establish_websocket_connection(self):
         event_loop = asyncio.get_event_loop()
-        event_loop.run_until_complete(self.run_websocket_client())
+        threading.Thread(target=self.loop_in_thread, args=(event_loop,), daemon=True).start()
         messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: None)
 
     async def run_websocket_client(self):
-        session = aiohttp.ClientSession()
-        address = 'http://' + self.server_address
-        while True:
-            try:
-                self.ws = await session.ws_connect(address)
-            except aiohttp.client_exceptions.ClientOSError:
-                logger.debug(f'Could not connect to {address}, trying again in 5 seconds')
-                time.sleep(5)
-            else:
-                break
+        print('assad')
+        async with aiohttp.ClientSession() as session:
+            address = 'http://' + self.server_address
+            while True:
+                try:
+                    self.ws = await session.ws_connect(address)
+                except aiohttp.client_exceptions.ClientOSError:
+                    logger.debug(f'Could not connect to {address}, trying again in 5 seconds')
+                    time.sleep(5)
+                else:
+                    break
+            while True:
+                print('fsdsf')
+                async for msg in self.ws:
+                    print(msg, msg.data)
+                    if msg.type == aiohttp.WSMsgType.TEXT:
+                        common.receive_message(msg)
+                    elif msg.type == aiohttp.WSMsgType.CLOSED:
+                        break
+                    elif msg.type == aiohttp.WSMsgType.ERROR:
+                        break
+
+    def loop_in_thread(self, loop):
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(self.run_websocket_client())
 
     async def receive_websocket_messages(self):
         async for msg in self.ws:
+            print(msg, msg.data)
             if msg.type == aiohttp.WSMsgType.TEXT:
                 common.receive_message(msg)
             elif msg.type == aiohttp.WSMsgType.CLOSED:

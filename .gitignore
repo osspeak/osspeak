@@ -1,5 +1,6 @@
 user/commands/*
 Lib/
+share/
 Scripts/
 *.pyc
 Include/
