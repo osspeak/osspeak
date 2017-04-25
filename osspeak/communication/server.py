@@ -7,6 +7,7 @@ import socketserver
 import functools
 import json
 from aiohttp import web
+import aiohttp
 from communication import procs, messages, common
 from user.settings import user_settings
 from log import logger
@@ -22,7 +23,6 @@ class RemoteEngineServer:
         address = user_settings['server_address'].split(':')
         host, port = (address[0], 8080) if len(address) == 1 else address
         logger.debug(f'Hosting engine server at {host}:{port}')
-        print(host, port)
         web.run_app(self.app, host=host, port=int(port))
         
     async def websocket_handler(self, request):
@@ -33,7 +33,7 @@ class RemoteEngineServer:
         await self.ws.prepare(request)
         async for msg in self.ws:
             if msg.type == aiohttp.WSMsgType.TEXT:
-                common.receive_message(msg)
+                common.receive_message(msg.data)
             elif msg.type == aiohttp.self.WSMsgType.ERROR:
                 print('ws connection closed with exception %s' %
                     self.ws.exception())
@@ -41,7 +41,7 @@ class RemoteEngineServer:
         print('websocket connection closed')
         return self.ws
 
-    def shutdown(self):
+    def shutdown(self, *a, **k):
         messages.dispatch_sync(messages.STOP_MAIN_PROCESS)
 
 class RemoteEngineTCPHandler(socketserver.BaseRequestHandler):
