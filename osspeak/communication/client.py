@@ -6,6 +6,7 @@ import socket
 import aiohttp
 import time
 import sys
+import queue
 from log import logger
 from user.settings import user_settings
 from communication import messages, common
@@ -14,6 +15,9 @@ class RemoteEngineClient:
 
     def __init__(self):
         self.server_address = user_settings['server_address']
+        self.connected = False
+        self.message_queue = []
+        self.message_queue_lock = threading.Lock()
         messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: None)
         message_subscriptions = (
             messages.START_ENGINE_LISTENING,
@@ -23,11 +27,25 @@ class RemoteEngineClient:
             messages.HEARTBEAT,
         )
         for message in message_subscriptions:
-            cb = functools.partial(self.dispatch_message, message)
+            cb = functools.partial(self.send_or_queue_message, message)
             messages.subscribe(message, cb)
 
-    def dispatch_message(self, message_name, *args, **kwargs):
-        common.send_message(self.ws, message_name, args, kwargs)
+    def send_all_messages(self):
+        with self.message_queue_lock:
+            while self.message_queue:
+                try:
+                    msg = self.message_queue[-1]
+                    common.send_message(self.ws, msg['name'], *msg['args'], **msg['kwargs'])
+                except KeyError:
+                    return
+                self.message_queue.pop()
+
+    def send_or_queue_message(self, message_name, *args, **kwargs):
+        msg = {'name': message_name, 'args': args, 'kwargs': kwargs}
+        with self.message_queue_lock:
+            # potential queue clearing logic here
+            self.message_queue.insert(0, msg)
+        self.send_all_messages()
 
     def establish_websocket_connection(self):
         event_loop = asyncio.get_event_loop()
@@ -35,27 +53,28 @@ class RemoteEngineClient:
         messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: None)
 
     async def run_websocket_client(self):
-        print('assad')
         async with aiohttp.ClientSession() as session:
             address = 'http://' + self.server_address
             while True:
                 try:
                     self.ws = await session.ws_connect(address)
+                    self.connected = True
+                    messages.dispatch(messages.WEBSOCKET_CONNECTION_ESTABLISHED)
+                    break
                 except aiohttp.client_exceptions.ClientOSError:
                     logger.debug(f'Could not connect to {address}, trying again in 5 seconds')
                     time.sleep(5)
-                else:
-                    break
             while True:
-                print('fsdsf')
                 async for msg in self.ws:
-                    print(msg, msg.data)
                     if msg.type == aiohttp.WSMsgType.TEXT:
-                        common.receive_message(msg)
+                        common.receive_message(msg.data)
                     elif msg.type == aiohttp.WSMsgType.CLOSED:
                         break
                     elif msg.type == aiohttp.WSMsgType.ERROR:
                         break
+                self.connected = False
+                messages.dispatch(messages.WEBSOCKET_CONNECTION_BROKEN)
+                return
 
     def loop_in_thread(self, loop):
         asyncio.set_event_loop(loop)
@@ -63,7 +82,6 @@ class RemoteEngineClient:
 
     async def receive_websocket_messages(self):
         async for msg in self.ws:
-            print(msg, msg.data)
             if msg.type == aiohttp.WSMsgType.TEXT:
                 common.receive_message(msg)
             elif msg.type == aiohttp.WSMsgType.CLOSED:

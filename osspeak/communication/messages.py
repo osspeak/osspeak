@@ -3,15 +3,17 @@ import queue
 import threading
 import collections
 
+EMULATE_RECOGNITION = 'emulate recognition'
 ENGINE_STOP = 'engine stop'
 HEARTBEAT = 'heartbeat'
-EMULATE_RECOGNITION = 'emulate recognition'
+LOAD_MODULE_MAP = 'load module map'
+PERFORM_COMMANDS = 'perform commands'
+RELOAD_COMMAND_MODULE_FILES = 'reload command module files'
+SET_SAVED_MODULES = 'set saved modules'
 START_ENGINE_LISTENING = 'start engine listening'
 STOP_MAIN_PROCESS  = 'shutdown'
-SET_SAVED_MODULES = 'set saved modules'
-PERFORM_COMMANDS = 'perform commands'
-LOAD_MODULE_MAP = 'load module map'
-RELOAD_COMMAND_MODULE_FILES = 'reload command module files'
+WEBSOCKET_CONNECTION_ESTABLISHED = 'websocket connection established'
+WEBSOCKET_CONNECTION_BROKEN = 'websocket connection broken'
 
 _subscriptions = collections.defaultdict(list)
 _subscription_lock = threading.Lock()
