@@ -15,9 +15,10 @@ class RemoteEngineClient:
 
     def __init__(self):
         self.server_address = user_settings['server_address']
-        self.connected = False
+        self.ws = None
         self.message_queue = []
         self.message_queue_lock = threading.Lock()
+        messages.subscribe(messages.WEBSOCKET_CONNECTION_ESTABLISHED, lambda: self.send_all_messages())
         messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: None)
         message_subscriptions = (
             messages.START_ENGINE_LISTENING,
@@ -36,7 +37,7 @@ class RemoteEngineClient:
                 try:
                     msg = self.message_queue[-1]
                     common.send_message(self.ws, msg['name'], *msg['args'], **msg['kwargs'])
-                except KeyError:
+                except AttributeError:
                     return
                 self.message_queue.pop()
 
@@ -47,45 +48,37 @@ class RemoteEngineClient:
             self.message_queue.insert(0, msg)
         self.send_all_messages()
 
-    def establish_websocket_connection(self):
+    def start_websocket_loop(self):
         event_loop = asyncio.get_event_loop()
         threading.Thread(target=self.loop_in_thread, args=(event_loop,), daemon=True).start()
         messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: None)
 
     async def run_websocket_client(self):
         async with aiohttp.ClientSession() as session:
-            address = 'http://' + self.server_address
-            while True:
-                try:
-                    self.ws = await session.ws_connect(address)
-                    self.connected = True
-                    messages.dispatch(messages.WEBSOCKET_CONNECTION_ESTABLISHED)
-                    break
-                except aiohttp.client_exceptions.ClientOSError:
-                    logger.debug(f'Could not connect to {address}, trying again in 5 seconds')
-                    time.sleep(5)
-            while True:
-                async for msg in self.ws:
-                    if msg.type == aiohttp.WSMsgType.TEXT:
-                        common.receive_message(msg.data)
-                    elif msg.type == aiohttp.WSMsgType.CLOSED:
-                        break
-                    elif msg.type == aiohttp.WSMsgType.ERROR:
-                        break
-                self.connected = False
-                messages.dispatch(messages.WEBSOCKET_CONNECTION_BROKEN)
+            await self.establish_websocket_connection(session)
+            await self.receive_websocket_messages()
+            messages.dispatch(messages.WEBSOCKET_CONNECTION_BROKEN)
+
+    async def establish_websocket_connection(self, session):
+        address = 'http://' + self.server_address
+        while True:
+            try:
+                self.ws = await session.ws_connect(address)
+                messages.dispatch(messages.WEBSOCKET_CONNECTION_ESTABLISHED)
                 return
+            except aiohttp.client_exceptions.ClientOSError:
+                logger.debug(f'Could not connect to {address}, trying again in 5 seconds')
+                time.sleep(5)
 
     def loop_in_thread(self, loop):
         asyncio.set_event_loop(loop)
-        loop.run_until_complete(self.run_websocket_client())
+        while True:
+            loop.run_until_complete(self.run_websocket_client())
 
     async def receive_websocket_messages(self):
         async for msg in self.ws:
             if msg.type == aiohttp.WSMsgType.TEXT:
-                common.receive_message(msg)
-            elif msg.type == aiohttp.WSMsgType.CLOSED:
-                break
-            elif msg.type == aiohttp.WSMsgType.ERROR:
-                break
+                common.receive_message(msg.data)
+            elif msg.type in (aiohttp.WSMsgType.CLOSED, aiohttp.WSMsgType.ERROR):
+                return
 
