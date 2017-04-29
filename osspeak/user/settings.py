@@ -2,13 +2,13 @@ import os
 import json
 
 OSSPEAK_DIRECTORY = os.path.join(os.path.expanduser('~'), '.osspeak')
-USER_DIRECTORY = os.path.join(OSSPEAK_DIRECTORY, 'user')
-COMMAND_DIRECTORY = os.path.join(USER_DIRECTORY, 'commands')
 DEFAULT_CONFIG = {
     'interface': 'cli',
     'network': 'local',
     'server_address': '127.0.0.1:8888',
     "type_delay": .05,
+    'command_directory': os.path.join(OSSPEAK_DIRECTORY, 'commands'),
+    'external_directory': os.path.join(OSSPEAK_DIRECTORY, 'external'),
 }
 
 def save_settings(settings):
@@ -33,9 +33,6 @@ def load_user_settings():
     return user_settings
 
 user_settings = load_user_settings()
-
-def command_directory():
-    return defaults.COMMAND_DIRECTORY
 
 def parse_server_address(address):
     if isinstance(address, str):

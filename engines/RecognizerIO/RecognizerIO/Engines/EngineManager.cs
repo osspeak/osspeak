@@ -12,7 +12,8 @@ namespace RecognizerIO.Engines
     {
         public SpeechRecognitionEngine Engine;
         public Grammar ActiveGrammar;
-        public Dictionary<Grammar, string> AllGrammars = new Dictionary<Grammar, string>();
+        public string ActiveGrammarId;
+        public Boolean IsRunning = false;
 
         public EngineManager()
         {
@@ -25,7 +26,6 @@ namespace RecognizerIO.Engines
         public void LoadGrammar(string path, string gramId)
         {
             var gram = new Grammar(path);
-            AllGrammars[gram] = gramId;
             if (ActiveGrammar != null)
             {
                 Engine.RequestRecognizerUpdate();
@@ -36,11 +36,12 @@ namespace RecognizerIO.Engines
                 Engine.LoadGrammar(gram);
                 ActiveGrammar = gram;
             }
+            ActiveGrammarId = gramId;
         }
 
         void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            HandleRecognition(e.Result, AllGrammars[ActiveGrammar]);
+            HandleRecognition(e.Result, ActiveGrammarId);
         }
 
         void recognizer_RecognizerUpdateReached(object sender, RecognizerUpdateReachedEventArgs e)
@@ -61,11 +62,13 @@ namespace RecognizerIO.Engines
         public void Begin()
         {
             Engine.RecognizeAsync(RecognizeMode.Multiple);
+            IsRunning = true;
         }
 
         public void Stop()
         {
             Engine.RecognizeAsyncStop();
+            IsRunning = false;
         }
 
     }

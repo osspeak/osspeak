@@ -22,3 +22,6 @@ def shell(text):
 
 def get_active_window_name():
     return api.get_active_window_name()
+
+def external():
+    pass

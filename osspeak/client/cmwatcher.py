@@ -88,7 +88,7 @@ class CommandModuleWatcher:
 
     def load_command_json(self):
         json_module_dicts = {}
-        command_dir = settings.COMMAND_DIRECTORY
+        command_dir = settings.user_settings['command_directory']
         if not os.path.isdir(command_dir):
             os.makedirs(command_dir)
         for root, dirs, filenames in os.walk(command_dir):
@@ -246,7 +246,7 @@ class CommandModuleWatcher:
                 self.load_modules(self.active_modules)
 
     def update_modules(self, modified_modules):
-        command_dir = user.command_directory()
+        command_dir = settings.user_settings['command_directory']
         for path, cmd_module_config in modified_modules.items():
             self.command_module_json[path] = cmd_module_config
             with open(os.path.join(command_dir, path), 'w') as outfile:
