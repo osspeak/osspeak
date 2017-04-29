@@ -3,10 +3,10 @@ import threading
 
 class ProcessManager:
 
-    def __init__(self, path, on_output=lambda x: None):
+    def __init__(self, path, on_message=lambda x: None):
         self.process = subprocess.Popen(path, stdin=subprocess.PIPE,
             stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        self.on_output = on_output
+        self.on_message = on_message
         self.start_stdout_listening()
         
     def send_message(self, msg):
@@ -23,7 +23,7 @@ class ProcessManager:
     def dispatch_process_output(self):
         for line in self.process.stdout:
             line = line.decode('utf8')
-            self.on_output(line)
+            self.on_message(line)
 
     def start_stdout_listening(self):
         t = threading.Thread(target=self.dispatch_process_output, daemon=True)
