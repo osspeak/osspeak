@@ -42,8 +42,7 @@ namespace RecognizerIO
                         EngManager.LoadGrammar(tmpPath, item.Key);
                         System.IO.File.Delete(tmpPath);
                     }
-                    bool init = jsonMsg.Init;
-                    if (init) EngManager.Begin();
+                    if (!EngManager.IsRunning) EngManager.Begin();
                     break;
                 case "load settings":
                     break;
