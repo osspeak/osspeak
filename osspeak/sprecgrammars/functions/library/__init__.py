@@ -34,10 +34,12 @@ builtin_functions = {
     'state.delete': state.delete_state,
     'state.get': state.get_state,
 
+    'text.camelCase': text.camel_case,
     'text.contains': text.contains,
     'text.join': text.join,
     'text.length': text.length,
     'text.lower': text.lower,
+    'text.pascalCase': text.pascal_case,
     'text.replace': text.replace,
     'text.split': text.split,
     'text.upper': text.upper,

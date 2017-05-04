@@ -4,9 +4,9 @@ import threading
 class ProcessManager:
 
     def __init__(self, path, on_message=lambda x: None):
-        self.process = subprocess.Popen(path, stdin=subprocess.PIPE,
-            stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         self.on_message = on_message
+        self.process = subprocess.Popen(path, stdin=subprocess.PIPE,
+            stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
         self.start_stdout_listening()
         
     def send_message(self, msg):
