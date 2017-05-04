@@ -42,7 +42,7 @@ class EngineProcessManager(ProcessManager):
 
     def __init__(self, remote=False):
         super().__init__(ENGINE_PATH, on_output=self.on_engine_message)
-        messages.subscribe(messages.START_ENGINE_LISTENING, self.start_engine_listening)
+        messages.subscribe(messages.LOAD_GRAMMAR, self.load_engine_grammar)
         messages.subscribe(messages.ENGINE_STOP, self.stop)
         messages.subscribe(messages.STOP_MAIN_PROCESS , self.shutdown)
         messages.subscribe(messages.EMULATE_RECOGNITION, self.emulate_recognition)
@@ -52,7 +52,7 @@ class EngineProcessManager(ProcessManager):
             msg = json.dumps(msg)
         super().send_message(msg)
 
-    def start_engine_listening(self, init, grammar_xml, grammar_id):
+    def load_engine_grammar(self, init, grammar_xml, grammar_id):
         msg = {
             'Type': 'load grammars',
             'Grammars': {

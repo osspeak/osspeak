@@ -44,7 +44,7 @@ class CommandModuleWatcher:
         self.load_command_module_information()
         self.fire_activation_events(previous_active_modules)
         self.create_grammar_output()
-        messages.dispatch(messages.START_ENGINE_LISTENING,
+        messages.dispatch(messages.LOAD_GRAMMAR,
                         self.initial,
                         ET.tostring(self.grammar_xml).decode('utf8'),
                         self.grammar_node.id)

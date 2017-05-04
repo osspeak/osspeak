@@ -21,7 +21,7 @@ class RemoteEngineClient:
         messages.subscribe(messages.WEBSOCKET_CONNECTION_ESTABLISHED, lambda: self.send_all_messages())
         messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: None)
         message_subscriptions = (
-            messages.START_ENGINE_LISTENING,
+            messages.LOAD_GRAMMAR,
             messages.ENGINE_STOP,
             messages.STOP_MAIN_PROCESS,
             messages.EMULATE_RECOGNITION,
