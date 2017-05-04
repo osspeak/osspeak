@@ -66,7 +66,7 @@ class RemoteEngineClient:
                 self.ws = await session.ws_connect(address)
                 messages.dispatch(messages.WEBSOCKET_CONNECTION_ESTABLISHED)
                 return
-            except aiohttp.client_exceptions.ClientOSError:
+            except aiohttp.client_exceptions.ClientConnectorError:
                 logger.debug(f'Could not connect to {address}, trying again in 5 seconds')
                 time.sleep(5)
 
