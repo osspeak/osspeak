@@ -41,13 +41,14 @@ class CommandModuleWatcher:
             self.command_module_json = self.load_command_json()
         self.initialize_modules()
         self.flag_active_modules()
-        self.load_command_module_information()
+        grammar_node = self.load_command_module_information()
         self.fire_activation_events(previous_active_modules)
-        self.create_grammar_output()
+        self.send_module_information_to_ui()
+        grammar_xml = self.serialize_scope_xml(grammar_node)
         messages.dispatch(messages.LOAD_GRAMMAR,
                         self.initial,
-                        ET.tostring(self.grammar_xml).decode('utf8'),
-                        self.grammar_node.id)
+                        ET.tostring(grammar_xml).decode('utf8'),
+                        grammar_node.id)
         self.initial = False
         self.current_user_state = sprecgrammars.functions.library.state.USER_DEFINED_STATE.copy()
 
@@ -67,10 +68,6 @@ class CommandModuleWatcher:
             if 'activate' in cmd_module.events:
                 cmd_module.events['activate'].perform(variables=[])
 
-    def create_grammar_output(self):
-        self.send_module_information_to_ui()
-        self.serialize_scope_xml()
-
     def init_fields(self):
         self.conditions = {
             'titles': collections.defaultdict(set),
@@ -80,8 +77,6 @@ class CommandModuleWatcher:
         self.scope_groupings = {'': scopes.Scope()}
         self.cmd_modules = {}
         self.active_modules = {}
-        self.grammar_node = astree.GrammarNode()
-        self.grammar_xml = None
         self.previous_command_map = self.command_map
         # key is string id, val is Action instance
         self.command_map = {}
@@ -150,10 +145,12 @@ class CommandModuleWatcher:
         return True
 
     def load_command_module_information(self):
+        grammar_node = astree.GrammarNode()
         self.load_functions()
-        self.load_rules()
-        self.load_commands()
+        self.load_rules(grammar_node)
+        self.load_commands(grammar_node)
         self.load_events()
+        return grammar_node
 
     def load_functions(self):
         self.load_builtin_functions()
@@ -162,22 +159,22 @@ class CommandModuleWatcher:
         for path, cmd_module in self.cmd_modules.items():
             cmd_module.set_function_actions()
 
-    def load_rules(self):
+    def load_rules(self, grammar_node):
         for path, cmd_module in self.cmd_modules.items():
             cmd_module.initialize_rules()
         for path, cmd_module in self.cmd_modules.items():
             cmd_module.load_rules()
             for rule in cmd_module.rules:
                 if path in self.active_modules:
-                    self.grammar_node.rules.append(rule)
+                    grammar_node.rules.append(rule)
 
-    def load_commands(self):
+    def load_commands(self, grammar_node):
         for path, cmd_module in self.cmd_modules.items():
             cmd_module.load_commands()
             for cmd in cmd_module.commands:
                 self.command_map[cmd.id] = cmd
                 if path in self.active_modules:
-                    self.grammar_node.rules.append(cmd.rule)
+                    grammar_node.rules.append(cmd.rule)
     
     def load_builtin_functions(self):
         from sprecgrammars.api import rule
@@ -188,9 +185,9 @@ class CommandModuleWatcher:
         for path, cmd_module in self.cmd_modules.items():
             cmd_module.load_events()
 
-    def serialize_scope_xml(self):
+    def serialize_scope_xml(self, grammar_node):
         converter = SrgsXmlConverter()
-        self.grammar_xml = converter.convert_grammar(self.grammar_node)
+        return converter.convert_grammar(grammar_node)
 
     def load_conditions(self, path, cmd_module):
         conditions_config = cmd_module.conditions
