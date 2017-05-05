@@ -205,8 +205,7 @@ class CommandModuleWatcher:
 
     def start_watch_active_window(self):
         self.load_initial_user_state()
-        t = threading.Thread(target=self.watch_active_window, daemon=True)
-        t.start()
+        threading.Thread(target=self.watch_active_window, daemon=True).start()
 
     def watch_active_window(self):
         while not self.shutdown.isSet():
