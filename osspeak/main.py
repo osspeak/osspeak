@@ -3,7 +3,7 @@ import asyncio
 
 import log
 import clargs
-from client import dispatcher
+from client import dispatcher, userstate
 from communication import server, client, messages
 from interfaces.cli import menu
 from user import settings
@@ -22,7 +22,7 @@ def main():
     try:
         cmw = cmwatcher.CommandModuleWatcher()
         cmw.initialize_modules()
-        cmw.start_watch_active_window()
+        userstate.start_watching_user_state(cmw)
         ui_manager.main_loop()
     finally:
         messages.dispatch_sync(messages.STOP_MAIN_PROCESS)

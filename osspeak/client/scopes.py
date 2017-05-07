@@ -13,13 +13,12 @@ class Scope:
             self.rules = ScopeFieldMap(global_scope.rules.global_dict, {})
             self.functions = ScopeFieldMap(global_scope.functions.global_dict, {})
 
-class CurrentCondition:
-
-    def __init__(self):
-        self.window_title = ''
-        self.variables = {}
-
 class ScopeFieldMap:
+
+    '''
+    Proxy around two dictionaries. Get/set from local_dict first,
+    global_dict as fallback.
+    '''
 
     def __init__(self, global_dict, local_dict=None):
         self.global_dict = global_dict

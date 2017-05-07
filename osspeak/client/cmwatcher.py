@@ -8,7 +8,7 @@ from sprecgrammars.actions.parser import ActionParser
 import sprecgrammars.functions.library.state
 from user import settings
 from interfaces.gui import serializer
-from client import commands, scopes, action
+from client import commands, scopes, action, userstate
 from sprecgrammars.rules import astree
 from sprecgrammars.rules.parser import RuleParser
 from sprecgrammars.rules.converter import SrgsXmlConverter
@@ -20,27 +20,23 @@ import time
 class CommandModuleWatcher:
 
     def __init__(self):
-        self.current_condition = scopes.CurrentCondition()
         self.initial = True
         self.command_map = {}
         self.modules_to_save = {}
         self.command_module_json = self.load_command_json()
         self.shutdown = threading.Event()
-        self.current_user_state = sprecgrammars.functions.library.state.USER_DEFINED_STATE.copy()
         self.loading_lock = threading.Lock()
-        messages.subscribe(messages.STOP_MAIN_PROCESS , lambda: self.shutdown.set())
+        messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: self.shutdown.set())
         messages.subscribe(messages.PERFORM_COMMANDS, self.perform_commands)
         messages.subscribe(messages.SET_SAVED_MODULES, self.update_modules)
-        messages.subscribe(messages.RELOAD_COMMAND_MODULE_FILES,
-            lambda: self.maybe_load_modules(force_load=True))
 
-    def load_modules(self, previous_active_modules=None, reload_files=False):
+    def load_modules(self, current_window, current_state, reload_files=False):
+        previous_active_modules = self.active_modules
         if reload_files:
             self.load_initial_user_state()
-            self.current_condition = scopes.CurrentCondition()
             self.command_module_json = self.load_command_json()
         self.initialize_modules()
-        self.flag_active_modules()
+        self.flag_active_modules(current_window, current_state)
         grammar_node = self.load_command_module_information()
         self.fire_activation_events(previous_active_modules)
         self.send_module_information_to_ui()
@@ -50,7 +46,6 @@ class CommandModuleWatcher:
                         ET.tostring(grammar_xml).decode('utf8'),
                         grammar_node.id)
         self.initial = False
-        self.current_user_state = sprecgrammars.functions.library.state.USER_DEFINED_STATE.copy()
 
     def initialize_modules(self):
         self.init_fields()
@@ -69,10 +64,7 @@ class CommandModuleWatcher:
                 cmd_module.events['activate'].perform(variables=[])
 
     def init_fields(self):
-        self.conditions = {
-            'titles': collections.defaultdict(set),
-            'state': None,
-        }
+        self.grouped_titles = collections.defaultdict(set)
         # start with global scope
         self.scope_groupings = {'': scopes.Scope()}
         self.cmd_modules = {}
@@ -122,24 +114,24 @@ class CommandModuleWatcher:
         for path, cmd_module in self.cmd_modules.items():
             initial_state = {k: eval(v) for k, v in cmd_module.initial_state.items()}
             sprecgrammars.functions.library.state.USER_DEFINED_STATE.update(initial_state)
-
-    def flag_active_modules(self):
-        for path, cmd_module in self.get_active_modules():
+ 
+    def flag_active_modules(self, current_window, current_state):
+        for path, cmd_module in self.get_active_modules(current_window, current_state):
             self.active_modules[path] = cmd_module
 
-    def get_active_modules(self):
+    def get_active_modules(self, current_window, current_state):
         for path, cmd_module in self.cmd_modules.items():
-            is_active = self.is_command_module_active(cmd_module)
+            is_active = self.is_command_module_active(cmd_module, current_window, current_state)
             if is_active:
                 yield path, cmd_module
 
-    def is_command_module_active(self, cmd_module):
-        return self.current_window_matches(cmd_module) and cmd_module.state
+    def is_command_module_active(self, cmd_module, current_window, current_state):
+        return self.current_window_matches(cmd_module, current_window) and cmd_module.state
 
-    def current_window_matches(self, cmd_module):
-        for title_filter, filtered_paths in self.conditions['titles'].items():
+    def current_window_matches(self, cmd_module, current_window):
+        for title_filter, filtered_paths in self.grouped_titles.items():
             if cmd_module.path in filtered_paths:
-                if title_filter in self.current_condition.window_title:
+                if title_filter in current_window:
                     return True
                 return False
         return True
@@ -193,7 +185,7 @@ class CommandModuleWatcher:
         conditions_config = cmd_module.conditions
         title = conditions_config.get('title', '').lower()
         if title:
-            self.conditions['titles'][title].add(path)
+            self.grouped_titles[title].add(path)
 
     def load_scope(self, path, cmd_module):
         scope_name = cmd_module.config.get('scope', '')
@@ -202,30 +194,6 @@ class CommandModuleWatcher:
             self.scope_groupings[scope_name] = scopes.Scope(global_scope, name=scope_name)
         self.scope_groupings[scope_name].cmd_modules[path] = cmd_module
         cmd_module.scope = self.scope_groupings[scope_name]
-
-    def start_watch_active_window(self):
-        self.load_initial_user_state()
-        threading.Thread(target=self.watch_active_window, daemon=True).start()
-
-    def watch_active_window(self):
-        while not self.shutdown.isSet():
-            self.maybe_load_modules()
-            self.shutdown.wait(timeout=1)
-
-    def maybe_load_modules(self, force_load=False):
-        with self.loading_lock:
-            if force_load:
-                self.load_modules(self.active_modules, reload_files=True)
-                return
-            active_window = api.get_active_window_name().lower()
-            same_window = active_window == self.current_condition.window_title
-            same_user_state = self.current_user_state == sprecgrammars.functions.library.state.USER_DEFINED_STATE
-            if same_window and same_user_state:
-                return self.current_user_state
-            self.current_condition.window_title = active_window
-            new_active_modules = dict(self.get_active_modules())
-            if new_active_modules != self.active_modules:
-                self.load_modules(self.active_modules)
 
     def update_modules(self, modified_modules):
         raise NotImplementedError
