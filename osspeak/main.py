@@ -3,7 +3,7 @@ import asyncio
 
 import log
 import clargs
-from client import dispatcher, userstate
+from client import userstate
 from communication import server, client, messages
 from interfaces.cli import menu
 from user import settings

@@ -72,7 +72,7 @@ class CommandModule:
         return self.config.get('initialState', {})
 
     @property
-    def state(self):
+    def state_active(self):
         return 'state' not in self.conditions or eval(self.conditions['state'], {}, state.USER_DEFINED_STATE)
 
 class Command:
