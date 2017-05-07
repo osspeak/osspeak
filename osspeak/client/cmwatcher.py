@@ -30,7 +30,7 @@ class CommandModuleWatcher:
         self.loading_lock = threading.Lock()
         messages.subscribe(messages.STOP_MAIN_PROCESS , lambda: self.shutdown.set())
         messages.subscribe(messages.PERFORM_COMMANDS, self.perform_commands)
-        messages.subscribe(messages.SET_SAVED_MODULES, self.set_saved_modules)
+        messages.subscribe(messages.SET_SAVED_MODULES, self.update_modules)
         messages.subscribe(messages.RELOAD_COMMAND_MODULE_FILES,
             lambda: self.maybe_load_modules(force_load=True))
 
@@ -209,29 +209,15 @@ class CommandModuleWatcher:
 
     def watch_active_window(self):
         while not self.shutdown.isSet():
-            changed_modules = self.save_updated_modules()
-            if changed_modules:
-                self.update_modules(changed_modules)
-                continue
             self.maybe_load_modules()
             self.shutdown.wait(timeout=1)
 
-    def save_updated_modules(self):
-        # should use a lock here
-        modules_to_save = self.modules_to_save
-        self.modules_to_save = {}
-        changed_modules = {}
-        for path, cmd_module_config in modules_to_save.items():
-            if cmd_module_config != self.cmd_modules[path].config:
-                changed_modules[path] = cmd_module_config
-        return changed_modules
-
     def maybe_load_modules(self, force_load=False):
         with self.loading_lock:
-            active_window = api.get_active_window_name().lower()
             if force_load:
                 self.load_modules(self.active_modules, reload_files=True)
                 return
+            active_window = api.get_active_window_name().lower()
             same_window = active_window == self.current_condition.window_title
             same_user_state = self.current_user_state == sprecgrammars.functions.library.state.USER_DEFINED_STATE
             if same_window and same_user_state:
@@ -242,6 +228,7 @@ class CommandModuleWatcher:
                 self.load_modules(self.active_modules)
 
     def update_modules(self, modified_modules):
+        raise NotImplementedError
         command_dir = settings.user_settings['command_directory']
         for path, cmd_module_config in modified_modules.items():
             self.command_module_json[path] = cmd_module_config
@@ -249,25 +236,9 @@ class CommandModuleWatcher:
                 json.dump(cmd_module_config, outfile, indent=4)
         self.load_modules()
 
-    def save_updated_modules(self):
-        # should use a lock here
-        modules_to_save = self.modules_to_save
-        self.modules_to_save = {}
-        changed_modules = {}
-        for path, cmd_module_config in modules_to_save.items():
-            if cmd_module_config != self.cmd_modules[path].config:
-                changed_modules[path] = cmd_module_config
-        return changed_modules
-
-    def save_changed_modules(self):
-        self.changed_modules = {'created': {}, 'edited': {}, 'deleted': {}, 'all': self.cmd_modules}
-
     def send_module_information_to_ui(self):
         payload = {'modules': self.cmd_modules}
         messages.dispatch(messages.LOAD_MODULE_MAP, payload)
 
-    def set_saved_modules(self, modules_to_save):
-        self.modules_to_save = modules_to_save
-
     def perform_commands(self, grammar_id, command_results):
-        action.perform_commands(command_results, self.command_map, self.previous_command_map)        
+        action.perform_commands(command_results, self.command_map, self.previous_command_map)
