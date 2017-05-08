@@ -1,3 +1,4 @@
+import time
 import subprocess
 import threading
 import json
@@ -95,4 +96,5 @@ class EngineProcessManager(ProcessManager):
             'Delay': delay,
             'Text': text
         }
+        time.sleep(delay)
         self.send_message(msg)
