@@ -2,6 +2,7 @@ import subprocess
 import threading
 import json
 import sys
+from user.settings import user_settings
 import xml.etree.ElementTree as ET
 from communication import messages
 
@@ -68,7 +69,7 @@ class EngineProcessManager(ProcessManager):
     def on_engine_message(self, msg_string):
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition':
-            if msg['Confidence'] > .9:
+            if msg['Confidence'] > user_settings['engine']['recognitionConfidence']:
                 messages.dispatch(messages.PERFORM_COMMANDS, msg['GrammarId'], msg['Commands'])
         elif msg['Type'] == 'error':
             print('error!')

@@ -9,6 +9,9 @@ DEFAULT_CONFIG = {
     "type_delay": .05,
     'command_directory': os.path.join(OSSPEAK_DIRECTORY, 'commands'),
     'external_directory': os.path.join(OSSPEAK_DIRECTORY, 'external'),
+    'engine': {
+        'recognitionConfidence': .9
+    }
 }
 
 def save_settings(settings):
