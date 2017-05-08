@@ -86,7 +86,7 @@ class EngineProcessManager(ProcessManager):
         self.send_simple_message('stop')
 
     def start(self):
-        self.engine_runqning = True
+        self.engine_running = True
         self.send_simple_message('start')
 
     def emulate_recognition(self, text, delay=5):
