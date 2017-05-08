@@ -4,6 +4,7 @@ import threading
 import collections
 
 EMULATE_RECOGNITION = 'emulate recognition'
+ENGINE_START = 'engine start'
 ENGINE_STOP = 'engine stop'
 HEARTBEAT = 'heartbeat'
 LOAD_MODULE_MAP = 'load module map'

@@ -34,6 +34,7 @@ namespace RecognizerIO
             {
                 case "load grammars":
                     var grammars = jsonMsg.Grammars.ToObject<Dictionary<string, string>>();
+                    bool startEngine = jsonMsg.StartEngine;
                     foreach(var item in grammars)
                     {
                         string xml = item.Value;
@@ -42,7 +43,7 @@ namespace RecognizerIO
                         EngManager.LoadGrammar(tmpPath, item.Key);
                         System.IO.File.Delete(tmpPath);
                     }
-                    if (!EngManager.IsRunning) EngManager.Begin();
+                    if (!EngManager.IsRunning && startEngine) EngManager.Begin();
                     break;
                 case "load settings":
                     break;
@@ -52,6 +53,9 @@ namespace RecognizerIO
                     break;
                 case "shutdown":
                     shutdown = true;
+                    break;
+                case "start":
+                    if (!EngManager.IsRunning) EngManager.Begin();
                     break;
                 case "stop":
                     EngManager.Stop();

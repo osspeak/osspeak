@@ -42,7 +42,9 @@ class EngineProcessManager(ProcessManager):
 
     def __init__(self, remote=False):
         super().__init__(ENGINE_PATH, on_output=self.on_engine_message)
+        self.engine_running = True
         messages.subscribe(messages.LOAD_GRAMMAR, self.load_engine_grammar)
+        messages.subscribe(messages.ENGINE_START, self.start)
         messages.subscribe(messages.ENGINE_STOP, self.stop)
         messages.subscribe(messages.STOP_MAIN_PROCESS , self.shutdown)
         messages.subscribe(messages.EMULATE_RECOGNITION, self.emulate_recognition)
@@ -59,6 +61,7 @@ class EngineProcessManager(ProcessManager):
                 grammar_id: grammar_xml,
             },
             'Init': init,
+            'StartEngine': self.engine_running
         }
         self.send_message(msg)
 
@@ -77,9 +80,11 @@ class EngineProcessManager(ProcessManager):
         self.send_simple_message('shutdown')
 
     def stop(self):
+        self.engine_running = False
         self.send_simple_message('stop')
 
     def start(self):
+        self.engine_running = True
         self.send_simple_message('start')
 
     def emulate_recognition(self, text, delay=5):
