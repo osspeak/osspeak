@@ -68,7 +68,8 @@ class EngineProcessManager(ProcessManager):
     def on_engine_message(self, msg_string):
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition':
-            messages.dispatch(messages.PERFORM_COMMANDS, msg['GrammarId'], msg['Commands'])
+            if msg['Confidence'] > .9:
+                messages.dispatch(messages.PERFORM_COMMANDS, msg['GrammarId'], msg['Commands'])
         elif msg['Type'] == 'error':
             print('error!')
             print(msg['Message'])
@@ -84,7 +85,7 @@ class EngineProcessManager(ProcessManager):
         self.send_simple_message('stop')
 
     def start(self):
-        self.engine_running = True
+        self.engine_runqning = True
         self.send_simple_message('start')
 
     def emulate_recognition(self, text, delay=5):

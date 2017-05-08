@@ -126,14 +126,12 @@ class CommandModuleWatcher:
                 yield path, cmd_module
 
     def is_command_module_active(self, cmd_module, current_window, current_state):
-        return self.current_window_matches(cmd_module, current_window) and cmd_module.state_active
+        return self.current_window_matches(cmd_module, current_window) and cmd_module.state_active(current_state)
 
     def current_window_matches(self, cmd_module, current_window):
         for title_filter, filtered_paths in self.grouped_titles.items():
             if cmd_module.path in filtered_paths:
-                if title_filter in current_window:
-                    return True
-                return False
+                return title_filter in current_window
         return True
 
     def load_command_module_information(self):

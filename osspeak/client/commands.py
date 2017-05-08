@@ -71,9 +71,8 @@ class CommandModule:
     def initial_state(self):
         return self.config.get('initialState', {})
 
-    @property
-    def state_active(self):
-        return 'state' not in self.conditions or eval(self.conditions['state'], {}, state.USER_DEFINED_STATE)
+    def state_active(self, user_state):
+        return 'state' not in self.conditions or eval(self.conditions['state'], {}, user_state)
 
 class Command:
     

@@ -54,7 +54,7 @@ namespace RecognizerIO.Engines
         {
             if (srResult == null || srResult.Confidence <= .5) return;
             var resultText = srResult.Semantics.Value.ToString().Replace("[object Object]", "");
-            var result = new ProcessedRecognitionResult(resultText, grammarId);
+            var result = new ProcessedRecognitionResult(resultText, grammarId, srResult.Confidence);
             string serializedResult = JsonConvert.SerializeObject(result);
             Console.WriteLine(serializedResult);
         }
