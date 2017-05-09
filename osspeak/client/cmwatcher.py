@@ -43,8 +43,7 @@ class CommandModuleWatcher:
         grammar_xml = self.serialize_scope_xml(grammar_node)
         messages.dispatch(messages.LOAD_GRAMMAR,
                         self.initial,
-                        ET.tostring(grammar_xml).decode('utf8'),
-                        grammar_node.id)
+                        ET.tostring(grammar_xml).decode('utf8'))
         self.initial = False
 
     def initialize_modules(self):
@@ -206,5 +205,5 @@ class CommandModuleWatcher:
         payload = {'modules': self.cmd_modules}
         messages.dispatch(messages.LOAD_MODULE_MAP, payload)
 
-    def perform_commands(self, grammar_id, command_results):
+    def perform_commands(self, command_results):
         action.perform_commands(command_results, self.command_map, self.previous_command_map)

@@ -33,16 +33,12 @@ namespace RecognizerIO
             switch (msgType)
             {
                 case "load grammars":
-                    var grammars = jsonMsg.Grammars.ToObject<Dictionary<string, string>>();
+                    string grammarXml = jsonMsg.Grammar;
                     bool startEngine = jsonMsg.StartEngine;
-                    foreach(var item in grammars)
-                    {
-                        string xml = item.Value;
-                        string tmpPath = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".xml";
-                        System.IO.File.WriteAllText(tmpPath, xml);
-                        EngManager.LoadGrammar(tmpPath, item.Key);
-                        System.IO.File.Delete(tmpPath);
-                    }
+                    string tmpPath = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".xml";
+                    System.IO.File.WriteAllText(tmpPath, grammarXml);
+                    EngManager.LoadGrammar(tmpPath);
+                    System.IO.File.Delete(tmpPath);
                     if (!EngManager.IsRunning && startEngine) EngManager.Begin();
                     break;
                 case "load settings":

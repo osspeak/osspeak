@@ -12,7 +12,6 @@ namespace RecognizerIO.Engines
     {
         public SpeechRecognitionEngine Engine;
         public Grammar ActiveGrammar;
-        public string ActiveGrammarId;
         public Boolean IsRunning = false;
 
         public EngineManager()
@@ -23,7 +22,7 @@ namespace RecognizerIO.Engines
             Engine.SetInputToDefaultAudioDevice();
         }
 
-        public void LoadGrammar(string path, string gramId)
+        public void LoadGrammar(string path)
         {
             var gram = new Grammar(path);
             if (ActiveGrammar != null)
@@ -36,12 +35,11 @@ namespace RecognizerIO.Engines
                 Engine.LoadGrammar(gram);
                 ActiveGrammar = gram;
             }
-            ActiveGrammarId = gramId;
         }
 
         void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            HandleRecognition(e.Result, ActiveGrammarId);
+            HandleRecognition(e.Result);
         }
 
         void recognizer_RecognizerUpdateReached(object sender, RecognizerUpdateReachedEventArgs e)
@@ -50,11 +48,11 @@ namespace RecognizerIO.Engines
             Engine.LoadGrammar(ActiveGrammar);
         }
 
-        public void HandleRecognition(RecognitionResult srResult, string grammarId)
+        public void HandleRecognition(RecognitionResult srResult)
         {
-            if (srResult == null || srResult.Confidence <= .5) return;
+            if (srResult == null) return;
             var resultText = srResult.Semantics.Value.ToString().Replace("[object Object]", "");
-            var result = new ProcessedRecognitionResult(resultText, grammarId, srResult.Confidence);
+            var result = new ProcessedRecognitionResult(resultText, srResult.Confidence);
             string serializedResult = JsonConvert.SerializeObject(result);
             Console.WriteLine(serializedResult);
         }

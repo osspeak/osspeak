@@ -59,12 +59,10 @@ class EngineProcessManager(ProcessManager):
             msg = json.dumps(msg)
         super().send_message(msg)
 
-    def load_engine_grammar(self, init, grammar_xml, grammar_id):
+    def load_engine_grammar(self, init, grammar_xml):
         msg = {
             'Type': 'load grammars',
-            'Grammars': {
-                grammar_id: grammar_xml,
-            },
+            'Grammar': grammar_xml,
             'Init': init,
             'StartEngine': self.engine_running
         }
@@ -74,7 +72,7 @@ class EngineProcessManager(ProcessManager):
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition':
             if msg['Confidence'] > user_settings['engine']['recognitionConfidence']:
-                messages.dispatch(messages.PERFORM_COMMANDS, msg['GrammarId'], msg['Commands'])
+                messages.dispatch(messages.PERFORM_COMMANDS, msg['Commands'])
         elif msg['Type'] == 'error':
             print('error!')
             print(msg['Message'])
