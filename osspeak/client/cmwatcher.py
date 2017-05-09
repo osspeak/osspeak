@@ -134,7 +134,7 @@ class CommandModuleWatcher:
             cmd_module.load_rules()
 
     def load_commands(self):
-        for path, cmd_module in self.cmd_modules.items():
+        for cmd_module in self.cmd_modules.values():
             cmd_module.load_commands()
             self.command_map.update({cmd.id: cmd for cmd in cmd_module.commands})
     
