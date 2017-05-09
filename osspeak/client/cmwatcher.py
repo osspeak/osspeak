@@ -20,7 +20,6 @@ import time
 class CommandModuleWatcher:
 
     def __init__(self):
-        self.initial = True
         self.command_map = {}
         self.modules_to_save = {}
         self.command_module_json = self.load_command_json()
@@ -41,10 +40,7 @@ class CommandModuleWatcher:
         self.fire_activation_events(previous_active_modules)
         self.send_module_information_to_ui()
         grammar_xml = self.serialize_scope_xml(grammar_node)
-        messages.dispatch(messages.LOAD_GRAMMAR,
-                        self.initial,
-                        ET.tostring(grammar_xml).decode('utf8'))
-        self.initial = False
+        messages.dispatch(messages.LOAD_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'))
 
     def initialize_modules(self):
         self.init_fields()
@@ -63,7 +59,6 @@ class CommandModuleWatcher:
                 cmd_module.events['activate'].perform(variables=[])
 
     def init_fields(self):
-        self.grouped_titles = collections.defaultdict(set)
         # start with global scope
         self.scope_groupings = {'': scopes.Scope()}
         self.cmd_modules = {}
