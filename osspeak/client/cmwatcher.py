@@ -1,20 +1,14 @@
 import os
 import json
-import threading
-import collections
-import tempfile
 import log
-from sprecgrammars.actions.parser import ActionParser
 import sprecgrammars.functions.library.state
 from user import settings
 from interfaces.gui import serializer
 from client import commands, scopes, action, userstate
-from sprecgrammars.rules.parser import RuleParser
 from sprecgrammars.rules.converter import SrgsXmlConverter
 from platforms import api
 import xml.etree.ElementTree as ET
 from communication import messages
-import time
 
 class CommandModuleWatcher:
 
@@ -22,9 +16,6 @@ class CommandModuleWatcher:
         self.command_map = {}
         self.modules_to_save = {}
         self.command_module_json = self.load_command_json()
-        self.shutdown = threading.Event()
-        self.loading_lock = threading.Lock()
-        messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: self.shutdown.set())
         messages.subscribe(messages.PERFORM_COMMANDS, self.perform_commands)
         messages.subscribe(messages.SET_SAVED_MODULES, self.update_modules)
 
