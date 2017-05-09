@@ -170,10 +170,6 @@ class CommandModuleWatcher:
         rules.extend(command_rules)
         return SrgsXmlConverter().build_grammar(rules)
 
-    def serialize_scope_xml(self, grammar_node):
-        converter = SrgsXmlConverter()
-        return converter.convert_grammar(grammar_node)
-
     def update_modules(self, modified_modules):
         raise NotImplementedError
         command_dir = settings.user_settings['command_directory']
