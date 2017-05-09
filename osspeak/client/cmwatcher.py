@@ -144,7 +144,7 @@ class CommandModuleWatcher:
         global_scope.rules['_dictate'] = rule('', '_dictate')
 
     def load_events(self):
-        for path, cmd_module in self.cmd_modules.items():
+        for cmd_module in self.cmd_modules.values():
             cmd_module.load_events()
 
     def build_grammar_xml(self):
