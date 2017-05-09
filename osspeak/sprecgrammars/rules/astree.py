@@ -11,13 +11,6 @@ class ASTNode:
     def id(self):
         return f'r{self._id}'
 
-class GrammarNode(ASTNode):
-     
-     def __init__(self):
-         super().__init__()
-         self.rules = []
-         self.variables = []
-
 class Rule(ASTNode):
 
     def __init__(self, name=None):

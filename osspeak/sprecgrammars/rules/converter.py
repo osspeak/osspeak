@@ -6,10 +6,6 @@ from pprint import pprint
 class SrgsXmlConverter:
 
     def __init__(self):
-        self.convert_map = {
-            astree.Rule: self.convert_rule,
-            astree.GrammarNode: self.convert_grammar,
-        }
         self.grammar_attrib = {
             'version': '1.0',
             'mode': 'voice',
@@ -21,14 +17,11 @@ class SrgsXmlConverter:
         self.root = ET.Element('grammar', attrib=self.grammar_attrib)
         self.ruleref_container_id = 'r' + str(uuid.uuid4()).replace('-', '')
 
-    def convert(self, node):
-        return self.convert_map[type(node)](node)
-
-    def convert_grammar(self, grammar_node):
+    def build_grammar(self, rules):
         self.root = ET.Element('grammar', attrib=self.grammar_attrib)
         self.build_root_rule()
         top_level_choices = self.build_top_level_choices()
-        for rule_node in grammar_node.rules:
+        for rule_node in rules:
             self.append_rule_node(rule_node, top_level_choices)
         return self.root
 
