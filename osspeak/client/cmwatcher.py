@@ -34,7 +34,7 @@ class CommandModuleWatcher:
             self.load_initial_user_state()
             self.command_module_json = self.load_command_json()
         self.initialize_modules()
-        self.flag_active_modules(current_window, current_state)
+        self.active_modules = self.get_active_modules(current_window, current_state)
         self.load_command_module_information()
         self.fire_activation_events(previous_active_modules)
         self.send_module_information_to_ui()
@@ -111,16 +111,13 @@ class CommandModuleWatcher:
         for path, cmd_module in self.cmd_modules.items():
             initial_state = {k: eval(v) for k, v in cmd_module.initial_state.items()}
             sprecgrammars.functions.library.state.USER_DEFINED_STATE.update(initial_state)
- 
-    def flag_active_modules(self, current_window, current_state):
-        for path, cmd_module in self.get_active_modules(current_window, current_state):
-            self.active_modules[path] = cmd_module
 
     def get_active_modules(self, current_window, current_state):
+        active_modules = {}
         for path, cmd_module in self.cmd_modules.items():
-            is_active = self.is_command_module_active(cmd_module, current_window, current_state)
-            if is_active:
-                yield path, cmd_module
+            if self.is_command_module_active(cmd_module, current_window, current_state):
+                active_modules[path] = cmd_module
+        return active_modules
 
     def is_command_module_active(self, cmd_module, current_window, current_state):
         title_filter = cmd_module.conditions.get('title')
@@ -149,8 +146,7 @@ class CommandModuleWatcher:
     def load_commands(self):
         for path, cmd_module in self.cmd_modules.items():
             cmd_module.load_commands()
-            for cmd in cmd_module.commands:
-                self.command_map[cmd.id] = cmd
+            self.command_map.update({cmd.id: cmd for cmd in cmd_module.commands})
     
     def load_builtin_functions(self):
         from sprecgrammars.api import rule

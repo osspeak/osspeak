@@ -1,7 +1,6 @@
 import threading
 import log
 from sprecgrammars.functions.library.state import state_copy
-from sprecgrammars.rules.converter import SrgsXmlConverter
 from platforms import api
 from communication import messages
 import time
@@ -29,7 +28,7 @@ def watch_user_system_state(command_module_watcher, shutdown_event):
         current_state = state_copy()
         different_user_state = previous_state != current_state
         if different_window or different_user_state or reload_files:
-            new_active_modules = dict(command_module_watcher.get_active_modules(current_window, current_state))
+            new_active_modules = command_module_watcher.get_active_modules(current_window, current_state)
             if new_active_modules != command_module_watcher.active_modules:
                 command_module_watcher.load_modules(current_window, current_state, reload_files=reload_files)
             previous_window = current_window
