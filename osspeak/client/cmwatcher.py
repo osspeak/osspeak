@@ -49,7 +49,7 @@ class CommandModuleWatcher:
     def initialize_modules(self):
         self.init_fields()
         self.load_command_modules()
-        self.load_scope_and_conditions()
+        self.load_scopes()
 
     def fire_activation_events(self, previous_active_modules):
         previous_names, current_names = set(previous_active_modules), set(self.active_modules)
@@ -103,10 +103,14 @@ class CommandModuleWatcher:
             cmd_module = commands.CommandModule(config, path)
             self.cmd_modules[path] = cmd_module
 
-    def load_scope_and_conditions(self):
+    def load_scopes(self):
         for path, cmd_module in self.cmd_modules.items():
-            self.load_conditions(path, cmd_module)
-            self.load_scope(path, cmd_module)
+            scope_name = cmd_module.config.get('scope', '')
+            if scope_name not in self.scope_groupings:
+                global_scope = self.scope_groupings['']
+                self.scope_groupings[scope_name] = scopes.Scope(global_scope, name=scope_name)
+            self.scope_groupings[scope_name].cmd_modules[path] = cmd_module
+            cmd_module.scope = self.scope_groupings[scope_name]
 
     def load_initial_user_state(self):
         sprecgrammars.functions.library.state.USER_DEFINED_STATE = {}
@@ -125,13 +129,9 @@ class CommandModuleWatcher:
                 yield path, cmd_module
 
     def is_command_module_active(self, cmd_module, current_window, current_state):
-        return self.current_window_matches(cmd_module, current_window) and cmd_module.state_active(current_state)
-
-    def current_window_matches(self, cmd_module, current_window):
-        for title_filter, filtered_paths in self.grouped_titles.items():
-            if cmd_module.path in filtered_paths:
-                return title_filter in current_window
-        return True
+        title_filter = cmd_module.conditions.get('title')
+        current_window_matches = title_filter is None or title_filter.lower() in current_window.lower() 
+        return current_window_matches and cmd_module.state_active(current_state)
 
     def load_command_module_information(self):
         grammar_node = astree.GrammarNode()
@@ -177,20 +177,6 @@ class CommandModuleWatcher:
     def serialize_scope_xml(self, grammar_node):
         converter = SrgsXmlConverter()
         return converter.convert_grammar(grammar_node)
-
-    def load_conditions(self, path, cmd_module):
-        conditions_config = cmd_module.conditions
-        title = conditions_config.get('title', '').lower()
-        if title:
-            self.grouped_titles[title].add(path)
-
-    def load_scope(self, path, cmd_module):
-        scope_name = cmd_module.config.get('scope', '')
-        if scope_name not in self.scope_groupings:
-            global_scope = self.scope_groupings['']
-            self.scope_groupings[scope_name] = scopes.Scope(global_scope, name=scope_name)
-        self.scope_groupings[scope_name].cmd_modules[path] = cmd_module
-        cmd_module.scope = self.scope_groupings[scope_name]
 
     def update_modules(self, modified_modules):
         raise NotImplementedError
