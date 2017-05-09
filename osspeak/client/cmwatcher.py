@@ -85,8 +85,7 @@ class CommandModuleWatcher:
 
     def load_command_modules(self):
         for path, config in self.command_module_json.items():
-            cmd_module = commands.CommandModule(config, path)
-            self.cmd_modules[path] = cmd_module
+            self.cmd_modules[path] = commands.CommandModule(config, path)
 
     def load_scopes(self):
         for path, cmd_module in self.cmd_modules.items():
