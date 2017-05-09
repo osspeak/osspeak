@@ -122,15 +122,15 @@ class CommandModuleWatcher:
 
     def load_functions(self):
         self.load_builtin_functions()
-        for path, cmd_module in self.cmd_modules.items():
+        for cmd_module in self.cmd_modules.values():
             cmd_module.define_functions()
-        for path, cmd_module in self.cmd_modules.items():
+        for cmd_module in self.cmd_modules.values():
             cmd_module.set_function_actions()
 
     def load_rules(self):
-        for path, cmd_module in self.cmd_modules.items():
+        for cmd_module in self.cmd_modules.values():
             cmd_module.initialize_rules()
-        for path, cmd_module in self.cmd_modules.items():
+        for cmd_module in self.cmd_modules.values():
             cmd_module.load_rules()
 
     def load_commands(self):
