@@ -44,7 +44,10 @@ class EngineProcessManager(ProcessManager):
 
     def __init__(self, remote=False):
         super().__init__(ENGINE_PATH, on_output=self.on_engine_message)
+        self.create_subscriptions()
         self.engine_running = True
+
+    def create_subscriptions(self):
         messages.subscribe(messages.LOAD_GRAMMAR, self.load_engine_grammar)
         messages.subscribe(messages.ENGINE_START, self.start)
         messages.subscribe(messages.ENGINE_STOP, self.stop)

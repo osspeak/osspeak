@@ -4,8 +4,9 @@ from user import settings
 class Menu:
 
     def main_loop(self, display_options=True):
-        self.print_title()
-        self.print_options()
+        if display_options:
+            self.print_title()
+            self.print_options()
         user_input = input("\nEnter an option or 'q' to quit: ").strip().lower()
         if user_input == 'q':
             return
@@ -55,8 +56,7 @@ class MainMenu(Menu):
 
     def reload_command_modules(self):
         print('Reloading command modules...')
-        messages.dispatch_sync(messages.RELOAD_COMMAND_MODULE_FILES)
-        print('Done!')
+        messages.dispatch(messages.RELOAD_COMMAND_MODULE_FILES)
         return True
 
 class SettingsMenu(Menu):
