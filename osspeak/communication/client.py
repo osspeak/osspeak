@@ -58,6 +58,7 @@ class RemoteEngineClient:
             await self.establish_websocket_connection(session)
             await self.receive_websocket_messages()
             messages.dispatch(messages.WEBSOCKET_CONNECTION_BROKEN)
+            messages.dispatch(messages.RELOAD_GRAMMAR)
 
     async def establish_websocket_connection(self, session):
         address = 'http://' + self.server_address

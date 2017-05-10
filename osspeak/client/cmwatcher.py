@@ -29,6 +29,9 @@ class CommandModuleWatcher:
         self.load_command_module_information()
         self.fire_activation_events(previous_active_modules)
         self.send_module_information_to_ui()
+        self.load_and_send_grammar()
+
+    def load_and_send_grammar(self):
         grammar_xml = self.build_grammar_xml()
         messages.dispatch(messages.LOAD_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'))
 
