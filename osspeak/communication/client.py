@@ -23,7 +23,7 @@ class RemoteEngineClient:
         message_subscriptions = (
             messages.LOAD_GRAMMAR,
             messages.ENGINE_STOP,
-            messages.STOP_MAIN_PROCESS,
+            # messages.STOP_MAIN_PROCESS,
             messages.EMULATE_RECOGNITION,
             messages.HEARTBEAT,
         )
