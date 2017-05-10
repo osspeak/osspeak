@@ -19,11 +19,9 @@ class RemoteEngineClient:
         self.message_queue = []
         self.message_queue_lock = threading.Lock()
         messages.subscribe(messages.WEBSOCKET_CONNECTION_ESTABLISHED, lambda: self.send_all_messages())
-        messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: None)
         message_subscriptions = (
             messages.LOAD_GRAMMAR,
             messages.ENGINE_STOP,
-            # messages.STOP_MAIN_PROCESS,
             messages.EMULATE_RECOGNITION,
             messages.HEARTBEAT,
         )
