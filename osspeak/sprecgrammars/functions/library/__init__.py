@@ -1,5 +1,5 @@
 from sprecgrammars.functions.library import (mouse, window, keys, state, system,
-extensions, general, text, clipboard, osspeak, conditionals, history)
+extensions, general, text, clipboard, osspeak, conditionals, history, fsystem)
 
 builtin_functions = {
     'eval': general.python_evaluate,
@@ -20,6 +20,8 @@ builtin_functions = {
     'extensions.call': extensions.call,
     'extensions.message': extensions.send_message,
     'extensions.run': extensions.run,
+
+    'file.read': fsystem.read_file,
 
     'history.last': history.last,
 
