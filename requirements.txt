@@ -1,5 +1,11 @@
 aiohttp==2.0.7
-async-timeout==1.2.0
-chardet==3.0.1
+async-timeout==1.2.1
+chardet==3.0.2
+cx-Freeze==5.0.1
+future==0.16.0
 multidict==2.1.4
-yarl==0.10.0
+PyInstaller==3.3.dev0+c7a24e5
+pypiwin32==220
+requests==2.14.2
+six==1.10.0
+yarl==0.10.1
