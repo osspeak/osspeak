@@ -34,10 +34,11 @@ namespace RecognizerIO
             {
                 case "load grammars":
                     string grammarXml = jsonMsg.Grammar;
+                    string grammarId = jsonMsg.Id;
                     bool startEngine = jsonMsg.StartEngine;
                     string tmpPath = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".xml";
                     System.IO.File.WriteAllText(tmpPath, grammarXml);
-                    EngManager.LoadGrammar(tmpPath);
+                    EngManager.LoadGrammar(tmpPath, grammarId);
                     System.IO.File.Delete(tmpPath);
                     if (!EngManager.IsRunning && startEngine) EngManager.Begin();
                     break;

@@ -12,6 +12,7 @@ namespace RecognizerIO.Engines
     {
         public SpeechRecognitionEngine Engine;
         public Grammar ActiveGrammar;
+        public string GrammarId;
         public Boolean IsRunning = false;
 
         public EngineManager()
@@ -22,19 +23,19 @@ namespace RecognizerIO.Engines
             Engine.SetInputToDefaultAudioDevice();
         }
 
-        public void LoadGrammar(string path)
+        public void LoadGrammar(string path, string grammarId)
         {
             var gram = new Grammar(path);
             if (ActiveGrammar != null)
             {
                 Engine.RequestRecognizerUpdate();
-                ActiveGrammar = gram;
             }
             else
             {
                 Engine.LoadGrammar(gram);
-                ActiveGrammar = gram;
             }
+            ActiveGrammar = gram;
+            GrammarId = grammarId;
         }
 
         void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
@@ -52,7 +53,7 @@ namespace RecognizerIO.Engines
         {
             if (srResult == null) return;
             var resultText = srResult.Semantics.Value.ToString().Replace("[object Object]", "");
-            var result = new ProcessedRecognitionResult(resultText, srResult.Confidence);
+            var result = new ProcessedRecognitionResult(resultText, srResult.Confidence, GrammarId);
             string serializedResult = JsonConvert.SerializeObject(result);
             Console.WriteLine(serializedResult);
         }
