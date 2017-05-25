@@ -1,4 +1,5 @@
 import os
+import uuid
 import json
 import log
 import sprecgrammars.functions.library.state
@@ -33,7 +34,8 @@ class CommandModuleWatcher:
 
     def load_and_send_grammar(self):
         grammar_xml = self.build_grammar_xml()
-        messages.dispatch(messages.LOAD_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'))
+        grammar_id = str(uuid.uuid4())
+        messages.dispatch(messages.LOAD_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
 
     def initialize_modules(self):
         self.init_fields()

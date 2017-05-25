@@ -59,10 +59,11 @@ class EngineProcessManager(ProcessManager):
             msg = json.dumps(msg)
         super().send_message(msg)
 
-    def load_engine_grammar(self, grammar_xml):
+    def load_engine_grammar(self, grammar_xml, grammar_id):
         msg = {
             'Type': 'load grammars',
             'Grammar': grammar_xml,
+            'Id': grammar_id,
             'StartEngine': self.engine_running
         }
         self.send_message(msg)
