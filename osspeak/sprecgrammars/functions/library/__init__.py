@@ -10,6 +10,10 @@ builtin_functions = {
     'start': window.start,
     'shell': window.shell,
 
+    'int': lambda x: int(x),
+    'float': lambda x: float(x),
+    'str': lambda x: str(x),
+
     'clipboard.get': clipboard.get,
     'clipboard.set': clipboard.set,
 
