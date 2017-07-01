@@ -1,5 +1,5 @@
 from sprecgrammars.functions.library import (mouse, window, keys, state, system,
-extensions, general, text, clipboard, osspeak, conditionals, history, fsystem)
+extensions, general, text, clipboard, osspeak, conditionals, history, fsystem, math)
 
 builtin_functions = {
     'eval': general.python_evaluate,
@@ -25,6 +25,8 @@ builtin_functions = {
     'file.write': fsystem.write_file,
 
     'history.last': history.last,
+
+    'op': math.operation,
 
     'mouse.click': mouse.click,
     'mouse.move': mouse.move,
