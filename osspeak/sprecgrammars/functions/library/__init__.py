@@ -22,6 +22,7 @@ builtin_functions = {
     'extensions.run': extensions.run,
 
     'file.read': fsystem.read_file,
+    'file.write': fsystem.write_file,
 
     'history.last': history.last,
 
