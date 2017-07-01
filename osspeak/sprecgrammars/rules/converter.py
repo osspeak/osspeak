@@ -19,14 +19,14 @@ class SrgsXmlConverter:
 
     def build_grammar(self, rules):
         self.root = ET.Element('grammar', attrib=self.grammar_attrib)
-        self.build_root_rule()
+        self.root.append(self.build_root_rule())
         top_level_choices = self.build_top_level_choices()
         for rule_node in rules:
             self.append_rule_node(rule_node, top_level_choices)
         return self.root
 
     def append_rule_node(self, rule_node, top_level_choices):
-        rule = self.convert_rule(rule_node)
+        rule = self.convert_rule_element(rule_node)
         self.root.append(rule)
         if rule_node.name is None:
             tag_text = f'out += "-command-{rule_node.id}:" + rules.latest();'
@@ -34,10 +34,10 @@ class SrgsXmlConverter:
 
     def build_root_rule(self):
         root_rule = ET.Element('rule', attrib={'id': self.grammar_attrib['root']})
-        self.root.append(root_rule)
         item = ET.Element('item')
         item.append(self.get_ruleref_item(self.ruleref_container_id, text='out += rules.latest();'))
         root_rule.append(item)
+        return root_rule
 
     def build_top_level_choices(self):
         ruleref_container = ET.Element('rule', attrib={'id': self.ruleref_container_id})
@@ -59,7 +59,7 @@ class SrgsXmlConverter:
         ruleref_item.append(tag)
         return ruleref_item
 
-    def convert_rule(self, rule_node):
+    def convert_rule_element(self, rule_node):
         rule = ET.Element('rule', attrib={'id': rule_node.id})
         choices = ET.Element('one-of')
         rule.append(choices)
@@ -133,12 +133,10 @@ class SrgsXmlConverter:
     def is_not_named_rule(self, node):
         return not isinstance(node, astree.Rule) or node.name is None
 
-    def apply_repeat_attrib(self, elem, low, high, low_default=0, high_default=99):
+    def apply_repeat_attrib(self, elem, low, high):
         elem.attrib.pop('repeat', None)
-        low = low_default if low is None else low
-        high = high_default if high is None else high
         if (low, high) != (1, 1):
-            elem.attrib['repeat'] = f'{low}-{high}'
+            elem.attrib['repeat'] = f'{low or 0}-{high or 99}'
 
     def append_text(self, elem, text):
         elem.text = text if elem.text is None else f'{elem.text} {text}'
@@ -148,4 +146,4 @@ class SrgsXmlConverter:
         low, high = repeat_str.split('-')
         return int(low) if low else 0, int(high) if high else None
 
-        
+    
