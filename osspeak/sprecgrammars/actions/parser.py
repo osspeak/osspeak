@@ -43,6 +43,8 @@ class ActionParser:
                     continue
                 if len(self.grouped_action_stack) == 1:
                     break
+        if len(self.grouped_action_stack) > 1:
+            self.croak('Insufficient closing grouping characters')
         assert len(self.grouped_action_stack) == 1
         return self.grouped_action_stack[0]
 
@@ -92,7 +94,7 @@ class ActionParser:
 
     def pop_grouped_action(self):
         if len(self.grouped_action_stack) < 2:
-            self.error('too many closing parens')
+            self.croak('Too many closing grouping characters')
         self.action_to_modify = self.grouped_action_stack.pop()        
 
     def parse_plus_sign(self, tok):
@@ -105,16 +107,16 @@ class ActionParser:
         if not isinstance(self.grouped_action_stack[-1], nodes.FunctionCall):
             return self.parse_literal_token(tok)
         seq = self.grouped_action_stack[-1]
-        self.grouping_delimiter_flags[seq] = False  
+        self.grouping_delimiter_flags[seq] = False
+
+    def croak(self, msg):
+        raise RuntimeError(f'Error parsing action "{self.stream.stream.text}":\n{msg}')
 
     def next(self):
         return self.stream.next()
 
     def peek(self):
         return self.stream.peek()
-
-    def error(self, msg):
-        self.stream.croak(msg)
 
     def eof():
         return self.peek() is None
@@ -153,7 +155,7 @@ class ActionParser:
         last_action = self.grouped_action_stack[-1]
         if last_action in self.grouping_delimiter_flags:
             if self.grouping_delimiter_flags[last_action]:
-                self.error('foobar')
+                self.croak('Delimiter issie')
             self.grouping_delimiter_flags[last_action] = True
 
     def parse_whitespace_token(self, tok):
