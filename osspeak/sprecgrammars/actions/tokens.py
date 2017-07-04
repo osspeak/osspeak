@@ -43,6 +43,12 @@ class GroupingOpeningToken(ActionToken):
 
 class GroupingClosingToken(ActionToken):
     CHARACTER = ')'
+    
+class KeySequenceOpeningToken(ActionToken):
+    CHARACTER = '{'
+
+class KeySequenceClosingToken(ActionToken):
+    CHARACTER = '}'
 
 class BraceToken(ActionToken):
     

@@ -7,6 +7,8 @@ WORD_DELIMITERS = set([
     tokens.SliceToken.CLOSING_DELIMITER,
     tokens.GroupingOpeningToken.CHARACTER,
     tokens.GroupingClosingToken.CHARACTER,
+    tokens.KeySequenceOpeningToken.CHARACTER,
+    tokens.KeySequenceClosingToken.CHARACTER,
 ])
 NUMBER_CHARACTERS = set([str(n) for n in list(range(10))] + ['-', '.'])
 
@@ -24,8 +26,8 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
             tokens.SliceToken.OPENING_DELIMITER: self.read_slice_token,
             tokens.GroupingOpeningToken.CHARACTER: self.read_grouping_opening_token,
             tokens.GroupingClosingToken.CHARACTER: self.read_grouping_closing_token,
-            '{': self.read_brace_token,
-            '}': self.read_brace_token,
+            tokens.KeySequenceOpeningToken.CHARACTER: self.read_keysequence_opening_token,
+            tokens.KeySequenceClosingToken.CHARACTER: self.read_keysequence_closing_token,
             '+': self.read_plus_token,
             ',': self.read_comma_token,
             '$': self.read_variable_token,
@@ -80,8 +82,13 @@ class ActionTokenStream(abstokenstream.AbstractTokenStream):
         self.stream.next()
         return tokens.GroupingClosingToken()
 
-    def read_brace_token(self):
-        return tokens.BraceToken(self.stream.next())
+    def read_keysequence_opening_token(self):
+        self.stream.next()
+        return tokens.KeySequenceOpeningToken()
+
+    def read_keysequence_closing_token(self):
+        self.stream.next()
+        return tokens.KeySequenceClosingToken()
 
     def read_plus_token(self):
         self.stream.next()

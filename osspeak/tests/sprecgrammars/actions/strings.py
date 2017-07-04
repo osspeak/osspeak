@@ -1,6 +1,7 @@
 EMPTY = ''
 HANGING_PLUS = "foo +"
 HANGING_COMMA = "foo ,"
+GROUPING_TOKEN_MISMATCH = '{ctrl+1)'
 
 BASIC_KEYPRESS = '{shift+ctrl+e}'
 KEYPRESS_WITHOUT_DELIMITER = '{alt 4}'

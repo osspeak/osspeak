@@ -18,7 +18,8 @@ class ActionParser:
             tokens.WordToken: self.parse_word_token,
             tokens.GroupingOpeningToken: self.parse_open_grouping_token, # (
             tokens.GroupingClosingToken: self.parse_closing_grouping_token, # )
-            tokens.BraceToken: self.parse_curly_brace,
+            tokens.KeySequenceOpeningToken: lambda t: self.add_action(nodes.KeySequence(), grouped=True), # {
+            tokens.KeySequenceClosingToken: lambda t: self.pop_grouped_action(t), # }
             tokens.PlusToken: self.parse_plus_sign,
             tokens.CommaToken: self.parse_comma_token,
             tokens.NumberToken: self.parse_number_token,
@@ -45,7 +46,6 @@ class ActionParser:
                     break
         if len(self.grouped_action_stack) > 1:
             self.croak('Insufficient closing grouping characters')
-        assert len(self.grouped_action_stack) == 1
         return self.grouped_action_stack[0]
 
     def add_grouped_action(self):
@@ -79,22 +79,22 @@ class ActionParser:
         del self.grouping_delimiter_flags[root_action]        
 
     def parse_closing_grouping_token(self, tok):
-        self.pop_grouped_action()
+        self.pop_grouped_action(tok)
 
-    def parse_curly_brace(self, tok):
-        if tok.is_open:
-            seq = nodes.KeySequence()
-            self.add_action(seq, grouped=True)
-            return
-        self.pop_grouped_action()
+    def parse_open_keysequence_token(self, tok):
+        self.add_action(nodes.KeySequence(), grouped=True)
 
     def parse_number_token(self, tok):
         number_action = nodes.NumberNode(tok.number)
         self.add_action(number_action)
 
-    def pop_grouped_action(self):
+    def pop_grouped_action(self, tok):
         if len(self.grouped_action_stack) < 2:
             self.croak('Too many closing grouping characters')
+        last_action = self.grouped_action_stack[-1]
+        if isinstance(tok, tokens.KeySequenceClosingToken) and not isinstance(last_action, nodes.KeySequence):
+            self.croak('Closing token mismatch')
+        print(tok, self.grouped_action_stack[-1])
         self.action_to_modify = self.grouped_action_stack.pop()        
 
     def parse_plus_sign(self, tok):
@@ -155,7 +155,7 @@ class ActionParser:
         last_action = self.grouped_action_stack[-1]
         if last_action in self.grouping_delimiter_flags:
             if self.grouping_delimiter_flags[last_action]:
-                self.croak('Delimiter issie')
+                self.croak('Delimiter issuse')
             self.grouping_delimiter_flags[last_action] = True
 
     def parse_whitespace_token(self, tok):
