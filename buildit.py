@@ -68,7 +68,7 @@ def build_gui():
 
 def build_osspeak():
     subprocess.call(['pyinstaller', OSSPEAK_MAIN_PATH, '--clean', '-F',
-    '--paths', OSSPEAK_SRC_FOLDER])
+    '--paths', OSSPEAK_SRC_FOLDER, '-n', 'osspeak'])
     copy_engines()
 
 def copy_engines():
@@ -108,7 +108,7 @@ def upload_release_folder(upload_url, auth, zip_name='windows-cli.zip'):
         'name': 'windows-cli.zip'
     }
     response = requests.post(
-        upload_url + '?name={}'.format(zip_name),
+        f'{upload_url}?name={zip_name}',
         data=zip_bytes,
         auth=auth,
         headers=headers
