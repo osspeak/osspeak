@@ -4,7 +4,7 @@ from sprecgrammars.rules import ruletokstream, astree, tokens
 
 class RuleParser:
     '''
-    Convert a rule string i.e. 'hello (world|universe) into
+    Convert a rule string i.e. 'hello (world|universe)' into
     an abstract syntax tree of nodes that can be serialized
     into speech recognition grammar formats like SRGS XML. 
     '''

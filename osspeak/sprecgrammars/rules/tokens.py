@@ -17,11 +17,11 @@ class GroupingOpeningToken(BaseToken):
 class GroupingClosingToken(BaseToken):
     CHARACTER = ')'    
 
-class BracketToken(BaseToken):
+class OptionalGroupingOpeningToken(BaseToken):
+    CHARACTER = '['
 
-    def __init__(self, char):
-        assert char in '[]'
-        self.is_open = char == '['
+class OptionalGroupingClosingToken(BaseToken):
+    CHARACTER = ']'    
 
 class NamedRuleToken(BaseToken):
     
