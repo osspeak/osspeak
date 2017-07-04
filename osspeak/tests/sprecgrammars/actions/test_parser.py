@@ -49,7 +49,6 @@ class TestActionParser(unittest.TestCase):
 
     def test_extensions_args_function(self):
         action = self.parse_action_string(strings.EXTENSIONS_FUNCTION_WITH_ARGS)
-        print(action)
 
     def test_mismatch(self):
         with self.assertRaises(RuntimeError):

@@ -92,9 +92,15 @@ class ActionParser:
         if len(self.grouped_action_stack) < 2:
             self.croak('Too many closing grouping characters')
         last_action = self.grouped_action_stack[-1]
+        mismatch_error = None
         if isinstance(tok, tokens.KeySequenceClosingToken) and not isinstance(last_action, nodes.KeySequence):
-            self.croak('Closing token mismatch')
-        print(tok, self.grouped_action_stack[-1])
+            mismatch_error = 'Closing token mismatch'
+        elif isinstance(tok, tokens.GroupingClosingToken):
+            valid_actions = [nodes.FunctionCall, nodes.RootAction]
+            if not any(isinstance(last_action, a) for a in valid_actions):
+                mismatch_error = 'Closing token mismatch'
+        if mismatch_error is not None:
+            self.croak(mismatch_error)
         self.action_to_modify = self.grouped_action_stack.pop()        
 
     def parse_plus_sign(self, tok):

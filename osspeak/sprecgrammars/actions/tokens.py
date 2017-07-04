@@ -50,11 +50,6 @@ class KeySequenceOpeningToken(ActionToken):
 class KeySequenceClosingToken(ActionToken):
     CHARACTER = '}'
 
-class BraceToken(ActionToken):
-    
-    def __init__(self, ch):
-        self.is_open = ch == '{'
-
 class CommaToken(ActionToken):
 
     def __init__(self):
