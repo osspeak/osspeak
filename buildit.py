@@ -91,6 +91,10 @@ def create_github_release():
         data=json.dumps(data),
         auth=auth
     )
+    if not response.ok:
+        print('Error uploading release to GitHub:')
+        print(response.text)
+        return
     response_data = json.loads(response.text)
     upload_url = response_data['upload_url'].split('{')[0]
     upload_release_folder(upload_url, auth)
