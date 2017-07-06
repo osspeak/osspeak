@@ -22,7 +22,8 @@ def setup_logger():
     formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s: %(message)s')
     handler.setFormatter(formatter)
     ch = logging.StreamHandler()
-    print_debug_level = logging.DEBUG if clargs.args.debug else logging.INFO
+    args = clargs.get_args()
+    print_debug_level = logging.DEBUG if args is not None and args.debug else logging.INFO
     ch.setLevel(print_debug_level)
     ch.setFormatter(formatter)
     logger.addHandler(handler)

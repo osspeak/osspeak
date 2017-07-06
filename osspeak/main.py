@@ -12,7 +12,7 @@ from client import cmwatcher
 from communication.procs import EngineProcessManager
 
 def main():
-    args = clargs.args
+    args = clargs.get_args()
     if settings.user_settings['network'] == 'server':
         server.RemoteEngineServer().loop_forever()
         return
