@@ -12,16 +12,16 @@ class OrToken(BaseToken):
     pass
 
 class GroupingOpeningToken(BaseToken):
-    CHARACTER = '('
+    pass
 
 class GroupingClosingToken(BaseToken):
-    CHARACTER = ')'    
+    pass    
 
 class OptionalGroupingOpeningToken(BaseToken):
-    CHARACTER = '['
+    pass
 
 class OptionalGroupingClosingToken(BaseToken):
-    CHARACTER = ']'    
+    pass    
 
 class NamedRuleToken(BaseToken):
     
