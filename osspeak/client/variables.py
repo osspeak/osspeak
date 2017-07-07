@@ -6,8 +6,9 @@ TreeNodeWrapper = collections.namedtuple('TreeNodeWrapper', ['path', 'node', 'ru
 
 class RecognitionResultsTree:
 
-    def __init__(self, root_rule_node):
+    def __init__(self, root_rule_node, node_ids):
         self.root_rule_node = root_rule_node
+        self.node_ids = node_ids
         self.init_everything()
 
     def init_everything(self):
@@ -20,7 +21,8 @@ class RecognitionResultsTree:
             self.tree_node_map[node_wrapper.path] = node_wrapper
             assert isinstance(node_wrapper.rule_path, tuple)
             if isinstance(node_wrapper.node, astree.Rule):
-                self.rule_paths[node_wrapper.node.id] = node_wrapper
+                node_id = self.node_ids[node_wrapper.node]
+                self.rule_paths[node_id] = node_wrapper
             is_ambiguous = (isinstance(node_wrapper.node, astree.GroupingNode) or
                             isinstance(node_wrapper.node, astree.Rule) and node_wrapper.node.name == '_dictate')
             if is_ambiguous:
@@ -32,7 +34,7 @@ class RecognitionResultsTree:
     def get_full_path_engine_variables(self, engine_variables):
         current_node = None
         full_path_engine_variables = []
-        current_rule_wrapper = self.rule_paths[self.root_rule_node.id]
+        current_rule_wrapper = self.rule_paths[self.node_ids[self.root_rule_node]]
         for i, (var_id, var_val) in enumerate(engine_variables):
             split_id = var_id.split('-')
             if split_id[0] == 'dictation':
@@ -46,7 +48,7 @@ class RecognitionResultsTree:
             while var_id not in current_rule_wrapper.descendant_ids:
                 assert current_rule_wrapper.node is not self.root_rule_node
                 current_rule_wrapper = self.rule_paths[current_rule_wrapper.rule_path[-1]]
-            full_rule_path = current_rule_wrapper.rule_path + (current_rule_wrapper.node.id,)
+            full_rule_path = current_rule_wrapper.rule_path + (self.node_ids[current_rule_wrapper.node],)
             full_path = self.rule_children[full_rule_path][var_id]
             full_path_engine_variables.append([full_path, var_val])
         return full_path_engine_variables
@@ -62,9 +64,10 @@ class RecognitionResultsTree:
     def tree_nodes(self, root=None, root_path=None, rule_path=None):
         root = self.root_rule_node if root is None else root
         rule_path = [] if rule_path is None else rule_path
-        path = [root.id] if root_path is None else root_path + [root.id]
+        root_id = self.node_ids[root]
+        path = [root_id] if root_path is None else root_path + [root_id]
         for child in getattr(root, 'children', []):
-            child_rule_path = rule_path + [root.id] if isinstance(root, astree.Rule) else rule_path 
+            child_rule_path = rule_path + [root_id] if isinstance(root, astree.Rule) else rule_path 
             yield from self.tree_nodes(child, path, child_rule_path)
         descendant_ids = set(self.get_descendant_ids(root))
         yield TreeNodeWrapper(tuple(path), root, tuple(rule_path), descendant_ids)
@@ -72,7 +75,7 @@ class RecognitionResultsTree:
     def get_descendant_ids(self, node):
         descendant_ids = []
         for child in getattr(node, 'children', []):
-            descendant_ids.extend(self.get_descendant_ids(child) + [child.id])
+            descendant_ids.extend(self.get_descendant_ids(child) + [self.node_ids[child]])
         return descendant_ids
 
     def action_variables(self, engine_variables):

@@ -84,7 +84,6 @@ class Command:
     def init_rule(self, rule_text):
         self.rule_text = rule_text
         self.rule = api.rule(rule_text, rules=self.scope.rules)
-        self.variable_tree = variables.RecognitionResultsTree(self.rule)
 
     def init_action(self, action_text):
         self.action_text = action_text

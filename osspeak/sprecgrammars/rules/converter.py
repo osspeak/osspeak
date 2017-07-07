@@ -5,7 +5,7 @@ from pprint import pprint
 
 class SrgsXmlConverter:
 
-    def __init__(self):
+    def __init__(self, node_ids):
         self.grammar_attrib = {
             'version': '1.0',
             'mode': 'voice',
@@ -14,6 +14,7 @@ class SrgsXmlConverter:
             'root': 'root',
             'tag-format': 'semantics/1.0'
         }
+        self.node_ids = node_ids
         self.root = ET.Element('grammar', attrib=self.grammar_attrib)
         self.ruleref_container_id = 'ruleref_container'
 
@@ -29,8 +30,8 @@ class SrgsXmlConverter:
         rule = self.convert_rule_element(rule_node)
         self.root.append(rule)
         if rule_node.name is None:
-            tag_text = f'out += "-command-{rule_node.id}:" + rules.latest();'
-            top_level_choices.append(self.get_ruleref_item(rule_node.id, text=tag_text))
+            tag_text = f'out += "-command-{self.node_ids[rule_node]}:" + rules.latest();'
+            top_level_choices.append(self.get_ruleref_item(self.node_ids[rule_node], text=tag_text))
 
     def build_root_rule(self):
         root_rule = ET.Element('rule', attrib={'id': self.grammar_attrib['root']})
@@ -60,7 +61,7 @@ class SrgsXmlConverter:
         return ruleref_item
 
     def convert_rule_element(self, rule_node):
-        rule = ET.Element('rule', attrib={'id': rule_node.id})
+        rule = ET.Element('rule', attrib={'id': self.node_ids[rule_node]})
         choices = ET.Element('one-of')
         rule.append(choices)
         self.fill_choices(rule_node, choices)
@@ -87,31 +88,31 @@ class SrgsXmlConverter:
             ruleref = ET.Element('ruleref', attrib={'uri': 'grammar:dictation', 'type': 'application/srgs+xml'})
             choices[-1].append(ruleref)
             tag = ET.Element('tag')
-            tag.text = f'out += "dictation-{rule_node.id}=" + rules.latest(); + "|"'
+            tag.text = f'out += "dictation-{self.node_ids[rule_node]}=" + rules.latest(); + "|"'
             choices[-1].append(tag)
             return
         # all rule nodes here should be copies that refer to base rule
-        rritem = self.get_ruleref_item(rule_node.base_rule.id, outid=rule_node.id, text=None,
+        rritem = self.get_ruleref_item(self.node_ids[rule_node.base_rule], outid=self.node_ids[rule_node], text=None,
                 low=rule_node.repeat_low, high=rule_node.repeat_high)
         choices[-1].append(rritem)
         
     def add_grouping(self, child, choices):
-        rule = ET.Element('rule', attrib={'id': child.id})
+        rule = ET.Element('rule', attrib={'id': self.node_ids[child]})
         self.root.append(rule)
         child_choices = ET.Element('one-of')
         rule.append(child_choices)
-        rritem = self.get_ruleref_item(child.id, low=child.repeat_low, high=child.repeat_high)
+        rritem = self.get_ruleref_item(self.node_ids[child], low=child.repeat_low, high=child.repeat_high)
         choices[-1].append(rritem)
         self.fill_choices(child, child_choices)
 
     def add_substitute_word(self, child, choices):
-        rule = ET.Element('rule', attrib={'id': child.id})
+        rule = ET.Element('rule', attrib={'id': self.node_ids[child]})
         self.root.append(rule)
         word_item = ET.Element('item')
         word_item.text = child.text
         rule.append(word_item)
-        text = f'out += "{child.id}=" + rules.latest() + "|";'
-        rritem = self.get_ruleref_item(child.id, text=text)
+        text = f'out += "{self.node_ids[child]}=" + rules.latest() + "|";'
+        rritem = self.get_ruleref_item(self.node_ids[child], text=text)
         choices[-1].append(rritem)
 
     def add_text_to_item_elem(self, parent_elem, word_node, parent_node):
@@ -128,7 +129,7 @@ class SrgsXmlConverter:
         if self.is_not_named_rule(parent_node):
             text_tag = parent_elem[-1].find('tag')
             # text_tag.text = f'out += "literal-{parent_node.id}={parent_elem[-1].text}|";'
-            text_tag.text = f'out += "{word_node.id}={parent_elem[-1].text}|";'
+            text_tag.text = f'out += "{self.node_ids[word_node]}={parent_elem[-1].text}|";'
 
     def is_not_named_rule(self, node):
         return not isinstance(node, astree.Rule) or node.name is None

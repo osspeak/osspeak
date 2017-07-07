@@ -11,6 +11,11 @@ class ASTNode:
     def id(self):
         return f'r{self._id}'
 
+    def walk(self):
+        yield self
+        for child in getattr(self, 'children', []):
+            yield from child.walk()
+            
 class Rule(ASTNode):
 
     def __init__(self, name=None):
@@ -27,6 +32,7 @@ class Rule(ASTNode):
         reference_rule.base_rule = self
         reference_rule._id = str(uuid.uuid4()).replace('-', '')
         return reference_rule
+
 
 class WordNode(ASTNode):
 

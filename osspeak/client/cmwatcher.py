@@ -1,11 +1,13 @@
+import itertools
 import os
+import collections
 import uuid
 import json
 import log
 import sprecgrammars.functions.library.state
 from user import settings
 from interfaces.gui import serializer
-from client import commands, scopes, action, userstate
+from client import commands, scopes, action, userstate, variables
 from sprecgrammars.rules.converter import SrgsXmlConverter
 from platforms import api
 import xml.etree.ElementTree as ET
@@ -14,6 +16,7 @@ from communication import messages
 class CommandModuleWatcher:
 
     def __init__(self):
+        self.grammar_commands = collections.OrderedDict() # grammar_id: string -> dictionary of commands
         self.command_map = {}
         self.modules_to_save = {}
         self.command_module_json = self.load_command_json()
@@ -33,9 +36,34 @@ class CommandModuleWatcher:
         self.load_and_send_grammar()
 
     def load_and_send_grammar(self):
-        grammar_xml = self.build_grammar_xml()
+        active_rules = self.active_rules
+        node_ids = self.generate_node_ids(active_rules)
+        commands = self.active_commands
+        grammar_commands = {}
+        for cmd in commands:
+            variable_tree = variables.RecognitionResultsTree(cmd.rule, node_ids)
+            grammar_commands[node_ids[cmd.rule]] = {'command': cmd, 'variable_tree': variable_tree}
+        grammar_xml = self.build_grammar_xml(active_rules, node_ids)
         grammar_id = str(uuid.uuid4())
+        self.add_new_grammar(grammar_commands, grammar_id)
         messages.dispatch(messages.LOAD_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
+
+    def add_new_grammar(self, commands, grammar_id):
+        # remove oldest grammar if needed
+        if len(self.grammar_commands) > 4:
+            self.grammar_commands.popitem(last=False)
+        self.grammar_commands[grammar_id] = commands
+
+    def generate_node_ids(self, rules):
+        import uuid
+        node_ids = {}
+        for rule in rules:
+            for node in rule.walk():
+                if node not in node_ids:
+                    # node_ids[node] = f'n{len(node_ids) + 1}'
+                    node_ids[node] = 'n' + str(uuid.uuid4()).replace('-', '')
+        return node_ids
+
 
     def initialize_modules(self):
         self.init_fields()
@@ -152,14 +180,23 @@ class CommandModuleWatcher:
         for cmd_module in self.cmd_modules.values():
             cmd_module.load_events()
 
-    def build_grammar_xml(self):
+    def build_grammar_xml(self, active_rules, node_ids):
+        return SrgsXmlConverter(node_ids).build_grammar(active_rules)
+
+    @property
+    def active_rules(self):
         rules = []
         command_rules = []
         for cmd_module in self.active_modules.values():
             rules.extend(cmd_module.rules)
             command_rules.extend(cmd.rule for cmd in cmd_module.commands)
         rules.extend(command_rules)
-        return SrgsXmlConverter().build_grammar(rules)
+        return rules
+
+    @property
+    def active_commands(self):
+        grouped_commands = [m.commands for m in self.active_modules.values()]
+        return list(itertools.chain.from_iterable(grouped_commands))
 
     def update_modules(self, modified_modules):
         raise NotImplementedError
@@ -174,5 +211,10 @@ class CommandModuleWatcher:
         payload = {'modules': self.cmd_modules}
         messages.dispatch(messages.LOAD_MODULE_MAP, payload)
 
-    def perform_commands(self, command_results):
-        action.perform_commands(command_results, self.command_map, self.previous_command_map)
+    def perform_commands(self, command_results, grammar_id):
+        try:
+            command_map = self.grammar_commands[grammar_id]
+        except KeyError:
+            log.logger.warning(f'Grammar {grammar_id} no longer exists')
+            return
+        action.perform_commands(command_results, command_map)

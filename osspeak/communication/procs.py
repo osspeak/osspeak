@@ -72,7 +72,7 @@ class EngineProcessManager(ProcessManager):
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition':
             if msg['Confidence'] > user_settings['engine']['recognitionConfidence']:
-                messages.dispatch(messages.PERFORM_COMMANDS, msg['Commands'])
+                messages.dispatch(messages.PERFORM_COMMANDS, msg['Commands'], msg['GrammarId'])
         elif msg['Type'] == 'error':
             print('error!')
             print(msg['Message'])
