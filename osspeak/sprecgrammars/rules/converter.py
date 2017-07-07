@@ -11,11 +11,11 @@ class SrgsXmlConverter:
             'mode': 'voice',
             'xmlns': 'http://www.w3.org/2001/06/grammar',
             'xml:lang': 'en-US',
-            'root': 'r' + str(uuid.uuid4()).replace('-', ''),
+            'root': 'root',
             'tag-format': 'semantics/1.0'
         }
         self.root = ET.Element('grammar', attrib=self.grammar_attrib)
-        self.ruleref_container_id = 'r' + str(uuid.uuid4()).replace('-', '')
+        self.ruleref_container_id = 'ruleref_container'
 
     def build_grammar(self, rules):
         self.root = ET.Element('grammar', attrib=self.grammar_attrib)
