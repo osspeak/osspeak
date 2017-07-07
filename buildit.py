@@ -22,7 +22,7 @@ BASE_ELECTRON_FOLDER = 'gui'
 ELECTRON_BUILD_PATH = os.path.join('node_modules', 'electron', 'dist', 'resources', 'app')
 ELECTRON_DIST_SRC = os.path.join('node_modules', 'electron', 'dist')
 
-WSR_SRC_FOLDER = r'engines\RecognizerIO\RecognizerIO\bin\Debug'
+WSR_SRC_FOLDER = os.path.join('engines', 'RecognizerIO', 'RecognizerIO', 'bin', 'Debug')
 WSR_DEST_FOLDER = os.path.join(DIST_FOLDER, 'engines', 'wsr')
 
 TEST_DIR = os.path.join('osspeak', 'tests')
