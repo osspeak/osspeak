@@ -88,7 +88,3 @@ class Command:
     def init_action(self, action_text):
         self.action_text = action_text
         self.action = api.action(action_text, self.scope.functions)
-
-    @property
-    def id(self):
-        return self.rule.id

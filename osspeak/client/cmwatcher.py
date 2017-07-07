@@ -1,7 +1,7 @@
 import itertools
+import uuid
 import os
 import collections
-import uuid
 import json
 import log
 import sprecgrammars.functions.library.state
@@ -17,7 +17,6 @@ class CommandModuleWatcher:
 
     def __init__(self):
         self.grammar_commands = collections.OrderedDict() # grammar_id: string -> dictionary of commands
-        self.command_map = {}
         self.modules_to_save = {}
         self.command_module_json = self.load_command_json()
         messages.subscribe(messages.PERFORM_COMMANDS, self.perform_commands)
@@ -55,15 +54,12 @@ class CommandModuleWatcher:
         self.grammar_commands[grammar_id] = commands
 
     def generate_node_ids(self, rules):
-        import uuid
         node_ids = {}
         for rule in rules:
             for node in rule.walk():
                 if node not in node_ids:
-                    # node_ids[node] = f'n{len(node_ids) + 1}'
-                    node_ids[node] = 'n' + str(uuid.uuid4()).replace('-', '')
+                    node_ids[node] = f'n{len(node_ids) + 1}'
         return node_ids
-
 
     def initialize_modules(self):
         self.init_fields()
@@ -86,9 +82,6 @@ class CommandModuleWatcher:
         self.scope_groupings = {'': scopes.Scope()}
         self.cmd_modules = {}
         self.active_modules = {}
-        self.previous_command_map = self.command_map
-        # key is string id, val is Action instance
-        self.command_map = {}
 
     def load_command_json(self):
         json_module_dicts = {}
@@ -169,7 +162,6 @@ class CommandModuleWatcher:
     def load_commands(self):
         for cmd_module in self.cmd_modules.values():
             cmd_module.load_commands()
-            self.command_map.update({cmd.id: cmd for cmd in cmd_module.commands})
     
     def load_builtin_functions(self):
         from sprecgrammars.api import rule
