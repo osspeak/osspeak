@@ -33,7 +33,7 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
             if whitespace:
                 self.croak('Repetition must immediately follow a word or grouping')
             return self.read_repetition()
-        self.croak('Invalid character: {}'.format(ch))
+        self.croak(f'Invalid character: {ch}')
 
     def read_whitespace(self):
         return self.read_while(lambda ch: ch in ' \n\t')

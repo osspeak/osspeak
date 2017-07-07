@@ -16,7 +16,7 @@ class FunctionDefinitionTokenStream(abstokenstream.AbstractTokenStream):
             return self.read_comma_token()
         if ch == '=':
             return self.read_default_action()
-        self.croak('Invalid character: {}'.format(ch))
+        self.croak(f'Invalid character: {ch}')
 
     def read_whitespace(self):
         return self.read_while(lambda ch: ch in ' \n\t')

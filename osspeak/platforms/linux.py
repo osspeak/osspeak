@@ -20,13 +20,13 @@ def transcribe_line(key_inputs, delay=0, direction=''):
     delay = delay/1000 # seconds to milliseconds
     for key_input in key_inputs:
         if isinstance(key_input, str):
-            subprocess.call(['xdotool', 'type', '--delay', '{}ms'.format(delay), key_input])
+            subprocess.call(['xdotool', 'type', '--delay', f'{delay}ms', key_input])
         else:
             press_key_combination(key_input.keys, delay)
 
 def press_key_combination(keys, delay):
     xdotool_keys = [linuxconstants.XDOTOOL_KEYMAP.get(k.lower(), k) for k in keys] 
-    subprocess.call(['xdotool', 'key', '--delay', '{}ms'.format(delay), '+'.join(xdotool_keys)])
+    subprocess.call(['xdotool', 'key', '--delay', f'{delay}ms', '+'.join(xdotool_keys)])
 
 def get_mouse_location():
     return subprocess.check_output(['xdotool', 'getmouselocation'])

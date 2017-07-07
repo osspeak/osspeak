@@ -79,7 +79,7 @@ def copy_engines():
 def create_github_release():
     username = input('Github username: ')
     pwd = getpass.getpass('Github password: ')
-    release_version = 'v{}'.format(version.version)
+    release_version = f'v{version.version}'
     auth = username, pwd
     data = {
         "tag_name": release_version,
