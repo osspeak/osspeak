@@ -13,14 +13,12 @@ namespace RecognizerIO.Engines
         public SpeechRecognitionEngine Engine;
         public Grammar ActiveGrammar;
         public string GrammarId;
-        public string RecognitionGrammarId = "";
         public Boolean IsRunning = false;
 
         public EngineManager()
         {
             Engine = new SpeechRecognitionEngine();
             Engine.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(recognizer_SpeechRecognized);
-            Engine.SpeechDetected += new EventHandler<SpeechDetectedEventArgs>(recognizer_SpeechDetected);
             Engine.RecognizerUpdateReached += new EventHandler<RecognizerUpdateReachedEventArgs>(recognizer_RecognizerUpdateReached);
             Engine.SetInputToDefaultAudioDevice();
         }
@@ -28,6 +26,7 @@ namespace RecognizerIO.Engines
         public void LoadGrammar(string path, string grammarId)
         {
             var gram = new Grammar(path);
+            gram.Name = grammarId;
             if (ActiveGrammar != null)
             {
                 Engine.RequestRecognizerUpdate();
@@ -45,11 +44,6 @@ namespace RecognizerIO.Engines
             HandleRecognition(e.Result);
         }
 
-        void recognizer_SpeechDetected(object sender, SpeechDetectedEventArgs e)
-        {
-            RecognitionGrammarId = GrammarId;
-        }
-
         void recognizer_RecognizerUpdateReached(object sender, RecognizerUpdateReachedEventArgs e)
         {
             Engine.UnloadAllGrammars();
@@ -60,7 +54,7 @@ namespace RecognizerIO.Engines
         {
             if (srResult == null) return;
             var resultText = srResult.Semantics.Value.ToString().Replace("[object Object]", "");
-            var result = new ProcessedRecognitionResult(resultText, srResult.Confidence, RecognitionGrammarId);
+            var result = new ProcessedRecognitionResult(resultText, srResult.Confidence, srResult.Grammar.Name);
             string serializedResult = JsonConvert.SerializeObject(result);
             Console.WriteLine(serializedResult);
         }

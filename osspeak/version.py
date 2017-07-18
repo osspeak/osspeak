@@ -1,4 +1,4 @@
-_version = (0, 1, 6)
+_version = (0, 1, 7)
 version = '.'.join(str(n) for n in _version)
 
 release_notes = [
