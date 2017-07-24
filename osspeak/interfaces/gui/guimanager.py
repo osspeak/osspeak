@@ -2,6 +2,7 @@ import subprocess
 import sys
 import threading
 import json
+import os
 from aiohttp import web
 import aiohttp
 from communication.procs import ProcessManager
@@ -9,14 +10,16 @@ from communication import messages
 from interfaces.gui import serializer
 
 if getattr(sys, 'frozen', False):
-    ELECTRON_PATH = r'engines\wsr\RecognizerIO.exe'
+    ELECTRON_PATH = os.path.join('f')
 else:
-    ELECTRON_PATH = '..\\gui\\node_modules\\electron\\dist\\electron.exe ..\\gui\\'
+    ELECTRON_PATH = '..\\gui\\node_modules\\electron\\dist\\electron.exe'
+
+ELECTRON_FOLDER = ' ..\\gui\\'
 
 class GuiProcessManager(ProcessManager):
 
     def __init__(self):
-        super().__init__(ELECTRON_PATH)
+        super().__init__(f'{ELECTRON_PATH} {ELECTRON_FOLDER}')
         self.websocket_established = False
         self.message_queue = []
         self.message_queue_lock = threading.Lock()
@@ -70,7 +73,7 @@ class GuiProcessManager(ProcessManager):
             elif msg.type == aiohttp.WSMsgType.ERROR:
                 print('ws connection closed with exception %s' %
                     self.ws.exception())
-        messages.dispatch(messages.STOP_MAIN_PROCESS)
+        messages.dispatch_sync(messages.STOP_MAIN_PROCESS)
         print('websocket connection closed')
         return self.ws
 

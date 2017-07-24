@@ -8,6 +8,7 @@ from communication import server, client, messages
 from interfaces.cli import menu
 from user import settings
 from interfaces.gui.guimanager import GuiProcessManager
+from interfaces import create_ui_manager
 from client import cmwatcher
 from communication.procs import EngineProcessManager
 
@@ -16,8 +17,7 @@ def main():
     if settings.user_settings['network'] == 'server':
         server.RemoteEngineServer().loop_forever()
         return
-    use_gui = settings.user_settings['interface'] == 'gui'
-    ui_manager = GuiProcessManager() if use_gui else menu.MainMenu()
+    ui_manager = create_ui_manager()
     engine = initialize_speech_engine_client()
     try:
         cmw = cmwatcher.CommandModuleWatcher()
