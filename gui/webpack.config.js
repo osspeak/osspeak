@@ -1,25 +1,29 @@
-const path = require('path');
-const webpack = require('webpack');
 module.exports = {
-  context: path.resolve(__dirname, './src'),
-  entry: {
-    app: './app/osspeak.js',
-  },
-  output: {
-    path: path.resolve(__dirname, './dist'),
-    filename: '[name].bundle.js',
-  },
-  module: {
-    loaders: [
-      {
-        test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
-        loader: 'babel-loader',
-        query: {
-          presets: ['es2015'],
-          plugins: ["transform-react-jsx", "transform-object-rest-spread"]
-        }
-      }
-    ]
-  }
+    entry: "./src/index.tsx",
+    output: {
+        filename: "bundle.js",
+        path: __dirname + "/dist"
+    },
+
+    // Enable sourcemaps for debugging webpack's output.
+    devtool: "source-map",
+
+    resolve: {
+        // Add '.ts' and '.tsx' as resolvable extensions.
+        extensions: [".ts", ".tsx", ".js", ".json"]
+    },
+
+    module: {
+        rules: [
+            // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
+            { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
+
+            // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+            { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
+        ]
+    },
+    externals: {
+        "react": "React",
+        "react-dom": "ReactDOM"
+    },
 };
