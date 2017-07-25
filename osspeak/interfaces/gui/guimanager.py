@@ -8,6 +8,8 @@ import aiohttp
 from communication.procs import ProcessManager
 from communication import messages
 from interfaces.gui import serializer
+from flask import Flask
+from flask_sockets import Sockets
 
 if getattr(sys, 'frozen', False):
     ELECTRON_PATH = os.path.join('f')
@@ -16,17 +18,25 @@ else:
 
 ELECTRON_FOLDER = ' ..\\gui\\'
 
+app = Flask(__name__)
+sockets = Sockets(app)
+@sockets.route('/websocket')
+def socket_opened(ws):
+    messages.dispatch_sync(messages.WEBSOCKET_CONNECTION_ESTABLISHED, ws)
+
 class GuiProcessManager(ProcessManager):
 
     def __init__(self):
         super().__init__(f'{ELECTRON_PATH} {ELECTRON_FOLDER}')
         self.websocket_established = False
         self.message_queue = []
+        self.open_sockets = set()
         self.message_queue_lock = threading.Lock()
-        self.on_message = {
+        self.message_dispatcher = {
             'save modules': self.save_modules
         }
         messages.subscribe(messages.LOAD_MODULE_MAP, lambda payload: self.send_message('module map', payload))
+        messages.subscribe(messages.WEBSOCKET_CONNECTION_ESTABLISHED, self.on_connected)
 
     def save_modules(self, msg_data):
         module_configurations = {k: self.to_module_config(v) for (k, v) in msg_data['modules'].items()}
@@ -47,35 +57,30 @@ class GuiProcessManager(ProcessManager):
                 module_config[k] = config
         return module_config
 
-    async def hello(self, request):
-        return web.Response(text="Hello, world")
+    def stop(self):
+        self.server.stop()
+
+    def on_message(self, msg, ws):
+        msg_dict = json.loads(msg.data)
+        self.message_dispatcher[msg_dict['type']](msg_dict['payload'])
     
     def main_loop(self):
-        self.app = web.Application()
-        self.app.router.add_get('/', self.hello)
-        self.app.router.add_get('/websocket', self.websocket_handler)
-        web.run_app(self.app)
+        from gevent import pywsgi
+        from geventwebsocket.handler import WebSocketHandler
+        self.server = pywsgi.WSGIServer(('', 8080), app, handler_class=WebSocketHandler)
+        self.server.serve_forever()
 
-    async def websocket_handler(self, request):
-        self.ws = web.WebSocketResponse()
-        await self.ws.prepare(request)
-        self.websocket_established = True
-        with threading.Lock():
-            for msg in self.message_queue:
-                self.ws.send_str(msg)
-            del self.message_queue[:]
-        async for msg in self.ws:
-            if msg.type == aiohttp.WSMsgType.TEXT:
-                msg_dict = json.loads(msg.data)
-                self.on_message[msg_dict['type']](msg_dict['payload'])
-                if msg.data == 'close':
-                    await self.ws.close()
-            elif msg.type == aiohttp.WSMsgType.ERROR:
-                print('ws connection closed with exception %s' %
-                    self.ws.exception())
-        messages.dispatch_sync(messages.STOP_MAIN_PROCESS)
-        print('websocket connection closed')
-        return self.ws
+    def on_connected(self, ws):
+        self.open_sockets.add(ws)
+        while not ws.closed:
+            message = ws.receive()
+            messages.dispatch(messages.RECEIVED_WEBSOCKET_MESSAGE, ws, message)
+        self.open_sockets.remove(ws)
+        self.stop()
+
+    def message(self, msg):
+        for ws in self.open_sockets:
+            ws.send(msg)
 
     def send_message(self, name, payload=None, encoder=None):
         payload = payload or {}
