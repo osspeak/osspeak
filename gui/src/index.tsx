@@ -17,4 +17,3 @@ ReactDOM.render(
 )
 
 export default App;
-console.log('foo');

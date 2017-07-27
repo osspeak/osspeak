@@ -36,6 +36,7 @@ class ProcessManager:
             line = line.decode('utf8')
             self.on_output(line)
 
+
     def start_stdout_listening(self):
         t = threading.Thread(target=self.dispatch_process_output, daemon=True)
         t.start()

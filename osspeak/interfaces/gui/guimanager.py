@@ -14,9 +14,9 @@ from flask_sockets import Sockets
 if getattr(sys, 'frozen', False):
     ELECTRON_PATH = os.path.join('f')
 else:
-    ELECTRON_PATH = '..\\gui\\node_modules\\electron\\dist\\electron.exe'
+    ELECTRON_PATH = os.path.join('..', 'gui', 'node_modules', 'electron', 'dist', 'electron.exe')
 
-ELECTRON_FOLDER = ' ..\\gui\\'
+ELECTRON_FOLDER = os.path.join(' ..', 'gui')
 
 app = Flask(__name__)
 sockets = Sockets(app)
