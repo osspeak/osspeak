@@ -54,11 +54,14 @@ class CommandModuleWatcher:
         self.grammar_commands[grammar_id] = commands
 
     def generate_node_ids(self, rules):
+        from sprecgrammars.rules import astree
+        prefix_map = {astree.GroupingNode: 'g', astree.Rule: 'r', astree.WordNode: 'w'}
         node_ids = {}
         for rule in rules:
             for node in rule.walk():
                 if node not in node_ids:
-                    node_ids[node] = f'n{len(node_ids) + 1}'
+                    prefix = prefix_map.get(type(node), 'n')
+                    node_ids[node] = f'{prefix}{len(node_ids) + 1}'
         return node_ids
 
     def initialize_modules(self):
