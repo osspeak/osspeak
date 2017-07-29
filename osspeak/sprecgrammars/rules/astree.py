@@ -1,5 +1,4 @@
 import collections
-import uuid
 import copy
 
 class ASTNode:
@@ -21,8 +20,7 @@ class Rule(ASTNode):
 
     def create_reference(self):
         reference_rule = copy.copy(self)
-        reference_rule.base_rule = self
-        reference_rule._id = str(uuid.uuid4()).replace('-', '')
+        reference_rule.base_rule = self.base_rule or self
         return reference_rule
 
 class WordNode(ASTNode):
