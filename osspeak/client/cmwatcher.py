@@ -58,7 +58,8 @@ class CommandModuleWatcher:
         prefix_map = {astree.GroupingNode: 'g', astree.Rule: 'r', astree.WordNode: 'w'}
         node_ids = {}
         for rule in rules:
-            for node in rule.walk():
+            for node_info in rule.walk():
+                node = node_info['node']
                 if node not in node_ids:
                     prefix = prefix_map.get(type(node), 'n')
                     node_ids[node] = f'{prefix}{len(node_ids) + 1}'
