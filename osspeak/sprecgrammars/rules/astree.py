@@ -5,9 +5,9 @@ class ASTNode:
 
     def walk(self, ancestors=None):
         ancestors = ancestors or []
-        yield {'node': self, 'ancestors': tuple(ancestors)}
         for child in getattr(self, 'children', []):
             yield from child.walk(ancestors + [self])
+        yield {'node': self, 'ancestors': tuple(ancestors)}
             
 class Rule(ASTNode):
 

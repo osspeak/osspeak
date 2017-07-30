@@ -9,14 +9,27 @@ class RecognitionResultsTree:
     def __init__(self, root_rule_node, node_ids):
         self.root_rule_node = root_rule_node
         self.node_ids = node_ids
-        self.init_everything()
+        self.initialize_fields()
 
-    def init_everything(self):
+    def walk_tree(self):
+        for node_info in self.root_rule_node.walk():
+            yield RuleNodeWrapper(node_info['node'], node_info['ancestors'], self.node_ids)
+
+    def initialize_fields(self):
         self.rule_paths = {}
         # {'ruleid': {'child id': 'child full path'}}
         self.rule_children = collections.defaultdict(dict)
         self.ambiguities = collections.OrderedDict()
         self.tree_node_map = {}
+        self.node_map = {}
+        self.variables = collections.OrderedDict()
+        self.tree = list(self.walk_tree())
+        for node_wrapper in self.tree:
+            is_ambiguous = (isinstance(node_wrapper.node, astree.GroupingNode) or
+                isinstance(node_wrapper.node, astree.Rule) and node_wrapper.node.name == '_dictate')
+            if is_ambiguous:
+                self.variables[node_wrapper.path] = node_wrapper
+            self.node_map[node_wrapper.path] = node_wrapper
         for node_wrapper in self.tree_nodes():
             self.tree_node_map[node_wrapper.path] = node_wrapper
             assert isinstance(node_wrapper.rule_path, tuple)
@@ -53,6 +66,35 @@ class RecognitionResultsTree:
             full_path_engine_variables.append([full_path, var_val])
         return full_path_engine_variables
 
+    def get_full_path_engine_variables2(self, engine_variables):
+        full_path_engine_variables = collections.defaultdict(list)
+        path = ()
+        for i, (var_id, var_val) in enumerate(engine_variables):
+            if path not in self.node_map:
+                path = ()
+                continue
+            next_path = path + (var_id,)
+            if next_path not in self.node_map:
+                val = engine_variables[i - 1][1]
+                action = self.leaf_action(self.node_map[path].node, ' '.join(val))
+                full_path_engine_variables[path].append(action)
+                next_path = self.next_path(list(path), var_id)
+            path = next_path
+        if path:
+            val = engine_variables[-1][1]
+            action = self.leaf_action(self.node_map[path].node, ' '.join(val))
+            full_path_engine_variables[path].append(action)
+        return full_path_engine_variables
+
+    def next_path(self, current_path, next_end):
+        next_path = []
+        while current_path:
+            path = tuple(current_path + [next_end])
+            if path in self.node_map:
+                return path
+            current_path.pop()
+        return (next_end,)
+
     def leaf_action(self, node, result_text):
         if getattr(node, 'action_substitute', None) is not None:
             return node.action_substitute
@@ -79,20 +121,26 @@ class RecognitionResultsTree:
         return descendant_ids
 
     def action_variables(self, engine_variables):
-        results = collections.defaultdict(list)
-        full_path_engine_variables = self.get_full_path_engine_variables(engine_variables)
-        for i, (full_path, var_text) in enumerate(full_path_engine_variables):
-            node_wrapper = self.tree_node_map[full_path]
-            action = self.leaf_action(node_wrapper.node, var_text)
-            if action is not None:
-                for j, node_id in enumerate(full_path, start=1):
-                    # 'abcd' => 'a' 'ab', 'abc', 'abcd'
-                    partial_path = full_path[:j]
-                    results[partial_path].append(action)
-        variables = []
-        for grouping_path in self.ambiguities:
-            # variables need to be root actions because they can contain multiple other variables
-            action = nodes.RootAction()
-            action.children = results.get(grouping_path, [])
-            variables.append(action)
-        return variables
+        results = collections.OrderedDict({path: nodes.RootAction() for path in self.variables})
+        full_path_engine_variables = self.get_full_path_engine_variables2(engine_variables)
+        for i, (full_path, actions) in enumerate(full_path_engine_variables.items()):
+            for grouping_path, node_wrapper in self.variables.items():
+                if full_path[:len(grouping_path)] == grouping_path:
+                    results[grouping_path].children.extend(actions)
+        return list(results.values())
+
+class RuleNodeWrapper:
+
+    def __init__(self, node, ancestors, node_ids):
+        self.node = node
+        self.descendant_ids = self.get_descendant_ids(node_ids)
+        self.ancestors = ancestors
+        self.full_path = tuple([node_ids[n] for n in ancestors] + [node_ids[node]])
+
+    def get_descendant_ids(self, node_ids):
+        descendants = list(info['node'] for info in self.node.walk())[1:]
+        return set(node_ids[n] for n in descendants)
+
+    @property
+    def path(self):
+        return tuple(self.full_path[1:])
