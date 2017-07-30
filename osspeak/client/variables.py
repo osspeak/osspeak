@@ -27,19 +27,22 @@ class RecognitionResultsTree:
         full_path_engine_variables = collections.defaultdict(list)
         path = ()
         for i, (var_id, var_val) in enumerate(engine_variables):
+            split_id = var_id.split('-')
+            if split_id[0] == 'dictation':
+                var_id = split_id[1]
             if path not in self.node_map:
                 path = ()
                 continue
             next_path = path + (var_id,)
             if next_path not in self.node_map:
                 val = engine_variables[i - 1][1]
-                action = self.leaf_action(self.node_map[path].node, ' '.join(val))
+                action = self.leaf_action(self.node_map[path].node, val)
                 full_path_engine_variables[path].append(action)
                 next_path = self.next_path(list(path), var_id)
             path = next_path
         if path:
             val = engine_variables[-1][1]
-            action = self.leaf_action(self.node_map[path].node, ' '.join(val))
+            action = self.leaf_action(self.node_map[path].node, val)
             full_path_engine_variables[path].append(action)
         return full_path_engine_variables
 
