@@ -27,7 +27,7 @@ class RecognitionResultsTree:
         full_path_engine_variables = collections.defaultdict(list)
         path = ()
         for i, (var_id, var_val) in enumerate(engine_variables):
-            split_id = var_id.split('-')
+            split_id = var_id.split('-', 1)
             if split_id[0] == 'dictation':
                 var_id = split_id[1]
             if path not in self.node_map:
