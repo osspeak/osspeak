@@ -15,12 +15,12 @@ class RecognitionResultsTree:
 
     def initialize_fields(self):
         self.node_map = {}
-        self.variables = collections.OrderedDict()
+        self.variables = []
         for node_wrapper in self.walk_tree():
             is_ambiguous = (isinstance(node_wrapper.node, astree.GroupingNode) or
                 isinstance(node_wrapper.node, astree.Rule) and node_wrapper.node.name == '_dictate')
             if is_ambiguous:
-                self.variables[node_wrapper.path] = node_wrapper
+                self.variables.append(node_wrapper.path)
             self.node_map[node_wrapper.path] = node_wrapper
 
     def get_full_path_engine_variables(self, engine_variables):
@@ -66,10 +66,10 @@ class RecognitionResultsTree:
     def action_variables(self, engine_variables):
         results = collections.OrderedDict({path: nodes.RootAction() for path in self.variables})
         full_path_engine_variables = self.get_full_path_engine_variables(engine_variables)
-        for i, (full_path, actions) in enumerate(full_path_engine_variables.items()):
-            for grouping_path, node_wrapper in self.variables.items():
-                if full_path[:len(grouping_path)] == grouping_path:
-                    results[grouping_path].children.extend(actions)
+        for full_path, actions in full_path_engine_variables.items():
+            for variable_path in self.variables:
+                if full_path[:len(variable_path)] == variable_path:
+                    results[variable_path].children.extend(actions)
         return list(results.values())
 
 class RuleNodeWrapper:
