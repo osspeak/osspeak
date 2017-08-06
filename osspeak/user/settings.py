@@ -39,7 +39,7 @@ user_settings = load_user_settings()
 
 def get_server_address():
     address = user_settings['server_address'].split(':')
-    return = (address[0], 8080) if len(address) == 1 else address[0], int(address[1])
+    return (address[0], 8080) if len(address) == 1 else (address[0], int(address[1]))
 
 def parse_server_address(address):
     if isinstance(address, str):

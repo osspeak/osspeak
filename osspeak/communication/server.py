@@ -36,13 +36,13 @@ class RemoteEngineServer:
             print(time.clock() - then)
             return jsonify(msg)
 
-    @app.route('/message', METHODS=['post'])
+    @app.route('/message', methods=['post'])
     def client_message(self):
         common.receive_message(request.data)
         return ''
 
     def loop_forever(self):
-        host_port = get_server_address()
+        host, port = get_server_address()
         logger.debug(f'Hosting engine server at {host}:{port}')
         app.run(host=host, port=port, threaded=True)
         
