@@ -30,6 +30,7 @@ class RemoteEngineClient:
         for message in message_subscriptions:
             cb = functools.partial(self.send_or_queue_message, message)
             messages.subscribe(message, cb)
+        threading.Thread(target=self.engine_status, daemon=True).start()
 
     def on_engine_connection(self):
         if not self.engine_connection_established:
@@ -50,7 +51,6 @@ class RemoteEngineClient:
                 continue
             else:
                 common.receive_message(resp.data)
-            
 
     def engine_status(self):
         url = f'{self.server_address}/status'
@@ -66,16 +66,6 @@ class RemoteEngineClient:
                 self.engine_connection_established = False
             time.sleep(max(now - 10, 0))
 
-    def send_all_messages(self):
-        with self.message_queue_lock:
-            while self.message_queue:
-                try:
-                    msg = self.message_queue[-1]
-                    common.send_message(self.ws, msg['name'], *msg['args'], **msg['kwargs'])
-                except AttributeError:
-                    return
-                self.message_queue.pop()
-
     def send_or_queue_message(self, message_name, *args, **kwargs):
         if message_name in (messages.ENGINE_START, messages.LOAD_GRAMMAR):
             self.engine_should_be_running = True
@@ -87,7 +77,7 @@ class RemoteEngineClient:
             try:
                 requests.post(json=msg)
             except requests.exceptions.RequestException:
-                pass
+                logger.warning('Message send error')
 
     def establish_engine_connection(self):
         event_loop = asyncio.get_event_loop()
