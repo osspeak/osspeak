@@ -1,4 +1,5 @@
 import asyncio
+import requests
 import functools
 import threading
 import json
@@ -8,17 +9,18 @@ import time
 import sys
 import queue
 from log import logger
+import user.settings
 from user.settings import user_settings
 from communication import messages, common
 
 class RemoteEngineClient:
 
     def __init__(self):
-        self.server_address = user_settings['server_address']
-        self.ws = None
-        self.message_queue = []
-        self.message_queue_lock = threading.Lock()
-        messages.subscribe(messages.WEBSOCKET_CONNECTION_ESTABLISHED, lambda: self.send_all_messages())
+        self.server_address = user.settings.get_server_address()
+        self.engine_should_be_running = False
+        self.engine_connection_established = False
+        messages.subscribe(messages.ENGINE_CONNECTION_OK, self.on_engine_connection)
+        messages.subscribe(messages.POLL_ENGINE_SERVER, self.poll)
         message_subscriptions = (
             messages.LOAD_GRAMMAR,
             messages.ENGINE_STOP,
@@ -28,6 +30,41 @@ class RemoteEngineClient:
         for message in message_subscriptions:
             cb = functools.partial(self.send_or_queue_message, message)
             messages.subscribe(message, cb)
+
+    def on_engine_connection(self):
+        if not self.engine_connection_established:
+            if self.engine_should_be_running:
+                messages.dispatch(messages.RELOAD_GRAMMAR)
+            messages.dispatch(messages.POLL_ENGINE_SERVER)
+        self.engine_connection_established = True
+
+    def load_grammar(self):
+        pass
+
+    def poll(self):
+        url = f'{self.server_address}/poll'
+        while self.engine_connection_established:
+            try:
+                resp = requests.get(url, timeout=360)
+            except requests.exceptions.RequestException:
+                continue
+            else:
+                common.receive_message(resp.data)
+            
+
+    def engine_status(self):
+        url = f'{self.server_address}/status'
+        while True:
+            now = time.clock()
+            try:
+                resp = requests.get(url, timeout=10)
+                if resp.ok:
+                    messages.dispatch(messages.ENGINE_CONNECTION_OK)
+                    self.engine_connection_established = True
+            except requests.exceptions.RequestException:
+                messages.dispatch(messages.ENGINE_CONNECTION_BROKEN)
+                self.engine_connection_established = False
+            time.sleep(max(now - 10, 0))
 
     def send_all_messages(self):
         with self.message_queue_lock:
@@ -40,13 +77,19 @@ class RemoteEngineClient:
                 self.message_queue.pop()
 
     def send_or_queue_message(self, message_name, *args, **kwargs):
-        msg = {'name': message_name, 'args': args, 'kwargs': kwargs}
-        with self.message_queue_lock:
-            # potential queue clearing logic here
-            self.message_queue.insert(0, msg)
-        self.send_all_messages()
+        if message_name in (messages.ENGINE_START, messages.LOAD_GRAMMAR):
+            self.engine_should_be_running = True
+        elif message_name == messages.ENGINE_STOP:
+            self.engine_should_be_running = False
+        if self.engine_connection_established:
+            msg = {'name': message_name, 'args': args, 'kwargs': kwargs}
+            url = f'{self.server_address}/message'
+            try:
+                requests.post(json=msg)
+            except requests.exceptions.RequestException:
+                pass
 
-    def start_websocket_loop(self):
+    def establish_engine_connection(self):
         event_loop = asyncio.get_event_loop()
         threading.Thread(target=self.loop_in_thread, args=(event_loop,), daemon=True).start()
         messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: None)

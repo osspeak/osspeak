@@ -14,9 +14,12 @@ SET_SAVED_MODULES = 'set saved modules'
 LOAD_GRAMMAR = 'load grammar'
 RELOAD_GRAMMAR = 'reload grammar'
 STOP_MAIN_PROCESS  = 'shutdown'
+ENGINE_CONNECTION_OK = 'ENGINE_CONNECTION_OK'
+ENGINE_CONNECTION_BROKEN = 'ENGINE_CONNECTION_BROKEN'
 WEBSOCKET_CONNECTION_ESTABLISHED = 'websocket connection established'
 WEBSOCKET_CONNECTION_BROKEN = 'websocket connection broken'
 RECEIVED_WEBSOCKET_MESSAGE = 'RECEIVED_WEBSOCKET_MESSAGE'
+POLL_ENGINE_SERVER = 'POLL_ENGINE_SERVER'
 
 _subscriptions = collections.defaultdict(list)
 _subscription_lock = threading.Lock()

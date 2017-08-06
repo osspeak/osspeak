@@ -6,66 +6,58 @@ import time
 import socketserver
 import functools
 import json
+import queue
+import flask
+from flask import Response, jsonify, request
 from aiohttp import web
 import aiohttp
 from communication import procs, messages, common
-from user.settings import user_settings
+from user.settings import user_settings, get_server_address
 from log import logger
+
+app = flask.Flask(__name__)
 
 class RemoteEngineServer:
 
     def __init__(self):
+        self.message_queue = queue.Queue(maxsize=5)
+        messages.subscribe(messages.PERFORM_COMMANDS, self.send_message) 
         self.engine = procs.EngineProcessManager()
-        self.app = web.Application()
-        self.app.router.add_get('/', self.websocket_handler)
+
+    @app.route('/status')
+    def check_status(self):
+        return ''
+
+    @app.route('/poll')
+    def client_poll(self):
+        while True:
+            msg = self.message_queue.get()
+            then = msg.pop('timestamp')
+            print(time.clock() - then)
+            return jsonify(msg)
+
+    @app.route('/message', METHODS=['post'])
+    def client_message(self):
+        common.receive_message(request.data)
+        return ''
 
     def loop_forever(self):
-        address = user_settings['server_address'].split(':')
-        host, port = (address[0], 8080) if len(address) == 1 else address
+        host_port = get_server_address()
         logger.debug(f'Hosting engine server at {host}:{port}')
-        web.run_app(self.app, host=host, port=int(port))
+        app.run(host=host, port=port, threaded=True)
         
-    async def websocket_handler(self, request):
-        self.ws = web.WebSocketResponse()
-        logger.debug(f'Hosting engine server at')
-        cb = functools.partial(common.send_message, self.ws, messages.PERFORM_COMMANDS)
-        sub = messages.subscribe(messages.PERFORM_COMMANDS, cb) 
-        await self.ws.prepare(request)
-        async for msg in self.ws:
-            if msg.type == aiohttp.WSMsgType.TEXT:
-                common.receive_message(msg.data)
-            elif msg.type == aiohttp.self.WSMsgType.ERROR:
-                print('ws connection closed with exception %s' %
-                    self.ws.exception())
-        messages.unsubscribe(sub)
-        print('websocket connection closed')
-        return self.ws
+    def send_message(self, msg):
+        while True:
+            try:
+                self.message_queue.put_nowait(msg)
+            except queue.Full:
+                try:
+                    self.message_queue.get_nowait()
+                except queue.Empty:
+                    pass
+            else:
+                msg['timestamp'] = time.clock()
+                return
 
     def shutdown(self, *a, **k):
         messages.dispatch_sync(messages.STOP_MAIN_PROCESS)
-
-class RemoteEngineTCPHandler(socketserver.BaseRequestHandler):
-
-    def handle(self):
-        # self.request is the TCP socket connected to the client
-        self.request.settimeout(20)
-        logger.info(f'Connection established with {self.request.getpeername()}')
-        cb = functools.partial(common.send_message, self.request, messages.PERFORM_COMMANDS)
-        sub = messages.subscribe(messages.PERFORM_COMMANDS, cb) 
-        self.receive_loop()
-        messages.unsubscribe(sub)
-        messages.dispatch(messages.ENGINE_STOP)
-
-    def receive_loop(self):
-        leftover = ''
-        while True:
-            try:
-                msg = self.request.recv(1024)
-            except socket.timeout as e:
-                logger.info(f'Connection closed with {self.request.getpeername()}')
-                return
-            if msg:
-                leftover = common.receive_message(leftover, msg)
-            else:
-                logger.info(f'Connection closed with {self.request.getpeername()}')
-                return
