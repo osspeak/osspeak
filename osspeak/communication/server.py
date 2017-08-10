@@ -9,8 +9,6 @@ import json
 import queue
 import flask
 from flask import Response, jsonify, request
-from aiohttp import web
-import aiohttp
 from communication import procs, messages, common
 from user.settings import user_settings, get_server_address
 from log import logger
@@ -20,7 +18,7 @@ app = flask.Flask(__name__)
 class RemoteEngineServer:
 
     def __init__(self):
-        self.message_queue = queue.Queue(maxsize=5)
+        self.push_message_queue = queue.Queue(maxsize=5)
         messages.subscribe(messages.PERFORM_COMMANDS, self.send_message) 
         self.engine = procs.EngineProcessManager()
 
@@ -31,7 +29,7 @@ class RemoteEngineServer:
     @app.route('/poll')
     def client_poll(self):
         while True:
-            msg = self.message_queue.get()
+            msg = self.push_message_queue.get()
             then = msg.pop('timestamp')
             print(time.clock() - then)
             return jsonify(msg)
@@ -49,10 +47,10 @@ class RemoteEngineServer:
     def send_message(self, msg):
         while True:
             try:
-                self.message_queue.put_nowait(msg)
+                self.push_message_queue.put_nowait(msg)
             except queue.Full:
                 try:
-                    self.message_queue.get_nowait()
+                    self.push_message_queue.get_nowait()
                 except queue.Empty:
                     pass
             else:

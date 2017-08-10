@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engines\EngineManager.cs" />
+    <Compile Include="Engines\EngineStatus.cs" />
     <Compile Include="Engines\ProcessedRecognitionResult.cs" />
     <Compile Include="Error.cs" />
     <Compile Include="InputHandler.cs" />

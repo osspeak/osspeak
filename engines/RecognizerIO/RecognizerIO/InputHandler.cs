@@ -48,6 +48,9 @@ namespace RecognizerIO
                     string text = jsonMsg.Text;
                     EngManager.Engine.EmulateRecognize(text);
                     break;
+                case "GET_ENGINE_STATUS":
+                    Console.WriteLine(EngManager.Status());
+                    break;
                 case "shutdown":
                     shutdown = true;
                     break;

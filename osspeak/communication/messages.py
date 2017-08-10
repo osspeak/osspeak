@@ -20,6 +20,7 @@ WEBSOCKET_CONNECTION_ESTABLISHED = 'websocket connection established'
 WEBSOCKET_CONNECTION_BROKEN = 'websocket connection broken'
 RECEIVED_WEBSOCKET_MESSAGE = 'RECEIVED_WEBSOCKET_MESSAGE'
 POLL_ENGINE_SERVER = 'POLL_ENGINE_SERVER'
+SET_ENGINE_STATUS = 'SET_ENGINE_STATUS'
 
 _subscriptions = collections.defaultdict(list)
 _subscription_lock = threading.Lock()

@@ -4,7 +4,7 @@ import functools
 import threading
 import json
 import socket
-import aiohttp
+# import aiohttp
 import time
 import sys
 import queue
@@ -31,6 +31,9 @@ class RemoteEngineClient:
             cb = functools.partial(self.send_or_queue_message, message)
             messages.subscribe(message, cb)
         threading.Thread(target=self.engine_status, daemon=True).start()
+
+    def set_engine_connection(self, value):
+        self.engine_connection_established = value
 
     def on_engine_connection(self):
         if not self.engine_connection_established:
