@@ -47,6 +47,7 @@ class EngineProcessManager(ProcessManager):
         super().__init__(ENGINE_PATH, on_output=self.on_engine_message)
         self.create_subscriptions()
         self.engine_running = True
+        threading.Thread(target=self.poll_engine_status, daemon=True).start()
 
     def create_subscriptions(self):
         messages.subscribe(messages.LOAD_GRAMMAR, self.load_engine_grammar)
@@ -69,11 +70,19 @@ class EngineProcessManager(ProcessManager):
         }
         self.send_message(msg)
 
+    def poll_engine_status(self):
+        while True:
+            self.send_simple_message('GET_ENGINE_STATUS')
+            time.sleep(5)
+
     def on_engine_message(self, msg_string):
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition':
             if msg['Confidence'] > user_settings['engine']['recognitionConfidence']:
                 messages.dispatch(messages.PERFORM_COMMANDS, msg['Commands'], msg['GrammarId'])
+        elif msg['Type'] == messages.SET_ENGINE_STATUS:
+            messages.dispatch(messages.SET_ENGINE_STATUS, msg)
+            print(msg)
         elif msg['Type'] == 'error':
             print('error!')
             print(msg['Message'])

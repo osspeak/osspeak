@@ -71,5 +71,11 @@ namespace RecognizerIO.Engines
             IsRunning = false;
         }
 
+        public string Status()
+        {
+            var status = new EngineStatus(GrammarId, IsRunning);
+            return JsonConvert.SerializeObject(status);
+        }
+
     }
 }

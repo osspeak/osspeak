@@ -3,13 +3,13 @@ import sys
 import threading
 import json
 import os
-from aiohttp import web
-import aiohttp
+# from aiohttp import web
+# import aiohttp
 from communication.procs import ProcessManager
 from communication import messages
 from interfaces.gui import serializer
 from flask import Flask
-from flask_sockets import Sockets
+# from flask_sockets import Sockets
 
 if getattr(sys, 'frozen', False):
     ELECTRON_PATH = os.path.join('f')
@@ -18,11 +18,11 @@ else:
 
 ELECTRON_FOLDER = os.path.join(' ..', 'gui')
 
-app = Flask(__name__)
-sockets = Sockets(app)
-@sockets.route('/websocket')
-def socket_opened(ws):
-    messages.dispatch_sync(messages.WEBSOCKET_CONNECTION_ESTABLISHED, ws)
+# app = Flask(__name__)
+# sockets = Sockets(app)
+# @sockets.route('/websocket')
+# def socket_opened(ws):
+#     messages.dispatch_sync(messages.WEBSOCKET_CONNECTION_ESTABLISHED, ws)
 
 class GuiProcessManager(ProcessManager):
 

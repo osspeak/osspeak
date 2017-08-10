@@ -30,7 +30,7 @@ def main():
 def initialize_speech_engine_client():
     if settings.user_settings['network'] == 'remote':
         engine_client = client.RemoteEngineClient()
-        engine_client.start_websocket_loop()
+        engine_client.establish_engine_connection()
         return engine_client
     else:
         return EngineProcessManager()
