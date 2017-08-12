@@ -15,7 +15,8 @@ from communication import messages, common
 class RemoteEngineClient:
 
     def __init__(self):
-        self.server_address = user.settings.get_server_address()
+        host, port = user.settings.get_server_address()
+        self.server_address = f'http://{host}:{port}'
         self.poll_request_count = 0
         messages.subscribe(messages.SET_ENGINE_STATUS, self.set_engine_status)
         message_subscriptions = (
