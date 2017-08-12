@@ -50,5 +50,5 @@ class RemoteEngineClient:
         url = f'{self.server_address}/message'
         try:
             requests.post(url, json=msg)
-        except requests.exceptions.RequestException:
-            logger.warning('Message send error')
+        except requests.exceptions.RequestException as e:
+            logger.warning(f'Message send error: {e}')
