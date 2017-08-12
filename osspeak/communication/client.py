@@ -38,7 +38,8 @@ class RemoteEngineClient:
         self.poll_request_count += 1
         url = f'{self.server_address}/poll'
         try:
-            resp = requests.get(url, timeout=360)
+            print('sending poll request to ', url)
+            resp = requests.get(url, timeout=10)
         except requests.exceptions.RequestException:
             self.poll_request_count -= 1
         else:

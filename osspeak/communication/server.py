@@ -42,7 +42,6 @@ class RemoteEngineServer:
     def loop_forever(self):
         host, port = get_server_address()
         logger.debug(f'Hosting engine server at {host}:{port}')
-        print('wtf', host, port)
         app.run(host=host, port=port, threaded=True)
         
     def send_message(self, msg):
