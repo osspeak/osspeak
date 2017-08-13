@@ -1,4 +1,5 @@
 import communicator from './communicator';
+import './app.css'
 
 export default class Application extends React.Component {
 
@@ -13,7 +14,7 @@ export default class Application extends React.Component {
 
     render() {
         return (
-            <div className="vbox fill-parent">
+            <div id="application-root" className="vbox fill-parent">
                 <div className="hbox">
                     <CommandModuleTree
                         selected={this.state.activeModule}

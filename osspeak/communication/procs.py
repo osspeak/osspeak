@@ -82,7 +82,6 @@ class EngineProcessManager(ProcessManager):
                 messages.dispatch(messages.PERFORM_COMMANDS, msg['Commands'], msg['GrammarId'])
         elif msg['Type'] == messages.SET_ENGINE_STATUS:
             messages.dispatch(messages.SET_ENGINE_STATUS, msg)
-            print(msg)
         elif msg['Type'] == 'error':
             print('error!')
             print(msg['Message'])
