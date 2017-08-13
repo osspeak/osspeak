@@ -8,5 +8,6 @@ messages.subscribe(messages.MESSAGE_GUI, lambda msg: common.put_message_in_queue
 
 @app.route('/poll')
 def poll():
+    print('poll')
     msg = server_message_queue.get()
     return jsonify(msg)

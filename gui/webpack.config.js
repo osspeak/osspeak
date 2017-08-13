@@ -1,7 +1,11 @@
 module.exports = {
-    entry: "./src/app/app.tsx",
+    target: 'electron-main',
+    entry: {
+        app: "./src/app/app.tsx",
+        preload: "./src/preload.ts"
+    },
     output: {
-        filename: "bundle.js",
+        filename: "bundle.[name].js",
         path: __dirname + "/dist"
     },
 

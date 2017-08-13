@@ -2,8 +2,14 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {observable} from 'mobx'
 import {observer} from "mobx-react";
+import './command-modules.css';
 
-class CommandModulesView extends React.Component<any, any> {
+class CommandModulesViewContainer extends React.Component<any, any> {
+
+    componentDidMount() {
+
+    }
+
     render() {
         return (
             <div id="command-modules-view">
@@ -13,4 +19,4 @@ class CommandModulesView extends React.Component<any, any> {
     }
 }
 
-export default CommandModulesView;
+export default CommandModulesViewContainer;
