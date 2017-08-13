@@ -40,6 +40,8 @@ def dispatch_sync(message_name, *args, **kwargs):
         sub.callback(*args, **kwargs)
 
 def subscribe(message_name, callback):
+    if not callable(callback):
+        raise TypeError(f'Callback for message {message_name} must be callable')
     sub = Subscription(callback, message_name)
     _subscriptions[message_name].append(sub)
     return sub
@@ -48,6 +50,8 @@ def unsubscribe(subscription):
     with _subscription_lock:
         if subscription.name in _subscriptions:
             _subscriptions[subscription.name] = [s for s in _subscriptions[subscription.name] if s is not subscription]
+            if not _subscriptions[subscription.name]:
+                del _subscriptions[subscription.name]
         subscription.stop()
 
 class Subscription:

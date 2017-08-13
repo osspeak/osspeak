@@ -7,8 +7,8 @@ import time
 
 def create_message_subscriptions(shutdown_event, msg_list):
     messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: shutdown_event.set())
-    messages.subscribe(messages.RELOAD_COMMAND_MODULE_FILES, set_message(msg_list, messages.RELOAD_COMMAND_MODULE_FILES))
-    messages.subscribe(messages.RELOAD_GRAMMAR, set_message(msg_list, messages.RELOAD_GRAMMAR))
+    messages.subscribe(messages.RELOAD_COMMAND_MODULE_FILES, lambda: set_message(msg_list, messages.RELOAD_COMMAND_MODULE_FILES))
+    messages.subscribe(messages.RELOAD_GRAMMAR, lambda: set_message(msg_list, messages.RELOAD_GRAMMAR))
 
 def start_watching_user_state(command_module_watcher):
     command_module_watcher.load_initial_user_state()
