@@ -1,4 +1,6 @@
 import json
+import socket
+import queue
 from log import logger
 from communication import messages
 
@@ -14,3 +16,22 @@ def send_message(ws, msg_name, *args, **kwargs):
     }
     ws.send_str(json.dumps(msg))
 
+def put_message_in_queue(q, msg):
+    while True:
+        try:
+            q.put_nowait(msg)
+        except queue.Full as e:
+            if not q.maxsize:
+                raise e
+            try:
+                q.get_nowait()
+            except queue.Empty:
+                pass
+
+def get_open_port():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("",0))
+    s.listen(1)
+    port = s.getsockname()[1]
+    s.close()
+    return port

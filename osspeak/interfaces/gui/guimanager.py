@@ -6,8 +6,8 @@ import os
 # from aiohttp import web
 # import aiohttp
 from communication.procs import ProcessManager
-from communication import messages
-from interfaces.gui import serializer
+from communication import messages, common
+from interfaces.gui import serializer, server
 from flask import Flask
 # from flask_sockets import Sockets
 
@@ -18,25 +18,12 @@ else:
 
 ELECTRON_FOLDER = os.path.join(' ..', 'gui')
 
-# app = Flask(__name__)
-# sockets = Sockets(app)
-# @sockets.route('/websocket')
-# def socket_opened(ws):
-#     messages.dispatch_sync(messages.WEBSOCKET_CONNECTION_ESTABLISHED, ws)
-
 class GuiProcessManager(ProcessManager):
 
     def __init__(self):
         super().__init__(f'{ELECTRON_PATH} {ELECTRON_FOLDER}')
-        self.websocket_established = False
-        self.message_queue = []
-        self.open_sockets = set()
-        self.message_queue_lock = threading.Lock()
-        self.message_dispatcher = {
-            'save modules': self.save_modules
-        }
-        messages.subscribe(messages.LOAD_MODULE_MAP, lambda payload: self.send_message('module map', payload))
-        messages.subscribe(messages.WEBSOCKET_CONNECTION_ESTABLISHED, self.on_connected)
+        # messages.subscribe(messages.LOAD_MODULE_MAP, lambda payload: self.send_message('module map', payload))
+        # messages.subscribe(messages.WEBSOCKET_CONNECTION_ESTABLISHED, self.on_connected)
 
     def save_modules(self, msg_data):
         module_configurations = {k: self.to_module_config(v) for (k, v) in msg_data['modules'].items()}
@@ -65,10 +52,8 @@ class GuiProcessManager(ProcessManager):
         self.message_dispatcher[msg_dict['type']](msg_dict['payload'])
     
     def main_loop(self):
-        from gevent import pywsgi
-        from geventwebsocket.handler import WebSocketHandler
-        self.server = pywsgi.WSGIServer(('', 8080), app, handler_class=WebSocketHandler)
-        self.server.serve_forever()
+        port = common.get_open_port()
+        server.app.run(port=port)
 
     def on_connected(self, ws):
         self.open_sockets.add(ws)
@@ -77,10 +62,6 @@ class GuiProcessManager(ProcessManager):
             messages.dispatch(messages.RECEIVED_WEBSOCKET_MESSAGE, ws, message)
         self.open_sockets.remove(ws)
         self.stop()
-
-    def message(self, msg):
-        for ws in self.open_sockets:
-            ws.send(msg)
 
     def send_message(self, name, payload=None, encoder=None):
         payload = payload or {}
