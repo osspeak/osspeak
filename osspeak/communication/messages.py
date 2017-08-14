@@ -36,8 +36,7 @@ def dispatch_sync(message_name, *args, **kwargs):
     logger.debug(f"Dispatching sync message: '{message_name}'")
     with _subscription_lock:
         subscriptions = _subscriptions[message_name].copy()
-    for sub in subscriptions:
-        sub.callback(*args, **kwargs)
+    return [s.callback(*args, **kwargs) for s in subscriptions]
 
 def subscribe(message_name, callback):
     if not callable(callback):
