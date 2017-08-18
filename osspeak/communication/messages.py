@@ -7,6 +7,7 @@ EMULATE_RECOGNITION = 'emulate recognition'
 ENGINE_START = 'engine start'
 ENGINE_STOP = 'engine stop'
 HEARTBEAT = 'heartbeat'
+FETCH_MODULE_MAP = 'FETCH_MODULE_MAP'
 LOAD_MODULE_MAP = 'load module map'
 PERFORM_COMMANDS = 'perform commands'
 RELOAD_COMMAND_MODULE_FILES = 'reload command module files'
@@ -47,10 +48,11 @@ def subscribe(message_name, callback):
 
 def unsubscribe(subscription):
     with _subscription_lock:
-        if subscription.name in _subscriptions:
-            _subscriptions[subscription.name] = [s for s in _subscriptions[subscription.name] if s is not subscription]
-            if not _subscriptions[subscription.name]:
-                del _subscriptions[subscription.name]
+        name = subscription.name
+        if name in _subscriptions:
+            _subscriptions[name] = [s for s in _subscriptions[name] if s is not subscription]
+            if not _subscriptions[name]:
+                del _subscriptions[name]
         subscription.stop()
 
 class Subscription:

@@ -2,13 +2,13 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import "./app.css"
 import CommandModulesView from '../command-modules/view';
-import {pollServer} from '../poll'
+import {wsFetch} from '../websocket';
+wsFetch
 
-console.log('nit')
 class App extends React.Component<{}, {}> {
 
     componentDidMount() {
-        pollServer();
+        // console.log(ws)
     }
 
     render() {

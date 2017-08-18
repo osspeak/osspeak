@@ -1,3 +1,4 @@
+import threading
 import itertools
 import uuid
 import os
@@ -21,18 +22,21 @@ class CommandModuleWatcher:
         self.command_module_json = self.load_command_json()
         messages.subscribe(messages.PERFORM_COMMANDS, self.perform_commands)
         messages.subscribe(messages.SET_SAVED_MODULES, self.update_modules)
+        messages.subscribe(messages.FETCH_MODULE_MAP, self.fetch_module_map)
+        self.lock = threading.Lock()
 
     def load_modules(self, current_window, current_state, reload_files=False):
-        previous_active_modules = self.active_modules
-        if reload_files:
-            self.load_initial_user_state()
-            self.command_module_json = self.load_command_json()
-        self.initialize_modules()
-        self.active_modules = self.get_active_modules(current_window, current_state)
-        self.load_command_module_information()
-        self.fire_activation_events(previous_active_modules)
-        self.send_module_information_to_ui()
-        self.load_and_send_grammar()
+        with self.lock:
+            previous_active_modules = self.active_modules
+            if reload_files:
+                self.load_initial_user_state()
+                self.command_module_json = self.load_command_json()
+            self.initialize_modules()
+            self.active_modules = self.get_active_modules(current_window, current_state)
+            self.load_command_module_information()
+            self.fire_activation_events(previous_active_modules)
+            self.send_module_information_to_ui()
+            self.load_and_send_grammar()
 
     def load_and_send_grammar(self):
         active_rules = self.active_rules
@@ -214,3 +218,8 @@ class CommandModuleWatcher:
             log.logger.warning(f'Grammar {grammar_id} no longer exists')
             return
         action.perform_commands(command_results, command_map)
+
+    def fetch_module_map(self):
+        with self.lock():
+            payload = {'modules': self.cmd_modules}
+        messages.dispatch(messages.LOAD_MODULE_MAP, payload)

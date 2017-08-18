@@ -33,7 +33,7 @@
     "jstree": "^3.3.3",
     "react-redux": "^5.0.5",
     "style-loader": "^0.18.2",
-    "ts-loader": "^2.0.2",
+    "ts-loader": "^2.3.3",
     "typescript": "^2.4.2",
     "webpack": "^2.7.0"
   }
