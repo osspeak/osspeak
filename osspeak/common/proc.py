@@ -3,11 +3,18 @@ import threading
 
 class ProcessManager:
 
-    def __init__(self, path, on_message=lambda x: None):
+    def __init__(self, path, on_message=lambda x: None, on_exit=lambda: print('wtf')):
         self.on_message = on_message
+        self.on_exit = on_exit
+        print('nf')
+        threading.Thread(target=self.start_process, args=(path,), daemon=True).start()
+        self.start_stdout_listening()
+
+    def start_process(self, path):
         self.process = subprocess.Popen(path, stdin=subprocess.PIPE,
             stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-        self.start_stdout_listening()
+        self.process.wait()
+        self.on_exit()
         
     def send_message(self, msg):
         if not isinstance(msg, bytes):

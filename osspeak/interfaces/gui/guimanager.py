@@ -6,7 +6,7 @@ import json
 import os
 from communication.procs import ProcessManager
 from communication import messages, common
-from interfaces.gui import serializer, server
+from interfaces.gui import serializer
 from flask import Flask
 from aiohttp import web
 import aiohttp
@@ -20,45 +20,51 @@ else:
 ELECTRON_FOLDER = os.path.join(' ..', 'gui')
 
 routes = {
-    'FOO': lambda *a: ('sdfsdfsdf')
+    'FOO': lambda *a: ('sdfsdfsdf'),
+    'GET_COMMAND_MODULES': lambda *a: 55
 }
 
 class GuiProcessManager(ProcessManager):
 
     def __init__(self):
+        self.loop = asyncio.get_event_loop()
         self.port = common.get_open_port()
         self.app = aiohttp.web.Application()
         self.app.router.add_get('/ws', self.websocket_handler)
         self.websocket_connections = set()
-        messages.subscribe(messages.RECEIVED_WEBSOCKET_MESSAGE, self.on_message)
-        messages.subscribe(messages.MESSAGE_GUI, self.send_message)
-        super().__init__(f'{ELECTRON_PATH} {ELECTRON_FOLDER} localhost:{self.port}')
+        messages.subscribe(messages.RECEIVED_GUI_MESSAGE, self.on_message)
+        messages.subscribe(messages.SEND_GUI_MESSAGE, self.send_gui_message)
+        super().__init__(f'{ELECTRON_PATH} {ELECTRON_FOLDER} localhost:{self.port}', on_exit=self.shutdown)
 
-    @property
-    def command_line_args(self):
-        args = {
-            'address': f'localhost:{self.port}'
-        }
-        return json.dumps(args)
+    def send_gui_message(self, message_name, data=None):
+        data = {} if data is None else data
+        msg_data, ok = self.gui_resource(message_name, data)
+        self.send_message(message_name, msg_data, ok=ok)
 
     def on_message(self, msg):
-        data_func = routes[msg['type']]
+        msg_data, ok = self.gui_resource(msg['type'], msg.get('data', {}))
+        self.send_message(msg['type'], msg_data, msg_id=msg['id'], ok=ok)
+
+    def gui_resource(self, name, data):
+        if name not in routes:
+            return f'No resource named {name}', False
+        data_func = routes[name]
         ok = True
         try:
-            result = data_func(msg.get('data'))
+            result = data_func(data)
         except Exception as e:
             logger.error(str(e))
             result = str(e)
             ok = False
-        self.send_message('RESPONSE', result, ok=ok)
+        return result, ok
 
     def send_message(self, message_name, msg, msg_id=None, ok=True):
-        full_message = json.dumps({'type': message_name, 'data': msg, 'ok': ok})
+        full_message = {'type': message_name, 'data': msg, 'ok': ok}
         if msg_id is not None:
-            assert message_name == 'RESPONSE'
             full_message['id'] = msg_id
+        serialized_message = json.dumps(full_message, default=serializer.GuiEncoder)
         for ws in self.websocket_connections:
-            ws.send_str(msg)
+            ws.send_str(serialized_message)
 
     def save_modules(self, msg_data):
         module_configurations = {k: self.to_module_config(v) for (k, v) in msg_data['modules'].items()}
@@ -80,16 +86,10 @@ class GuiProcessManager(ProcessManager):
         return module_config
     
     def main_loop(self):
-        loop = asyncio.get_event_loop()
-        messages.subscribe(messages.WEBSOCKET_CONNECTION_BROKEN, self.shutdown)
-        threading.Thread(target=self.shutdown, daemon=True, args=(loop,)).start()
         aiohttp.web.run_app(self.app, host='localhost', port=self.port)
-        # server.app.run(port=self.port, host='localhost', threaded=True)
 
-    def shutdown(self, loop):
-        import time
-        time.sleep(60)
-        loop.call_soon_threadsafe(lambda: loop.stop())
+    def shutdown(self):
+        self.loop.call_soon_threadsafe(lambda: self.loop.stop())
 
     async def websocket_handler(self, request):
         ws = aiohttp.web.WebSocketResponse()
@@ -100,7 +100,7 @@ class GuiProcessManager(ProcessManager):
                 if msg.data == 'close':
                     await ws.close()
                 else:
-                    messages.dispatch(messages.RECEIVED_WEBSOCKET_MESSAGE, json.loads(msg.data))
+                    messages.dispatch(messages.RECEIVED_GUI_MESSAGE, json.loads(msg.data))
             elif msg.type == aiohttp.WSMsgType.ERROR:
                 print('ws connection closed with exception %s' %
                     ws.exception())

@@ -14,11 +14,17 @@ else:
 
 class ProcessManager:
 
-    def __init__(self, path, on_output=lambda x: None):
-        self.process = subprocess.Popen(path, stdin=subprocess.PIPE,
-            stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    def __init__(self, path, on_output=lambda x: None, on_exit=lambda: None):
         self.on_output = on_output
+        self.on_exit = on_exit
+        self.process = subprocess.Popen(path, stdin=subprocess.PIPE,
+            stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+        threading.Thread(target=self.wait, daemon=True).start()
         self.start_stdout_listening()
+
+    def wait(self):
+        self.process.wait()
+        self.on_exit()
         
     def send_message(self, msg):
         if not isinstance(msg, bytes):

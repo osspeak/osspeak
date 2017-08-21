@@ -220,6 +220,6 @@ class CommandModuleWatcher:
         action.perform_commands(command_results, command_map)
 
     def fetch_module_map(self):
-        with self.lock():
+        with self.lock:
             payload = {'modules': self.cmd_modules}
         messages.dispatch(messages.LOAD_MODULE_MAP, payload)
