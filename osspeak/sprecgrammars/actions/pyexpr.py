@@ -39,13 +39,13 @@ def greedy_parse(s, validator=lambda x: compile(x, filename='<ast>', mode='eval'
             expr_text = try_parse_string
             remaining_text = s[len(expr_text):]
         except SyntaxError as e:
-            handled_error = on_error(try_parse_string, e.offset - 1)
-            if handled_error is None:
-                first_error = first_error or e
-            else:
-                expr, expr_text, remaining_text = handled_error
+            first_error = first_error or e
     if expr is None:
-        raise first_error
+        handled_error = on_error(try_parse_string, first_error.offset - 1)
+        if handled_error is None:
+            raise first_error
+        else:
+            expr, expr_text, remaining_text = handled_error
     return expr, expr_text, remaining_text
 
 def on_error(s, offset):
@@ -62,8 +62,8 @@ vals = [
     '$1 0 or 7',
 ]
 
-for val in vals:
-    comp = compile_python_expressions(val)
-    for exp in comp:
-        print(eval(exp[0]))
+# for val in vals:
+#     comp = compile_python_expressions(val)
+#     for exp in comp:
+#         print(eval(exp[0]))
     
