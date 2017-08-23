@@ -3,10 +3,9 @@ import threading
 
 class ProcessManager:
 
-    def __init__(self, path, on_message=lambda x: None, on_exit=lambda: print('wtf')):
+    def __init__(self, path, on_message=lambda x: None, on_exit=pass):
         self.on_message = on_message
         self.on_exit = on_exit
-        print('nf')
         threading.Thread(target=self.start_process, args=(path,), daemon=True).start()
         self.start_stdout_listening()
 
