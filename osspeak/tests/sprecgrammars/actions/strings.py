@@ -15,4 +15,5 @@ FUNCTION_WITH_ARGS = 'mouse.move(100, 200)'
 
 VARIABLE1 = '"hello" $1 "world"'
 # VARIABLE2 = '0 or 3 "hello world" max(len($1), 2*4)'
-VARIABLE2 = 'len($1)'
+VARIABLE2 = 'len($1, $-2)'
+VARIABLE3 = 'len($1, $-2) "foo $2"'

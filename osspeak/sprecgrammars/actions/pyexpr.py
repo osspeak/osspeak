@@ -1,21 +1,12 @@
 import re
 
-def variable_error(s, offset, match):
-    matched_text = match.group()
+def varrepl(matched_text):
     num = int(matched_text[1:])
     if num > 0:
         num -= 1
-    pre = s[:offset]
-    post = s[offset + len(matched_text):]
-    new_text = f'{pre}variables[{num}]{post}'
-    return greedy_parse(new_text)
+    return f'variables[{num}]'
 
-variables = ['var1', 'var2']
-
-error_map = {
-    r'\$-?\d+': variable_error
-}
-error_map = {re.compile(k): v for k, v in error_map.items()}
+VAR_PATTERN = re.compile(r'\$-?\d+')
 
 def compile_python_expressions(input_string):
     expressions = []
@@ -30,23 +21,39 @@ def greedy_parse(s, validator=lambda x: compile(x, filename='<ast>', mode='eval'
     expr = None
     first_error = None
     expr_text = None
+    expr_matches = None
     remaining_text = None
+    seen_string = ''
     try_parse_string = ''
     for char in s:
-        try_parse_string += char
+        seen_string += char
+        try_parse_string = re.sub(VAR_PATTERN, 'x', seen_string)
         try:
             expr = validator(try_parse_string)
-            expr_text = try_parse_string
-            remaining_text = s[len(expr_text):]
+            expr_matches = re.finditer(VAR_PATTERN, seen_string) 
+            expr_text = seen_string
+            remaining_text = s[len(seen_string):]
         except SyntaxError as e:
             first_error = first_error or e
     if expr is None:
-        handled_error = on_error(try_parse_string, first_error.offset - 1)
-        if handled_error is None:
-            raise first_error
-        else:
-            expr, expr_text, remaining_text = handled_error
-    return expr, expr_text, remaining_text
+        raise first_error
+    matches = list(reversed(list(expr_matches)))
+    replace_matches = []
+    testidx = 0
+    for testidx, match in enumerate(matches):
+        teststr = expr_text
+        test_matches = [m for m in matches if m is not match]
+        for m in test_matches:
+            teststr = teststr[:m.start()] + 'x' + teststr[m.end():]
+        try:
+            validator(teststr)
+        except SyntaxError:
+            replace_matches.append(match)
+    replaced_text = expr_text
+    for m in replace_matches:
+        old = expr_text[m.start():m.end()]
+        replaced_text = replaced_text[:m.start()] + varrepl(old) + replaced_text[m.end():]
+    return validator(replaced_text), replaced_text, remaining_text
 
 def on_error(s, offset):
     remainder = s[offset:]
