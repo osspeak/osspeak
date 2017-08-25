@@ -31,4 +31,4 @@ class TestPyExpr(unittest.TestCase):
 
     def test_variable3(self):
         exprs = self.parse_action_string(strings.VARIABLE3)
-        self.assertEqual(exprs, ['len(variables[0], variables[-2])', '"foo $2"'])
+        self.assertEqual(exprs, ['len(variables[0], variables[-2]) ', '"foo $2"'])
