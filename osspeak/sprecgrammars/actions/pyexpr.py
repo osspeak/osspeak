@@ -7,6 +7,7 @@ def varrepl(matched_text):
     return f'variables[{num}]'
 
 VAR_PATTERN = re.compile(r'\$-?\d+')
+VAR_PATTERN_END = re.compile(r'\$-?\d+$')
 
 def compile_python_expressions(input_string):
     expressions = []
@@ -27,7 +28,7 @@ def greedy_parse(s, validator=lambda x: compile(x, filename='<ast>', mode='eval'
     try_parse_string = ''
     for char in s:
         seen_string += char
-        try_parse_string = re.sub(VAR_PATTERN, 'x', seen_string)
+        try_parse_string = re.sub(VAR_PATTERN, 'variables[0]', seen_string)
         try:
             expr = validator(try_parse_string)
             expr_matches = re.finditer(VAR_PATTERN, seen_string) 
@@ -37,23 +38,35 @@ def greedy_parse(s, validator=lambda x: compile(x, filename='<ast>', mode='eval'
             first_error = first_error or e
     if expr is None:
         raise first_error
-    matches = list(reversed(list(expr_matches)))
+    replaced_text = replace_matches(expr_matches, expr_text, validator)
+    return validator(replaced_text), replaced_text, remaining_text
+
+def replace_matches(matches, expr_text, validator):
+    '''
+    find which $int matches we need to replace (Names) and which we
+    don't (inside strings). Then replace whichever matches raised
+    syntax errors
+    '''
     replace_matches = []
     testidx = 0
+    # replace in reversed order to preserve positions of earlier matches
+    matches = list(reversed(list(matches)))
     for testidx, match in enumerate(matches):
         teststr = expr_text
-        test_matches = [m for m in matches if m is not match]
+        test_matches = (m for m in matches if m is not match)
         for m in test_matches:
-            teststr = teststr[:m.start()] + 'x' + teststr[m.end():]
+            teststr = teststr[:m.start()] + 'variables[0]' + teststr[m.end():]
         try:
             validator(teststr)
         except SyntaxError:
             replace_matches.append(match)
+    # replace the matches that raised syntax error if not changed
     replaced_text = expr_text
     for m in replace_matches:
         old = expr_text[m.start():m.end()]
+        assert( VAR_PATTERN_END.match(old))
         replaced_text = replaced_text[:m.start()] + varrepl(old) + replaced_text[m.end():]
-    return validator(replaced_text), replaced_text, remaining_text
+    return replaced_text
 
 def on_error(s, offset):
     remainder = s[offset:]
