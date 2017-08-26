@@ -7,10 +7,6 @@ from tests.sprecgrammars.actions import strings
 
 class TestAstTransform(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        pass
-
     def evaluate(self, expr_text, usrglobals=None, usrlocals=None):
         usrglobals, usrlocals = usrglobals or globals(), usrlocals or locals()
         expr = asttransform.transform_expression(expr_text)
@@ -31,7 +27,7 @@ class TestAstTransform(unittest.TestCase):
     def test_top_level_builtin(self):
         res = self.evaluate(strings.TOP_LEVEL_BUILTIN)
         self.assertEqual(res, 'len')
-        
+
     def test_index(self):
         res = self.evaluate(strings.INDEX_EXPR, usrlocals={'x': [5]})
         self.assertEqual(res, 5)

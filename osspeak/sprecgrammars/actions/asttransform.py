@@ -1,3 +1,14 @@
+'''
+Replace ast.Name nodes with strings wherever possible:
+    foo + bar -> 'foo' + 'bar'
+    sorted([sjhsdfjsdfsdf, abc, 'de'], key=len) -> sorted(['de', 'abc', 'sjhsdfjsdfsdf'], key=len)
+
+Ignore:
+    foo[0], foo[::], foo()
+    arguments TODO: fix scope escaping
+    locals/globals unless they're direct children of root expression
+'''
+
 import ast
 
 class NameToStringTransformer(ast.NodeTransformer):
