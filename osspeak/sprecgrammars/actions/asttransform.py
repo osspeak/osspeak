@@ -13,9 +13,10 @@ import ast
 
 class NameToStringTransformer(ast.NodeTransformer):
 
-    def __init__(self, root):
+    def __init__(self, root, _globals):
         super().__init__()
         self.nodes_to_replace = self.to_replace(root)
+        self._globals = _globals
         
     def to_replace(self, root):
         nodes_to_replace = set()
@@ -37,7 +38,7 @@ class NameToStringTransformer(ast.NodeTransformer):
             return ast.Str(s=node.id)
         return node
 
-def transform_expression(expr_text):
+def transform_expression(expr_text, _globals=None):
     expr = ast.parse(expr_text, mode='eval')
-    new_expr = NameToStringTransformer(expr).visit(expr)
+    new_expr = NameToStringTransformer(expr, _globals).visit(expr)
     return compile(ast.fix_missing_locations(new_expr), filename='<ast>', mode='eval')

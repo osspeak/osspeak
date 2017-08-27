@@ -14,7 +14,7 @@ def compile_python_expressions(input_string):
     remaining_text = input_string
     while remaining_text:
         expr, expr_text, remaining_text = greedy_parse(remaining_text)
-        expressions.append((expr, expr_text))
+        expressions.append(expr_text)
     return expressions
 
 def greedy_parse(s, validator=lambda x: compile(x, filename='<ast>', mode='eval')):

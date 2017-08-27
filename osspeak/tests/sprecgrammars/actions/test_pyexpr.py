@@ -7,19 +7,8 @@ from tests.sprecgrammars.actions import strings
 
 class TestPyExpr(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        cls.function_definitions = {}
-        defs = {
-            'mouse.click()': '' 
-        }
-        for sig, action in defs.items():
-            func_def = api.func_definition(sig, action)
-            cls.function_definitions[func_def.name] = func_def
-
     def parse_action_string(self, action_string):
-        results = pyexpr.compile_python_expressions(action_string)
-        return [r[1] for r in results]
+        return pyexpr.compile_python_expressions(action_string)
 
     def test_variable1(self):
         exprs = self.parse_action_string(strings.VARIABLE1)
