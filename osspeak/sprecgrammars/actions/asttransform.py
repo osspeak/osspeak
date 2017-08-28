@@ -13,10 +13,10 @@ import ast
 
 class NameToStringTransformer(ast.NodeTransformer):
 
-    def __init__(self, root, _globals):
+    def __init__(self, root, namespace):
         super().__init__()
+        self.namespace = namespace
         self.nodes_to_replace = self.to_replace(root)
-        self._globals = _globals
         
     def to_replace(self, root):
         nodes_to_replace = set()
@@ -29,7 +29,7 @@ class NameToStringTransformer(ast.NodeTransformer):
                     continue
                 if not (isinstance(node, (ast.Subscript, ast.Attribute)) or
                     (isinstance(node, ast.Call) and node.func is child) or 
-                    (child.id in __builtins__ and node is not root)):
+                    (child.id in self.namespace and node is not root)):
                     nodes_to_replace.add(child)
         return set(n for n in nodes_to_replace if n.id not in names_to_keep)
 
@@ -38,7 +38,12 @@ class NameToStringTransformer(ast.NodeTransformer):
             return ast.Str(s=node.id)
         return node
 
-def transform_expression(expr_text, _globals=None):
+def transform_expression(expr_text, namespace=None):
+    namespace = set() if namespace is None else namespace
+    namespace = namespace.union(get_builtins())
     expr = ast.parse(expr_text, mode='eval')
-    new_expr = NameToStringTransformer(expr, _globals).visit(expr)
+    new_expr = NameToStringTransformer(expr, namespace).visit(expr)
     return compile(ast.fix_missing_locations(new_expr), filename='<ast>', mode='eval')
+
+def get_builtins():
+    return set(__builtins__ if isinstance(__builtins__, dict) else dir(__builtins__))

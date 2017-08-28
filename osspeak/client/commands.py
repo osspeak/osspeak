@@ -49,6 +49,7 @@ class CommandModule:
     def define_functions(self):
         for func_signature, func_text in self.config.get('functions', {}):
             func_definition = api.func_definition(func_signature, defined_functions=self.scope.functions)
+            user_function = api.function(func_signature, func_text)
             self.scope.functions[func_definition.name] = func_definition
             self.functions.append(func_definition)
 

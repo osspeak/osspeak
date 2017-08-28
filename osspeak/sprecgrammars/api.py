@@ -2,6 +2,8 @@ from sprecgrammars.rules.parser import RuleParser
 from sprecgrammars.actions.parser import ActionParser
 from sprecgrammars.actions.action import Action
 from sprecgrammars.functions.parser import FunctionDefinitionParser
+from sprecgrammars.functions.parser import FunctionDefinitionParser
+from sprecgrammars.function import Function
 from sprecgrammars.actions import pyexpr, asttransform
 
 def rule(text, name=None, rules=None, defined_functions=None):
@@ -24,7 +26,9 @@ def func_definition(func_signature, func_action=None, defined_functions=None):
     if func_action is not None:
         func_def.action = action(func_action, defined_functions=defined_functions)
     return func_def
-def function_definition(func_signature, func_action=None, defined_functions=None):
+
+def function(func_signature, func_action=None, defined_functions=None):
+    func = Function(func_signature, func_action)
     fstr = f'def {func_signature}: pass'
     try:
         exec(fstr)
