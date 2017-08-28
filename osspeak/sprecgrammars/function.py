@@ -9,9 +9,9 @@ class Function:
 
     def validate_signature(self):
         try:
-            exec(f'def {func_signature}: pass')
+            exec(f'def {self.signature_text}: pass')
         except SyntaxError:
-            exec(f'def {func_signature}(): pass')
+            exec(f'def {self.signature_text}(): pass')
 
     def compile_action(self):
         pass
