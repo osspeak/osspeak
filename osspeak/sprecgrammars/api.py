@@ -29,8 +29,4 @@ def func_definition(func_signature, func_action=None, defined_functions=None):
 
 def function(func_signature, func_action=None, defined_functions=None):
     func = Function(func_signature, func_action)
-    fstr = f'def {func_signature}: pass'
-    try:
-        exec(fstr)
-    except Exception as e:
-        raise e
+    return func

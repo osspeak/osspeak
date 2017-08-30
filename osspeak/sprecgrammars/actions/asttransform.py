@@ -39,11 +39,10 @@ class NameToStringTransformer(ast.NodeTransformer):
         return node
 
 def transform_expression(expr_text, namespace=None):
-    namespace = set() if namespace is None else namespace
-    namespace = namespace.union(get_builtins())
+    namespace = get_builtins() if namespace is None else namespace
     expr = ast.parse(expr_text, mode='eval')
     new_expr = NameToStringTransformer(expr, namespace).visit(expr)
     return compile(ast.fix_missing_locations(new_expr), filename='<ast>', mode='eval')
 
 def get_builtins():
-    return set(__builtins__ if isinstance(__builtins__, dict) else dir(__builtins__))
+    return __builtins__ if isinstance(__builtins__, dict) else dir(__builtins__)

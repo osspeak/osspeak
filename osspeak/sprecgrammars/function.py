@@ -1,3 +1,5 @@
+from sprecgrammars.actions.action import Action
+
 class Function:
 
     def __init__(self, signature_text, action_text):
@@ -13,5 +15,8 @@ class Function:
         except SyntaxError:
             exec(f'def {self.signature_text}(): pass')
 
-    def compile_action(self):
+    def compile_action(self, defined_functions):
+        self.action = Action(self.action_text, defined_functions)
+
+    def __call__(self, *args, **kwargs):
         pass

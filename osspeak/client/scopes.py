@@ -38,3 +38,11 @@ class ScopeFieldMap:
             return key in self.local_dict
         return key in self.global_dict
     
+    def __iter__(self):
+        return {**self.global_dict, **(self.local_dict or {})}.__iter__()
+
+    def keys(self):
+        kset = set(self.global_dict.keys())
+        if self.local_dict is not None:
+            kset.union(self.local_dict.keys())
+        return list(kset)

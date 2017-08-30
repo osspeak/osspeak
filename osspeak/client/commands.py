@@ -48,16 +48,13 @@ class CommandModule:
 
     def define_functions(self):
         for func_signature, func_text in self.config.get('functions', {}):
-            func_definition = api.func_definition(func_signature, defined_functions=self.scope.functions)
             user_function = api.function(func_signature, func_text)
-            self.scope.functions[func_definition.name] = func_definition
-            self.functions.append(func_definition)
+            self.scope.functions[user_function.name] = user_function
+            self.functions.append(user_function)
 
     def set_function_actions(self):
-        config_funcs = self.config.get('functions', {})
-        for i, func in enumerate(self.functions):
-            action_text = config_funcs[i][1]
-            func.action = api.action(action_text, defined_functions=self.scope.functions)
+        for func in self.functions:
+            func.compile_action(self.scope.functions)
 
     def load_events(self):
         for event_name, event_text in self.config.get('events', {}).items():
