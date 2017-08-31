@@ -1,5 +1,6 @@
 from sprecgrammars.actions import parser, actionstream
 from sprecgrammars import api
+from sprecgrammars.action import Action
 
 class BaseToken:
     pass
