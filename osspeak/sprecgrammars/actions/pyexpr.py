@@ -13,7 +13,7 @@ def compile_python_expressions(input_string, validator: lambda expr: True):
     expressions = []
     remaining_text = input_string
     while remaining_text:
-        expr, expr_text, remaining_text = greedy_parse(remaining_text, validator)
+        expr_text, remaining_text = greedy_parse(remaining_text, validator)
         expressions.append(expr_text)
     return expressions
 
@@ -28,17 +28,20 @@ def greedy_parse(s, validator)
         seen_string += char
         try_parse_string = re.sub(VAR_PATTERN, 'variables[0]', seen_string)
         try:
-            expr = validator(try_parse_string)
             expr = ast.parse(try_parse_string, mode='eval')
+        except SyntaxError as e:
+            first_error = first_error or e
+        else:
+            if not validator(expr):
+                remaining_text = None
+                break
             expr_matches = re.finditer(VAR_PATTERN, seen_string) 
             expr_text = seen_string
             remaining_text = s[len(seen_string):]
-        except SyntaxError as e:
-            first_error = first_error or e
     if expr is None:
         raise first_error
     replaced_text = replace_matches(expr_matches, expr_text)
-    return validator(replaced_text), replaced_text, remaining_text
+    return replaced_text, remaining_text
 
 def replace_matches(matches, expr_text):
     '''
@@ -65,23 +68,4 @@ def replace_matches(matches, expr_text):
         assert( VAR_PATTERN_END.match(old))
         replaced_text = replaced_text[:m.start()] + varrepl(old) + replaced_text[m.end():]
     return replaced_text
-
-def on_error(s, offset):
-    remainder = s[offset:]
-    for pattern, handler in error_map.items():
-        match = pattern.match(remainder)
-        if match is not None:
-            return handler(s, offset, match)
-
-vals = [
-    '"hello world"',
-    '"hello" 42',
-    '$1',
-    '$1 0 or 7',
-]
-
-# for val in vals:
-#     comp = compile_python_expressions(val)
-#     for exp in comp:
-#         print(eval(exp[0]))
     
