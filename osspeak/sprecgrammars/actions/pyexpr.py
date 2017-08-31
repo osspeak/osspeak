@@ -25,12 +25,12 @@ def greedy_parse(s, validator=lambda x: compile(x, filename='<ast>', mode='eval'
     expr_matches = None
     remaining_text = None
     seen_string = ''
-    try_parse_string = ''
     for char in s:
         seen_string += char
         try_parse_string = re.sub(VAR_PATTERN, 'variables[0]', seen_string)
         try:
             expr = validator(try_parse_string)
+            expr = ast.parse(try_parse_string, mode='eval')
             expr_matches = re.finditer(VAR_PATTERN, seen_string) 
             expr_text = seen_string
             remaining_text = s[len(seen_string):]
@@ -38,26 +38,25 @@ def greedy_parse(s, validator=lambda x: compile(x, filename='<ast>', mode='eval'
             first_error = first_error or e
     if expr is None:
         raise first_error
-    replaced_text = replace_matches(expr_matches, expr_text, validator)
+    replaced_text = replace_matches(expr_matches, expr_text)
     return validator(replaced_text), replaced_text, remaining_text
 
-def replace_matches(matches, expr_text, validator):
+def replace_matches(matches, expr_text):
     '''
     find which $int matches we need to replace (Names) and which we
     don't (inside strings). Then replace whichever matches raised
     syntax errors
     '''
     replace_matches = []
-    testidx = 0
     # replace in reversed order to preserve positions of earlier matches
     matches = list(reversed(list(matches)))
-    for testidx, match in enumerate(matches):
+    for match in matches:
         teststr = expr_text
         test_matches = (m for m in matches if m is not match)
         for m in test_matches:
             teststr = teststr[:m.start()] + 'variables[0]' + teststr[m.end():]
         try:
-            validator(teststr)
+            ast.parse(teststr, mode='eval')
         except SyntaxError:
             replace_matches.append(match)
     # replace the matches that raised syntax error if not changed
