@@ -65,7 +65,7 @@ def replace_matches(matches, expr_text):
     replaced_text = expr_text
     for m in replace_matches:
         old = expr_text[m.start():m.end()]
-        assert( VAR_PATTERN_END.match(old))
+        assert VAR_PATTERN_END.match(old)
         replaced_text = replaced_text[:m.start()] + varrepl(old) + replaced_text[m.end():]
     return replaced_text
     
