@@ -38,7 +38,7 @@ def greedy_parse(s, validator)
             expr_matches = re.finditer(VAR_PATTERN, seen_string) 
             expr_text = seen_string
             remaining_text = s[len(seen_string):]
-    if expr is None:
+    if expr_text is None:
         raise first_error
     replaced_text = replace_matches(expr_matches, expr_text)
     return replaced_text, remaining_text
