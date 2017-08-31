@@ -9,7 +9,7 @@ def varrepl(matched_text):
 VAR_PATTERN = re.compile(r'\$-?\d+')
 VAR_PATTERN_END = re.compile(r'\$-?\d+$')
 
-def compile_python_expressions(input_string, validator: lambda expr: True):
+def compile_python_expressions(input_string, validator=lambda expr: True):
     expressions = []
     remaining_text = input_string
     while remaining_text:
