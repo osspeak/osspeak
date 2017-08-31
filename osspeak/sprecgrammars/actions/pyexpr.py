@@ -9,17 +9,16 @@ def varrepl(matched_text):
 VAR_PATTERN = re.compile(r'\$-?\d+')
 VAR_PATTERN_END = re.compile(r'\$-?\d+$')
 
-def compile_python_expressions(input_string):
+def compile_python_expressions(input_string, validator: lambda expr: True):
     expressions = []
     remaining_text = input_string
     while remaining_text:
-        expr, expr_text, remaining_text = greedy_parse(remaining_text)
+        expr, expr_text, remaining_text = greedy_parse(remaining_text, validator)
         expressions.append(expr_text)
     return expressions
 
-def greedy_parse(s, validator=lambda x: compile(x, filename='<ast>', mode='eval')):
+def greedy_parse(s, validator)
     assert s
-    expr = None
     first_error = None
     expr_text = None
     expr_matches = None
