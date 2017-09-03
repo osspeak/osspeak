@@ -8,12 +8,13 @@ from sprecgrammars.actions import pyexpr, asttransform
 
 def rule(text, name=None, rules=None, defined_functions=None):
     parser = RuleParser(text, rules=rules, defined_functions=defined_functions)
+    print('text: ', text)
     rule_obj = parser.parse_as_rule(name=name)
     rule_obj.raw_text = text
     return rule_obj
 
 def action(text, defined_functions=None):
-    a = Action(text, defined_functions)
+    return Action(text, defined_functions)
     parser = ActionParser(text, defined_functions=defined_functions)
     action_obj = parser.parse()
     action_obj.raw_text = text

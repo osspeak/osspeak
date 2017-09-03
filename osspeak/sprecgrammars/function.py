@@ -19,4 +19,4 @@ class Function:
         self.action = Action(self.action_text, defined_functions)
 
     def __call__(self, *args, **kwargs):
-        pass
+        print(f'calling function: {self.name}')

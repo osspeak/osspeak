@@ -1,23 +1,30 @@
+import ast
 import re
 
 def varrepl(matched_text):
     num = int(matched_text[1:])
     if num > 0:
         num -= 1
-    return f'variables[{num}]'
+    return f'result.vars.get({num})'
 
 VAR_PATTERN = re.compile(r'\$-?\d+')
 VAR_PATTERN_END = re.compile(r'\$-?\d+$')
 
-def compile_python_expressions(input_string, validator=lambda expr: True):
+def compile_python_expressions(input_string, validator=lambda expr: True, raise_on_error=True):
     expressions = []
     remaining_text = input_string
     while remaining_text:
-        expr_text, remaining_text = greedy_parse(remaining_text, validator)
+        try:
+            expr_text, remaining_text = greedy_parse(remaining_text, validator)
+        except Exception as e:
+            if raise_on_error:
+                raise e
+            else:
+                break
         expressions.append(expr_text)
     return expressions
 
-def greedy_parse(s, validator)
+def greedy_parse(s, validator):
     assert s
     first_error = None
     expr_text = None
@@ -39,6 +46,7 @@ def greedy_parse(s, validator)
             expr_text = seen_string
             remaining_text = s[len(seen_string):]
     if expr_text is None:
+        print('yag', s, seen_string)
         raise first_error
     replaced_text = replace_matches(expr_matches, expr_text)
     return replaced_text, remaining_text

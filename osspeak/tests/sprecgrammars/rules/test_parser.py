@@ -60,3 +60,12 @@ class TestRuleSubstitute2(TestRuleParserBase):
 
     def test_first_action(self):
         rule = self.rule
+
+class TestRuleSubstitute3(TestRuleParserBase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.text = strings.SUBSTITUTE2
+
+    def test_first_action(self):
+        rule = self.rule

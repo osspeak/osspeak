@@ -1,15 +1,17 @@
 import log
 import threading
 from sprecgrammars.functions.library import history
-from client import action
+from client import recognition
 
 def perform_action(command, variable_tree, engine_result):
     log.logger.info(f'Matched rule: {command.rule.raw_text}')
     # empty variables dict, gets filled based on result
     engine_variables = tuple(v for v in engine_result['Variables'] if len(v) == 2)
     var_list = variable_tree.action_variables(engine_variables)
+    recognition_result = recognition.RecognitionResult(var_list)
     try:
-        result = command.action.perform(var_list)
+        result = command.action.perform(recognition_result)
+        return
         return {'result': result, 'action': command.action, 'variables': var_list}
     except Exception as e:
         log.logger.error(f'Action {command.action.raw_text} errored: {str(e)}')
