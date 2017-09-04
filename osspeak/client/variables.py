@@ -1,6 +1,7 @@
 import collections
 from sprecgrammars.rules import astree
 from sprecgrammars.actions import nodes
+from sprecgrammars.actions.action import Action
 
 class RecognitionResultsTree:
 
@@ -59,17 +60,19 @@ class RecognitionResultsTree:
         if getattr(node, 'action_substitute', None) is not None:
             return node.action_substitute
         if isinstance(node, astree.WordNode):
-           return nodes.LiteralKeysAction(node.text)
+            return Action(node.text)
+            return nodes.LiteralKeysAction(node.text)
         if isinstance(node, astree.Rule) and node.name == '_dictate':
-           return nodes.LiteralKeysAction(result_text)
+            return Action(result_text)
+            return nodes.LiteralKeysAction(result_text)
 
     def action_variables(self, engine_variables):
-        results = collections.OrderedDict({path: nodes.RootAction() for path in self.variables})
+        results = collections.OrderedDict({path: [] for path in self.variables})
         full_path_engine_variables = self.get_full_path_engine_variables(engine_variables)
         for full_path, actions in full_path_engine_variables.items():
             for variable_path in self.variables:
                 if full_path[:len(variable_path)] == variable_path:
-                    results[variable_path].children.extend(actions)
+                    results[variable_path].extend(actions)
         return list(results.values())
 
 class RuleNodeWrapper:

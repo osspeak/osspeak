@@ -5,7 +5,7 @@ def varrepl(matched_text):
     num = int(matched_text[1:])
     if num > 0:
         num -= 1
-    return f'result.vars.get({num})'
+    return f'result.vars.perform({num})'
 
 VAR_PATTERN = re.compile(r'\$-?\d+')
 VAR_PATTERN_END = re.compile(r'\$-?\d+$')
@@ -46,7 +46,6 @@ def greedy_parse(s, validator):
             expr_text = seen_string
             remaining_text = s[len(seen_string):]
     if expr_text is None:
-        print('yag', s, seen_string)
         raise first_error
     replaced_text = replace_matches(expr_matches, expr_text)
     return replaced_text, remaining_text

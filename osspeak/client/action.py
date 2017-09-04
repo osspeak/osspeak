@@ -13,8 +13,8 @@ def perform_action(command, variable_tree, engine_result):
         result = command.action.perform(recognition_result)
         return
         return {'result': result, 'action': command.action, 'variables': var_list}
-    except Exception as e:
-        log.logger.error(f'Action {command.action.raw_text} errored: {str(e)}')
+    except KeyError as e:
+        log.logger.error(f'Action {command.action.text} errored: {str(e)}')
 
 def perform_commands(command_results, command_map):
     log.logger.debug(f'Got commands: {command_results}')

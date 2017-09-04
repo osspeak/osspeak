@@ -48,6 +48,3 @@ class ActionSubstituteToken(BaseToken):
         exprs = pyexpr.compile_python_expressions(text, action_substitute_validator, raise_on_error=False)
         self.action = Action(exprs, defined_functions)
         self.consumed_char_count = sum(len(e) for e in exprs)
-        # action_parser = parser.ActionParser(text, defined_functiorns=defined_functions)
-        # self.action = action_parser.parse(substitute=True)
-        # self.consumed_char_count = sum(t.character_count for t in action_parser.parsed_tokens)
