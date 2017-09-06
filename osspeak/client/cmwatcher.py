@@ -8,7 +8,7 @@ import log
 import sprecgrammars.functions.library.state
 from user import settings
 from interfaces.gui import serializer
-from client import commands, scopes, action, userstate, variables
+from client import commands, scopes, action, userstate, variables, recognition
 from sprecgrammars.rules.converter import SrgsXmlConverter
 from platforms import api
 import xml.etree.ElementTree as ET
@@ -217,7 +217,7 @@ class CommandModuleWatcher:
         except KeyError:
             log.logger.warning(f'Grammar {grammar_id} no longer exists')
             return
-        action.perform_commands(command_results, command_map)
+        recognition.perform_commands(command_results, command_map)
 
     def fetch_module_map(self):
         with self.lock:
