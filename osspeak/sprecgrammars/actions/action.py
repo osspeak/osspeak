@@ -13,12 +13,10 @@ class Action:
         except SyntaxError as e:
             print(f'error: {text}')
 
-    def perform(self, recognition_result=None):
-        if recognition_result is None:
-            action_globals = globals()
-        else:
-            action_globals = {'result': recognition_result, **self.namespace}
+    def perform(self):
         results = []
+        recognition_result = recognition.get_recognition_result()
+        action_globals = {'result': recognition_result, **self.namespace}
         for expr in self.expressions:
             result = eval(expr, action_globals)
             results.append(result)
