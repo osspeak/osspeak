@@ -23,13 +23,18 @@ def recognition_action_worker():
         except KeyError as e:
             log.logger.error(f'Action {command.action.text} errored: {str(e)}')
         else:
-            for result in results:
-                if isinstance(result, str):
-                    platforms.api.type_line(result)
-                elif :
-                    pass
+            perform_io(results)
         finally:
             del results_map[t]
+
+def perform_io(items):
+    if not any(isinstance(x, (tuple, list)) for x in items):
+        return platforms.api.type_keypresses(items)
+    for item in items:
+        if isinstance(item, (tuple, list)):
+            perform_io(item)
+        elif isinstance(item, (int, str, float)):
+            platforms.api.type_literal(item)
             
 workers = [threading.Thread(target=recognition_action_worker, daemon=True) for _ in range(3)]
 for worker in workers:
