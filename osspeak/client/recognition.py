@@ -1,6 +1,7 @@
 import threading
 import log
 import queue
+import platforms.api
 from sprecgrammars.functions import library
 
 recognition_queue = queue.Queue()
@@ -18,9 +19,15 @@ def recognition_action_worker():
         t = threading.current_thread()
         results_map[t] = {'recognition': recognition_result}
         try:
-            command.action.perform()
+            results = command.action.perform(top_level=True)
         except KeyError as e:
             log.logger.error(f'Action {command.action.text} errored: {str(e)}')
+        else:
+            for result in results:
+                if isinstance(result, str):
+                    platforms.api.type_line(result)
+                elif :
+                    pass
         finally:
             del results_map[t]
             
@@ -43,8 +50,7 @@ class VariableList:
             variable_actions = self._vars[idx]
         except IndexError:
             return default
-        print('gin', self._vars)
-        return var_result(variable_actions)
+        return var_result(variable_actions) if variable_actions else default
 
 def var_result(variable_actions):
     results = []

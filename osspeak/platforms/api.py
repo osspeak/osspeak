@@ -54,7 +54,7 @@ def type_line(evaluated_item_list):
 			time.sleep(settings.user_settings['type_delay'])
 		if isinstance(item, (int, float)):
 			item = str(item)
-		if isinstance(item, str):
+		if isinstance(item, (str, int, float)):
 			type_literal(item)
 		elif isinstance(item, list):
 			for key_combination in item:
@@ -64,6 +64,8 @@ def type_line(evaluated_item_list):
 			pass
 
 def type_literal(text):
+	if isinstance(text, (int, float)):
+		text = str(text)
 	platform.type_literal(text)
 
 def type_keypresses(text, direction='both'):

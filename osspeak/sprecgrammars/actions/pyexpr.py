@@ -5,7 +5,7 @@ def varrepl(matched_text):
     num = int(matched_text[1:])
     if num > 0:
         num -= 1
-    return f'result.vars.perform({num})'
+    return f'result.vars.get({num})'
 
 VAR_PATTERN = re.compile(r'\$-?\d+')
 VAR_PATTERN_END = re.compile(r'\$-?\d+$')
