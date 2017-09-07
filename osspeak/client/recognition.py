@@ -19,6 +19,8 @@ def recognition_action_worker():
         t = threading.current_thread()
         results_map[t] = {'recognition': recognition_result}
         try:
+            for result in command.action.generate_results():
+                perform_io(result)
             results = command.action.perform(top_level=True)
         except KeyError as e:
             log.logger.error(f'Action {command.action.text} errored: {str(e)}')
