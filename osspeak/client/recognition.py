@@ -21,22 +21,21 @@ def recognition_action_worker():
         try:
             for result in command.action.generate_results():
                 perform_io(result)
-            results = command.action.perform(top_level=True)
         except KeyError as e:
             log.logger.error(f'Action {command.action.text} errored: {str(e)}')
-        else:
-            perform_io(results)
         finally:
             del results_map[t]
 
 def perform_io(items):
-    if not any(isinstance(x, (tuple, list)) for x in items):
-        return platforms.api.type_keypresses(items)
-    for item in items:
-        if isinstance(item, (tuple, list)):
-            perform_io(item)
-        elif isinstance(item, (int, str, float)):
-            platforms.api.type_literal(item)
+    if isinstance(items, (str, float, int)):
+        return platforms.api.type_literal(items)
+    # if not any(isinstance(x, (tuple, list)) for x in items):
+    #     return platforms.api.type_keypresses(items)
+    # for item in items:
+    #     if isinstance(item, (tuple, list)):
+    #         perform_io(item)
+    #     elif isinstance(item, (int, str, float)):
+    #         platforms.api.type_literal(item)
             
 workers = [threading.Thread(target=recognition_action_worker, daemon=True) for _ in range(3)]
 for worker in workers:
@@ -79,9 +78,6 @@ def perform_commands(command_results, command_map):
     for result in command_results:
         command_dict = command_map[result['RuleId']]
         action_result = perform_action(command_dict['command'], command_dict['variable_tree'], result)
-    #     if action_result is not None:
-    #         action_results.append(action_result)
-    # save_command_perform_history(action_results)
     
 def save_command_perform_history(action_results):
     if any('threads' in r['result'] for r in action_results):
@@ -95,4 +91,3 @@ def join_async_threads(action_results):
             thread.join()
     if all(r['result']['store in history'] for r in action_results):
         history.command_history.append(action_results)
-
