@@ -33,8 +33,7 @@ class Function:
                 return v
 
     def compile_action(self, defined_functions):
-        print('i am lord', self.parameters)
-        self.action = Action(self.action_text, {**defined_functions, **self.parameters})
+        self.action = Action(self.action_text, defined_functions, set(self.parameters.keys()))
 
     def __call__(self, *args, **kwargs):
         print(f'calling function: {self.name}')

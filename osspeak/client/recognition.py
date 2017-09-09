@@ -19,25 +19,12 @@ def recognition_action_worker():
         t = threading.current_thread()
         results_map[t] = {'recognition': recognition_result}
         try:
-            for result in command.action.generate_results():
-                perform_io(result)
+            evaluation = command.action.perform()
         except KeyError as e:
             log.logger.error(f'Action {command.action.text} errored: {str(e)}')
         finally:
             del results_map[t]
 
-def perform_io(item):
-    print('perform io', item)
-    if isinstance(item, (str, float, int)):
-        return platforms.api.type_literal(item)
-    # if not any(isinstance(x, (tuple, list)) for x in items):
-    #     return platforms.api.type_keypresses(items)
-    # for item in items:
-    #     if isinstance(item, (tuple, list)):
-    #         perform_io(item)
-    #     elif isinstance(item, (int, str, float)):
-    #         platforms.api.type_literal(item)
-            
 workers = [threading.Thread(target=recognition_action_worker, daemon=True) for _ in range(3)]
 for worker in workers:
     worker.start()
