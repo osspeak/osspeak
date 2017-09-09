@@ -38,10 +38,20 @@ class NameToStringTransformer(ast.NodeTransformer):
             return ast.Str(s=node.id)
         return node
 
+class SetLiteralTransformer(ast.NodeTransformer):
+
+    def __init__(self):
+        super().__init__()
+        
+    def visit_Set(self, node):
+        func = ast.Name(id='keys', ctx=ast.Load())
+        return ast.Call(func=func, args=node.elts, keywords=[])
+
 def transform_expression(expr_text, namespace=None):
     namespace = get_builtins() if namespace is None else namespace
     expr = ast.parse(expr_text, mode='eval')
     new_expr = NameToStringTransformer(expr, namespace).visit(expr)
+    new_expr = SetLiteralTransformer().visit(new_expr)
     return compile(ast.fix_missing_locations(new_expr), filename='<ast>', mode='eval')
 
 def get_builtins():

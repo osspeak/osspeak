@@ -1,4 +1,5 @@
 from client import recognition
+import platforms.api
 
 class Action:
 
@@ -14,8 +15,9 @@ class Action:
             print(f'error: {text}')
 
     def perform(self, call_locals=None):
-        results = list(self.generate_results())
-        return results[0] if results else None
+        for result in self.generate_results(call_locals):
+            if isinstance(result, (str, float, int)):
+                return platforms.api.type_literal(result)
 
     def generate_results(self, call_locals=None):
         recognition_result = recognition.get_recognition_result()

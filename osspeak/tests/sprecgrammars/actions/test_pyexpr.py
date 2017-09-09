@@ -12,12 +12,12 @@ class TestPyExpr(unittest.TestCase):
 
     def test_variable1(self):
         exprs = self.parse_action_string(strings.VARIABLE1)
-        self.assertEqual(exprs, ['"hello" ', 'variables[0] ', '"world"'])
+        self.assertEqual(exprs, ['"hello" ', 'result.vars.get(0) ', '"world"'])
 
     def test_variable2(self):
         exprs = self.parse_action_string(strings.VARIABLE2)
-        self.assertEqual(exprs, ['len(variables[0], variables[-2])'])
+        self.assertEqual(exprs, ['len(result.vars.get(0), result.vars.get(-2))'])
 
     def test_variable3(self):
         exprs = self.parse_action_string(strings.VARIABLE3)
-        self.assertEqual(exprs, ['len(variables[0], variables[-2]) ', '"foo $2"'])
+        self.assertEqual(exprs, ['len(result.vars.get(0), result.vars.get(-2)) ', '"foo $2"'])

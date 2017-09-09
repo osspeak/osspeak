@@ -26,9 +26,10 @@ def recognition_action_worker():
         finally:
             del results_map[t]
 
-def perform_io(items):
-    if isinstance(items, (str, float, int)):
-        return platforms.api.type_literal(items)
+def perform_io(item):
+    print('perform io', item)
+    if isinstance(item, (str, float, int)):
+        return platforms.api.type_literal(item)
     # if not any(isinstance(x, (tuple, list)) for x in items):
     #     return platforms.api.type_keypresses(items)
     # for item in items:

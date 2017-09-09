@@ -20,7 +20,6 @@ class Function:
             if param.kind == Parameter.POSITIONAL_OR_KEYWORD:
                 call_args[name] = args[argpos]
                 argpos += 1
-            print('pee ram ', name, param.kind)
         return call_args
 
     def define_function(self):
@@ -34,7 +33,8 @@ class Function:
                 return v
 
     def compile_action(self, defined_functions):
-        self.action = Action(self.action_text, defined_functions)
+        print('i am lord', self.parameters)
+        self.action = Action(self.action_text, {**defined_functions, **self.parameters})
 
     def __call__(self, *args, **kwargs):
         print(f'calling function: {self.name}')
