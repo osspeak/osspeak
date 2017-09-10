@@ -18,4 +18,4 @@ def press(*keys):
         time.sleep(max(.05 - diff, 0))
     api.type_keypresses(keys)
     worker['last_keys'] = time.clock()
-        
+    
