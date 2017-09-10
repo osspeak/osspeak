@@ -10,6 +10,8 @@ Ignore:
 '''
 
 import ast
+from sprecgrammars.functions import library
+
 
 class NameToStringTransformer(ast.NodeTransformer):
 
@@ -51,12 +53,36 @@ class SetLiteralTransformer(ast.NodeTransformer):
         func = ast.Name(id='keys', ctx=ast.Load())
         return ast.Call(func=func, args=node.elts, keywords=[])
 
+class ATransformer(ast.NodeTransformer):
+
+    def __init__(self):
+        super().__init__()
+        
+    def visit_Call(self, node):
+        func = ast.Name(id='keys', ctx=ast.Load())
+        path = self.node_path(node.func)
+        if path in library.lambda_arguments:
+            newargs = []
+            for arg in node.args:
+                largs = ast.arguments(args=[], vararg=None, kwonlyargs=[], kw_defaults=[], kwarg=None, defaults=[])
+                newarg = ast.Lambda(args=largs, body=arg)
+                newargs.append(newarg)
+            node.args = newargs
+        return node
+        return ast.Call(func=func, args=node.elts, keywords=[])
+
+    def node_path(self, node):
+        if isinstance(node, ast.Name):
+            return node.id,
+        return self.node_path(node.value) + (node.attr,)
+
 def transform_expression(expr_text, namespace=None, arguments=None):
     arguments = arguments or []
     namespace = get_builtins() if namespace is None else namespace
     expr = ast.parse(expr_text, mode='eval')
     new_expr = NameToStringTransformer(expr, namespace, arguments).visit(expr)
     new_expr = SetLiteralTransformer().visit(new_expr)
+    new_expr = ATransformer().visit(new_expr)
     return compile(ast.fix_missing_locations(new_expr), filename=f'<{expr_text}>', mode='eval')
 
 def get_builtins():

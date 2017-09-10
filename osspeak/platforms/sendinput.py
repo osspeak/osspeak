@@ -45,8 +45,8 @@ from platforms import winconstants
 
 def send_input(events):
     inputs = [e.to_input() for e in events]
-    input = (Input * len(events))(*inputs)
-    inserted = windll.user32.SendInput(len(input), byref(input), sizeof(Input))
+    strinput = (Input * len(events))(*inputs)
+    inserted = windll.user32.SendInput(len(strinput), byref(strinput), sizeof(Input))
     if inserted != len(events):
         raise ValueError("windll.user32.SendInput: " + FormatMessage())
 

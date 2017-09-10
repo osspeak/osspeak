@@ -17,8 +17,7 @@ class Action:
 
     def perform(self, call_locals=None):
         for result in self.generate_results(call_locals):
-            if isinstance(result, (str, float, int)):
-                platforms.api.type_literal(result)
+            recognition.perform_io(result)
 
     def generate_results(self, call_locals=None):
         recognition_result = recognition.get_recognition_result()
