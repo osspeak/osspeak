@@ -60,10 +60,10 @@ class RecognitionResultsTree:
         if getattr(node, 'action_substitute', None) is not None:
             return node.action_substitute
         if isinstance(node, astree.WordNode):
-            return Action(node.text)
+            return Action(f"'{node.text}'")
             return nodes.LiteralKeysAction(node.text)
         if isinstance(node, astree.Rule) and node.name == '_dictate':
-            return Action(result_text)
+            return Action(f"'{result_text}'")
             return nodes.LiteralKeysAction(result_text)
 
     def action_variables(self, engine_variables):
@@ -81,7 +81,4 @@ class RuleNodeWrapper:
         self.node = node
         self.ancestors = ancestors
         self.full_path = tuple([node_ids[n] for n in ancestors] + [node_ids[node]])
-
-    @property
-    def path(self):
-        return tuple(self.full_path[1:])
+        self.path = tuple(self.full_path[1:])
