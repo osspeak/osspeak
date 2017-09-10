@@ -26,7 +26,7 @@ def recognition_action_worker():
         finally:
             del results_map[t]
 
-workers = [threading.Thread(target=recognition_action_worker, daemon=True) for _ in range(3)]
+workers = [threading.Thread(target=recognition_action_worker, daemon=True) for _ in range(1)]
 for worker in workers:
     worker.start()
 
@@ -55,7 +55,7 @@ def perform_io(item):
 def var_result(variable_actions):
     results = []
     for action in variable_actions:
-        results.append(action.perform())
+        results.append(action.perform_variable())
     return results[0]
 
 def perform_action(command, variable_tree, engine_result):

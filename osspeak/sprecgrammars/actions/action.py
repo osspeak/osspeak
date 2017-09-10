@@ -19,6 +19,11 @@ class Action:
         for result in self.generate_results(call_locals):
             recognition.perform_io(result)
 
+    def perform_variable(self, call_locals=None):
+        results = [r for r in self.generate_results(call_locals)]
+        if results:
+            return results[0]
+
     def generate_results(self, call_locals=None):
         recognition_result = recognition.get_recognition_result()
         action_globals = {'result': recognition_result, **self.namespace}
