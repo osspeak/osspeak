@@ -19,8 +19,12 @@ class Action:
         for result in self.generate_results(call_locals):
             recognition.perform_io(result)
 
-    def perform_variable(self, call_locals=None):
-        results = [r for r in self.generate_results(call_locals)]
+    def perform_variable(self, call_locals=None, type_results=False):
+        results = []
+        for result in self.generate_results(call_locals):
+            if type_results:
+                recognition.perform_io(result)
+            results.append(result)
         if results:
             return results[0]
 

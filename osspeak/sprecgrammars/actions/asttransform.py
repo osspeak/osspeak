@@ -60,7 +60,7 @@ class ATransformer(ast.NodeTransformer):
         
     def visit_Call(self, node):
         func = ast.Name(id='keys', ctx=ast.Load())
-        path = self.node_path(node.func)
+        path = node_path(node.func)
         if path in library.lambda_arguments:
             newargs = []
             for arg in node.args:
@@ -69,12 +69,35 @@ class ATransformer(ast.NodeTransformer):
                 newargs.append(newarg)
             node.args = newargs
         return node
-        return ast.Call(func=func, args=node.elts, keywords=[])
 
-    def node_path(self, node):
-        if isinstance(node, ast.Name):
-            return node.id,
-        return self.node_path(node.value) + (node.attr,)
+class VariableArgumentTransformer(ast.NodeTransformer):
+
+    def __init__(self, root):
+        super().__init__()
+        self.build_parent_map = self.build_parent_map(root)
+        
+    def visit_Call(self, node):
+        if node_path(node.func) != ('result', 'vars', 'get'):
+            return node
+        # keywords = [keyword(arg='a', value=NameConstant(value=True))]
+        return node
+        return node
+
+    def build_parent_map(self, root):
+        parent_map = {root: None}
+        for node in ast.walk(root):
+            for child in ast.iter_child_nodes(node):
+                parent_map[child] = node
+        return parent_map
+
+    def get_containing_function(self, node):
+        while node:
+            
+
+def node_path(node):
+    if isinstance(node, ast.Name):
+        return node.id,
+    return node_path(node.value) + (node.attr,)
 
 def transform_expression(expr_text, namespace=None, arguments=None):
     arguments = arguments or []
@@ -83,6 +106,7 @@ def transform_expression(expr_text, namespace=None, arguments=None):
     new_expr = NameToStringTransformer(expr, namespace, arguments).visit(expr)
     new_expr = SetLiteralTransformer().visit(new_expr)
     new_expr = ATransformer().visit(new_expr)
+    new_expr = VariableArgumentTransformer(new_expr).visit(new_expr)
     return compile(ast.fix_missing_locations(new_expr), filename=f'<{expr_text}>', mode='eval')
 
 def get_builtins():
