@@ -61,10 +61,8 @@ class RecognitionResultsTree:
             return node.action_substitute
         if isinstance(node, astree.WordNode):
             return Action(f"'{node.text}'")
-            return nodes.LiteralKeysAction(node.text)
         if isinstance(node, astree.Rule) and node.name == '_dictate':
             return Action(f"'{result_text}'")
-            return nodes.LiteralKeysAction(result_text)
 
     def action_variables(self, engine_variables):
         results = collections.OrderedDict({path: [] for path in self.variables})

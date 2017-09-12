@@ -9,7 +9,6 @@ class TestRuleTokenStreamBase(unittest.TestCase):
     @property
     def token_list(cls):
         stream = ruletokstream.RuleTokenStream(cls.text)
-        print('stream', list(stream))
         return list(stream)
 
 class TestRuleTokenStreamSubstitute(TestRuleTokenStreamBase):
