@@ -42,22 +42,16 @@ class NameToStringTransformer(ast.NodeTransformer):
     def visit_Name(self, node):
         if node in self.nodes_to_replace:
             return ast.Str(s=node.id)
-        return node
+        return self.generic_visit(node)
 
 class SetLiteralTransformer(ast.NodeTransformer):
 
-    def __init__(self):
-        super().__init__()
-        
     def visit_Set(self, node):
         func = ast.Name(id='keys', ctx=ast.Load())
         return ast.Call(func=func, args=node.elts, keywords=[])
 
-class ATransformer(ast.NodeTransformer):
+class LambdaArgTransformer(ast.NodeTransformer):
 
-    def __init__(self):
-        super().__init__()
-        
     def visit_Call(self, node):
         func = ast.Name(id='keys', ctx=ast.Load())
         path = node_path(node.func)
@@ -73,14 +67,19 @@ class ATransformer(ast.NodeTransformer):
 class VariableArgumentTransformer(ast.NodeTransformer):
 
     def __init__(self, root):
-        super().__init__()
-        self.build_parent_map = self.build_parent_map(root)
+        self.parent_map = self.build_parent_map(root)
         
     def visit_Call(self, node):
-        if node_path(node.func) != ('result', 'vars', 'get'):
-            return node
+        if not self.is_variable_call(node):
+            return self.generic_visit(node)
+        return self.generic_visit(node)
+        f = self.get_containing_function(node)
+        if f is not None:
+            return self.generic_visit(node)
+        node.keywords.append(ast.keyword(arg='type_results', value=NameConstant(value=True)))
+        print('nff', node.keywords)
+        return self.generic_visit(node)
         # keywords = [keyword(arg='a', value=NameConstant(value=True))]
-        return node
         return node
 
     def build_parent_map(self, root):
@@ -90,11 +89,20 @@ class VariableArgumentTransformer(ast.NodeTransformer):
                 parent_map[child] = node
         return parent_map
 
+    def is_variable_call(self, node):
+        return isinstance(node, ast.Call) and node_path(node.func) == ('result', 'vars', 'get')
+
     def get_containing_function(self, node):
         while node:
-            
+            parent = self.parent_map[node]
+            if isinstance(parent, ast.Call) and not self.is_variable_call(parent):
+                return parent
+            node = parent
+
 
 def node_path(node):
+    if isinstance(node, ast.Call):
+        return node_path(node.func)
     if isinstance(node, ast.Name):
         return node.id,
     return node_path(node.value) + (node.attr,)
@@ -105,8 +113,15 @@ def transform_expression(expr_text, namespace=None, arguments=None):
     expr = ast.parse(expr_text, mode='eval')
     new_expr = NameToStringTransformer(expr, namespace, arguments).visit(expr)
     new_expr = SetLiteralTransformer().visit(new_expr)
-    new_expr = ATransformer().visit(new_expr)
+    new_expr = LambdaArgTransformer().visit(new_expr)
     new_expr = VariableArgumentTransformer(new_expr).visit(new_expr)
+    # new_expr = VariableArgumentTransformer(new_expr).visit(new_expr)
+        # print('wtf', expr_text)
+        # parent_map = {expr: None}
+        # for node in ast.walk(expr):
+        #     for child in ast.iter_child_nodes(node):
+        #         parent_map[child] = node
+        # print('yag', parent_map)
     return compile(ast.fix_missing_locations(new_expr), filename=f'<{expr_text}>', mode='eval')
 
 def get_builtins():
