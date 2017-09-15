@@ -40,7 +40,7 @@ class VariableList:
     def __init__(self, variables):
         self._vars = variables
 
-    def get(self, idx, default=None, perform_results=False):
+    def get(self, idx, default=None, perform_results=True):
         try:
             variable_actions = self._vars[idx]
         except IndexError:
@@ -56,7 +56,8 @@ def var_result(variable_actions, perform_results):
     results = []
     for action in variable_actions:
         results.append(action.perform_variable(perform_results=perform_results))
-    return results[0]
+    if not perform_results:
+        return results[0]
 
 def perform_action(command, variable_tree, engine_result):
     log.logger.info(f'Matched rule: {command.rule.raw_text}')

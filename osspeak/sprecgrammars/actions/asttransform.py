@@ -12,7 +12,6 @@ Ignore:
 import ast
 from sprecgrammars.functions import library
 
-
 class NameToStringTransformer(ast.NodeTransformer):
 
     def __init__(self, root, namespace, arguments):
@@ -62,7 +61,7 @@ class LambdaArgTransformer(ast.NodeTransformer):
                 newarg = ast.Lambda(args=largs, body=arg)
                 newargs.append(newarg)
             node.args = newargs
-        return node
+        return self.generic_visit(node)
 
 class VariableArgumentTransformer(ast.NodeTransformer):
 
@@ -70,17 +69,13 @@ class VariableArgumentTransformer(ast.NodeTransformer):
         self.parent_map = self.build_parent_map(root)
         
     def visit_Call(self, node):
-        if not self.is_variable_call(node):
-            return self.generic_visit(node)
+        if self.is_variable_call(node):
+            path = self.get_containing_function_path(node)
+            if path:
+                func = path[0]
+                if node_path(func) != ('repeat',) or func.args[-1] is path[1]:
+                    node.keywords.append(ast.keyword(arg='perform_results', value=ast.NameConstant(value=False)))
         return self.generic_visit(node)
-        f = self.get_containing_function(node)
-        if f is not None:
-            return self.generic_visit(node)
-        node.keywords.append(ast.keyword(arg='type_results', value=NameConstant(value=True)))
-        print('nff', node.keywords)
-        return self.generic_visit(node)
-        # keywords = [keyword(arg='a', value=NameConstant(value=True))]
-        return node
 
     def build_parent_map(self, root):
         parent_map = {root: None}
@@ -92,11 +87,13 @@ class VariableArgumentTransformer(ast.NodeTransformer):
     def is_variable_call(self, node):
         return isinstance(node, ast.Call) and node_path(node.func) == ('result', 'vars', 'get')
 
-    def get_containing_function(self, node):
+    def get_containing_function_path(self, node):
+        path = [node]
         while node:
             parent = self.parent_map[node]
+            path.append(parent)
             if isinstance(parent, ast.Call) and not self.is_variable_call(parent):
-                return parent
+                return path[::-1]
             node = parent
 
 
@@ -115,13 +112,6 @@ def transform_expression(expr_text, namespace=None, arguments=None):
     new_expr = SetLiteralTransformer().visit(new_expr)
     new_expr = LambdaArgTransformer().visit(new_expr)
     new_expr = VariableArgumentTransformer(new_expr).visit(new_expr)
-    # new_expr = VariableArgumentTransformer(new_expr).visit(new_expr)
-        # print('wtf', expr_text)
-        # parent_map = {expr: None}
-        # for node in ast.walk(expr):
-        #     for child in ast.iter_child_nodes(node):
-        #         parent_map[child] = node
-        # print('yag', parent_map)
     return compile(ast.fix_missing_locations(new_expr), filename=f'<{expr_text}>', mode='eval')
 
 def get_builtins():
