@@ -30,7 +30,7 @@ workers = [threading.Thread(target=recognition_action_worker, daemon=True) for _
 for worker in workers:
     worker.start()
 
-class RecognitionResult:
+class RecognitionContext:
 
     def __init__(self, variables):
         self.vars = VariableList(variables)
@@ -43,8 +43,10 @@ class VariableList:
     def get(self, idx, default=None, perform_results=True):
         try:
             variable_actions = self._vars[idx]
-        except IndexError:
+        except IndexError as e:
+            raise e
             return default
+        print('vg', self._vars)
         return var_result(variable_actions, perform_results) if variable_actions else default
 
 def perform_io(item):
@@ -57,14 +59,26 @@ def var_result(variable_actions, perform_results):
     for action in variable_actions:
         results.append(action.perform_variable(perform_results=perform_results))
     if not perform_results:
-        return results[0]
+        return concat_results(results)
+
+def concat_results(results):
+    acc = None
+    for res in results:
+        if acc is None:
+            acc = res
+        else:
+            try:
+                acc += res
+            except TypeError:
+                pass
+    return acc
 
 def perform_action(command, variable_tree, engine_result):
     log.logger.info(f'Matched rule: {command.rule.raw_text}')
     # empty variables dict, gets filled based on result
     engine_variables = tuple(v for v in engine_result['Variables'] if len(v) == 2)
     var_list = variable_tree.action_variables(engine_variables)
-    recognition_result = RecognitionResult(var_list)
+    recognition_result = RecognitionContext(var_list)
     recognition_queue.put((command, recognition_result))
 
 def perform_commands(command_results, command_map):

@@ -20,17 +20,17 @@ class Action:
             recognition.perform_io(result)
 
     def perform_variable(self, call_locals=None, perform_results=False):
+        import client.recognition
         results = []
         for result in self.generate_results(call_locals):
             if perform_results:
                 recognition.perform_io(result)
             results.append(result)
-        if results:
-            return results[0]
+        return client.recognition.concat_results(results)
 
     def generate_results(self, call_locals=None):
         recognition_result = recognition.get_recognition_result()
         action_globals = {'result': recognition_result, **self.namespace}
-        for expr in self.expressions:
+        for i, expr in enumerate(self.expressions):
             result = eval(expr, action_globals, call_locals)
             yield result
