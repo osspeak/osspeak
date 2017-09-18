@@ -42,7 +42,7 @@ class ScopeFieldMap:
         return {**self.global_dict, **(self.local_dict or {})}.__iter__()
 
     def keys(self):
-        kset = set(self.global_dict.keys())
+        kset = set(self.global_dict)
         if self.local_dict is not None:
-            kset.union(self.local_dict.keys())
+            kset = kset.union(self.local_dict)
         return list(kset)
