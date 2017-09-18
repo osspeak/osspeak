@@ -2,8 +2,6 @@ import collections
 import itertools
 import json
 
-from sprecgrammars.actions import nodes
-from sprecgrammars.functions.parser import FunctionDefinitionParser
 from sprecgrammars.functions.library import state, history
 from sprecgrammars import api
 from interfaces.gui import serializer

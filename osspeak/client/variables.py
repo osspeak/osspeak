@@ -1,6 +1,5 @@
 import collections
 from sprecgrammars.rules import astree
-from sprecgrammars.actions import nodes
 from sprecgrammars.actions.action import Action
 
 class RecognitionResultsTree:
