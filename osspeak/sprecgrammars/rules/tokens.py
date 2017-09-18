@@ -46,5 +46,7 @@ class ActionSubstituteToken(BaseToken):
     def __init__(self, text, defined_functions=None):
         self.text = text
         exprs = pyexpr.compile_python_expressions(text, action_substitute_validator, raise_on_error=False)
+        if not exprs:
+            raise RuntimeError(f'Unable to parse any Python expressions from string:\n{text}')
         self.action = Action(exprs, defined_functions)
         self.consumed_char_count = sum(len(e) for e in exprs)

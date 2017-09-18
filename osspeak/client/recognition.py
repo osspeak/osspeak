@@ -46,7 +46,6 @@ class VariableList:
         except IndexError as e:
             raise e
             return default
-        print('vg', self._vars)
         return var_result(variable_actions, perform_results) if variable_actions else default
 
 def perform_io(item):

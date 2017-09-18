@@ -14,7 +14,7 @@ class TestAstTransform(unittest.TestCase):
 
     def test_lambda(self):
         res = self.evaluate(strings.LAMBDA_EXPRESSION)
-        self.assertEqual(res, 9)
+        self.assertEqual(res, 11)
 
     def test_kwarg(self):
         res = self.evaluate(strings.KWARG_EXPRESSION)
