@@ -18,16 +18,11 @@ class RecognitionResultsTree:
         self.node_map = {}
         self.variables = []
         for node_wrapper in self.walk_tree():
-            is_ambiguous = (isinstance(node_wrapper.node, astree.GroupingNode) or
+            is_variable = (isinstance(node_wrapper.node, astree.GroupingNode) or
                 isinstance(node_wrapper.node, astree.Rule) and node_wrapper.node.name == '_dictate')
-            if self.root_rule_node.raw_text == 'js <jsKeyword>_1-' and is_ambiguous:
-                print(node_wrapper.node)
-            if is_ambiguous:
+            if is_variable:
                 self.variables.append(node_wrapper.path)
             self.node_map[node_wrapper.path] = node_wrapper
-        if self.root_rule_node.raw_text == 'js <jsKeyword>_1-':
-            print(len(self.variables))
-            assert len(self.variables) == 1
 
     def get_full_path_engine_variables(self, engine_variables):
         full_path_engine_variables = collections.defaultdict(list)
