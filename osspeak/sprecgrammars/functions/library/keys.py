@@ -11,11 +11,5 @@ def release(keys):
     
 def press(*keys):
     from client import recognition
-    worker = recognition.results_map[threading.current_thread()]
-    now = time.clock()
-    if worker['last_keys'] is not None:
-        diff = time.clock() - worker['last_keys']
-        time.sleep(max(.05 - diff, 0))
-    api.type_keypresses(keys)
-    worker['last_keys'] = time.clock()
-    
+    with recognition.keypress_delay():
+        api.type_keypresses(keys)

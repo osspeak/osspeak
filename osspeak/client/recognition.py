@@ -2,13 +2,16 @@ import threading
 import log
 import time
 import queue
+import contextlib
 import platforms.api
 from sprecgrammars.functions import library
 
 recognition_queue = queue.Queue()
 results_map = {}
+last_keypress_timestamp = None
 builtins = __builtins__ if isinstance(__builtins__, dict) else dir(__builtins__)
 namespace = {**library.builtin_functions, **builtins}
+
 
 def get_recognition_result():
     t = threading.current_thread()
@@ -48,10 +51,19 @@ class VariableList:
             return default
         return var_result(variable_actions, perform_results) if variable_actions else default
 
+@contextlib.contextmanager
+def keypress_delay():
+    global last_keypress_timestamp
+    if last_keypress_timestamp is not None:
+        diff = time.clock() - last_keypress_timestamp
+        time.sleep(max(.05 - diff, 0))
+    yield
+    last_keypress_timestamp = time.clock()
+
 def perform_io(item):
     if isinstance(item, (str, float, int)):
-        time.sleep(.05)
-        platforms.api.type_literal(item)
+        with keypress_delay():
+            platforms.api.type_literal(item)
 
 def var_result(variable_actions, perform_results):
     results = []

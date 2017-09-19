@@ -36,7 +36,6 @@ class Function:
         self.action = Action(self.action_text, defined_functions, set(self.parameters.keys()))
 
     def __call__(self, *args, **kwargs):
-        print(f'calling function: {self.name}')
         self.func(*args, **kwargs)
         call_locals = self.get_call_locals(args, kwargs)
         return self.action.perform(call_locals)
