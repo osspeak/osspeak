@@ -19,9 +19,9 @@ def get_recognition_result():
 
 def recognition_action_worker():
     while True:
-        command, recognition_result = recognition_queue.get()
+        command, recognition_context = recognition_queue.get()
         t = threading.current_thread()
-        results_map[t] = {'recognition': recognition_result, 'last_keys': None}
+        results_map[t] = {'recognition': recognition_context}
         try:
             evaluation = command.action.perform()
         except KeyError as e:
@@ -98,16 +98,3 @@ def perform_commands(command_results, command_map):
     for result in command_results:
         command_dict = command_map[result['RuleId']]
         action_result = perform_action(command_dict['command'], command_dict['variable_tree'], result)
-    
-def save_command_perform_history(action_results):
-    if any('threads' in r['result'] for r in action_results):
-        threading.Thread(target=join_async_threads, args=[action_results]).start()
-    elif all(r['result']['store in history'] for r in action_results):
-        history.command_history.append(action_results)
-
-def join_async_threads(action_results):
-    for result in action_results:
-        for thread in result['result'].get('threads', []):
-            thread.join()
-    if all(r['result']['store in history'] for r in action_results):
-        history.command_history.append(action_results)

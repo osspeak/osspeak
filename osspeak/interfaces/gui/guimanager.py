@@ -8,9 +8,11 @@ from communication.procs import ProcessManager
 from communication import messages, common
 from interfaces.gui import serializer
 from flask import Flask
-from aiohttp import web
+import tornado.websocket
+from tornado import web
 import aiohttp
 from log import logger
+import tornado.ioloop
 
 if getattr(sys, 'frozen', False):
     ELECTRON_PATH = os.path.join('f')
@@ -29,13 +31,25 @@ class GuiProcessManager(ProcessManager):
     def __init__(self):
         self.loop = asyncio.get_event_loop()
         self.port = common.get_open_port()
-        self.app = aiohttp.web.Application()
-        self.app.router.add_get('/ws', self.websocket_handler)
-        self.websocket_connections = set()
-        messages.subscribe(messages.RECEIVED_GUI_MESSAGE, self.on_message)
-        messages.subscribe(messages.SEND_GUI_MESSAGE, self.send_gui_message)
+        self.app = web.Application([
+            (r'/ws', GuiWebSocket),
+        ])
+        self.app.listen(self.port)
         super().__init__(f'{ELECTRON_PATH} {ELECTRON_FOLDER} localhost:{self.port}', on_exit=self.shutdown)
 
+    def main_loop(self):
+        tornado.ioloop.IOLoop.current().start()
+
+    def shutdown(self):
+        tornado.ioloop.IOLoop.current().stop()
+
+class GuiWebSocket(tornado.websocket.WebSocketHandler):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        messages.subscribe(messages.RECEIVED_GUI_MESSAGE, self.on_message)
+        messages.subscribe(messages.SEND_GUI_MESSAGE, self.send_gui_message)
+        
     def send_gui_message(self, message_name, data=None):
         data = {} if data is None else data
         msg_data, ok = self.gui_resource(message_name, data)
@@ -58,52 +72,23 @@ class GuiProcessManager(ProcessManager):
             ok = False
         return result, ok
 
+    def open(self):
+        print("WebSocket opened")
+
+    def on_message(self, message):
+        print(message)
+        messages.dispatch(messages.RECEIVED_GUI_MESSAGE, json.loads(message))
+    
+    def on_close(self):
+        print("WebSocket closed")
+
+    def check_origin(self, origin):
+        print(origin)
+        return True
+
     def send_message(self, message_name, msg, msg_id=None, ok=True):
         full_message = {'type': message_name, 'data': msg, 'ok': ok}
         if msg_id is not None:
             full_message['id'] = msg_id
         serialized_message = json.dumps(full_message, default=serializer.GuiEncoder)
-        for ws in self.websocket_connections:
-            ws.send_str(serialized_message)
-
-    def save_modules(self, msg_data):
-        module_configurations = {k: self.to_module_config(v) for (k, v) in msg_data['modules'].items()}
-        messages.dispatch(messages.SET_SAVED_MODULES, module_configurations)
-
-    def to_module_config(self, gui_module):
-        module_config = {}
-        for k, config in gui_module.items():
-            if k in ('path', 'error'):
-                continue
-            elif k == 'functions':
-                module_config[k] = [[c['signature']['value'], c['action']['value']] for c in config]
-            elif k == 'rules':
-                module_config[k] = [[c['name']['value'], c['value']['value']] for c in config]
-            elif k == 'commands':
-                module_config[k] = [[c['rule']['value']['value'], c['action']['value']] for c in config]
-            else:
-                module_config[k] = config
-        return module_config
-    
-    def main_loop(self):
-        aiohttp.web.run_app(self.app, host='localhost', port=self.port)
-
-    def shutdown(self):
-        self.loop.call_soon_threadsafe(lambda: self.loop.stop())
-
-    async def websocket_handler(self, request):
-        ws = aiohttp.web.WebSocketResponse()
-        await ws.prepare(request)
-        self.websocket_connections.add(ws)
-        async for msg in ws:
-            if msg.type == aiohttp.WSMsgType.TEXT:
-                if msg.data == 'close':
-                    await ws.close()
-                else:
-                    messages.dispatch(messages.RECEIVED_GUI_MESSAGE, json.loads(msg.data))
-            elif msg.type == aiohttp.WSMsgType.ERROR:
-                print('ws connection closed with exception %s' %
-                    ws.exception())
-        print('websocket connection closed')
-        self.websocket_connections.remove(ws)
-        return ws
+        self.write_message(serialized_message)
