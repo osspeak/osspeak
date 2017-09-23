@@ -21,7 +21,7 @@ def recognition_action_worker():
         results_map[t] = {'recognition': recognition_context}
         try:
             evaluation = command.action.perform()
-        except KeyError as e:
+        except Exception as e:
             log.logger.error(f'Action {command.action.text} errored: {str(e)}')
         finally:
             del results_map[t]
