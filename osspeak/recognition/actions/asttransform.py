@@ -10,7 +10,7 @@ Ignore:
 '''
 
 import ast
-from sprecgrammars.functions import library
+from recognition import library
 
 class NameToStringTransformer(ast.NodeTransformer):
 

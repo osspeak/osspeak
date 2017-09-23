@@ -2,10 +2,11 @@ import collections
 import itertools
 import json
 
-from sprecgrammars.functions.library import state, history
+from recognition.library import state, history
+from recognition.actions import variables
 from sprecgrammars import api
 from interfaces.gui import serializer
-from client import commands, scopes, variables, action
+from client import commands, scopes
 from sprecgrammars.rules import astree
 from sprecgrammars.rules.parser import RuleParser
 from log import logger

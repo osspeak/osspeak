@@ -1,14 +1,14 @@
-from client import recognition
+from recognition import context, library, perform
 import platforms.api
 import time
 
 class Action:
 
     def __init__(self, text, defined_functions=None, arguments=None):
-        from sprecgrammars.actions import pyexpr, asttransform
+        from recognition.actions import pyexpr, asttransform
         self.text = text
         defined_functions = {} if defined_functions is None else defined_functions
-        self.namespace = {**defined_functions, **recognition.namespace}
+        self.namespace = {**defined_functions, **library.namespace}
         try:
             self.literal_expressions = pyexpr.compile_python_expressions(text) if isinstance(text, str) else text
             self.expressions = [asttransform.transform_expression(e, namespace=self.namespace, arguments=arguments) for e in self.literal_expressions]
@@ -17,18 +17,18 @@ class Action:
 
     def perform(self, call_locals=None):
         for result in self.generate_results(call_locals):
-            recognition.perform_io(result)
+            perform.perform_io(result)
 
     def perform_variable(self, call_locals=None, perform_results=False):
         results = []
         for result in self.generate_results(call_locals):
             if perform_results:
-                recognition.perform_io(result)
+                perform.perform_io(result)
             results.append(result)
-        return recognition.concat_results(results)
+        return perform.concat_results(results)
 
     def generate_results(self, call_locals=None):
-        recognition_result = recognition.get_recognition_result()
+        recognition_result = perform.get_recognition_result()
         action_globals = {'result': recognition_result, **self.namespace}
         for i, expr in enumerate(self.expressions):
             result = eval(expr, action_globals, call_locals)

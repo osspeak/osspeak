@@ -1,12 +1,12 @@
-from sprecgrammars.functions.library import (mouse, window, keys, state,
+from recognition.library import (mouse, window, keys, state,
 extensions, general, text, clipboard, osspeak, conditionals, history, fsystem, math)
 
 builtin_functions = globals().copy()
 from platforms import api
-from sprecgrammars.functions.library import flow
+from recognition.library import flow
 import subprocess
 import time
-from sprecgrammars.functions.library import system
+from recognition.library import system
 builtin_functions.update({
     'keys': keys.press,
     'start': window.start,
@@ -26,3 +26,6 @@ lambda_arguments = set([tuple(x.split('.')) for x in [
     'repeat',
     'flow.while',
 ]])
+
+builtins = __builtins__ if isinstance(__builtins__, dict) else dir(__builtins__)
+namespace = {**builtin_functions, **builtins}

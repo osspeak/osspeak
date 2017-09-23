@@ -1,7 +1,7 @@
 from sprecgrammars.rules.parser import RuleParser
-from sprecgrammars.actions.action import Action
-from sprecgrammars.function import Function
-from sprecgrammars.actions import pyexpr, asttransform
+from recognition.actions import action, pyexpr, asttransform
+from recognition.actions.action import Action
+from recognition.actions.function import Function
 
 def rule(text, name=None, rules=None, defined_functions=None):
     parser = RuleParser(text, rules=rules, defined_functions=defined_functions)

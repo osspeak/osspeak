@@ -1,8 +1,7 @@
 import ast
 
-from sprecgrammars.actions import pyexpr, asttransform
+from recognition.actions import pyexpr, asttransform, action
 from sprecgrammars import api
-from sprecgrammars.actions.action import Action
 
 def action_substitute_validator(expr):
     return not (isinstance(expr.body, ast.BinOp) and isinstance(expr.body.op, ast.BitOr))
@@ -48,5 +47,5 @@ class ActionSubstituteToken(BaseToken):
         exprs = pyexpr.compile_python_expressions(text, action_substitute_validator, raise_on_error=False)
         if not exprs:
             raise RuntimeError(f'Unable to parse any Python expressions from string:\n{text}')
-        self.action = Action(exprs, defined_functions)
+        self.action = action.Action(exprs, defined_functions)
         self.consumed_char_count = sum(len(e) for e in exprs)

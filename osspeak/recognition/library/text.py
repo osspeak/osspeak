@@ -1,5 +1,4 @@
 def camel_case(s, sep=None):
-    from client import recognition
     spl = s.split(sep) if isinstance(s, str) else s
     val = ''
     for i, word in enumerate(spl):

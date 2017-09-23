@@ -1,6 +1,5 @@
 from inspect import signature, Parameter
 import inspect
-from sprecgrammars.actions.action import Action
 
 
 class Function:
@@ -33,6 +32,7 @@ class Function:
                 return v
 
     def compile_action(self, defined_functions):
+        from recognition.actions.action import Action
         self.action = Action(self.action_text, defined_functions, set(self.parameters.keys()))
 
     def __call__(self, *args, **kwargs):

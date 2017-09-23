@@ -5,10 +5,12 @@ import os
 import collections
 import json
 import log
-import sprecgrammars.functions.library.state
+import recognition.library.state
+from recognition import perform
 from user import settings
 from interfaces.gui import serializer
-from client import commands, scopes, action, userstate, variables, recognition
+from recognition.actions import variables
+from client import commands, scopes, userstate
 from sprecgrammars.rules.converter import SrgsXmlConverter
 from platforms import api
 import xml.etree.ElementTree as ET
@@ -131,10 +133,10 @@ class CommandModuleWatcher:
             cmd_module.scope = self.scope_groupings[scope_name]
 
     def load_initial_user_state(self):
-        sprecgrammars.functions.library.state.USER_DEFINED_STATE = {}
+        recognition.library.state.USER_DEFINED_STATE = {}
         for path, cmd_module in self.cmd_modules.items():
             initial_state = {k: eval(v) for k, v in cmd_module.initial_state.items()}
-            sprecgrammars.functions.library.state.USER_DEFINED_STATE.update(initial_state)
+            recognition.library.state.USER_DEFINED_STATE.update(initial_state)
 
     def get_active_modules(self, current_window, current_state):
         active_modules = {}
@@ -217,7 +219,7 @@ class CommandModuleWatcher:
         except KeyError:
             log.logger.warning(f'Grammar {grammar_id} no longer exists')
             return
-        recognition.perform_commands(command_results, command_map)
+        perform.perform_commands(command_results, command_map)
 
     def fetch_module_map(self):
         with self.lock:
