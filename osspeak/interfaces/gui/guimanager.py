@@ -7,10 +7,10 @@ import os
 from communication.procs import ProcessManager
 from communication import messages, common
 from interfaces.gui import serializer
-from flask import Flask
+# from flask import Flask
 import tornado.websocket
 from tornado import web
-import aiohttp
+# import aiohttp
 from log import logger
 import tornado.ioloop
 

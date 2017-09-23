@@ -1,5 +1,5 @@
 import asyncio
-import requests
+# import requests
 import functools
 import threading
 import json
