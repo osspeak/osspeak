@@ -45,10 +45,10 @@ def merge_expressions(expressions):
             try_parse_expr += expr
             try:
                 ast.parse(try_parse_expr, mode='eval')
-                merged_expr = try_parse_expr
-                next_i = j + 1
             except SyntaxError:
-                pass
+                continue
+            merged_expr = try_parse_expr
+            next_i = j + 1
         merged.append(merged_expr)
         i = next_i
     return merged
