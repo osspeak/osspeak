@@ -36,6 +36,23 @@ def compile_python_expressions(input_string, validator=lambda expr: True, raise_
 
 def merge_expressions(expressions):
     merged = []
+    i = 0
+    while i < len(expressions):
+        next_i = i + 1
+        merged_expr = expressions[i]
+        try_parse_expr = merged_expr
+        for j, expr in enumerate(expressions[i+1:], start=i+1):
+            try_parse_expr += expr
+            try:
+                ast.parse(try_parse_expr, mode='eval')
+                merged_expr = try_parse_expr
+                next_i = j + 1
+            except:
+                pass
+        merged.append(merged_expr)
+        i = next_i
+    return merged
+
     for expr in expressions:
         if not merged:
             merged.append(expr)
