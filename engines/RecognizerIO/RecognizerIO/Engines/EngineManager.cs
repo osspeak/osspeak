@@ -1,4 +1,5 @@
 ﻿using System;
+using RecognizerIO.AudioDevice;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,13 +15,25 @@ namespace RecognizerIO.Engines
         public Grammar ActiveGrammar;
         public string GrammarId;
         public Boolean IsRunning = false;
+        public DeviceEventRaiser eventRaiser;
 
         public EngineManager()
         {
+            eventRaiser = new DeviceEventRaiser(this);
+            InitEngine();
+        }
+
+        void InitEngine() {
             Engine = new SpeechRecognitionEngine();
             Engine.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(recognizer_SpeechRecognized);
             Engine.RecognizerUpdateReached += new EventHandler<RecognizerUpdateReachedEventArgs>(recognizer_RecognizerUpdateReached);
             Engine.SetInputToDefaultAudioDevice();
+            IsRunning = false;
+            if (ActiveGrammar != null)
+            {
+                Engine.LoadGrammar(ActiveGrammar);
+                Begin();
+            }
         }
 
         public void LoadGrammar(string path, string grammarId)
@@ -59,6 +72,12 @@ namespace RecognizerIO.Engines
             Console.WriteLine(serializedResult);
         }
 
+        public void ResetDevice()
+        {
+            Engine.Dispose();
+            InitEngine();
+        }
+
         public void Begin()
         {
             Engine.RecognizeAsync(RecognizeMode.Multiple);
@@ -67,7 +86,7 @@ namespace RecognizerIO.Engines
 
         public void Stop()
         {
-            Engine.RecognizeAsyncStop();
+            Engine.RecognizeAsyncCancel();
             IsRunning = false;
         }
 

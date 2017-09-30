@@ -27,9 +27,9 @@ namespace RecognizerIO
             EngManager.Begin();
             return false;
             */
+            bool shutdown = false;
             dynamic jsonMsg = JsonConvert.DeserializeObject(input);
             string msgType = jsonMsg.Type;
-            bool shutdown = false;
             switch (msgType)
             {
                 case "load grammars":
@@ -53,6 +53,9 @@ namespace RecognizerIO
                     break;
                 case "shutdown":
                     shutdown = true;
+                    break;
+                case "RESET_DEVICE":
+                    EngManager.ResetDevice();
                     break;
                 case "start":
                     if (!EngManager.IsRunning) EngManager.Begin();

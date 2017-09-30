@@ -91,6 +91,10 @@ class EngineProcessManager(ProcessManager):
         elif msg['Type'] == 'error':
             print('error!')
             print(msg['Message'])
+        elif msg['Type'] == 'DEBUG':
+            print(f'Debug Message:\n{msg["Message"]}')
+        elif msg['Type'] == 'RESET_DEVICE':
+            self.send_simple_message(msg['Type'])
 
     def send_simple_message(self, msg_type):
         self.send_message({'Type': msg_type})

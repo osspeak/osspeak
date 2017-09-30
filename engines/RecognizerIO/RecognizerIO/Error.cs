@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,11 @@ namespace RecognizerIO
             StackTrace = e.StackTrace;
             Message = e.Message;
         }
-
+        public void send()
+        {
+            string serializedError = JsonConvert.SerializeObject(this);
+            Console.WriteLine(serializedError);
+        }
     }
+
 }

@@ -23,9 +23,7 @@ namespace RecognizerIO
                 }
                 catch (Exception e)
                 {
-                    var error = new Error(e);
-                    string serializedError = JsonConvert.SerializeObject(error);
-                    Console.WriteLine(serializedError);
+                    new Error(e).send();
                     throw;
                 }
             }
