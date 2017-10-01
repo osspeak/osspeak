@@ -5,7 +5,7 @@ def varrepl(_, num):
     num = int(num)
     if num > 0:
         num -= 1
-    return f'result.vars.get({num})'
+    return f'context.var({num})'
 
 error_handler_strings = {
     (r'\$', r'-?\d+'): varrepl

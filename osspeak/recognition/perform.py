@@ -10,15 +10,15 @@ recognition_queue = queue.Queue()
 results_map = {}
 last_keypress_timestamp = None
 
-def get_recognition_result():
+def get_recognition_context():
     t = threading.current_thread()
-    return results_map[t]['recognition']
+    return results_map[t]['context']
 
 def recognition_action_worker():
     while True:
         command, recognition_context = recognition_queue.get()
         t = threading.current_thread()
-        results_map[t] = {'recognition': recognition_context}
+        results_map[t] = {'context': recognition_context}
         try:
             evaluation = command.action.perform()
         except Exception as e:

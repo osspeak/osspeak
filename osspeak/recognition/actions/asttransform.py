@@ -85,7 +85,7 @@ class VariableArgumentTransformer(ast.NodeTransformer):
         return parent_map
 
     def is_variable_call(self, node):
-        return isinstance(node, ast.Call) and node_path(node.func) == ('result', 'vars', 'get')
+        return isinstance(node, ast.Call) and node_path(node.func) == ('context', 'var')
 
     def get_containing_function_path(self, node):
         path = [node]

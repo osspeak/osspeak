@@ -28,8 +28,8 @@ class Action:
         return perform.concat_results(results)
 
     def generate_results(self, call_locals=None):
-        recognition_result = perform.get_recognition_result()
-        action_globals = {'result': recognition_result, **self.namespace}
+        recognition_context = perform.get_recognition_context()
+        action_globals = {'context': recognition_context, **self.namespace}
         for i, expr in enumerate(self.expressions):
             result = eval(expr, action_globals, call_locals)
             yield result
