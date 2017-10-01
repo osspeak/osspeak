@@ -59,7 +59,6 @@ def merge_expressions(expressions):
     return merged
 
 def handle_parse_error(before, after):
-    print(before, after)
     for (before_pattern, after_pattern), handler in error_handlers.items():
         start, end = before, after
         before_error_text, after_error_text = None, None
@@ -80,19 +79,19 @@ def greedy_parse(s, validator):
     last_error = None
     expr_text = None
     remaining_text = None
-    seen_string = ''
+    try_parse_string = ''
     for char in s:
-        seen_string += char
+        try_parse_string += char
         try:
-            expr = ast.parse(seen_string, mode='eval')
+            expr = ast.parse(try_parse_string, mode='eval')
         except SyntaxError as e:
             last_error = e
         else:
             if not validator(expr):
                 remaining_text = None
                 break
-            expr_text = seen_string
-            remaining_text = s[len(seen_string):]
+            expr_text = try_parse_string
+            remaining_text = s[len(try_parse_string):]
     if expr_text is None:
         raise last_error
     return expr_text, remaining_text
