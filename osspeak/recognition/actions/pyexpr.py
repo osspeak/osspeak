@@ -7,8 +7,13 @@ def varrepl(_, num):
         num -= 1
     return f'context.var({num})'
 
+def keyword_call(a,b):
+    print('nf')
+    return f"context._meta.call_or_type('{a}')"
+
 error_handler_strings = {
-    (r'\$', r'-?\d+'): varrepl
+    (r'\$', r'-?\d+'): varrepl,
+    (r'if', None): keyword_call
 }
 
 error_handlers = {}
@@ -54,6 +59,7 @@ def merge_expressions(expressions):
     return merged
 
 def handle_parse_error(before, after):
+    print(before, after)
     for (before_pattern, after_pattern), handler in error_handlers.items():
         start, end = before, after
         before_error_text, after_error_text = None, None

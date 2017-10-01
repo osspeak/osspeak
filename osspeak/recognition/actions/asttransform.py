@@ -73,6 +73,7 @@ class VariableArgumentTransformer(ast.NodeTransformer):
             path = self.get_containing_function_path(node)
             if path:
                 func = path[0]
+                # only type results for certain arguments. ex: 'foo' in repeat('foo', 10), but not 10 
                 if node_path(func) != ('repeat',) or func.args[-1] is path[1]:
                     node.keywords.append(ast.keyword(arg='perform_results', value=ast.NameConstant(value=False)))
         return self.generic_visit(node)
