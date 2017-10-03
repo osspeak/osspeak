@@ -27,6 +27,9 @@ class RecognitionContextMeta:
         self.variables = variables
         self.temp_variables = {}
 
+    def call_or_type(self, value):
+        return CallOrType(value)
+
 class CallOrType(str):
 
     FUNC_MAP = {
@@ -39,7 +42,7 @@ class CallOrType(str):
         self.func = self.FUNC_MAP[func_name]
 
     def __call__(self, *args, **kwargs):
-        self.func(*args, **kwargs)
+        return self.func(*args, **kwargs)
 
     def __str__(self):
         return self.func_name

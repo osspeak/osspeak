@@ -1,3 +1,4 @@
+import collections
 import ast
 import re
 
@@ -7,17 +8,17 @@ def varrepl(_, num):
         num -= 1
     return f'context.var({num})'
 
-def keyword_call(a,b):
-    print('nf')
-    return f"context._meta.call_or_type('{a}')"
+def keyword_call(kw, _):
+    # print(f"context._meta.call_or_type('{kw}')")
+    return f"context._meta.call_or_type('{kw}')"
 
-error_handler_strings = {
-    (r'\$', r'-?\d+'): varrepl,
-    (r'if', None): keyword_call
-}
+error_handler_strings = (
+    ((r'\$', r'-?\d+'), varrepl),
+    (('if', None), keyword_call)
+)
 
-error_handlers = {}
-for (before_pattern, after_pattern), handler in error_handler_strings.items():
+error_handlers = collections.OrderedDict()
+for (before_pattern, after_pattern), handler in error_handler_strings:
     before_pattern = None if before_pattern is None else re.compile(f'(.*)({before_pattern})$')
     after_pattern = None if after_pattern is None else re.compile(f'({after_pattern})(.*)')
     error_handlers[(before_pattern, after_pattern)] = handler
@@ -29,48 +30,28 @@ def compile_python_expressions(input_string, validator=lambda expr: True, raise_
         try:
             expr_text, remaining_text = greedy_parse(remaining_text, validator)
         except Exception as e:
-            remaining_text = handle_parse_error(remaining_text[:e.offset], remaining_text[e.offset:])
-            if remaining_text is None:
-                if raise_on_error:
-                    raise e
-                break
+            if raise_on_error:
+                raise e
+            break
         else:
             expressions.append(expr_text)
-    expressions = merge_expressions(expressions)
     return expressions
-
-def merge_expressions(expressions):
-    merged = []
-    i = 0
-    while i < len(expressions):
-        next_i = i + 1
-        merged_expr = expressions[i]
-        try_parse_expr = merged_expr
-        for j, expr in enumerate(expressions[i+1:], start=i+1):
-            try_parse_expr += expr
-            try:
-                ast.parse(try_parse_expr, mode='eval')
-            except SyntaxError:
-                continue
-            merged_expr = try_parse_expr
-            next_i = j + 1
-        merged.append(merged_expr)
-        i = next_i
-    return merged
 
 def handle_parse_error(before, after):
     for (before_pattern, after_pattern), handler in error_handlers.items():
         start, end = before, after
         before_error_text, after_error_text = None, None
+        # if before == 'if':
+        #     print(before, after, before_pattern)
         if before_pattern:
             bmatch = before_pattern.match(before)
             if not bmatch:
-                break
+                continue
             start, before_error_text = bmatch.group(1), bmatch.group(2)
         if after_pattern:
             amatch = after_pattern.match(after)
             if not amatch:
-                break
+                continue
             after_error_text, after = amatch.group(1), amatch.group(2)
         return start + handler(before_error_text, after_error_text) + after
 
@@ -79,19 +60,27 @@ def greedy_parse(s, validator):
     last_error = None
     expr_text = None
     remaining_text = None
+    invalid_expression = False
     try_parse_string = ''
-    for char in s:
-        try_parse_string += char
-        try:
-            expr = ast.parse(try_parse_string, mode='eval')
-        except SyntaxError as e:
-            last_error = e
-        else:
-            if not validator(expr):
-                remaining_text = None
+    for i, char in enumerate(s):
+        try_parse_string = s[:i + 1] 
+        while try_parse_string is not None:
+            try:
+                expr = ast.parse(try_parse_string, mode='eval')
+            except SyntaxError as e:
+                if try_parse_string == s:
+                    last_error = e
+                before, after = try_parse_string[:e.offset], try_parse_string[e.offset:]
+                try_parse_string = handle_parse_error(before, after)
+            else:
+                if not validator(expr):
+                    invalid_expression = True
+                else:
+                    expr_text = try_parse_string
+                    remaining_text = s[i + 1:]
                 break
-            expr_text = try_parse_string
-            remaining_text = s[len(try_parse_string):]
-    if expr_text is None:
+        if invalid_expression:
+            break
+    if not expr_text:
         raise last_error
     return expr_text, remaining_text

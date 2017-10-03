@@ -52,9 +52,7 @@ class SetLiteralTransformer(ast.NodeTransformer):
 class LambdaArgTransformer(ast.NodeTransformer):
 
     def visit_Call(self, node):
-        func = ast.Name(id='keys', ctx=ast.Load())
-        path = node_path(node.func)
-        if path in library.lambda_arguments:
+        if self.is_deferred_func(node):
             newargs = []
             for arg in node.args:
                 largs = ast.arguments(args=[], vararg=None, kwonlyargs=[], kw_defaults=[], kwarg=None, defaults=[])
@@ -62,6 +60,17 @@ class LambdaArgTransformer(ast.NodeTransformer):
                 newargs.append(newarg)
             node.args = newargs
         return self.generic_visit(node)
+
+    def is_deferred_func(self, node):
+        path = node_path(node.func)
+        # TODO: needs cleanup
+        if (path in library.lambda_arguments or
+            path == ('context', '_meta', 'call_or_type') and isinstance(node.func, ast.Call)):
+            return True
+        return False
+
+        
+
 
 class VariableArgumentTransformer(ast.NodeTransformer):
 
