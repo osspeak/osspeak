@@ -24,7 +24,7 @@ class RecognitionResultsTree:
             self.node_map[node_wrapper.path] = node_wrapper
 
     def get_full_path_engine_variables(self, engine_variables):
-        full_path_engine_variables = collections.defaultdict(list)
+        full_path_engine_variables = []
         path = ()
         for i, (var_id, var_val) in enumerate(engine_variables):
             split_id = var_id.split('-', 1)
@@ -37,13 +37,13 @@ class RecognitionResultsTree:
             if next_path not in self.node_map:
                 val = engine_variables[i - 1][1]
                 action = self.leaf_action(self.node_map[path].node, val)
-                full_path_engine_variables[path].append(action)
+                full_path_engine_variables.append((path, action))
                 next_path = self.next_path(list(path), var_id)
             path = next_path
         if path:
             val = engine_variables[-1][1]
             action = self.leaf_action(self.node_map[path].node, val)
-            full_path_engine_variables[path].append(action)
+            full_path_engine_variables.append((path, action))
         return full_path_engine_variables
 
     def next_path(self, current_path, next_end):
@@ -66,10 +66,10 @@ class RecognitionResultsTree:
     def action_variables(self, engine_variables):
         results = collections.OrderedDict({path: [] for path in self.variables})
         full_path_engine_variables = self.get_full_path_engine_variables(engine_variables)
-        for full_path, actions in full_path_engine_variables.items():
+        for full_path, action in full_path_engine_variables:
             for variable_path in self.variables:
                 if full_path[:len(variable_path)] == variable_path:
-                    results[variable_path].extend(actions)
+                    results[variable_path].append(action)
         return list(results.values())
 
 class RuleNodeWrapper:
