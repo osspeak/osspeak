@@ -35,15 +35,13 @@ class RecognitionResultsTree:
                 continue
             next_path = path + (var_id,)
             if next_path not in self.node_map:
-                val = engine_variables[i - 1][1]
-                action = self.leaf_action(self.node_map[path].node, val)
-                full_path_engine_variables.append((path, action))
+                action_text = engine_variables[i - 1][1]
+                full_path_engine_variables.append((path, action_text))
                 next_path = self.next_path(list(path), var_id)
             path = next_path
         if path:
-            val = engine_variables[-1][1]
-            action = self.leaf_action(self.node_map[path].node, val)
-            full_path_engine_variables.append((path, action))
+            action_text = engine_variables[-1][1]
+            full_path_engine_variables.append((path, action_text))
         return full_path_engine_variables
 
     def next_path(self, current_path, next_end):
@@ -66,7 +64,8 @@ class RecognitionResultsTree:
     def action_variables(self, engine_variables):
         results = collections.OrderedDict({path: [] for path in self.variables})
         full_path_engine_variables = self.get_full_path_engine_variables(engine_variables)
-        for full_path, action in full_path_engine_variables:
+        for full_path, action_text in full_path_engine_variables:
+            action = self.leaf_action(self.node_map[full_path].node, action_text)
             for variable_path in self.variables:
                 if full_path[:len(variable_path)] == variable_path:
                     results[variable_path].append(action)
