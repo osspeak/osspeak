@@ -12,6 +12,7 @@ builtin_functions.update({
     'start': window.start,
     'wait': time.sleep,
     'repeat': flow.repeat,
+    'wait_for': flow.wait_for,
     'proc': system.proc,
     'path': system.path,
 })

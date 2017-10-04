@@ -17,3 +17,13 @@ def osspeak_if(*args):
         return args[1]()
     elif len(args) == 3:
         return args[2]()
+
+def wait_for(condition, timeout=None):
+    import time
+    start = time.clock()
+    timeout = timeout if timeout is None else float(timeout())
+    while not condition():
+        time.sleep(.01)
+        if timeout and time.clock() - start > timeout:
+            break
+    

@@ -13,7 +13,7 @@ class Function:
         self.action = None
 
     def get_call_locals(self, args, kwargs):
-        call_args = {}
+        call_args = kwargs.copy()
         argpos = 0
         for name, param in self.parameters.items():
             if param.kind == Parameter.POSITIONAL_OR_KEYWORD:
