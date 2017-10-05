@@ -10,7 +10,7 @@ class Action:
         defined_functions = {} if defined_functions is None else defined_functions
         self.namespace = {**defined_functions, **library.namespace}
         try:
-            self.literal_expressions = pyexpr.compile_python_expressions(text) if isinstance(text, str) else text
+            self.literal_expressions, _ = pyexpr.compile_python_expressions(text) if isinstance(text, str) else (text, '')
             self.expressions = [asttransform.transform_expression(e, namespace=self.namespace, arguments=arguments) for e in self.literal_expressions]
         except SyntaxError as e:
             print(f'error: {text}')

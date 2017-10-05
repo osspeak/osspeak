@@ -27,14 +27,15 @@ def compile_python_expressions(input_string, validator=lambda expr: True, raise_
     remaining_text = input_string
     while remaining_text:
         try:
-            expr_text, remaining_text = greedy_parse(remaining_text, validator)
+            expr_text, temp_remaining_text = greedy_parse(remaining_text, validator)
         except Exception as e:
             if raise_on_error:
                 raise e
             break
         else:
             expressions.append(expr_text)
-    return expressions
+            remaining_text = temp_remaining_text
+    return expressions, remaining_text
 
 def handle_parse_error(before, after):
     for (before_pattern, after_pattern), handler in error_handlers.items():
