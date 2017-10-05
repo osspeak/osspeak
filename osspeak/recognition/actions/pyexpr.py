@@ -8,8 +8,7 @@ def varrepl(_, num):
         num -= 1
     return f'context.var({num})'
 
-def keyword_call(kw, _):
-    # print(f"context._meta.call_or_type('{kw}')")
+def keyword_call(kw):
     return f"context._meta.call_or_type('{kw}')"
 
 error_handler_strings = (
@@ -40,20 +39,20 @@ def compile_python_expressions(input_string, validator=lambda expr: True, raise_
 def handle_parse_error(before, after):
     for (before_pattern, after_pattern), handler in error_handlers.items():
         start, end = before, after
-        before_error_text, after_error_text = None, None
-        # if before == 'if':
-        #     print(before, after, before_pattern)
+        handler_args = []
         if before_pattern:
             bmatch = before_pattern.match(before)
             if not bmatch:
                 continue
-            start, before_error_text = bmatch.group(1), bmatch.group(2)
+            start = bmatch.group(1)
+            handler_args.append(bmatch.group(2))
         if after_pattern:
             amatch = after_pattern.match(after)
             if not amatch:
                 continue
-            after_error_text, after = amatch.group(1), amatch.group(2)
-        return start + handler(before_error_text, after_error_text) + after
+            after = amatch.group(2)
+            handler_args.append(amatch.group(1))
+        return start + handler(*handler_args) + after
 
 def greedy_parse(s, validator):
     assert s
