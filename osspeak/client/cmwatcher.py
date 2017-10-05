@@ -5,7 +5,7 @@ import os
 import collections
 import json
 import log
-import recognition.library.state
+import recognition.actions.library.state
 from recognition.actions import perform
 from user import settings
 from interfaces.gui import serializer
@@ -133,10 +133,10 @@ class CommandModuleWatcher:
             cmd_module.scope = self.scope_groupings[scope_name]
 
     def load_initial_user_state(self):
-        recognition.library.state.USER_DEFINED_STATE = {}
+        recognition.actions.library.state.USER_DEFINED_STATE = {}
         for path, cmd_module in self.cmd_modules.items():
             initial_state = {k: eval(v) for k, v in cmd_module.initial_state.items()}
-            recognition.library.state.USER_DEFINED_STATE.update(initial_state)
+            recognition.actions.library.state.USER_DEFINED_STATE.update(initial_state)
 
     def get_active_modules(self, current_window, current_state):
         active_modules = {}

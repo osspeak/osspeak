@@ -10,7 +10,7 @@ Ignore:
 '''
 
 import ast
-from recognition import library
+from recognition.actions import library
 
 class NameToStringTransformer(ast.NodeTransformer):
 

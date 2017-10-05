@@ -5,9 +5,7 @@ import log
 import clargs
 from client import userstate
 from communication import server, client, messages
-from interfaces.cli import menu
 from user import settings
-from interfaces.gui.guimanager import GuiProcessManager
 from interfaces import create_ui_manager
 from client import cmwatcher
 from communication.procs import EngineProcessManager

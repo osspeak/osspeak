@@ -2,7 +2,7 @@ import collections
 import itertools
 import json
 
-from recognition.library import state, history
+from recognition.actions.library import state, history
 from recognition.actions import variables
 from recognition import api
 from interfaces.gui import serializer

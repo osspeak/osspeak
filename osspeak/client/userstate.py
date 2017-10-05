@@ -1,6 +1,6 @@
 import threading
 import log
-from recognition.library.state import state_copy
+from recognition.actions.library.state import state_copy
 from platforms import api
 from communication import messages
 import time

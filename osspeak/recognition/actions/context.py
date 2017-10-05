@@ -1,6 +1,6 @@
 import log
 import platforms.api
-from recognition import library
+from recognition.actions import library
 
 class RecognitionContext:
 

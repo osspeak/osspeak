@@ -1,12 +1,12 @@
-from recognition.library import (mouse, window, keys, state,
+from recognition.actions.library import (mouse, window, keys, state,
 extensions, general, text, clipboard, osspeak, conditionals, history, fsystem, math)
 
 builtin_functions = globals().copy()
 from platforms import api
-from recognition.library import flow
+from recognition.actions.library import flow
 import subprocess
 import time
-from recognition.library import system
+from recognition.actions.library import system
 builtin_functions.update({
     'keys': keys.press,
     'start': window.start,
