@@ -6,12 +6,12 @@ import collections
 import json
 import log
 import recognition.library.state
-from recognition import perform
+from recognition.actions import perform
 from user import settings
 from interfaces.gui import serializer
 from recognition.actions import variables
 from client import commands, scopes, userstate
-from sprecgrammars.rules.converter import SrgsXmlConverter
+from recognition.rules.converter import SrgsXmlConverter
 from platforms import api
 import xml.etree.ElementTree as ET
 from communication import messages
@@ -60,7 +60,7 @@ class CommandModuleWatcher:
         self.grammar_commands[grammar_id] = commands
 
     def generate_node_ids(self, rules):
-        from sprecgrammars.rules import astree
+        from recognition.rules import astree
         prefix_map = {astree.GroupingNode: 'g', astree.Rule: 'r', astree.WordNode: 'w'}
         node_ids = {}
         for rule in rules:
@@ -174,7 +174,7 @@ class CommandModuleWatcher:
             cmd_module.load_commands()
     
     def load_builtin_functions(self):
-        from sprecgrammars.api import rule
+        from recognition.api import rule
         global_scope = self.scope_groupings['']
         global_scope.rules['_dictate'] = rule('', '_dictate')
 

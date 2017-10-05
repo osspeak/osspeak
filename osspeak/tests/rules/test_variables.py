@@ -1,8 +1,8 @@
 import unittest
 
-from sprecgrammars.rules import converter, parser, ruletokstream, tokens
-from sprecgrammars.rules.astree import GroupingNode, OrNode, WordNode 
-from sprecgrammars import api
+from recognition.rules import converter, parser, ruletokstream, tokens
+from recognition.rules.astree import GroupingNode, OrNode, WordNode 
+from recognition import api
 from tests.rules import strings
 
 class TestVariableBase(unittest.TestCase):

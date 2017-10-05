@@ -1,9 +1,9 @@
 import os
 import unittest
 
-from sprecgrammars.actions import nodes, tokens, parser, pyexpr
-from sprecgrammars import api
-from tests.sprecgrammars.actions import strings
+from recognition.actions import nodes, tokens, parser, pyexpr
+from recognition import api
+from tests.recognition.actions import strings
 
 class TestPyExpr(unittest.TestCase):
 

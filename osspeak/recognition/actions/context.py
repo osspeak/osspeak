@@ -8,7 +8,7 @@ class RecognitionContext:
         self._meta = RecognitionContextMeta(variables)
 
     def var(self, idx, default=None, perform_results=True):
-        from recognition import perform
+        from recognition.actions import perform
         try:
             variable_actions = self._meta.variables[idx]
         except IndexError as e:

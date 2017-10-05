@@ -4,11 +4,11 @@ import json
 
 from recognition.library import state, history
 from recognition.actions import variables
-from sprecgrammars import api
+from recognition import api
 from interfaces.gui import serializer
 from client import commands, scopes
-from sprecgrammars.rules import astree
-from sprecgrammars.rules.parser import RuleParser
+from recognition.rules import astree
+from recognition.rules.parser import RuleParser
 from log import logger
 
 class CommandModule:

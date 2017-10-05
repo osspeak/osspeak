@@ -1,5 +1,5 @@
 def repeat(*args):
-    from recognition import perform
+    from recognition.actions import perform
     count = args[-1]()
     try:
         count = int(count)

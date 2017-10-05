@@ -1,5 +1,5 @@
-from sprecgrammars import abstokenstream
-from sprecgrammars.rules import tokens
+from recognition import abstokenstream
+from recognition.rules import tokens
 
 token_character_map = {
     '|': tokens.OrToken,

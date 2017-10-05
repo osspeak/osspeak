@@ -1,6 +1,6 @@
 import copy
 
-from sprecgrammars.rules import ruletokstream, astree, tokens
+from recognition.rules import ruletokstream, astree, tokens
 
 class RuleParser:
     '''
@@ -46,7 +46,7 @@ class RuleParser:
         self.top.children.append(or_node)
 
     def parse_named_rule_token(self, tok):
-        from sprecgrammars import api
+        from recognition import api
         self.pop_top_grouping_if_closed()
         rule_node = self.rules[tok.name]
         # rule text -> None -> Rule object

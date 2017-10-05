@@ -1,4 +1,4 @@
-from sprecgrammars import inputstream
+from recognition import inputstream
 import re
 
 WORD_DELIMITERS = set(['{', '}', '(', ')', ',', ' ', '\n', '\t', '+', ',', '|', '='])

@@ -1,7 +1,7 @@
 import ast
 
 from recognition.actions import pyexpr, asttransform, action
-from sprecgrammars import api
+from recognition import api
 
 def action_substitute_validator(expr):
     return not (isinstance(expr.body, ast.BinOp) and isinstance(expr.body.op, ast.BitOr))

@@ -1,9 +1,9 @@
 import unittest
 
-from sprecgrammars.rules import converter, parser 
-from sprecgrammars.rules.astree import GroupingNode, OrNode, WordNode 
-from sprecgrammars.actions import nodes
-from tests.sprecgrammars.rules import strings
+from recognition.rules import converter, parser 
+from recognition.rules.astree import GroupingNode, OrNode, WordNode 
+from recognition.actions import nodes
+from tests.recognition.rules import strings
 
 class TestRuleParserBase(unittest.TestCase):
 

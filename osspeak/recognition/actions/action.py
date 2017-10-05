@@ -1,4 +1,5 @@
-from recognition import context, library, perform
+from recognition import library
+from recognition.actions import context, perform
 import platforms.api
 import time
 

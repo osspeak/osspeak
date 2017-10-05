@@ -4,7 +4,7 @@ import time
 import queue
 import contextlib
 import platforms.api
-from recognition import context
+from recognition.actions import context
 
 recognition_queue = queue.Queue()
 results_map = {}

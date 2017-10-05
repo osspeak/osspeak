@@ -1,6 +1,6 @@
 import json
 from client import cmwatcher, commands
-from sprecgrammars.rules.astree import Rule
+from recognition.rules.astree import Rule
 from client import commands
 
 class GuiEncoder(json.JSONEncoder):

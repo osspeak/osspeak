@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from sprecgrammars.rules import astree
+from recognition.rules import astree
 from pprint import pprint
 
 class SrgsXmlConverter:

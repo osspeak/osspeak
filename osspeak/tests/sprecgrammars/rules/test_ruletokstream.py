@@ -1,8 +1,8 @@
 import unittest
 
-from sprecgrammars.rules import converter, parser, ruletokstream, tokens
-from sprecgrammars.rules.astree import GroupingNode, OrNode, WordNode 
-from tests.sprecgrammars.rules import strings
+from recognition.rules import converter, parser, ruletokstream, tokens
+from recognition.rules.astree import GroupingNode, OrNode, WordNode 
+from tests.recognition.rules import strings
 
 class TestRuleTokenStreamBase(unittest.TestCase):
 

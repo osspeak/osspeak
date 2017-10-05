@@ -10,6 +10,6 @@ def release(keys):
     api.type_keypresses(keys, direction='up')
     
 def press(*keys):
-    from recognition import perform
+    from recognition.actions import perform
     with perform.keypress_delay():
         api.type_keypresses(keys)

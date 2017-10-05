@@ -1,4 +1,4 @@
-from sprecgrammars.rules.parser import RuleParser
+from recognition.rules.parser import RuleParser
 from recognition.actions import action, pyexpr, asttransform
 from recognition.actions.action import Action
 from recognition.actions.function import Function
