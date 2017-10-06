@@ -69,7 +69,7 @@ class RecognitionResultsTree:
             for variable_path in self.variables:
                 if full_path[:len(variable_path)] == variable_path:
                     results[variable_path].append(action)
-        return list(results.values())
+        return list(results.values()), [v[1] for v in full_path_engine_variables]
 
 class RuleNodeWrapper:
 

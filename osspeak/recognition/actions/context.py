@@ -4,8 +4,10 @@ from recognition.actions import library
 
 class RecognitionContext:
 
-    def __init__(self, variables):
+    def __init__(self, variables, words):
         self._meta = RecognitionContextMeta(variables)
+        self.words = words
+        self.text = ' '.join(words)
 
     def var(self, idx, default=None, perform_results=True):
         from recognition.actions import perform
@@ -46,3 +48,8 @@ class CallOrType(str):
 
     def __str__(self):
         return self.func_name
+
+def create_recognition_context(engine_result, variable_tree):
+    engine_variables = tuple(v for v in engine_result['Variables'] if len(v) == 2)
+    var_list, words = variable_tree.action_variables(engine_variables)
+    return RecognitionContext(var_list, words)

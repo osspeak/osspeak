@@ -47,10 +47,8 @@ def perform_io(item):
 def perform_action(command, variable_tree, engine_result):
     log.logger.info(f'Matched rule: {command.rule.raw_text}')
     # empty variables dict, gets filled based on result
-    engine_variables = tuple(v for v in engine_result['Variables'] if len(v) == 2)
-    var_list = variable_tree.action_variables(engine_variables)
-    recognition_result = context.RecognitionContext(var_list)
-    recognition_queue.put((command, recognition_result))
+    recognition_context = context.create_recognition_context(engine_result, variable_tree)
+    recognition_queue.put((command, recognition_context))
 
 def perform_commands(command_results, command_map):
     log.logger.debug(f'Got commands: {command_results}')
