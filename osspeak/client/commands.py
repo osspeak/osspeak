@@ -1,4 +1,5 @@
 import collections
+import importlib
 import itertools
 import json
 
@@ -22,6 +23,10 @@ class CommandModule:
         self.commands = []
         # currently activate and deactivate
         self.events = {}
+
+    def import_modules(self):
+        for module_name in self.config.get("imports", []):
+            self.scope.functions[module_name] = importlib.import_module(module_name)
 
     def load_commands(self):
         for rule_text, action_text in self.config.get('commands', {}):

@@ -151,10 +151,15 @@ class CommandModuleWatcher:
         return current_window_matches and cmd_module.state_active(current_state)
 
     def load_command_module_information(self):
+        self.import_modules()
         self.load_functions()
         self.load_rules()
         self.load_commands()
         self.load_events()
+
+    def import_modules(self):
+        for cmd_module in self.cmd_modules.values():
+            cmd_module.import_modules()
 
     def load_functions(self):
         self.load_builtin_functions()

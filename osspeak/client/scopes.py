@@ -7,8 +7,8 @@ class Scope:
         self.cmd_modules = {}
         self.name = name
         if global_scope is None:
-            self.rules = ScopeFieldMap({})
-            self.functions = ScopeFieldMap({})
+            self.rules = ScopeFieldMap()
+            self.functions = ScopeFieldMap()
         else:
             self.rules = ScopeFieldMap(global_scope.rules.global_dict, {})
             self.functions = ScopeFieldMap(global_scope.functions.global_dict, {})
@@ -20,8 +20,8 @@ class ScopeFieldMap:
     global_dict as fallback.
     '''
 
-    def __init__(self, global_dict, local_dict=None):
-        self.global_dict = global_dict
+    def __init__(self, global_dict=None, local_dict=None):
+        self.global_dict = {} if global_dict is None else global_dict 
         self.local_dict = local_dict
 
     def __getitem__(self, key):
