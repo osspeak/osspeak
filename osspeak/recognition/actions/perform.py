@@ -20,7 +20,7 @@ def recognition_action_worker():
         t = threading.current_thread()
         results_map[t] = {'context': recognition_context}
         try:
-            evaluation = command.action.perform(top_level=True)
+            evaluation = command.action.perform()
         except Exception as e:
             log.logger.error(f'Action {command.action.text} errored: {str(e)}')
         finally:
@@ -57,11 +57,12 @@ def perform_commands(command_results, command_map):
         command_dict = command_map[result['RuleId']]
         action_result = perform_action(command_dict['command'], command_dict['variable_tree'], result)
 
-def var_result(variable_actions):
+def var_result(variable_actions, perform_results):
     results = []
     for action in variable_actions:
-        results.append(action.perform_variable())
-    return concat_results(results)
+        results.append(action.perform_variable(perform_results=perform_results))
+    if not perform_results:
+        return concat_results(results)
 
 def concat_results(results):
     acc = None

@@ -16,18 +16,15 @@ class Action:
         except SyntaxError as e:
             print(f'error: {text}')
 
-    def perform(self, call_locals=None, top_level=False):
-        last_result = None
+    def perform(self, call_locals=None):
         for result in self.generate_results(call_locals):
-            if top_level:
-                if isinstance(last_result, (str, float, int)) and isinstance(result, (str, float, int)):
-                    result = ' ' + str(result)
-                perform.perform_io(result)
-            last_result = result
+            perform.perform_io(result)
 
     def perform_variable(self, call_locals=None, perform_results=False):
         results = []
         for result in self.generate_results(call_locals):
+            if perform_results:
+                perform.perform_io(result)
             results.append(result)
         return perform.concat_results(results)
 
