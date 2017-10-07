@@ -69,44 +69,6 @@ class LambdaArgTransformer(ast.NodeTransformer):
             return True
         return False
 
-        
-
-
-class VariableArgumentTransformer(ast.NodeTransformer):
-
-    def __init__(self, root):
-        self.parent_map = self.build_parent_map(root)
-        
-    def visit_Call(self, node):
-        if self.is_variable_call(node):
-            path = self.get_containing_function_path(node)
-            if path:
-                func = path[0]
-                # only type results for certain arguments. ex: 'foo' in repeat('foo', 10), but not 10 
-                if node_path(func) != ('repeat',) or func.args[-1] is path[1]:
-                    node.keywords.append(ast.keyword(arg='perform_results', value=ast.NameConstant(value=False)))
-        return self.generic_visit(node)
-
-    def build_parent_map(self, root):
-        parent_map = {root: None}
-        for node in ast.walk(root):
-            for child in ast.iter_child_nodes(node):
-                parent_map[child] = node
-        return parent_map
-
-    def is_variable_call(self, node):
-        return isinstance(node, ast.Call) and node_path(node.func) == ('context', 'var')
-
-    def get_containing_function_path(self, node):
-        path = [node]
-        while node:
-            parent = self.parent_map[node]
-            path.append(parent)
-            if isinstance(parent, ast.Call) and not self.is_variable_call(parent):
-                return path[::-1]
-            node = parent
-
-
 def node_path(node):
     if isinstance(node, ast.Call):
         return node_path(node.func)
@@ -121,7 +83,6 @@ def transform_expression(expr_text, namespace=None, arguments=None):
     new_expr = NameToStringTransformer(expr, namespace, arguments).visit(expr)
     new_expr = SetLiteralTransformer().visit(new_expr)
     new_expr = LambdaArgTransformer().visit(new_expr)
-    new_expr = VariableArgumentTransformer(new_expr).visit(new_expr)
     return compile(ast.fix_missing_locations(new_expr), filename=f'<{expr_text}>', mode='eval')
 
 def get_builtins():

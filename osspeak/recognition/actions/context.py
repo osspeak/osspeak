@@ -9,13 +9,13 @@ class RecognitionContext:
         self.words = words
         self.text = ' '.join(words)
 
-    def var(self, idx, default=None, perform_results=True):
+    def var(self, idx, default=None):
         from recognition.actions import perform
         try:
             variable_actions = self._meta.variables[idx]
         except IndexError as e:
             return default
-        return perform.var_result(variable_actions, perform_results) if variable_actions else default
+        return perform.var_result(variable_actions) if variable_actions else default
 
     def get(self, key):
         return self._meta.temp_variables.get(key)
