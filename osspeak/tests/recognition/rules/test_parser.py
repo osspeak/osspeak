@@ -2,7 +2,6 @@ import unittest
 
 from recognition.rules import converter, parser 
 from recognition.rules.astree import GroupingNode, OrNode, WordNode 
-from recognition.actions import nodes
 from tests.recognition.rules import strings
 
 class TestRuleParserBase(unittest.TestCase):
@@ -39,18 +38,6 @@ class TestRuleSubstitute1(TestRuleParserBase):
     @property
     def grouping(self):
         return self.rule.children[0]
-
-    def test_first_action(self):
-        first_action = self.grouping.children[0].action_substitute
-        self.assertIsInstance(first_action, nodes.RootAction)
-        self.assertIsInstance(first_action.children[0], nodes.LiteralKeysAction)
-        self.assertEqual(first_action.children[0].text, 'left')
-
-    def test_second_action(self):
-        second_action = self.rule.children[0].children[2].action_substitute
-        self.assertIsInstance(second_action, nodes.RootAction)
-        self.assertIsInstance(second_action.children[0], nodes.LiteralKeysAction)
-        self.assertEqual(second_action.children[0].text, 'right')
 
 class TestRuleSubstitute2(TestRuleParserBase):
 

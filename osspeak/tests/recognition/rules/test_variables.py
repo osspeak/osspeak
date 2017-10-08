@@ -3,7 +3,7 @@ import unittest
 from recognition.rules import converter, parser, ruletokstream, tokens
 from recognition.rules.astree import GroupingNode, OrNode, WordNode 
 from recognition import api
-from tests.rules import strings
+from tests.recognition.rules import strings
 
 class TestVariableBase(unittest.TestCase):
 

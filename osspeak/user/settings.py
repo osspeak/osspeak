@@ -2,6 +2,7 @@ import os
 import json
 
 OSSPEAK_DIRECTORY = os.path.join(os.path.expanduser('~'), '.osspeak')
+OSSPEAK_CONFIG_PATH = 'osspeak.json' if os.path.exists('osspeak.json') else os.path.join(OSSPEAK_DIRECTORY, 'osspeak.json')
 DEFAULT_CONFIG = {
     'interface': 'cli',
     'network': 'local',
@@ -17,16 +18,14 @@ DEFAULT_CONFIG = {
 def save_settings(settings):
     if not os.path.isdir(OSSPEAK_DIRECTORY):
         os.makedirs(OSSPEAK_DIRECTORY)
-    config_file_path = os.path.join(OSSPEAK_DIRECTORY, 'config.json')
-    with open(config_file_path, 'w') as f:
+    with open(OSSPEAK_CONFIG_PATH, 'w') as f:
         json.dump(settings, f, indent=4)
 
 def load_user_settings():
-    config_file_path = os.path.join(OSSPEAK_DIRECTORY, 'config.json')
-    if not os.path.exists(config_file_path):
+    if not os.path.exists(OSSPEAK_CONFIG_PATH):
         save_settings(DEFAULT_CONFIG)
     try:
-        with open(config_file_path) as f:
+        with open(OSSPEAK_CONFIG_PATH) as f:
             user_settings = json.load(f)
     except json.decoder.JSONDecodeError:
         # logger.warning('Invalid settings configuration. Loading default settings.')

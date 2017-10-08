@@ -69,9 +69,6 @@ class LambdaArgTransformer(ast.NodeTransformer):
             return True
         return False
 
-        
-
-
 class VariableArgumentTransformer(ast.NodeTransformer):
 
     def __init__(self, root):
@@ -106,12 +103,13 @@ class VariableArgumentTransformer(ast.NodeTransformer):
                 return path[::-1]
             node = parent
 
-
 def node_path(node):
     if isinstance(node, ast.Call):
         return node_path(node.func)
     if isinstance(node, ast.Name):
         return node.id,
+    if isinstance(node, ast.Lambda):
+        return ()
     return node_path(node.value) + (node.attr,)
 
 def transform_expression(expr_text, namespace=None, arguments=None):

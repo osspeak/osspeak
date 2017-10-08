@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from recognition.actions import nodes, tokens, parser, asttransform
+from recognition.actions import asttransform
 from recognition import api
 from tests.recognition.actions import strings
 
@@ -14,7 +14,7 @@ class TestAstTransform(unittest.TestCase):
 
     def test_lambda(self):
         res = self.evaluate(strings.LAMBDA_EXPRESSION)
-        self.assertEqual(res, 11)
+        self.assertEqual(res, 9)
 
     def test_kwarg(self):
         res = self.evaluate(strings.KWARG_EXPRESSION)
