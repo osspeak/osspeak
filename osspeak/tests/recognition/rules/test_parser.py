@@ -1,58 +1,58 @@
 import unittest
+import json
+from pprint import pprint
 
 from recognition.rules import converter, parser 
+from recognition.rules.json import RuleAstEncoder
 from recognition.rules.astree import GroupingNode, OrNode, WordNode 
 from tests.recognition.rules import strings
 
 class TestRuleParserBase(unittest.TestCase):
 
-    @property
-    def rule(self):
-        rule_parser = parser.RuleParser(self.text)
+    def rule(self, text):
+        rule_parser = parser.RuleParser(text)
         ruleobj = rule_parser.parse_as_rule()
         return ruleobj
 
-class TestRuleGrouping1(TestRuleParserBase):
+    def encode_rule(self, rule):
+        return json.loads(json.dumps(rule, cls=RuleAstEncoder))
+    
+    def rule_test(self, text, test_dict):
+        rule = self.rule(text)
+        json_rule = self.encode_rule(rule)
+        # pprint(json_rule)
+        self.assertEqual(json_rule, test_dict)
 
-    @classmethod
-    def setUpClass(cls):
-        cls.text = strings.GROUPING1
+class TestRuleGrouping(TestRuleParserBase):
 
-    def test_grouping1(self):
-        rule = self.rule
-        self.assertEqual(len(rule.children), 1)
-        self.assertIsInstance(rule.children[0], GroupingNode)
-        self.assertEqual(len(rule.children[0].children), 2)
-        self.assertEqual(rule.children[0].children[0].text, 'hello')
-        self.assertEqual(len(rule.children[0].children[1].children), 3)
-        self.assertEqual(rule.children[0].children[1].children[0].text, 'world')
-        self.assertIsInstance(rule.children[0].children[1].children[1], OrNode)
-        self.assertEqual(rule.children[0].children[1].children[2].text, 'universe')
-
-class TestRuleSubstitute1(TestRuleParserBase):
-
-    @classmethod
-    def setUpClass(cls):
-        cls.text = strings.SUBSTITUTE1
-
-    @property
-    def grouping(self):
-        return self.rule.children[0]
-
-class TestRuleSubstitute2(TestRuleParserBase):
-
-    @classmethod
-    def setUpClass(cls):
-        cls.text = strings.SUBSTITUTE2
-
-    def test_first_action(self):
-        rule = self.rule
-
-class TestRuleSubstitute3(TestRuleParserBase):
-
-    @classmethod
-    def setUpClass(cls):
-        cls.text = strings.SUBSTITUTE2
-
-    def test_first_action(self):
-        rule = self.rule
+    def test_simple(self):
+        test_dict = {
+            'children': [{'children': [{'text': 'hello', 'type': 'word'},
+                            {'children': [{'text': 'world', 'type': 'word'},
+                                          {'type': 'or'},
+                                          {'text': 'universe', 'type': 'word'}],
+                             'type': 'grouping'}],
+               'type': 'grouping'}],
+            'type': 'rule'
+        }
+        self.rule_test(strings.GROUPING1, test_dict)
+        
+    def test_substitute(self):
+        self.maxDiff = None
+        #((dollar sign)='$' | semicolon) 
+        test_dict = {
+            'children':[
+                {'children': [
+                    {'children': [
+                        {'text': 'dollar', 'type': 'word'},
+                        {'text': 'sign', 'type': 'word'}
+                    ],
+                    'action': "'$' ",
+                    'type': 'grouping'},
+                    {'type': 'or'},
+                    {'text': 'semicolon', 'type': 'word'}
+                ],
+               'type': 'grouping'}],
+            'type': 'rule'
+        }
+        self.rule_test(strings.SUBSTITUTE4, test_dict)
