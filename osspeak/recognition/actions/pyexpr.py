@@ -51,9 +51,9 @@ def handle_parse_error(before, after):
             amatch = after_pattern.match(after)
             if not amatch:
                 continue
-            after = amatch.group(2)
+            end = amatch.group(2)
             handler_args.append(amatch.group(1))
-        return start + handler(*handler_args) + after
+        return start + handler(*handler_args) + end
 
 def greedy_parse(s, validator):
     assert s
