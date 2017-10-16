@@ -9,6 +9,7 @@ from recognition.actions import context
 recognition_queue = queue.Queue()
 results_map = {}
 last_keypress_timestamp = None
+last_keypress = {'timestamp': None, 'item': None, 'type': None}
 
 def get_recognition_context():
     t = threading.current_thread()
@@ -30,19 +31,20 @@ workers = [threading.Thread(target=recognition_action_worker, daemon=True) for _
 for worker in workers:
     worker.start()
 
-@contextlib.contextmanager
-def keypress_delay():
-    global last_keypress_timestamp
-    if last_keypress_timestamp is not None:
-        diff = time.clock() - last_keypress_timestamp
+def keyboard_event(key_type, item, keyboard_function):
+    multiple_keypress = key_type == 'keys' and len(item) > 1
+    is_repeat = not multiple_keypress and item == last_keypress['item'] and key_type == last_keypress['type']
+    if last_keypress['timestamp'] is not None and not is_repeat:
+        diff = time.clock() - last_keypress['timestamp']
         time.sleep(max(.05 - diff, 0))
-    yield
-    last_keypress_timestamp = time.clock()
+    keyboard_function(item)
+    last_keypress['timestamp'] = time.clock()
+    last_keypress['type'] = key_type
+    last_keypress['item'] = item
 
 def perform_io(item):
     if isinstance(item, (str, float, int)):
-        with keypress_delay():
-            platforms.api.type_literal(item)
+        keyboard_event('literal', item, platforms.api.type_literal)
 
 def perform_action(command, variable_tree, engine_result):
     log.logger.info(f'Matched rule: {command.rule.raw_text}')

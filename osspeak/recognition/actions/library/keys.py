@@ -11,5 +11,4 @@ def release(keys):
     
 def press(*keys):
     from recognition.actions import perform
-    with perform.keypress_delay():
-        api.type_keypresses(keys)
+    perform.keyboard_event('keys', keys, api.type_keypresses)
