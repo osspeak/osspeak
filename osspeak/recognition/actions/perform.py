@@ -2,7 +2,6 @@ import threading
 import log
 import time
 import queue
-import contextlib
 import platforms.api
 from recognition.actions import context
 
