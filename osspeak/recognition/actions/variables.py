@@ -17,8 +17,9 @@ class RecognitionResultsTree:
         self.node_map = {}
         self.variables = []
         for node_wrapper in self.walk_tree():
-            is_variable = (isinstance(node_wrapper.node, astree.GroupingNode) or
-                isinstance(node_wrapper.node, astree.Rule) and node_wrapper.node.name == '_dictate')
+            is_grouping_variable = isinstance(node_wrapper.node, astree.GroupingNode) and len(node_wrapper.node.children) > 1
+            is_dictation = isinstance(node_wrapper.node, astree.Rule) and node_wrapper.node.name == '_dictate'
+            is_variable = is_grouping_variable or is_dictation
             if is_variable:
                 self.variables.append(node_wrapper.path)
             self.node_map[node_wrapper.path] = node_wrapper
@@ -62,12 +63,15 @@ class RecognitionResultsTree:
             return Action(f"'{result_text}'")
 
     def action_variables(self, engine_variables):
+        print(self.variables)
         results = collections.OrderedDict({path: [] for path in self.variables})
         full_path_engine_variables = self.get_full_path_engine_variables(engine_variables)
+        print('ya', full_path_engine_variables)
         for full_path, action_text in full_path_engine_variables:
             action = self.leaf_action(self.node_map[full_path].node, action_text)
             for variable_path in self.variables:
                 if full_path[:len(variable_path)] == variable_path:
+                    print("gay", results[variable_path], action_text) 
                     results[variable_path].append(action)
         return list(results.values()), [v[1] for v in full_path_engine_variables]
 
