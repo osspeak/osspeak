@@ -8,7 +8,6 @@ from recognition.actions import context
 
 recognition_queue = queue.Queue()
 results_map = {}
-last_keypress_timestamp = None
 last_keypress = {'timestamp': None, 'item': None, 'type': None}
 
 def get_recognition_context():
