@@ -33,10 +33,10 @@ UPLOAD_URL = 'https://github.com/api/uploads/repos/osspeak/osspeak/releases'
 
 def main():
     cl_args = parse_cl_args()
-    # tests_passed = run_tests()
-    # if not tests_passed:
-    #     print('Unit test(s) failed')
-    #     return
+    tests_passed = run_tests()
+    if not tests_passed:
+        print('Unit test(s) failed')
+        return
     build_osspeak()
     # build_gui()
     if cl_args.release:
