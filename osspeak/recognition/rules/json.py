@@ -7,8 +7,7 @@ class RuleAstEncoder(json.JSONEncoder):
         if isinstance(obj, astree.ASTNode):
             obj_dict = getattr(self, f'encode_{obj.__class__.__name__}')(obj)
             if getattr(obj, 'action_substitute', None) is not None:
-                obj_dict['action'] = obj.action_substitute.text
-                print(type(obj.action_substitute.text))
+                obj_dict['action'] = ''.join(obj.action_substitute.literal_expressions)
             return obj_dict
         return super().default(obj)
 

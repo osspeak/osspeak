@@ -5,13 +5,13 @@ import time
 
 class Action:
 
-    def __init__(self, text, defined_functions=None, arguments=None):
+    def __init__(self, text, defined_functions=None, arguments=None, validator=lambda expr: True, raise_on_error=True):
         from recognition.actions import pyexpr, asttransform
         self.text = text
         self.remaining_text = None
         defined_functions = {} if defined_functions is None else defined_functions
         self.namespace = {**defined_functions, **library.namespace}
-        self.literal_expressions, self.remaining_text = pyexpr.compile_python_expressions(text) if isinstance(text, str) else (text, '')
+        self.literal_expressions, self.remaining_text = pyexpr.compile_python_expressions(text, validator=validator, raise_on_error=raise_on_error)
         self.expressions = [asttransform.transform_expression(e, namespace=self.namespace, arguments=arguments) for e in self.literal_expressions]
 
     def perform(self, call_locals=None):
