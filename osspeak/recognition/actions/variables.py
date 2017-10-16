@@ -63,15 +63,18 @@ class RecognitionResultsTree:
             return Action(f"'{result_text}'")
 
     def action_variables(self, engine_variables):
-        print(self.variables)
         results = collections.OrderedDict({path: [] for path in self.variables})
         full_path_engine_variables = self.get_full_path_engine_variables(engine_variables)
-        print('ya', full_path_engine_variables)
         for full_path, action_text in full_path_engine_variables:
+            action_path_length = len(full_path)
             action = self.leaf_action(self.node_map[full_path].node, action_text)
             for variable_path in self.variables:
                 if full_path[:len(variable_path)] == variable_path:
-                    print("gay", results[variable_path], action_text) 
+                    if len(variable_path) < action_path_length:
+                        node = self.node_map[variable_path].node
+                        if getattr(node, 'action_substitute', None) is not None:
+                            action_path_length = len(variable_path)
+                            action = node.action_substitute
                     results[variable_path].append(action)
         return list(results.values()), [v[1] for v in full_path_engine_variables]
 
