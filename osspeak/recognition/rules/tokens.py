@@ -47,4 +47,3 @@ class ActionSubstituteToken(BaseToken):
         if not self.action.expressions:
             raise RuntimeError(f'Unable to parse any Python expressions from string:\n{text}')
         self.consumed_char_count = len(text) - len(self.action.remaining_text)
-        print(self.consumed_char_count, text, self.action.remaining_text)
