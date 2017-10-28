@@ -13,7 +13,8 @@ def keyword_call(kw):
 
 error_handler_strings = (
     ((r'\$', r'-?\d+'), varrepl),
-    (('if', None), keyword_call)
+    (('if', None), keyword_call),
+    (('while', None), keyword_call),
 )
 
 error_handlers = collections.OrderedDict()

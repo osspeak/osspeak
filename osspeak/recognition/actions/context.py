@@ -35,8 +35,8 @@ class RecognitionContextMeta:
 class CallOrType(str):
 
     FUNC_MAP = {
-        'if': library.flow.osspeak_if
-        # 'while': library.flow.osspeak_while
+        'if': library.flow.osspeak_if,
+        'while': library.flow.osspeak_while
     }
 
     def __init__(self, func_name):

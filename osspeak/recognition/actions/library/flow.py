@@ -18,6 +18,12 @@ def osspeak_if(*args):
     elif len(args) == 3:
         return args[2]()
 
+def osspeak_while(*args):
+    action_args = args[1:]
+    while args[0]():
+        for arg in action_args:
+            arg()
+
 def wait_for(condition, timeout=None):
     import time
     start = time.clock()
