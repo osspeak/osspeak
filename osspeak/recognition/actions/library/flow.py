@@ -20,7 +20,7 @@ def osspeak_if(*args):
     condition_evaluation = args[0]()
     if condition_evaluation:
         return args[1]()
-    elif len(args) == 3:
+    if len(args) == 3:
         return args[2]()
 
 def osspeak_while(*args):
