@@ -1,3 +1,8 @@
+'''
+All of the arguments in these functions are wrapped in 
+lambdas in recognition.asttransform.py to prevent early binding
+'''
+
 def repeat(*args):
     from recognition.actions import perform
     count = args[-1]()
