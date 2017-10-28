@@ -5,10 +5,10 @@ def repeat(*args):
         count = int(count)
     except (TypeError, ValueError):
         count = 1
-    largs = args[:-1]
+    lambda_args = args[:-1]
     for i in range(count):
-        for larg in largs:
-            perform.perform_io(larg())
+        for lambda_arg in lambda_args:
+            perform.perform_io(lambda_arg())
 
 def osspeak_if(*args):
     assert 1 < len(args) < 4
