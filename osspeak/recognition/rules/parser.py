@@ -75,6 +75,7 @@ class RuleParser:
     def parse_grouping_closing_token(self, tok):
         if self.top in self.optional_groupings:
             self.croak("Can't match '[' with ')'")
+        self.pop_top_grouping_if_closed()
         self.top.open = False
 
     def parse_optional_grouping_opening_token(self, tok):
@@ -85,6 +86,7 @@ class RuleParser:
     def parse_optional_grouping_closing_token(self, tok):
         if self.top not in self.optional_groupings:
             self.croak("Can't match '(' with ']'")
+        self.pop_top_grouping_if_closed()
         self.top.open = False
 
     def parse_repetition_token(self, tok):
