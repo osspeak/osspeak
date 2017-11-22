@@ -73,9 +73,9 @@ class RuleParser:
         self.grouping_stack.append(grouping_node)
 
     def parse_grouping_closing_token(self, tok):
+        self.pop_top_grouping_if_closed()
         if self.top in self.optional_groupings:
             self.croak("Can't match '[' with ')'")
-        self.pop_top_grouping_if_closed()
         self.top.open = False
 
     def parse_optional_grouping_opening_token(self, tok):
