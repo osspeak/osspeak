@@ -1,4 +1,4 @@
-from recognition import abstokenstream
+from recognition import inputstream
 from recognition.rules import tokens
 
 token_character_map = {
@@ -9,10 +9,11 @@ token_character_map = {
     ']': tokens.OptionalGroupingClosingToken,
 }
 
-class RuleTokenStream(abstokenstream.AbstractTokenStream):
+class RuleTokenStream:
 
     def __init__(self, text, defined_functions=None):
-        super().__init__(text)
+        self.stream = inputstream.InputStream(text)
+        self.peeked_token = None
         self.defined_functions = {} if defined_functions is None else defined_functions
 
     def read_next(self):
@@ -74,3 +75,30 @@ class RuleTokenStream(abstokenstream.AbstractTokenStream):
         for i in range(tok.consumed_char_count):
             self.stream.next()
         return tok
+
+    def next(self):
+        tok = self.peeked_token
+        self.peeked_token = None
+        return self.read_next() if tok is None else tok
+
+    def peek(self):
+        if self.peeked_token is not None:
+            return self.peeked_token
+        self.peeked_token = self.read_next()
+        return self.peeked_token
+
+    def eof(self):
+        return self.peek() is None
+
+    def croak(self, text):
+        raise RuntimeError(text)
+
+    def read_while(self, predicate):
+        val = ''
+        while not self.stream.eof() and predicate(self.stream.peek()):
+            val += self.stream.next()
+        return val
+
+    def __iter__(self):
+        while not self.eof():
+            yield self.next()
