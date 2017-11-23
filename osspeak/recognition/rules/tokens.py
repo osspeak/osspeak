@@ -7,7 +7,9 @@ def action_substitute_validator(expr):
     return not (isinstance(expr.body, ast.BinOp) and isinstance(expr.body.op, ast.BitOr))
 
 class BaseToken:
-    pass
+    
+    def __init__(self, *args, **kwargs):
+        pass
 
 class WordToken(BaseToken):
     
@@ -27,7 +29,12 @@ class OptionalGroupingOpeningToken(BaseToken):
     pass
 
 class OptionalGroupingClosingToken(BaseToken):
-    pass    
+    pass
+
+class WhitespaceToken(BaseToken):
+
+    def __init__(self, text): 
+        self.text = text
 
 class NamedRuleToken(BaseToken):
     

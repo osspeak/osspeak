@@ -27,7 +27,8 @@ class RuleParser:
             tokens.OptionalGroupingClosingToken: self.parse_optional_grouping_closing_token,
             tokens.RepetitionToken: self.parse_repetition_token,
             tokens.NamedRuleToken: self.parse_named_rule_token,
-            tokens.ActionSubstituteToken: self.parse_action_substitute_token
+            tokens.ActionSubstituteToken: self.parse_action_substitute_token,
+            tokens.WhitespaceToken: self.parse_whitespace_token,
         }
 
     def parse_as_rule(self, name=None):
@@ -95,6 +96,9 @@ class RuleParser:
 
     def parse_action_substitute_token(self, tok):
         self.modifiable_node.action_substitute = tok.action
+
+    def parse_whitespace_token(self, tok):
+        pass
 
     def pop_top_grouping_if_closed(self):
         if not self.top.open:
