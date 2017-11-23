@@ -47,8 +47,7 @@ class RuleTokenStream:
                 else:
                     pos = match.span()[-1]
                 return token, pos
-        else:
-            self.croak('uh oh')
+        self.croak(f'Cannot tokenize text: {self.text[pos:]}')
 
     def __iter__(self):
         pos = 0
