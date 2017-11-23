@@ -1,6 +1,5 @@
 import re
 from inspect import isclass
-from recognition import inputstream
 from recognition.rules import tokens
 
 TOKEN_PATTERNS = tuple((re.compile(p, re.I), _) for p, _ in (
