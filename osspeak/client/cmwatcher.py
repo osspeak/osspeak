@@ -1,4 +1,5 @@
 import threading
+from profile import Profiler
 import itertools
 import uuid
 import os
@@ -29,16 +30,17 @@ class CommandModuleWatcher:
 
     def load_modules(self, current_window, current_state, reload_files=False):
         with self.lock:
-            previous_active_modules = self.active_modules
-            if reload_files:
-                self.load_initial_user_state()
-                self.command_module_json = self.load_command_json()
-            self.initialize_modules()
-            self.active_modules = self.get_active_modules(current_window, current_state)
-            self.load_command_module_information()
-            self.fire_activation_events(previous_active_modules)
-            self.send_module_information_to_ui()
-            self.load_and_send_grammar()
+            with Profiler('load modules'):
+                previous_active_modules = self.active_modules
+                if reload_files:
+                    self.load_initial_user_state()
+                    self.command_module_json = self.load_command_json()
+                self.initialize_modules()
+                self.active_modules = self.get_active_modules(current_window, current_state)
+                self.load_command_module_information()
+                self.fire_activation_events(previous_active_modules)
+                self.send_module_information_to_ui()
+                self.load_and_send_grammar()
 
     def load_and_send_grammar(self):
         active_rules = self.active_rules

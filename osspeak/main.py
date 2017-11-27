@@ -21,6 +21,7 @@ def main():
         cmw = cmwatcher.CommandModuleWatcher()
         cmw.initialize_modules()
         userstate.start_watching_user_state(cmw)
+        server.run_communication_server()
         ui_manager.main_loop()
     finally:
         messages.dispatch_sync(messages.STOP_MAIN_PROCESS)
