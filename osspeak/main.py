@@ -9,6 +9,7 @@ from user import settings
 from interfaces import create_ui_manager
 from client import cmwatcher
 from communication.procs import EngineProcessManager
+import threading
 
 def main():
     args = clargs.get_args()
@@ -18,11 +19,14 @@ def main():
     ui_manager = create_ui_manager()
     engine = initialize_speech_engine_client()
     try:
-        cmw = cmwatcher.CommandModuleWatcher()
-        cmw.initialize_modules()
-        userstate.start_watching_user_state(cmw)
-        server.run_communication_server()
-        ui_manager.main_loop()
+        # cmw = cmwatcher.CommandModuleWatcher()
+        # cmw.initialize_modules()
+        userstate.start_watching_user_state()
+        # ui_manager.main_loop()
+        threading.Thread(target=ui_manager.main_loop, daemon=True).start()
+        # server.run_communication_server()
+        while True:
+            pass
     finally:
         messages.dispatch_sync(messages.STOP_MAIN_PROCESS)
 

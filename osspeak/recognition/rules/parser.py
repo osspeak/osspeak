@@ -35,10 +35,9 @@ class RuleParser:
     def parse_as_rule(self, name=None):
         top_level_rule = astree.Rule(name=name)
         self.grouping_stack = [top_level_rule]
-        with Profiler.get('load modules').piece('tokenize'):
-            for tok in self.stream:
-                self.token_list.append(tok)
-                self.parse_map[type(tok)](tok)
+        for tok in self.stream:
+            self.token_list.append(tok)
+            self.parse_map[type(tok)](tok)
         valid_last_grouping = len(self.grouping_stack) == 1 or len(self.grouping_stack) == 2 and not self.grouping_stack[-1].open
         assert self.grouping_stack[0] is top_level_rule and valid_last_grouping
         return top_level_rule

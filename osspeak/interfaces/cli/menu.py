@@ -11,7 +11,10 @@ class Menu:
         if user_input == 'q':
             return
         if not user_input:
+            from communication.server import loop, shutdown
+            loop.call_soon_threadsafe(lambda l: shutdown(l), loop)
             return True
+        
         try:
             option = self.options[int(user_input) - 1]
         except (ValueError, IndexError):

@@ -4,7 +4,7 @@ from platforms import api
 class Scope:
 
     def __init__(self, global_scope=None, name=''):
-        self.cmd_modules = {}
+        self.command_modules = {}
         self.name = name
         if global_scope is None:
             self.rules = ScopeFieldMap()
