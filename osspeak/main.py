@@ -3,7 +3,7 @@ import asyncio
 
 import log
 import clargs
-from client import userstate
+from recognition.commands import monitor
 from communication import server, client, messages
 from user import settings
 from interfaces import create_ui_manager
@@ -21,7 +21,7 @@ def main():
     try:
         # cmw = cmwatcher.CommandModuleWatcher()
         # cmw.initialize_modules()
-        userstate.start_watching_user_state()
+        monitor.start_watching_user_state()
         # ui_manager.main_loop()
         threading.Thread(target=ui_manager.main_loop, daemon=True).start()
         # server.run_communication_server()
