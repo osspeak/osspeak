@@ -11,7 +11,7 @@ from recognition.actions import perform
 from user import settings
 from interfaces.gui import serializer
 from recognition.actions import variables
-from client import commands, scopes, userstate
+from client import commands, scopes
 from recognition.rules.converter import SrgsXmlConverter
 from platforms import api
 import xml.etree.ElementTree as ET

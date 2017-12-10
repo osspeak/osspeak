@@ -11,8 +11,6 @@ class Menu:
         if user_input == 'q':
             return
         if not user_input:
-            from communication.server import loop, shutdown
-            loop.call_soon_threadsafe(lambda l: shutdown(l), loop)
             return True
         
         try:
@@ -61,6 +59,14 @@ class MainMenu(Menu):
         print('Reloading command modules...')
         messages.dispatch(messages.RELOAD_COMMAND_MODULE_FILES)
         return True
+
+    def start(self):
+        try:
+            self.main_loop()
+        finally:
+            from communication.server import loop, shutdown
+            loop.stop()
+            # loop.call_soon_threadsafe(lambda l: shutdown(l), loop)
 
 class SettingsMenu(Menu):
     

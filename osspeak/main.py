@@ -10,6 +10,7 @@ from interfaces import create_ui_manager
 from client import cmwatcher
 from communication.procs import EngineProcessManager
 import threading
+import atexit
 
 def main():
     args = clargs.get_args()
@@ -18,17 +19,22 @@ def main():
         return
     ui_manager = create_ui_manager()
     engine = initialize_speech_engine_client()
+    loop = asyncio.get_event_loop()
     try:
-        # cmw = cmwatcher.CommandModuleWatcher()
-        # cmw.initialize_modules()
         monitor.start_watching_user_state()
-        # ui_manager.main_loop()
-        threading.Thread(target=ui_manager.main_loop, daemon=True).start()
-        # server.run_communication_server()
-        while True:
-            pass
+        threading.Thread(target=ui_manager.start, daemon=True).start()
+        server.run_communication_server()
+        # while True:
+        #     pass
     finally:
+        # asyncio.get_event_loop().stop()
         messages.dispatch_sync(messages.STOP_MAIN_PROCESS)
+
+@atexit.register
+def shutdown():
+    return
+    asyncio.get_event_loop().stop()
+    # asyncio.get_event_loop().close()
 
 def initialize_speech_engine_client():
     if settings.user_settings['network'] == 'remote':

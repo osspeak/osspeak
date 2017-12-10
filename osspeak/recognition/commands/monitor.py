@@ -1,5 +1,6 @@
 import threading
 import log
+import asyncio
 from recognition.actions.library.state import state_copy
 from recognition.commands import loader
 from recognition.actions import perform
@@ -15,20 +16,19 @@ def create_message_subscriptions(shutdown_event, msg_list, cache):
     messages.subscribe(messages.PERFORM_COMMANDS, lambda command_results, grammar_id: perform_commands(cache, command_results, grammar_id))
 
 def start_watching_user_state():
-    # command_module_watcher.load_initial_user_state()
     shutdown_event = threading.Event()
     msg_list = [None]
     cache = loader.CommandModuleCache()
     cache.populate()
     loader.load_initial_user_state(cache.command_modules)
     create_message_subscriptions(shutdown_event, msg_list, cache)
-    loop_args = (shutdown_event, msg_list, cache)
-    threading.Thread(target=watch_user_system_state, args=loop_args, daemon=True).start()
+    loop_args = (msg_list, cache)
+    asyncio.ensure_future(watch_user_system_state(*loop_args))
+    # threading.Thread(target=watch_user_system_state, args=loop_args, daemon=True).start()
 
-def watch_user_system_state(shutdown_event, msg_list, cache):
-    previous_window = None
-    previous_state = state_copy()
-    while not shutdown_event.isSet():
+async def watch_user_system_state(msg_list, cache):
+    previous_window, previous_state = None, state_copy()
+    while True:
         current_window = api.get_active_window_name().lower()
         different_window = current_window != previous_window
         current_state = state_copy()
@@ -44,7 +44,7 @@ def watch_user_system_state(shutdown_event, msg_list, cache):
             previous_window = current_window
             previous_state = current_state
             msg_list[0] = None
-        shutdown_event.wait(timeout=1)
+        await asyncio.sleep(1)
 
 def set_message(msg_list, msg):
     msg_list[0] = msg
