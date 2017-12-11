@@ -9,7 +9,7 @@ import argparse
 import log
 import clargs
 from recognition.commands import monitor
-from communication import server, client, messages
+from communication import server, client, messages, pubsub, topics
 from user import settings
 from interfaces import create_ui_manager
 from client import cmwatcher
@@ -24,21 +24,19 @@ def main():
         return
     ui_manager = create_ui_manager()
     engine = asyncio.get_event_loop().run_until_complete(initialize_speech_engine_client())
-    loop = asyncio.get_event_loop()
     try:
         monitor.start_watching_user_state()
         threading.Thread(target=ui_manager.start, daemon=True).start()
         server.run_communication_server()
-        # while True:
-        #     pass
     finally:
-        # asyncio.get_event_loop().stop()
-        messages.dispatch_sync(messages.STOP_MAIN_PROCESS)
+        pubsub.publish(topics.STOP_MAIN_PROCESS)
+        asyncio.get_event_loop().close()
+        print('finally')
 
-@atexit.register
-def shutdown():
-    return
-    asyncio.get_event_loop().stop()
+# @atexit.register
+# def shutdown():
+#     return
+#     asyncio.get_event_loop().stop()
     # asyncio.get_event_loop().close()
 
 async def initialize_speech_engine_client():

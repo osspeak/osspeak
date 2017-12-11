@@ -22,8 +22,10 @@ def publish(topic, *args, **kwargs):
     from communication.server import loop
     tasks = []
     for sub in _subscriptions.get(topic, []):
-        task = asyncio.ensure_future(sub.callback(*args), loop=loop)
-        tasks.append(task)
+        res = sub.callback(*args)
+        if inspect.iscoroutinefunction(sub.callback):
+            task = asyncio.ensure_future(res, loop=loop)
+            tasks.append(task)
     return tasks
 
 class Subscription:

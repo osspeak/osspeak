@@ -28,7 +28,6 @@ class ProcessManager:
         process_instance.process = await create
         asyncio.ensure_future(process_instance.dispatch_process_output())
 
-
     def __init__(self, path, on_output=lambda x: None, on_exit=lambda: None):
         self.on_output = on_output
         self.on_exit = on_exit
@@ -48,7 +47,6 @@ class ProcessManager:
     async def dispatch_process_output(self):
         async for line in self.process.stdout:
             line = line.decode('utf8')
-            print('lein', line)
             await self.on_output(line)
 
 class EngineProcessManager(ProcessManager):
@@ -63,10 +61,7 @@ class EngineProcessManager(ProcessManager):
         pubsub.subscribe(topics.LOAD_ENGINE_GRAMMAR, self.load_engine_grammar)
         pubsub.subscribe(topics.ENGINE_START, self.start)
         pubsub.subscribe(topics.ENGINE_STOP, self.stop)
-        # messages.subscribe(messages.LOAD_GRAMMAR, self.load_engine_grammar)
-        # messages.subscribe(messages.ENGINE_START, self.start)
-        # messages.subscribe(messages.ENGINE_STOP, self.stop)
-        # messages.subscribe(messages.STOP_MAIN_PROCESS, self.shutdown)
+        pubsub.subscribe(topics.STOP_MAIN_PROCESS, self.shutdown)
         pubsub.subscribe(topics.EMULATE_RECOGNITION_EVENT, self.emulate_recognition)
         
     async def send_message(self, msg):
@@ -106,16 +101,16 @@ class EngineProcessManager(ProcessManager):
     async def send_simple_message(self, msg_type):
         await self.send_message({'Type': msg_type})
 
-    async def shutdown(self):
-        await self.send_simple_message('shutdown')
+    def shutdown(self):
+        self.process.kill()
 
     async def stop(self):
-        self.engine_running = False
         await self.send_simple_message('stop')
+        self.engine_running = False
 
     async def start(self):
-        self.engine_running = True
         await self.send_simple_message('start')
+        self.engine_running = True
 
     async def emulate_recognition(self, text, delay=5):
         msg = {
