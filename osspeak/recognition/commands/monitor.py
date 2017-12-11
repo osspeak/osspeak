@@ -10,7 +10,6 @@ from profile import Profiler
 import time
 
 def create_message_subscriptions(shutdown_event, msg_list, cache):
-    messages.subscribe(messages.STOP_MAIN_PROCESS, lambda: shutdown_event.set())
     messages.subscribe(messages.RELOAD_COMMAND_MODULE_FILES, lambda: set_message(msg_list, messages.RELOAD_COMMAND_MODULE_FILES))
     messages.subscribe(messages.RELOAD_GRAMMAR, lambda: set_message(msg_list, messages.RELOAD_GRAMMAR))
     messages.subscribe(messages.PERFORM_COMMANDS, lambda command_results, grammar_id: perform_commands(cache, command_results, grammar_id))

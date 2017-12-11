@@ -1,3 +1,4 @@
+import copy
 import json
 import socket
 import queue
@@ -35,3 +36,19 @@ def get_open_port():
     port = s.getsockname()[1]
     s.close()
     return port
+
+def parametrized(dec):
+    def layer(*args, **kwargs):
+        def repl(f):
+            return dec(f, *args, **kwargs)
+        return repl
+    return layer
+
+def finish_tasks(tasks):
+    remaining_tasks = tasks
+    while remaining_tasks:
+        next_remaining_tasks = []
+        for task in remaining_tasks:
+            if not task.done():
+                next_remaining_tasks.append(task)
+        remaining_tasks = next_remaining_tasks

@@ -1,4 +1,4 @@
-from communication import messages
+from communication import messages, topics, pubsub, common
 from user import settings
 
 class Menu:
@@ -32,6 +32,10 @@ class Menu:
         for i, option in enumerate(self.options, start=1):
             print(f'{i}. {option["text"]}')
 
+    def await_publish(self, topic, *args):
+        tasks = pubsub.publish(topic, *args)
+        common.finish_tasks(tasks)
+
 class MainMenu(Menu):
     def __init__(self):
         self.title = 'Main Menu'
@@ -42,17 +46,17 @@ class MainMenu(Menu):
         ]
 
     def on_debug_commands(self):
-        messages.dispatch_sync(messages.ENGINE_STOP)
+        self.await_publish(topics.ENGINE_STOP)
         while True:
             user_input = input('Enter text to test or press enter to go back: ')
             if user_input:
-                 messages.dispatch_sync(messages.EMULATE_RECOGNITION, user_input)
+                 self.await_publish(topics.EMULATE_RECOGNITION_EVENT, user_input)
             else:
-                messages.dispatch_sync(messages.ENGINE_START)
+                self.await_publish(topics.ENGINE_START)
                 return True
 
     def on_adjust_settings(self):
-        messages.dispatch(messages.ENGINE_STOP)
+        messages.dispatch(topics.ENGINE_STOP)
         return SettingsMenu().main_loop()
 
     def reload_command_modules(self):
@@ -66,7 +70,7 @@ class MainMenu(Menu):
         finally:
             from communication.server import loop, shutdown
             loop.stop()
-            # loop.call_soon_threadsafe(lambda l: shutdown(l), loop)
+            loop.call_soon_threadsafe(lambda l: shutdown(l), loop)
 
 class SettingsMenu(Menu):
     

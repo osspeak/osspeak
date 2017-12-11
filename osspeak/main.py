@@ -1,6 +1,11 @@
-import argparse
 import asyncio
+import sys
 
+if sys.platform == 'win32':
+    loop = asyncio.ProactorEventLoop()
+    asyncio.set_event_loop(loop)
+
+import argparse
 import log
 import clargs
 from recognition.commands import monitor
@@ -8,7 +13,7 @@ from communication import server, client, messages
 from user import settings
 from interfaces import create_ui_manager
 from client import cmwatcher
-from communication.procs import EngineProcessManager
+from communication.procs import EngineProcessManager, ENGINE_PATH
 import threading
 import atexit
 
@@ -18,7 +23,7 @@ def main():
         server.RemoteEngineServer().loop_forever()
         return
     ui_manager = create_ui_manager()
-    engine = initialize_speech_engine_client()
+    engine = asyncio.get_event_loop().run_until_complete(initialize_speech_engine_client())
     loop = asyncio.get_event_loop()
     try:
         monitor.start_watching_user_state()
@@ -36,12 +41,12 @@ def shutdown():
     asyncio.get_event_loop().stop()
     # asyncio.get_event_loop().close()
 
-def initialize_speech_engine_client():
+async def initialize_speech_engine_client():
     if settings.user_settings['network'] == 'remote':
         engine_client = client.RemoteEngineClient()
         return engine_client
     else:
-        return EngineProcessManager()
+        return await EngineProcessManager.create(ENGINE_PATH)
 
 if __name__ == "__main__":
     main()

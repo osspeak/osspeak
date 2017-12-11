@@ -15,7 +15,7 @@ from client import commands, scopes
 from recognition.rules.converter import SrgsXmlConverter
 from platforms import api
 import xml.etree.ElementTree as ET
-from communication import messages
+from communication import messages, pubsub, topics
 
 class CommandModuleCache:
 
@@ -55,6 +55,7 @@ def load_and_send_grammar(cache):
     grammar_id = str(uuid.uuid4())
     add_new_grammar(cache.grammar_commands, grammar_commands, grammar_id)
     messages.dispatch(messages.LOAD_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
+    pubsub.publish(topics.LOAD_ENGINE_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
 
 def add_new_grammar(grammar_commands, commands, grammar_id):
     # remove oldest grammar if needed
