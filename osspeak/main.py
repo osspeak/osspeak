@@ -24,20 +24,18 @@ def main():
         return
     ui_manager = create_ui_manager()
     engine = asyncio.get_event_loop().run_until_complete(initialize_speech_engine_client())
+    monitor.start_watching_user_state()
+    threading.Thread(target=ui_manager.start, daemon=True).start()
     try:
-        monitor.start_watching_user_state()
-        threading.Thread(target=ui_manager.start, daemon=True).start()
         server.run_communication_server()
     finally:
-        pubsub.publish(topics.STOP_MAIN_PROCESS)
-        asyncio.get_event_loop().close()
-        print('finally')
+        pass
 
-# @atexit.register
-# def shutdown():
-#     return
-#     asyncio.get_event_loop().stop()
-    # asyncio.get_event_loop().close()
+@atexit.register
+def shutdown():
+    pubsub.publish(topics.STOP_MAIN_PROCESS)
+    for task in asyncio.Task.all_tasks():
+        task.cancel()
 
 async def initialize_speech_engine_client():
     if settings.user_settings['network'] == 'remote':
