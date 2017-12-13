@@ -4,7 +4,7 @@ import sys
 import threading
 import json
 import os
-from communication.procs import ProcessManager
+from communication.procs import ProcessHandler
 from communication import messages, common
 from interfaces.gui import serializer
 # from flask import Flask
@@ -26,7 +26,7 @@ routes = {
     'GET_COMMAND_MODULES': lambda *a: 55
 }
 
-class GuiProcessManager(ProcessManager):
+class GuiProcessManager(ProcessHandler):
 
     def __init__(self):
         self.loop = asyncio.get_event_loop()

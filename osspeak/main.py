@@ -13,7 +13,7 @@ from communication import server, client, messages, pubsub, topics
 from user import settings
 from interfaces import create_ui_manager
 from client import cmwatcher
-from communication.procs import EngineProcessManager, ENGINE_PATH
+from engine.handler import EngineProcessHandler
 import threading
 import atexit
 
@@ -26,10 +26,7 @@ def main():
     engine = asyncio.get_event_loop().run_until_complete(initialize_speech_engine_client())
     monitor.start_watching_user_state()
     threading.Thread(target=ui_manager.start, daemon=True).start()
-    try:
-        server.run_communication_server()
-    finally:
-        pass
+    server.run_communication_server()
 
 @atexit.register
 def shutdown():
@@ -42,7 +39,7 @@ async def initialize_speech_engine_client():
         engine_client = client.RemoteEngineClient()
         return engine_client
     else:
-        return await EngineProcessManager.create(ENGINE_PATH)
+        return await EngineProcessHandler.create()
 
 if __name__ == "__main__":
     main()
