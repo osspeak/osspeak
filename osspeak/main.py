@@ -9,23 +9,21 @@ import argparse
 import log
 import clargs
 from recognition.commands import monitor
-from communication import server, client, messages, pubsub, topics
+from communication import server, client, pubsub, topics
 from user import settings
 from interfaces import create_ui_manager
-from client import cmwatcher
 from engine.handler import EngineProcessHandler
+from engine.client import RemoteEngineClient
 import threading
 import atexit
 
 def main():
     args = clargs.get_args()
-    if settings.user_settings['network'] == 'server':
-        server.RemoteEngineServer().loop_forever()
-        return
-    ui_manager = create_ui_manager()
-    engine = asyncio.get_event_loop().run_until_complete(initialize_speech_engine_client())
-    monitor.start_watching_user_state()
-    threading.Thread(target=ui_manager.start, daemon=True).start()
+    engine = asyncio.get_event_loop().run_until_complete(initialize_speech_engine_connector())
+    if settings.user_settings['network'] != 'server':
+        ui_manager = create_ui_manager()
+        monitor.start_watching_user_state()
+        threading.Thread(target=ui_manager.start, daemon=True).start()
     server.run_communication_server()
 
 @atexit.register
@@ -34,12 +32,14 @@ def shutdown():
     for task in asyncio.Task.all_tasks():
         task.cancel()
 
-async def initialize_speech_engine_client():
-    if settings.user_settings['network'] == 'remote':
+async def initialize_speech_engine_connector():
+    network = settings.user_settings['network']
+    if network == 'remote':
         engine_client = client.RemoteEngineClient()
         return engine_client
     else:
-        return await EngineProcessHandler.create()
+        is_server = network == 'server'
+        return await EngineProcessHandler.create(remote=is_server)
 
 if __name__ == "__main__":
     main()

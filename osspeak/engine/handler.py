@@ -4,6 +4,7 @@ import sys
 from user.settings import user_settings
 from communication import pubsub, topics, messages
 from communication.procs import ProcessHandler
+from engine import server
 
 if getattr(sys, 'frozen', False):
     ENGINE_PATH = r'engines\wsr\RecognizerIO.exe'
@@ -16,10 +17,11 @@ class EngineProcessHandler:
         self.process = None
         self.create_subscriptions()
         self.engine_running = True
+        self.server = server.RemoteEngineServer() if remote else None
 
     @classmethod
-    async def create(cls):
-        instance = cls()
+    async def create(cls, *a, **kw):
+        instance = cls(*a, **kw)
         instance.process = await ProcessHandler.create(ENGINE_PATH, on_output=instance.on_engine_message)
         return instance
 
@@ -53,7 +55,7 @@ class EngineProcessHandler:
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition':
             if msg['Confidence'] > user_settings['engine']['recognitionConfidence']:
-                messages.dispatch(messages.PERFORM_COMMANDS, msg['Commands'], msg['GrammarId'])
+                pubsub.publish(topics.PERFORM_COMMANDS, msg['Commands'], msg['GrammarId'])
         elif msg['Type'] == messages.SET_ENGINE_STATUS:
             messages.dispatch(messages.SET_ENGINE_STATUS, msg)
         elif msg['Type'] == 'error':

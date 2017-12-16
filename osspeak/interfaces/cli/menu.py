@@ -56,7 +56,7 @@ class MainMenu(Menu):
                 return True
 
     def on_adjust_settings(self):
-        messages.dispatch(topics.ENGINE_STOP)
+        self.await_publish(topics.ENGINE_STOP)
         return SettingsMenu().main_loop()
 
     def reload_command_modules(self):

@@ -54,7 +54,6 @@ def load_and_send_grammar(cache):
     grammar_xml = build_grammar_xml(active_rules, node_ids)
     grammar_id = str(uuid.uuid4())
     add_new_grammar(cache.grammar_commands, grammar_commands, grammar_id)
-    messages.dispatch(messages.LOAD_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
     pubsub.publish(topics.LOAD_ENGINE_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
 
 def add_new_grammar(grammar_commands, commands, grammar_id):
@@ -211,9 +210,9 @@ def update_modules(self, modified_modules):
 
 def send_module_information_to_ui(command_modules):
     payload = {'modules': command_modules}
-    messages.dispatch(messages.LOAD_MODULE_MAP, payload)
+    pubsub.publish(topics.LOAD_MODULE_MAP, payload)
 
 def fetch_module_map(command_modules):
     with self.lock:
         payload = {'modules': command_modules}
-    messages.dispatch(messages.LOAD_MODULE_MAP, payload)
+    pubsub.publish(topics.LOAD_MODULE_MAP, payload)

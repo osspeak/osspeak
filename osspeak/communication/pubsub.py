@@ -3,8 +3,12 @@ import inspect
 
 _subscriptions = {}
 
-def subscribe(topic, callback):
-    return Subscription(topic, callback)
+def subscribe(topic: str, callback):
+    if topic not in _subscriptions:
+        _subscriptions[topic] = []
+    sub = Subscription(topic, callback)
+    _subscriptions[topic].append(sub)
+    return sub
     
 def publish(topic, *args, **kwargs):
     from communication.server import loop
@@ -18,9 +22,6 @@ def publish(topic, *args, **kwargs):
 
 class Subscription:
 
-    def __init__(self, topic, callback):
+    def __init__(self, topic: str, callback):
         self.topic = topic
         self.callback = callback
-        if self.topic not in _subscriptions:
-            _subscriptions[self.topic] = []
-        _subscriptions[self.topic].append(self)

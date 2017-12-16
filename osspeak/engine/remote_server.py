@@ -1,4 +1,0 @@
-class RemoteEngineServer:
-    pass
-
-    

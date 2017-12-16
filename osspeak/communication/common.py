@@ -52,3 +52,9 @@ def finish_tasks(tasks):
             if not task.done():
                 next_remaining_tasks.append(task)
         remaining_tasks = next_remaining_tasks
+
+def publish_json_message(msg):
+    decoded_message = json.loads(msg)
+    args = decoded_message.get('args', [])
+    kwargs = decoded_message.get('kwargs', {})
+    pubsub.publish(decoded_message.topic, *args, **kwargs)
