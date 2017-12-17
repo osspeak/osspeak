@@ -70,7 +70,8 @@ class EngineProcessHandler:
         await self.send_message({'Type': msg_type})
 
     def shutdown(self):
-        self.process.kill()
+        if self.process is not None:
+            self.process.kill()
 
     async def stop(self):
         await self.send_simple_message('stop')

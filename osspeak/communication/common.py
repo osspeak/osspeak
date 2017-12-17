@@ -29,6 +29,8 @@ def put_message_in_queue(q, msg):
                 q.get_nowait()
             except queue.Empty:
                 pass
+        else:
+            return
 
 def yield_queue_contents(q):
     while True:
@@ -63,6 +65,12 @@ def finish_tasks(tasks):
 
 def publish_json_message(msg):
     decoded_message = json.loads(msg)
-    args = decoded_message.get('args', [])
-    kwargs = decoded_message.get('kwargs', {})
-    pubsub.publish(decoded_message.topic, *args, **kwargs)
+    messages = decoded_message if isinstance(decoded_message, list) else [decoded_message]
+    for message in messages:
+        args = message.get('args', [])
+        kwargs = message.get('kwargs', {})
+        pubsub.publish(message.topic, *args, **kwargs)
+
+def get_host_and_port(address):
+    host, port = address.rsplit(':', 1)
+    return host, int(port)

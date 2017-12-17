@@ -1,5 +1,6 @@
 import json
 import aiohttp
+from user import settings
 from communication.server import app
 from communication.common import publish_json_message
 
@@ -7,13 +8,13 @@ class RemoteEngineServer:
     
     def __init__(self):
         self.ws = None
-        app.add_get('/engine/ws', self.websocket_handler)
+        app.router.add_get('/engine/ws', self.websocket_handler)
 
-    async def websocket_handler(request):
+    async def websocket_handler(self, request):
         if self.ws is not None:
             print('already have a connection')
             return
-        self.ws = web.WebSocketResponse()
+        self.ws = aiohttp.web.WebSocketResponse()
         await self.ws.prepare(request)
 
         async for msg in self.ws:

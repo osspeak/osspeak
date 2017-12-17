@@ -19,7 +19,12 @@ loop = asyncio.get_event_loop()
 app = web.Application()
 
 def run_communication_server():
-    web.run_app(app, loop=loop, print=False)
+    if user_settings['network'] == 'server':
+        address = user_settings['server_address']
+        host, port = common.get_host_and_port(address)
+    else:
+        host, port = None, None
+    web.run_app(app, loop=loop, host=host, port=port, print=print)
 
 def shutdown(l):
     l.stop()
