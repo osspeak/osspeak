@@ -20,6 +20,15 @@ def publish(topic, *args, **kwargs):
             tasks.append(task)
     return tasks
 
+async def publish_async(topic, *args, **kwargs):
+    from communication.server import loop
+    tasks = []
+    for sub in _subscriptions.get(topic, []):
+        res = sub.callback(*args, **kwargs)
+        if inspect.iscoroutinefunction(sub.callback):
+            tasks.append(task)
+    return await asyncio.gather(*tasks)
+
 class Subscription:
 
     def __init__(self, topic: str, callback):

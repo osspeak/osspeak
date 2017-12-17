@@ -37,7 +37,7 @@ async def watch_user_system_state(msg_list, cache):
             new_active_modules = loader.get_active_modules(cache.command_modules, current_window, current_state)
             if new_active_modules != cache.active_command_modules:
                 reload_files = msg == topics.RELOAD_COMMAND_MODULE_FILES
-                loader.load_modules(cache, current_window, current_state, reload_files=reload_files)
+                await loader.load_modules(cache, current_window, current_state, reload_files=reload_files)
             elif msg == topics.RELOAD_GRAMMAR:
                 loader.load_and_send_grammar(cache)
             previous_window = current_window

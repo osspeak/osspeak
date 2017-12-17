@@ -35,8 +35,7 @@ def shutdown():
 async def initialize_speech_engine_connector():
     network = settings.user_settings['network']
     if network == 'remote':
-        engine_client = client.RemoteEngineClient()
-        return engine_client
+        return RemoteEngineClient()
     else:
         is_server = network == 'server'
         return await EngineProcessHandler.create(remote=is_server)

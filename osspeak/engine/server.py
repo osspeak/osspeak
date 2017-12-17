@@ -8,7 +8,6 @@ class RemoteEngineServer:
     def __init__(self):
         self.ws = None
         app.add_get('/engine/ws', self.websocket_handler)
-        print('ff')
 
     async def websocket_handler(request):
         if self.ws is not None:

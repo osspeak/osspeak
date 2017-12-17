@@ -31,7 +31,7 @@ class CommandModuleCache:
         self.command_modules = load_command_modules(self.command_module_json)
         self.scopes = load_scopes(self.command_modules)
 
-def load_modules(cache, current_window, current_state, reload_files=False):
+async def load_modules(cache, current_window, current_state, reload_files=False):
     previous_active_modules = cache.active_command_modules
     if reload_files:
         load_initial_user_state(cache.command_modules)
@@ -41,9 +41,9 @@ def load_modules(cache, current_window, current_state, reload_files=False):
     load_command_module_information(cache.command_modules, cache.scopes)
     fire_activation_events(cache.active_modules, previous_active_modules)
     send_module_information_to_ui(cache.command_modules)
-    load_and_send_grammar(cache)
+    await load_and_send_grammar(cache)
 
-def load_and_send_grammar(cache):
+async def load_and_send_grammar(cache):
     active_rules = get_active_rules(cache.active_modules)
     node_ids = generate_node_ids(active_rules)
     commands = get_active_commands(cache.active_modules)
@@ -54,7 +54,8 @@ def load_and_send_grammar(cache):
     grammar_xml = build_grammar_xml(active_rules, node_ids)
     grammar_id = str(uuid.uuid4())
     add_new_grammar(cache.grammar_commands, grammar_commands, grammar_id)
-    pubsub.publish(topics.LOAD_ENGINE_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
+    await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
+
 
 def add_new_grammar(grammar_commands, commands, grammar_id):
     # remove oldest grammar if needed

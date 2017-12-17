@@ -2,6 +2,7 @@ import copy
 import json
 import socket
 import queue
+import queue
 from log import logger
 from communication import messages
 
@@ -28,6 +29,13 @@ def put_message_in_queue(q, msg):
                 q.get_nowait()
             except queue.Empty:
                 pass
+
+def yield_queue_contents(q):
+    while True:
+        try:
+            yield q.get_nowait()
+        except queue.Empty:
+            return
 
 def get_open_port():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
