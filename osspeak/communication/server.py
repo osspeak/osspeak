@@ -24,7 +24,7 @@ def run_communication_server():
         host, port = common.get_host_and_port(address)
     else:
         host, port = None, None
-    web.run_app(app, loop=loop, host=host, port=port, print=print)
+    web.run_app(app, loop=loop, host=host, port=port, print=False)
 
 def shutdown(l):
     l.stop()

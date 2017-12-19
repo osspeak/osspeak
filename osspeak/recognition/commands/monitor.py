@@ -21,9 +21,8 @@ def start_watching_user_state():
     cache.populate()
     loader.load_initial_user_state(cache.command_modules)
     create_message_subscriptions(shutdown_event, msg_list, cache)
-    loop_args = (msg_list, cache)
-    asyncio.ensure_future(watch_user_system_state(*loop_args))
-    # threading.Thread(target=watch_user_system_state, args=loop_args, daemon=True).start()
+    fut = watch_user_system_state(msg_list, cache)
+    asyncio.ensure_future(fut)
 
 async def watch_user_system_state(msg_list, cache):
     loop = asyncio.get_event_loop()

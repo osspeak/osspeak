@@ -1,7 +1,5 @@
-import copy
 import json
 import socket
-import queue
 import queue
 from log import logger
 from communication import messages
