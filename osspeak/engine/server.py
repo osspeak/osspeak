@@ -13,7 +13,7 @@ class RemoteEngineServer:
     async def websocket_handler(self, request):
         if self.ws is not None:
             print('already have a connection')
-            return
+            return aiohttp.web.WebSocketResponse()
         self.ws = aiohttp.web.WebSocketResponse()
         await self.ws.prepare(request)
 
@@ -25,7 +25,8 @@ class RemoteEngineServer:
                         ws.exception())
 
         print('websocket connection closed')
-        self.ws = None
+        ws, self.ws = self.ws, None
+        return ws
 
     async def send_message(self, topic, content):
         if not isinstance(msg, str):
