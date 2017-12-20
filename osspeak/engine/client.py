@@ -5,12 +5,12 @@ import functools
 import asyncio
 from communication import pubsub, topics
 from communication.common import publish_json_message, yield_queue_contents, put_message_in_queue
-from user import settings
+import settings
 
 class RemoteEngineClient:
 
     def __init__(self):
-        self.url = f'http://{settings.user_settings["server_address"]}/engine/ws'
+        self.url = f'http://{settings.settings["server_address"]}/engine/ws'
         self.ws = None
         self.queue = queue.Queue(maxsize=5)
         self.create_subscriptions()

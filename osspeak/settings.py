@@ -1,8 +1,12 @@
 import os
 import json
+import clargs
+import sys
 
 OSSPEAK_DIRECTORY = os.path.join(os.path.expanduser('~'), '.osspeak')
+EXECUTABLE_DIRECTORY = os.path.split(os.path.abspath(sys.argv[0]))[0]
 OSSPEAK_CONFIG_PATH = 'osspeak.json' if os.path.exists('osspeak.json') else os.path.join(OSSPEAK_DIRECTORY, 'osspeak.json')
+
 DEFAULT_CONFIG = {
     'interface': 'cli',
     'network': 'local',
@@ -15,6 +19,13 @@ DEFAULT_CONFIG = {
     }
 }
 
+def try_load_json_file(path):
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except (FileNotFoundError, json.decoder.JSONDecodeError):
+        return {}
+
 def save_settings(settings):
     if not os.path.isdir(OSSPEAK_DIRECTORY):
         os.makedirs(OSSPEAK_DIRECTORY)
@@ -22,22 +33,17 @@ def save_settings(settings):
         json.dump(settings, f, indent=4)
 
 def load_user_settings():
-    if not os.path.exists(OSSPEAK_CONFIG_PATH):
-        save_settings(DEFAULT_CONFIG)
-    try:
-        with open(OSSPEAK_CONFIG_PATH) as f:
-            user_settings = json.load(f)
-    except json.decoder.JSONDecodeError:
-        # logger.warning('Invalid settings configuration. Loading default settings.')
-        user_settings = DEFAULT_CONFIG
-    for setting_name in DEFAULT_CONFIG:
-        user_settings[setting_name] = user_settings.get(setting_name, DEFAULT_CONFIG[setting_name])
+    user_settings = DEFAULT_CONFIG.copy()
+    user_settings.update(try_load_json_file(os.path.join(OSSPEAK_DIRECTORY, 'osspeak.json')))
+    user_settings.update(try_load_json_file(os.path.join(EXECUTABLE_DIRECTORY, 'osspeak.json')))
+    args = clargs.get_args()
+    user_settings.update(args)
     return user_settings
 
-user_settings = load_user_settings()
+settings = load_user_settings()
 
 def get_server_address():
-    address = user_settings['server_address'].rsplit(':', 1)
+    address = settings['server_address'].rsplit(':', 1)
     return address[0], int(address[1])
 
 def parse_server_address(address):

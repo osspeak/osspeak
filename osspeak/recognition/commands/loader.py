@@ -8,7 +8,7 @@ import json
 import log
 import recognition.actions.library.state
 from recognition.actions import perform
-from user import settings
+import settings
 from interfaces.gui import serializer
 from recognition.actions import variables
 from client import commands, scopes
@@ -88,7 +88,7 @@ def fire_activation_events(active_modules, previous_active_modules):
 
 def load_command_json():
     json_module_dicts = {}
-    command_dir = settings.user_settings['command_directory']
+    command_dir = settings.settings['command_directory']
     if not os.path.isdir(command_dir):
         os.makedirs(command_dir)
     for root, dirs, filenames in os.walk(command_dir):
@@ -202,7 +202,7 @@ def get_active_commands(active_modules):
 
 def update_modules(self, modified_modules):
     raise NotImplementedError
-    command_dir = settings.user_settings['command_directory']
+    command_dir = settings.settings['command_directory']
     for path, cmd_module_config in modified_modules.items():
         self.command_module_json[path] = cmd_module_config
         with open(os.path.join(command_dir, path), 'w') as outfile:

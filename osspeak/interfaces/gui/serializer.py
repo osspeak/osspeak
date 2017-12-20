@@ -1,5 +1,5 @@
 import json
-from client import cmwatcher, commands
+from client import commands
 from recognition.rules.astree import Rule
 from client import commands
 

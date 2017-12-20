@@ -3,7 +3,7 @@ import queue
 import threading
 import importlib.util
 
-from user import settings
+import settings
 
 imported_modules = {}
 
@@ -20,7 +20,7 @@ def get_runpath(path):
     if path.endswith('.py'):
         path = path[:-3]
     filepath = path.replace('.', os.sep) + '.py'
-    return os.path.join(settings.user_settings['command_directory'], filepath)
+    return os.path.join(settings.settings['command_directory'], filepath)
 
 def call(path, function, *args):
     module = imported_modules[path]

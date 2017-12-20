@@ -1,6 +1,6 @@
 import json
 import aiohttp
-from user import settings
+import settings
 from communication.server import app
 from communication.common import publish_json_message
 

@@ -10,7 +10,7 @@ import queue
 # import flask
 # from flask import Response, jsonify, request
 from communication import procs, messages, common
-from user.settings import user_settings, get_server_address
+from settings import settings, get_server_address
 from log import logger
 from aiohttp import web
 import asyncio
@@ -19,8 +19,8 @@ loop = asyncio.get_event_loop()
 app = web.Application()
 
 def run_communication_server():
-    if user_settings['network'] == 'server':
-        address = user_settings['server_address']
+    if settings['network'] == 'server':
+        address = settings['server_address']
         host, port = common.get_host_and_port(address)
     else:
         host, port = None, None

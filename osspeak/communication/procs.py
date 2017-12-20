@@ -5,7 +5,7 @@ import subprocess
 import threading
 import json
 import sys
-from user.settings import user_settings
+from settings import settings
 import xml.etree.ElementTree as ET
 from communication import messages, pubsub, topics
 

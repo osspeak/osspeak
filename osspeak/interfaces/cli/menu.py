@@ -1,5 +1,5 @@
 from communication import messages, topics, pubsub, common
-from user import settings
+import settings
 
 class Menu:
 
@@ -92,18 +92,18 @@ class SettingsMenu(Menu):
                 print('invalid host:port combination')
             else:
                 host, port = split_input
-                settings.user_settings['server_address'] = address_input
+                settings.settings['server_address'] = address_input
                 print(f'Saving new remote server address: {address_input}')
-                settings.save_settings(settings.user_settings)
+                settings.save_settings(settings.settings)
         return True
 
     def display_current_settings(self):
         print('\nCurrent settings: ')
-        ui = 'command line' if settings.user_settings['interface'] else 'GUI'
+        ui = 'command line' if settings.settings['interface'] else 'GUI'
         print(f'User interface: {ui}')
-        network_mode = {'server': 'Speech engine server', 'remote': 'Remote client'}.get(settings.user_settings['network'], 'Local')
+        network_mode = {'server': 'Speech engine server', 'remote': 'Remote client'}.get(settings.settings['network'], 'Local')
         print(f'Network mode: {network_mode}')
-        engine_server = settings.parse_server_address(settings.user_settings['server_address'])
+        engine_server = settings.parse_server_address(settings.settings['server_address'])
         if engine_server is None:
             engine_server = 'Invalid'
         print (f'Speech engine server address (not used in local mode): {engine_server}')

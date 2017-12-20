@@ -7,8 +7,12 @@ def get_args():
     if __main__.__file__ == 'buildit.py':
         return
     parser = argparse.ArgumentParser()
-    parser.add_argument('--debug', action='store_true')
-    parser.add_argument('--interface', default='remote')
-    parser.add_argument('--network', default='local') # or remote
-    parser.add_argument('--engine_server', action='store_true')
-    return parser.parse_args()
+    parser.add_argument('--interface', default=Nil)
+    parser.add_argument('--network', default=Nil) # or remote
+    parser.add_argument('--server_address', default=Nil)
+    parser.add_argument('--debug', default=Nil, action='store_true')
+    res = vars(parser.parse_args())
+    return {k: v for (k, v) in res.items() if v is not Nil}
+
+class Nil:
+    pass

@@ -1,6 +1,6 @@
 import sys
 import time
-from user import settings
+import settings
 
 def load_platform_module():
 	if sys.platform == 'win32':

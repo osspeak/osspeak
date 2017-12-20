@@ -1,7 +1,7 @@
 import json
 import asyncio
 import sys
-from user.settings import user_settings
+from settings import settings
 from communication import pubsub, topics, messages
 from communication.procs import ProcessHandler
 from engine import server
@@ -54,7 +54,7 @@ class EngineProcessHandler:
     async def on_engine_message(self, msg_string):
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition':
-            if msg['Confidence'] > user_settings['engine']['recognitionConfidence']:
+            if msg['Confidence'] > settings['engine']['recognitionConfidence']:
                 pubsub.publish(topics.PERFORM_COMMANDS, msg['Commands'], msg['GrammarId'])
         elif msg['Type'] == messages.SET_ENGINE_STATUS:
             messages.dispatch(messages.SET_ENGINE_STATUS, msg)
