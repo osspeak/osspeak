@@ -2,6 +2,7 @@ import threading
 import log
 import time
 import queue
+from settings import settings
 import platforms.api
 from recognition.actions import context
 
@@ -33,8 +34,9 @@ def keyboard_event(key_type, item, keyboard_function):
     multiple_keypress = key_type == 'keys' and len(item) > 1
     is_repeat = not multiple_keypress and item == last_keypress['item'] and key_type == last_keypress['type']
     if not (last_keypress['timestamp'] is None or is_repeat):
-        diff = time.clock() - last_keypress['timestamp']
-        time.sleep(max(.05 - diff, 0))
+        time_elapsed = time.clock() - last_keypress['timestamp']
+        type_delay = float(settings['type_delay'])
+        time.sleep(max(type_delay - time_elapsed, 0))
     keyboard_function(item)
     last_keypress['timestamp'] = time.clock()
     last_keypress['type'] = key_type
