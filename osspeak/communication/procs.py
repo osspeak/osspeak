@@ -6,13 +6,7 @@ import threading
 import json
 import sys
 from settings import settings
-import xml.etree.ElementTree as ET
 from communication import messages, pubsub, topics
-
-if getattr(sys, 'frozen', False):
-    ENGINE_PATH = r'engines\wsr\RecognizerIO.exe'
-else:
-    ENGINE_PATH = r'..\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.exe'
 
 class ProcessHandler:
 
