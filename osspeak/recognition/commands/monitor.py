@@ -1,4 +1,3 @@
-import threading
 import log
 import asyncio
 from recognition.actions.library.state import state_copy
@@ -9,18 +8,17 @@ from communication import topics, pubsub
 from profile import Profiler
 import time
 
-def create_message_subscriptions(shutdown_event, msg_list, cache):
+def create_message_subscriptions(msg_list, cache):
     pubsub.subscribe(topics.RELOAD_COMMAND_MODULE_FILES, lambda: set_message(msg_list, topics.RELOAD_COMMAND_MODULE_FILES))
     pubsub.subscribe(topics.RELOAD_GRAMMAR, lambda: set_message(msg_list, topics.RELOAD_GRAMMAR))
     pubsub.subscribe(topics.PERFORM_COMMANDS, lambda command_results, grammar_id: perform_commands(cache, command_results, grammar_id))
 
 def start_watching_user_state():
-    shutdown_event = threading.Event()
     msg_list = [None]
     cache = loader.CommandModuleCache()
     cache.populate()
     loader.load_initial_user_state(cache.command_modules)
-    create_message_subscriptions(shutdown_event, msg_list, cache)
+    create_message_subscriptions(msg_list, cache)
     fut = watch_user_system_state(msg_list, cache)
     asyncio.ensure_future(fut)
 
