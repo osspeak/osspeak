@@ -39,7 +39,7 @@ class EngineProcessHandler:
 
     async def load_engine_grammar(self, grammar_xml, grammar_id):
         msg = {
-            'Type': 'load grammars',
+            'Type': topics.LOAD_ENGINE_GRAMMAR,
             'Grammar': grammar_xml,
             'Id': grammar_id,
             'StartEngine': self.engine_running
@@ -74,16 +74,16 @@ class EngineProcessHandler:
             self.process.kill()
 
     async def stop(self):
-        await self.send_simple_message('stop')
+        await self.send_simple_message(topics.ENGINE_STOP)
         self.engine_running = False
 
     async def start(self):
-        await self.send_simple_message('start')
+        await self.send_simple_message(topics.ENGINE_START)
         self.engine_running = True
 
     async def emulate_recognition(self, text, delay=5):
         msg = {
-            'Type': 'emulate recognition',
+            'Type': topics.EMULATE_RECOGNITION_EVENT,
             'Delay': delay,
             'Text': text
         }

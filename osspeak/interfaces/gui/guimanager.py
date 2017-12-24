@@ -1,5 +1,6 @@
 import subprocess
 import asyncio
+import websockets
 import sys
 import threading
 import json
