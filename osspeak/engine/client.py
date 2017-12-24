@@ -1,4 +1,5 @@
 import aiohttp
+import websockets
 import json
 import queue
 import functools
@@ -10,7 +11,7 @@ import settings
 class RemoteEngineClient:
 
     def __init__(self):
-        self.url = f'http://{settings.settings["server_address"]}/engine/ws'
+        self.url = f'ws://{settings.settings["server_address"]}'
         self.ws = None
         self.queue = queue.Queue(maxsize=5)
         self.create_subscriptions()
@@ -29,24 +30,29 @@ class RemoteEngineClient:
             pubsub.subscribe(sub_topic, cb)
 
     async def connection_loop(self):
-        session = aiohttp.ClientSession()
         while True:
-            print('tryna connect at ' + self.url)
             try:
-                async with session.ws_connect(self.url) as self.ws:
-                    print('yayaya')
-                    await self.send_queued_messages()
-                    async for msg in self.ws:
-                        if msg.type == aiohttp.WSMsgType.TEXT:
-                            publish_json_message(msg.data)
-                        elif msg.type == aiohttp.WSMsgType.CLOSED:
-                            break
-                        elif msg.type == aiohttp.WSMsgType.ERROR:
-                            break
-            except aiohttp.client_exceptions.ClientConnectorError:
-                pass
-            self.ws = None
-            await asyncio.sleep(30)
+                async with websockets.connect(self.url) as self.ws:                  
+                    print('got the connect')
+                    await self.receive_ws_messages(self.ws)
+                self.ws = None
+            except ConnectionRefusedError:
+                await asyncio.sleep(30)
+
+    async def receive_ws_messages(self, ws):
+        while True:
+            try:
+                msg = await asyncio.wait_for(ws.recv(), timeout=20)
+            except asyncio.TimeoutError:
+                # No data in 20 seconds, check the connection.
+                try:
+                    pong_waiter = await ws.ping()
+                    await asyncio.wait_for(pong_waiter, timeout=10)
+                except asyncio.TimeoutError:
+                    # No response to ping in 10 seconds, disconnect.
+                    break
+            else:
+                publish_json_message(msg)
 
     async def publish_message_to_server(self, topic, *args, **kwargs):
         msg = {
@@ -58,7 +64,7 @@ class RemoteEngineClient:
         if self.ws is None:
             put_message_in_queue(self.queue, encoded_message)
         else:
-            await self.ws.send_str(encoded_message)
+            await self.ws.send(encoded_message)
 
     async def send_queued_messages(self):
         for msg in yield_queue_contents(self.queue):

@@ -1,30 +1,24 @@
-import datetime
-import threading
-import socket
+import websockets
 import asyncio
-import time
-import socketserver
-import functools
 import json
-import queue
-# import flask
-# from flask import Response, jsonify, request
 from communication import procs, messages, common
+from engine.server import RemoteEngineServer
 from settings import settings, get_server_address
 from log import logger
 from aiohttp import web
-import asyncio
 
 loop = asyncio.get_event_loop()
-app = web.Application()
 
 def run_communication_server():
+    server_handlers = []
     if settings['network'] == 'server':
-        address = settings['server_address']
-        host, port = common.get_host_and_port(address)
-    else:
-        host, port = None, None
-    web.run_app(app, loop=loop, host=host, port=port, print=False)
+        host, port = common.get_host_and_port(settings['server_address'])
+        handler = RemoteEngineServer().websocket_handler
+        server_handlers.append((handler, host, port))
+    for handler, host, port in server_handlers:
+        ws_future = websockets.serve(handler, host, port)
+        asyncio.get_event_loop().run_until_complete(ws_future)
+    asyncio.get_event_loop().run_forever()
 
 def shutdown(l):
     l.stop()

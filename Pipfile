@@ -9,6 +9,7 @@ name = "pypi"
 
 aiohttp = "*"
 tornado = "*"
+websockets = "*"
 
 
 [dev-packages]

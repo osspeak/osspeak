@@ -32,7 +32,7 @@ namespace RecognizerIO
             string msgType = jsonMsg.Type;
             switch (msgType)
             {
-                case "load grammars":
+                case "LOAD_ENGINE_GRAMMAR":
                     string grammarXml = jsonMsg.Grammar;
                     string grammarId = jsonMsg.Id;
                     bool startEngine = jsonMsg.StartEngine;
@@ -42,25 +42,25 @@ namespace RecognizerIO
                     System.IO.File.Delete(tmpPath);
                     if (!EngManager.IsRunning && startEngine) EngManager.Begin();
                     break;
-                case "load settings":
+                case "LOAD_SETTINGS":
                     break;
-                case "emulate recognition":
+                case "EMULATE_RECOGNITION_EVENT":
                     string text = jsonMsg.Text;
                     EngManager.Engine.EmulateRecognize(text);
                     break;
                 case "GET_ENGINE_STATUS":
                     Console.WriteLine(EngManager.Status());
                     break;
-                case "shutdown":
+                case "ENGINE_SHUTDOWN":
                     shutdown = true;
                     break;
                 case "RESET_DEVICE":
                     EngManager.ResetDevice();
                     break;
-                case "start":
+                case "ENGINE_START":
                     if (!EngManager.IsRunning) EngManager.Begin();
                     break;
-                case "stop":
+                case "ENGINE_STOP":
                     EngManager.Stop();
                     break;
             }

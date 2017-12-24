@@ -68,7 +68,7 @@ def publish_json_message(msg):
     for message in messages:
         args = message.get('args', [])
         kwargs = message.get('kwargs', {})
-        pubsub.publish(message.topic, *args, **kwargs)
+        pubsub.publish(message['topic'], *args, **kwargs)
 
 def get_host_and_port(address):
     host, port = address.rsplit(':', 1)

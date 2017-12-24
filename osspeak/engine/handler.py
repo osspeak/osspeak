@@ -87,5 +87,5 @@ class EngineProcessHandler:
             'Delay': delay,
             'Text': text
         }
-        await asyncio.sleep(delay)
+        await asyncio.sleep(5)
         await self.send_message(msg)

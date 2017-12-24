@@ -14,6 +14,7 @@ DEFAULT_CONFIG = {
     "type_delay": .05,
     'command_directory': os.path.join(OSSPEAK_DIRECTORY, 'commands'),
     'external_directory': os.path.join(OSSPEAK_DIRECTORY, 'external'),
+    'internal_port': 3922,
     'engine': {
         'recognitionConfidence': .9
     }
