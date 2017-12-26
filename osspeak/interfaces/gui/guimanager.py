@@ -44,6 +44,9 @@ class GuiProcessManager(ProcessHandler):
     def shutdown(self):
         tornado.ioloop.IOLoop.current().stop()
 
+    def start(self):
+        pass
+
 class GuiWebSocket(tornado.websocket.WebSocketHandler):
 
     def __init__(self, *args, **kwargs):

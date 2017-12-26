@@ -5,7 +5,7 @@ import queue
 import functools
 import asyncio
 from communication import pubsub, topics
-from communication.common import publish_json_message, yield_queue_contents, put_message_in_queue
+from communication.common import publish_json_message, yield_queue_contents, put_message_in_queue, receive_ws_messages
 import settings
 
 class RemoteEngineClient:
@@ -34,25 +34,10 @@ class RemoteEngineClient:
             try:
                 async with websockets.connect(self.url) as self.ws:                  
                     print('got the connect')
-                    await self.receive_ws_messages(self.ws)
+                    await receive_ws_messages(self.ws)
                 self.ws = None
             except ConnectionRefusedError:
                 await asyncio.sleep(30)
-
-    async def receive_ws_messages(self, ws):
-        while True:
-            try:
-                msg = await asyncio.wait_for(ws.recv(), timeout=20)
-            except asyncio.TimeoutError:
-                # No data in 20 seconds, check the connection.
-                try:
-                    pong_waiter = await ws.ping()
-                    await asyncio.wait_for(pong_waiter, timeout=10)
-                except asyncio.TimeoutError:
-                    # No response to ping in 10 seconds, disconnect.
-                    break
-            else:
-                publish_json_message(msg)
 
     async def publish_message_to_server(self, topic, *args, **kwargs):
         msg = {

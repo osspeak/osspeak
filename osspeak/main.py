@@ -19,9 +19,9 @@ import atexit
 def main():
     engine = asyncio.get_event_loop().run_until_complete(initialize_speech_engine_connector())
     if settings.settings['network'] != 'server':
-        ui_manager = create_ui_manager()
         monitor.start_watching_user_state()
-        threading.Thread(target=ui_manager.start, daemon=True).start()
+    cli_loop = get_cli_loop()
+    threading.Thread(target=cli_loop, daemon=True).start()
     server.run_communication_server()
 
 @atexit.register
@@ -37,6 +37,20 @@ async def initialize_speech_engine_connector():
     else:
         is_server = network == 'server'
         return await EngineProcessHandler.create(remote=is_server)
+
+def get_cli_loop():
+    no_cli = settings.settings['interface'] == 'gui' or settings.settings['network'] == 'server'
+    if no_cli:
+        input_blocker = lambda: input('')
+    else:
+        input_blocker = menu.MainMenu().start
+
+    def loop_func():
+        input_blocker()
+        server.loop.stop()
+
+    return loop_func
+
 
 if __name__ == "__main__":
     main()

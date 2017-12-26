@@ -73,3 +73,18 @@ def publish_json_message(msg):
 def get_host_and_port(address):
     host, port = address.rsplit(':', 1)
     return host, int(port)
+
+async def receive_ws_messages(ws):
+    while True:
+        try:
+            msg = await asyncio.wait_for(ws.recv(), timeout=20)
+        except asyncio.TimeoutError:
+            # No data in 20 seconds, check the connection.
+            try:
+                pong_waiter = await ws.ping()
+                await asyncio.wait_for(pong_waiter, timeout=10)
+            except asyncio.TimeoutError:
+                # No response to ping in 10 seconds, disconnect.
+                break
+        else:
+            publish_json_message(msg)
