@@ -20,11 +20,11 @@ def main():
     engine = asyncio.get_event_loop().run_until_complete(initialize_speech_engine_connector())
     if settings.settings['network'] != 'server':
         monitor.start_watching_user_state()
-    if settings.settings['interface'] == 'gui':
-        electron = server.loop.run_until_complete(start_electron())
     threading.Thread(target=get_cli_loop(), daemon=True).start()
     ws_handlers = server.get_websocket_handlers()
     server.loop.run_until_complete(server.start_websockets(ws_handlers))
+    if settings.settings['interface'] == 'gui':
+        electron = server.loop.run_until_complete(start_electron())
     server.loop.run_forever()
 
 @atexit.register

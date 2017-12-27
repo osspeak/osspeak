@@ -7,9 +7,10 @@ if getattr(sys, 'frozen', False):
 else:
     ELECTRON_PATH = os.path.join('..', 'gui', 'node_modules', 'electron', 'dist', 'electron.exe')
 
+APP_PATH = r'C:\Users\evan\modules\osspeak\gui'
 
 async def start_electron():
-    proc = await ProcessHandler.create(ELECTRON_PATH, on_output=foo)
+    proc = await ProcessHandler.create([ELECTRON_PATH, APP_PATH], on_output=foo)
     
 async def foo(a):
     print(a)

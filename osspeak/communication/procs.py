@@ -13,12 +13,20 @@ class ProcessHandler:
     @classmethod
     async def create(cls, path, *a, **kw):
         process_instance = cls(path, *a, **kw)
-        create = asyncio.create_subprocess_exec(
-            path,
-            stdout=asyncio.subprocess.PIPE,
-            stdin=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
+        if isinstance(path, str):
+            create = asyncio.create_subprocess_exec(
+                path,
+                stdout=asyncio.subprocess.PIPE,
+                stdin=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+        else:
+            create = asyncio.create_subprocess_exec(
+                *path,
+                stdout=asyncio.subprocess.PIPE,
+                stdin=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
         process_instance.process = await create
         asyncio.ensure_future(process_instance.dispatch_process_output())
         return process_instance
