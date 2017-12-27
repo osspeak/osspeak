@@ -10,7 +10,7 @@ from recognition.commands import monitor
 from communication import server, pubsub, topics
 import settings
 from interfaces import cli
-from interfaces.gui import ELECTRON_PATH
+from interfaces.gui import start_electron
 from engine.handler import EngineProcessHandler
 from engine.client import RemoteEngineClient
 import threading
@@ -20,6 +20,8 @@ def main():
     engine = asyncio.get_event_loop().run_until_complete(initialize_speech_engine_connector())
     if settings.settings['network'] != 'server':
         monitor.start_watching_user_state()
+    if settings.settings['interface'] == 'gui':
+        electron = server.loop.run_until_complete(start_electron())
     threading.Thread(target=get_cli_loop(), daemon=True).start()
     ws_handlers = server.get_websocket_handlers()
     server.loop.run_until_complete(server.start_websockets(ws_handlers))
