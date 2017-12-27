@@ -10,7 +10,7 @@ let win
 
 function createWindow () {
   // Create the browser window.
-  const webPrefs = {nodeIntegration: false, preload: path.join(__dirname, 'dist', 'bundle.preload.js')}
+  const webPrefs = {preload: path.join(__dirname, 'dist', 'bundle.preload.js')}
   global.args = process.argv;
   const options = {width: 8000, height: 6000, webPreferences: webPrefs}
   win = new BrowserWindow(options)

@@ -1,7 +1,7 @@
 module.exports = {
     target: 'electron-main',
     entry: {
-        app: "./src/app/app.tsx",
+        app: "./src/renderer/app.tsx",
         preload: "./src/preload.ts"
     },
     output: {
@@ -28,8 +28,8 @@ module.exports = {
             
         ]
     },
-    externals: {
-        "react": "React",
-        "react-dom": "ReactDOM"
-    },
+    // externals: {
+    //     "react": "React",
+    //     "react-dom": "ReactDOM"
+    // },
 };
