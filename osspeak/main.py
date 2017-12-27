@@ -6,11 +6,11 @@ if sys.platform == 'win32':
     asyncio.set_event_loop(loop)
 
 import log
-import clargs
 from recognition.commands import monitor
 from communication import server, pubsub, topics
 import settings
-from interfaces import create_ui_manager
+from interfaces import cli
+from interfaces.gui import ELECTRON_PATH
 from engine.handler import EngineProcessHandler
 from engine.client import RemoteEngineClient
 import threading
@@ -20,9 +20,10 @@ def main():
     engine = asyncio.get_event_loop().run_until_complete(initialize_speech_engine_connector())
     if settings.settings['network'] != 'server':
         monitor.start_watching_user_state()
-    cli_loop = get_cli_loop()
-    threading.Thread(target=cli_loop, daemon=True).start()
-    server.run_communication_server()
+    threading.Thread(target=get_cli_loop(), daemon=True).start()
+    ws_handlers = server.get_websocket_handlers()
+    server.loop.run_until_complete(server.start_websockets(ws_handlers))
+    server.loop.run_forever()
 
 @atexit.register
 def shutdown():
@@ -43,7 +44,7 @@ def get_cli_loop():
     if no_cli:
         input_blocker = lambda: input('')
     else:
-        input_blocker = menu.MainMenu().start
+        input_blocker = cli.menu.MainMenu().start
 
     def loop_func():
         input_blocker()

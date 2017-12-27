@@ -54,6 +54,9 @@ def parametrized(dec):
     return layer
 
 def finish_tasks(tasks):
+    '''
+    tasks must be in a separate thread, otherwise this just blocks forever
+    '''
     remaining_tasks = tasks
     while remaining_tasks:
         next_remaining_tasks = []
