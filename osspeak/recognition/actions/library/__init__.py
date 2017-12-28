@@ -1,4 +1,4 @@
-from recognition.actions.library import (mouse, window, keys, state,
+from recognition.actions.library import (mouse, window, keyboard, state, thread,
 extensions, general, text, clipboard, osspeak, conditionals, history, fsystem, math)
 
 builtin_functions = globals().copy()
@@ -8,13 +8,14 @@ import subprocess
 import time
 from recognition.actions.library import system
 builtin_functions.update({
-    'keys': keys.press,
+    'keys': keyboard.send_and_release,
     'start': window.start,
     'wait': time.sleep,
     'repeat': flow.repeat,
     'wait_for': flow.wait_for,
     'proc': system.proc,
     'path': system.path,
+    'thread': thread.run_in_thread
 })
 
 lambda_arguments = set([tuple(x.split('.')) for x in [
@@ -22,6 +23,7 @@ lambda_arguments = set([tuple(x.split('.')) for x in [
     'if',
     'wait_for',
     'while',
+    'thread',
 ]])
 
 builtins = __builtins__ if isinstance(__builtins__, dict) else dir(__builtins__)
