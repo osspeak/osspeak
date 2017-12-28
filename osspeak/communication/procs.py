@@ -21,6 +21,7 @@ class ProcessHandler:
         )
         process_instance.process = await create
         asyncio.ensure_future(process_instance.dispatch_process_output())
+        asyncio.ensure_future(process_instance.dispatch_process_err())
         return process_instance
 
     def __init__(self, on_output=None, on_exit=None):
@@ -48,3 +49,8 @@ class ProcessHandler:
             await self.on_output(line)
         if self.on_exit is not None:
             await self.on_exit()
+            
+    async def dispatch_process_err(self):
+        async for line in self.process.stderr:
+            line = line.decode('utf8')
+            print('error: ', line)
