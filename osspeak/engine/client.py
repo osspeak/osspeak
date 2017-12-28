@@ -1,4 +1,3 @@
-import aiohttp
 import websockets
 import json
 import queue

@@ -1,6 +1,5 @@
 import json
 import asyncio
-import aiohttp
 import settings
 import websockets
 from settings import settings

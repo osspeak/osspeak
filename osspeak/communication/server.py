@@ -6,7 +6,6 @@ from engine.server import RemoteEngineServer
 from communication.ws import internal_websocket_handler
 from settings import settings, get_server_address
 from log import logger
-from aiohttp import web
 
 loop = asyncio.get_event_loop()
 

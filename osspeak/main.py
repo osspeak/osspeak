@@ -9,7 +9,7 @@ import log
 from recognition.commands import monitor
 from communication import server, pubsub, topics
 import settings
-from interfaces import cli
+from interfaces.cli import menu
 from interfaces.gui import start_electron
 from engine.handler import EngineProcessHandler
 from engine.client import RemoteEngineClient
@@ -46,7 +46,7 @@ def get_cli_loop():
     if no_cli:
         input_blocker = lambda: input('')
     else:
-        input_blocker = cli.menu.MainMenu().start
+        input_blocker = menu.MainMenu().start
 
     def loop_func():
         input_blocker()
