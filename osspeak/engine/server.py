@@ -1,7 +1,6 @@
 import json
 import asyncio
 import settings
-import websockets
 from settings import settings
 from communication.common import publish_json_message, get_host_and_port
 

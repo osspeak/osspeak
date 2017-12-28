@@ -1,4 +1,3 @@
-import websockets
 import asyncio
 import json
 from communication import procs, messages, common
@@ -19,6 +18,7 @@ def get_websocket_handlers():
     return websocket_handlers
         
 async def start_websockets(websocket_handlers):
+    import websockets
     futures = []
     for handler, host, port in websocket_handlers:
         ws_future = websockets.serve(handler, host, port)

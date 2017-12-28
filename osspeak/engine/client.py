@@ -1,4 +1,3 @@
-import websockets
 import json
 import queue
 import functools
@@ -29,6 +28,7 @@ class RemoteEngineClient:
             pubsub.subscribe(sub_topic, cb)
 
     async def connection_loop(self):
+        import websockets
         while True:
             try:
                 async with websockets.connect(self.url) as self.ws:                  

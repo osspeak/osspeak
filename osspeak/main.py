@@ -22,7 +22,8 @@ def main():
         monitor.start_watching_user_state()
     threading.Thread(target=get_cli_loop(), daemon=True).start()
     ws_handlers = server.get_websocket_handlers()
-    server.loop.run_until_complete(server.start_websockets(ws_handlers))
+    if ws_handlers
+        server.loop.run_until_complete(server.start_websockets(ws_handlers))
     if settings.settings['interface'] == 'gui':
         electron = server.loop.run_until_complete(start_electron())
     server.loop.run_forever()
