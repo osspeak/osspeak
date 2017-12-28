@@ -11,27 +11,19 @@ from communication import messages, pubsub, topics
 class ProcessHandler:
 
     @classmethod
-    async def create(cls, path, *a, **kw):
-        process_instance = cls(path, *a, **kw)
-        if isinstance(path, str):
-            create = asyncio.create_subprocess_exec(
-                path,
-                stdout=asyncio.subprocess.PIPE,
-                stdin=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-        else:
-            create = asyncio.create_subprocess_exec(
-                *path,
-                stdout=asyncio.subprocess.PIPE,
-                stdin=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
+    async def create(cls, *args, **kw):
+        process_instance = cls(**kw)
+        create = asyncio.create_subprocess_exec(
+            *args,
+            stdout=asyncio.subprocess.PIPE,
+            stdin=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
         process_instance.process = await create
         asyncio.ensure_future(process_instance.dispatch_process_output())
         return process_instance
 
-    def __init__(self, path, on_output=None, on_exit=lambda: None):
+    def __init__(self, on_output=None, on_exit=None):
         self.on_output = on_output
         self.on_exit = on_exit
         self.process = None
@@ -54,4 +46,5 @@ class ProcessHandler:
         async for line in self.process.stdout:
             line = line.decode('utf8')
             await self.on_output(line)
-
+        if self.on_exit is not None:
+            await self.on_exit()

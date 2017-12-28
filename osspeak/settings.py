@@ -38,7 +38,8 @@ def load_user_settings():
     user_settings.update(try_load_json_file(os.path.join(OSSPEAK_DIRECTORY, 'osspeak.json')))
     user_settings.update(try_load_json_file(os.path.join(EXECUTABLE_DIRECTORY, 'osspeak.json')))
     args = clargs.get_args()
-    user_settings.update(args)
+    if args is not None:
+        user_settings.update(args)
     return user_settings
 
 settings = load_user_settings()

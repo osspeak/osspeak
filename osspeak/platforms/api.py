@@ -51,7 +51,7 @@ def type_line(evaluated_item_list):
 		evaluated_item_list = [evaluated_item_list]
 	for i, item in enumerate(evaluated_item_list):
 		if i > 0:
-			time.sleep(settings.settings['type_delay'])
+			time.sleep(settings['type_delay'])
 		if isinstance(item, (int, float)):
 			item = str(item)
 		if isinstance(item, (str, int, float)):
