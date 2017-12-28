@@ -12,8 +12,8 @@ C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\Recogn
 C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.exe
 C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.pdb
 C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\NAudio.dll
-C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\Newtonsoft.Json.dll
 C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\NAudio.xml
 C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\Newtonsoft.Json.xml
 C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\obj\Debug\RecognizerIO.exe
 C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\obj\Debug\RecognizerIO.pdb
+C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\Newtonsoft.Json.dll
