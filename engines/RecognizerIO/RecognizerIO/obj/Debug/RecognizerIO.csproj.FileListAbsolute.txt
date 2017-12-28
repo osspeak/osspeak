@@ -7,7 +7,6 @@ C:\Users\evan\modules\net\OSSpeak\RecognizerIO\RecognizerIO\obj\Debug\Recognizer
 C:\Users\evan\modules\net\OSSpeak\RecognizerIO\RecognizerIO\bin\Debug\Newtonsoft.Json.dll
 C:\Users\evan\modules\net\OSSpeak\RecognizerIO\RecognizerIO\bin\Debug\Newtonsoft.Json.xml
 C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\obj\Debug\RecognizerIO.csproj.CoreCompileInputs.cache
-C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\obj\Debug\RecognizerIO.csprojResolveAssemblyReference.cache
 C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.exe.config
 C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.exe
 C:\Users\evan\modules\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.pdb
