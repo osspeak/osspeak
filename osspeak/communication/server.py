@@ -2,7 +2,7 @@ import asyncio
 import json
 from communication import procs, messages, common
 from engine.server import RemoteEngineServer
-from communication.ws import internal_websocket_handler
+from interfaces.gui.ws import gui_websocket_handler
 from settings import settings, get_server_address
 from log import logger
 
@@ -14,7 +14,8 @@ def get_websocket_handlers():
         host, port = common.get_host_and_port(settings['server_address'])
         handler = RemoteEngineServer().websocket_handler
         websocket_handlers.append((handler, host, port))
-    websocket_handlers.append((internal_websocket_handler, 'localhost', settings['internal_port']))
+    if settings['interface'] == 'gui':
+        websocket_handlers.append((gui_websocket_handler, 'localhost', settings['gui_port']))
     return websocket_handlers
         
 async def start_websockets(websocket_handlers):

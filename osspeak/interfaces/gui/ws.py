@@ -1,2 +1,2 @@
-def funcname(parameter_list):
-    pass
+def gui_websocket_handler(websocket):
+    print(websocket)

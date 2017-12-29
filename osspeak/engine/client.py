@@ -39,16 +39,17 @@ class RemoteEngineClient:
                 await asyncio.sleep(30)
 
     async def publish_message_to_server(self, topic, *args, **kwargs):
+        import websockets
         msg = {
             'topic': topic,
             'args': args,
             'kwargs': kwargs,
         }
         encoded_message = json.dumps(msg)
-        if self.ws is None:
-            put_message_in_queue(self.queue, encoded_message)
-        else:
+        try:
             await self.ws.send(encoded_message)
+        except (AttributeError, websockets.exceptions.ConnectionClosed):
+            put_message_in_queue(self.queue, encoded_message)
 
     async def send_queued_messages(self):
         for msg in yield_queue_contents(self.queue):
