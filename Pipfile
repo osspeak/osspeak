@@ -10,9 +10,9 @@ name = "pypi"
 websockets = "*"
 mouse = "*"
 keyboard = "*"
-pyinstaller = "*"
-requests = "*"
 
 
 [dev-packages]
 
+requests = "*"
+pyinstaller = "*"
