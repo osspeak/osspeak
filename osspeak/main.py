@@ -33,6 +33,7 @@ def shutdown():
     pubsub.publish(topics.STOP_MAIN_PROCESS)
     for task in asyncio.Task.all_tasks():
         task.cancel()
+    server.loop.stop()
 
 async def initialize_speech_engine_connector():
     network = settings.settings['network']
@@ -51,7 +52,7 @@ def get_cli_loop():
 
     def loop_func():
         input_blocker()
-        server.loop.stop()
+        server.loop.call_soon_threadsafe(sys.exit)
 
     return loop_func
 
