@@ -84,7 +84,6 @@ def create_github_release():
     data = {
         "tag_name": release_version,
         "name": release_version,
-        "body": '\n'.join(version.release_notes),
     }
     response = requests.post(
         'https://api.github.com/repos/osspeak/osspeak/releases',

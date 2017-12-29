@@ -1,6 +1,2 @@
-_version = (0, 1, 9)
+_version = (0, 0, 1)
 version = '.'.join(str(n) for n in _version)
-
-release_notes = [
-    
-]
