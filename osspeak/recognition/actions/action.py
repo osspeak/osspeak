@@ -1,6 +1,4 @@
-from recognition.actions import library, pyexpr, asttransform
-from recognition.actions import context, perform
-        # from recognition.actions import pyexpr, asttransform
+from recognition.actions import library, pyexpr, asttransform, context, perform
 
 class Action:
 
