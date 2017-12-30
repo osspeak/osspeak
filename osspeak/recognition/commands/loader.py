@@ -1,4 +1,3 @@
-import threading
 from profile import Profiler
 import itertools
 import uuid
