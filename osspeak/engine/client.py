@@ -5,6 +5,7 @@ import asyncio
 from communication import pubsub, topics
 from communication.common import publish_json_message, yield_queue_contents, put_message_in_queue, receive_ws_messages
 import settings
+from communication.server import loop
 
 class RemoteEngineClient:
 
@@ -16,7 +17,6 @@ class RemoteEngineClient:
         asyncio.ensure_future(self.connection_loop())
 
     def create_subscriptions(self):
-        from communication.server import loop
         sub_topics = (
             topics.LOAD_ENGINE_GRAMMAR,
             topics.ENGINE_START,
@@ -24,7 +24,7 @@ class RemoteEngineClient:
             topics.EMULATE_RECOGNITION_EVENT,
         )
         for sub_topic in sub_topics:
-            cb = lambda *a, **kw: asyncio.ensure_future(self.publish_message_to_server(sub_topic, *a, **kw), loop=loop)
+            cb = functools.partial(self.publish, sub_topic)
             pubsub.subscribe(sub_topic, cb)
 
     async def connection_loop(self):
@@ -37,6 +37,10 @@ class RemoteEngineClient:
                 self.ws = None
             except ConnectionRefusedError:
                 await asyncio.sleep(30)
+
+    def publish(self, topic, *args, **kwargs):
+        fut = self.publish_message_to_server(topic, *args, **kwargs)
+        asyncio.ensure_future(fut, loop=loop)
 
     async def publish_message_to_server(self, topic, *args, **kwargs):
         import websockets
@@ -54,3 +58,4 @@ class RemoteEngineClient:
     async def send_queued_messages(self):
         for msg in yield_queue_contents(self.queue):
             self.ws.send_str(msg)
+ 

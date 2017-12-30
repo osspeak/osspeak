@@ -1,7 +1,6 @@
 import json
-from client import commands
 from recognition.rules.astree import Rule
-from client import commands
+from recognition.commands import commands
 
 class GuiEncoder(json.JSONEncoder):
 

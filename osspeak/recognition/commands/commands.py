@@ -7,7 +7,7 @@ from recognition.actions.library import state, history
 from recognition.actions import variables
 from recognition import api
 from interfaces.gui import serializer
-from client import commands, scopes
+from recognition.commands import scopes
 from recognition.rules import astree
 from recognition.rules.parser import RuleParser
 from log import logger
