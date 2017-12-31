@@ -13,9 +13,5 @@ def press(keys):
 def release(keys):
     keyboard.release(keys)
 
-# def release(keys):
-#     api.type_keypresses(keys, direction='up')
-    
-def press_and_release(*keys):
-    from recognition.actions import perform
-    perform.keyboard_event('keys', keys, api.type_keypresses)
+def press_and_release(keys):
+    keyboard.send(keys)

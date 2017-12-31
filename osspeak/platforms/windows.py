@@ -6,8 +6,6 @@ import msvcrt
 import time
 import ctypes
 from platforms import winconstants, winclipboard
-import pyautogui
-from platforms.vocolakeys import send_input
 
 EnumWindows = ctypes.windll.user32.EnumWindows
 EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
@@ -40,64 +38,6 @@ def get_window_title(hwnd):
     buff = ctypes.create_unicode_buffer(length + 1)
     GetWindowText(hwnd, buff, length + 1)
     return buff.value
-
-def transcribe_line(key_inputs, delay, direction):
-    for i, key_input in enumerate(key_inputs):
-        if i != 0:
-            time.sleep(delay)
-        if isinstance(key_input, str):
-            press_key(key_input, direction)
-        else:
-            press_key_combination([k.lower() for k in key_input.keys], direction)
-
-def type_literal(text, direction='both'):
-    for char in text:
-        press_key(char, direction)
-
-def type_keypresses(keys, direction='both'):
-    press_key_combination([k.lower() for k in keys], direction)
-
-def press_key(key_input, direction, delay=.03):
-    pyautogui.typewrite(key_input, pause=delay)
-    return
-    if len(key_input) == 1 and key_input.isupper():
-        press_shift = True
-        key_input = key_input.lower()
-    else:
-        try:
-            key_input = winconstants.WINDOWS_SHIFT_MAP[key_input]
-            press_shift = True
-        except KeyError:
-            press_shift = False
-    if key_input not in winconstants.WINDOWS_KEYCODES:
-        return
-    char_int = winconstants.WINDOWS_KEYCODES[key_input]
-    if direction in ('down', 'both'):
-        if press_shift:
-            keydown(winconstants.WINDOWS_KEYCODES['shift'])
-        keydown(char_int)
-    if direction in ('up', 'both'):
-        keyup(char_int)
-        if press_shift:
-            keyup(winconstants.WINDOWS_KEYCODES['shift'])
-
-def press_key_combination(keys, direction, delay=.02):
-    input_text = '{' + '+'.join(keys) + '}'
-    send_input(input_text)
-
-def keydown(hex_key_code):
-    extra = ctypes.c_ulong(0)
-    ii_ = winconstants.INPUT_I()
-    ii_.ki = winconstants.KEYBOARD_INPUT(hex_key_code, 0x48, 0, 0, ctypes.pointer(extra))
-    x = winconstants.INPUT(ctypes.c_ulong(1), ii_)
-    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
-
-def keyup(hex_key_code):
-    extra = ctypes.c_ulong(0)
-    ii_ = winconstants.INPUT_I()
-    ii_.ki = winconstants.KEYBOARD_INPUT(hex_key_code, 0x48, 0x0002, 0, ctypes.pointer(extra))
-    x = winconstants.INPUT(ctypes.c_ulong(1), ii_)
-    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
 def get_matching_windows(title_list):
     matches = {}

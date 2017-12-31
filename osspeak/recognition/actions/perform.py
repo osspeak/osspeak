@@ -2,13 +2,13 @@ import threading
 import log
 import time
 import queue
+import keyboard
 from settings import settings
 import platforms.api
 from recognition.actions import context
 
 recognition_queue = queue.Queue()
 results_map = {}
-last_keypress = {'timestamp': None, 'item': None, 'type': None}
 
 def get_recognition_context():
     t = threading.current_thread()
@@ -26,25 +26,12 @@ def recognition_action_worker():
         finally:
             del results_map[t]
 
-workers = [threading.Thread(target=recognition_action_worker, daemon=True) for _ in range(1)]
-for worker in workers:
-    worker.start()
-
-def keyboard_event(key_type, item, keyboard_function):
-    multiple_keypress = key_type == 'keys' and len(item) > 1
-    is_repeat = not multiple_keypress and item == last_keypress['item'] and key_type == last_keypress['type']
-    if not (last_keypress['timestamp'] is None or is_repeat):
-        time_elapsed = time.clock() - last_keypress['timestamp']
-        type_delay = float(settings['type_delay'])
-        time.sleep(max(type_delay - time_elapsed, 0))
-    keyboard_function(item)
-    last_keypress['timestamp'] = time.clock()
-    last_keypress['type'] = key_type
-    last_keypress['item'] = item
+worker = threading.Thread(target=recognition_action_worker, daemon=True)
+worker.start()
 
 def perform_io(item):
     if isinstance(item, (str, float, int)):
-        keyboard_event('literal', item, platforms.api.type_literal)
+        keyboard.write(item)
 
 def perform_action(command, variable_tree, engine_result):
     log.logger.info(f'Matched rule: {command.rule.raw_text}')

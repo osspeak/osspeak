@@ -8,7 +8,7 @@ import subprocess
 import time
 from recognition.actions.library import system
 builtin_functions.update({
-    'keys': keyboard.press_and_release,
+    'keys': lambda *k: keyboard.press_and_release([list(k)]),
     'start': window.start,
     'wait': time.sleep,
     'repeat': flow.repeat,
