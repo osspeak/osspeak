@@ -1,11 +1,12 @@
 from recognition.actions import library, pyexpr, asttransform, context, perform
+import keyboard
 
 class Action:
 
     def __init__(self, action_input, defined_functions=None, arguments=None, validator=lambda expr: True, raise_on_error=True):
         defined_functions = {} if defined_functions is None else defined_functions
         self.namespace = {**defined_functions, **library.namespace}
-        self.literal_expressions, self.remaining_text = self.compile_expressions(action_input, validator=validator, raise_on_error=raise_on_error)
+        self.literal_expressions, self.remaining_text = self.compile_expressions(action_input, validator, raise_on_error)
         self.expressions = [asttransform.transform_expression(e, namespace=self.namespace, arguments=arguments) for e in self.literal_expressions]
 
     @property
@@ -20,7 +21,6 @@ class Action:
             exprs, _ = pyexpr.compile_python_expressions(text, validator=validator, raise_on_error=raise_on_error)
             literal_expressions.extend(exprs)
         return literal_expressions, None
-
 
     def perform(self, call_locals=None):
         for result in self.generate_results(call_locals):
