@@ -4,7 +4,8 @@ declare var window: any;
 
 // let serverMessage = observable.ref(null);
 // export const connected = observable(false);
-const wsUrl = `ws://${window.commandLineArgs.address}/ws`;
+// const wsUrl = `ws://${window.commandLineArgs.address}/ws`;
+const wsUrl = `ws://localhost:3922`;
 console.log(wsUrl)
 export const ws = new WebSocket(wsUrl);
 // const serverMessageQueue: string[] = [];
