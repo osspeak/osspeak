@@ -80,6 +80,8 @@ class SrgsXmlConverter:
                 self.add_grouping(child, choices)
             elif isinstance(child, astree.Rule):
                 self.add_rule(child, choices)
+            else:
+                raise TypeError(f'Unable to serialize element {child}')
 
     def add_rule(self, rule_node, choices):
         if rule_node.name == '_dictate':
