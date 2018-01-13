@@ -61,10 +61,13 @@ class RecognitionResultsTree:
             return Action(f"'{node.text}'")
         if isinstance(node, astree.Rule) and node.name == '_dictate':
             return Action(f"'{result_text}'")
+        # print(node, result_text)
+        # raise TypeError
 
     def action_variables(self, engine_variables):
         results = collections.OrderedDict({path: [] for path in self.variables})
         full_path_engine_variables = self.get_full_path_engine_variables(engine_variables)
+        print(full_path_engine_variables)
         for full_path, action_text in full_path_engine_variables:
             action_path_length = len(full_path)
             action = self.leaf_action(self.node_map[full_path].node, action_text)

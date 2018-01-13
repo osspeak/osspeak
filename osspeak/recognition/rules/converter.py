@@ -80,6 +80,8 @@ class SrgsXmlConverter:
                 self.add_grouping(child, choices)
             elif isinstance(child, astree.Rule):
                 self.add_rule(child, choices)
+            elif isinstance(child, astree.RuleReference):
+                self.add_rule_reference(child, choices)
             else:
                 raise TypeError(f'Unable to serialize element {child}')
 
