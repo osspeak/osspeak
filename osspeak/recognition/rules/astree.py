@@ -47,3 +47,10 @@ class GroupingNode(ASTNode):
         self.repeat_low = 1
         self.repeat_high = 1
         self.action_substitute = None
+
+class RuleReference(ASTNode):
+
+    def __init__(self, rule_name):
+        self.rule_name = rule_name
+        self.repeat_low = 1
+        self.repeat_high = 1

@@ -3,7 +3,8 @@ import keyboard
 
 class Action:
 
-    def __init__(self, action_input, defined_functions=None, arguments=None, validator=lambda expr: True, raise_on_error=True):
+    def __init__(self, action_input, defined_functions=None, arguments=None,
+                 validator=lambda expr: True, raise_on_error=True):
         defined_functions = {} if defined_functions is None else defined_functions
         self.namespace = {**defined_functions, **library.namespace}
         self.literal_expressions, self.remaining_text = self.compile_expressions(action_input, validator, raise_on_error)
@@ -23,8 +24,14 @@ class Action:
         return literal_expressions, None
 
     def perform(self, call_locals=None):
+        '''
+        top level perform
+        '''
+        typed_previous_result = False
         for result in self.generate_results(call_locals):
-            perform.perform_io(result)
+            if typed_previous_result and isinstance(result, str):
+                result = ' ' + result
+            typed_previous_result = perform.perform_io(result)
 
     def perform_variable(self, call_locals=None, perform_results=False):
         results = []

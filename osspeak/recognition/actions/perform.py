@@ -31,7 +31,9 @@ worker.start()
 
 def perform_io(item):
     if isinstance(item, (str, float, int)):
-        keyboard.write(item)
+        keyboard.write(str(item))
+        return True
+    return False
 
 def perform_action(command, variable_tree, engine_result):
     log.logger.info(f'Matched rule: {command.rule.raw_text}')
