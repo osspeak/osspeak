@@ -83,6 +83,21 @@ class SrgsXmlConverter:
             else:
                 raise TypeError(f'Unable to serialize element {child}')
 
+    def add_rule_reference(self, ruleref_node, choices):
+        if ruleref_node.rule_name == '_dictate':
+            # '<ruleref uri="grammar:dictation" type="application/srgs+xml"/><tag>out.SpokenText=rules.latest();</tag>'
+            ruleref = ET.Element('ruleref', attrib={'uri': 'grammar:dictation', 'type': 'application/srgs+xml'})
+            choices[-1].append(ruleref)
+            tag = ET.Element('tag')
+            tag.text = f'out += "dictation-{self.node_ids[ruleref_node]}=" + rules.latest(); + "|"'
+            choices[-1].append(tag)
+            return
+        # all rule nodes here should be copies that refer to base rule
+        base_rule = self.rule_id_map[ruleref_node.rule_name]
+        rritem = self.get_ruleref_item(self.node_ids[base_rule], outid=self.node_ids[ruleref_node], text=None,
+                low=ruleref_node.repeat_low, high=ruleref_node.repeat_high)
+        choices[-1].append(rritem)
+
     def add_rule(self, rule_node, choices):
         if rule_node.name == '_dictate':
             # '<ruleref uri="grammar:dictation" type="application/srgs+xml"/><tag>out.SpokenText=rules.latest();</tag>'
