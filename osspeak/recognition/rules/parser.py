@@ -53,7 +53,6 @@ class RuleParser:
         self.top.children.append(or_node)
 
     def parse_named_rule_token(self, tok):
-        from recognition import api
         self.pop_top_grouping_if_closed()
         rule_reference = astree.RuleReference(tok.name)
         self.top.children.append(rule_reference)
