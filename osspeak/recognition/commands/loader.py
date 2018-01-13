@@ -44,7 +44,7 @@ async def load_modules(cache, current_window, current_state, reload_files=False)
 
 async def load_and_send_grammar(cache):
     rules, command_rules = get_active_rules(cache.active_modules)
-    named_rule_map = {r.name for r in rules}
+    named_rule_map = {r.name: r for r in rules}
     all_rules = rules + command_rules 
     node_ids = generate_node_ids(all_rules)
     commands = get_active_commands(cache.active_modules)
