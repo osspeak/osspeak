@@ -60,7 +60,6 @@ class RuleParser:
     def parse_named_rule_token(self, tok):
         from recognition import api
         self.pop_top_grouping_if_closed()
-        rule_reference = astree.RuleReference(tok.name)
         rule_node = self.rules[tok.name]
         # rule text -> None -> Rule object
         if isinstance(rule_node, str):
