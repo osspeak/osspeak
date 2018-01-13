@@ -4,7 +4,7 @@ from pprint import pprint
 
 class SrgsXmlConverter:
 
-    def __init__(self, node_ids):
+    def __init__(self, node_ids, named_rule_map):
         self.grammar_attrib = {
             'version': '1.0',
             'mode': 'voice',
@@ -14,6 +14,7 @@ class SrgsXmlConverter:
             'tag-format': 'semantics/1.0'
         }
         self.node_ids = node_ids
+        self.named_rule_map = named_rule_map
         self.root = ET.Element('grammar', attrib=self.grammar_attrib)
         self.ruleref_container_id = 'ruleref_container'
 
@@ -95,7 +96,7 @@ class SrgsXmlConverter:
             choices[-1].append(tag)
             return
         # all rule nodes here should be copies that refer to base rule
-        base_rule = self.rule_id_map[ruleref_node.rule_name]
+        base_rule = self.named_rule_map[ruleref_node.rule_name]
         rritem = self.get_ruleref_item(self.node_ids[base_rule], outid=self.node_ids[ruleref_node], text=None,
                 low=ruleref_node.repeat_low, high=ruleref_node.repeat_high)
         choices[-1].append(rritem)

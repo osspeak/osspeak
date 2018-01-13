@@ -44,6 +44,7 @@ async def load_modules(cache, current_window, current_state, reload_files=False)
 
 async def load_and_send_grammar(cache):
     rules, command_rules = get_active_rules(cache.active_modules)
+    named_rule_map = {r.name for r in rules}
     all_rules = rules + command_rules 
     node_ids = generate_node_ids(all_rules)
     commands = get_active_commands(cache.active_modules)
@@ -51,7 +52,7 @@ async def load_and_send_grammar(cache):
     for cmd in commands:
         variable_tree = variables.RecognitionResultsTree(cmd.rule, node_ids)
         grammar_commands[node_ids[cmd.rule]] = {'command': cmd, 'variable_tree': variable_tree}
-    grammar_xml = build_grammar_xml(all_rules, node_ids)
+    grammar_xml = build_grammar_xml(all_rules, node_ids, named_rule_map)
     grammar_id = str(uuid.uuid4())
     add_new_grammar(cache.grammar_commands, grammar_commands, grammar_id)
     await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
@@ -184,8 +185,8 @@ def load_events(command_modules):
     for cmd_module in command_modules.values():
         cmd_module.load_events()
 
-def build_grammar_xml(active_rules, node_ids):
-    return SrgsXmlConverter(node_ids).build_grammar(active_rules)
+def build_grammar_xml(active_rules, node_ids, named_rule_map):
+    return SrgsXmlConverter(node_ids, named_rule_map).build_grammar(active_rules)
 
 def get_active_rules(active_modules):
     rules = []
