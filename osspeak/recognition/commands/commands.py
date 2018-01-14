@@ -39,13 +39,6 @@ class CommandModule:
 
     def load_rules(self):
         for rule_name, rule_text in self.config.get('rules', {}):
-            current_rule = self.scope.rules[rule_name]
-            if isinstance(current_rule, astree.Rule):
-                assert current_rule.name is not None
-                self.rules.append(current_rule)
-                continue
-            assert isinstance(current_rule, str)
-            self.scope.rules[rule_name] = None
             rule = api.rule(rule_text, name=rule_name, rules=self.scope.rules, defined_functions=self.scope.functions)
             self.scope.rules[rule_name] = rule
             self.rules.append(rule)

@@ -3,10 +3,12 @@ import copy
 
 class ASTNode:
 
-    def walk(self, ancestors=None):
+    def walk(self, ancestors=None, rules=None):
         ancestors = ancestors or []
+        rules = rules or {}
+        new_ancestors = ancestors + [self]
         for child in getattr(self, 'children', []):
-            yield from child.walk(ancestors + [self])
+            yield from child.walk(new_ancestors, rules)
         yield {'node': self, 'ancestors': tuple(ancestors)}
             
 class Rule(ASTNode):
@@ -54,3 +56,12 @@ class RuleReference(ASTNode):
         self.rule_name = rule_name
         self.repeat_low = 1
         self.repeat_high = 1
+
+    def walk(self, ancestors=None, rules=None):
+        ancestors = ancestors or {}
+        if self.rule_name != '_dictate':
+            new_ancestors = ancestors + [self]
+            rule = rules[self.rule_name]
+            for child in rule.children:
+                yield from child.walk(new_ancestors, rules)
+        yield {'node': self, 'ancestors': tuple(ancestors)}

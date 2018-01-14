@@ -46,11 +46,11 @@ async def load_and_send_grammar(cache):
     rules, command_rules = get_active_rules(cache.active_modules)
     named_rule_map = {r.name: r for r in rules}
     all_rules = rules + command_rules 
-    node_ids = generate_node_ids(all_rules)
+    node_ids = generate_node_ids(all_rules, named_rule_map)
     commands = get_active_commands(cache.active_modules)
     grammar_commands = {}
     for cmd in commands:
-        variable_tree = variables.RecognitionResultsTree(cmd.rule, node_ids)
+        variable_tree = variables.RecognitionResultsTree(cmd.rule, node_ids, named_rule_map)
         grammar_commands[node_ids[cmd.rule]] = {'command': cmd, 'variable_tree': variable_tree}
     grammar_xml = build_grammar_xml(all_rules, node_ids, named_rule_map)
     grammar_id = str(uuid.uuid4())
@@ -64,12 +64,12 @@ def add_new_grammar(grammar_commands, commands, grammar_id):
         grammar_commands.popitem(last=False)
     grammar_commands[grammar_id] = commands
 
-def generate_node_ids(rules):
+def generate_node_ids(rules, named_rule_map):
     from recognition.rules import astree
     prefix_map = {astree.GroupingNode: 'g', astree.Rule: 'r', astree.WordNode: 'w'}
     node_ids = {}
     for rule in rules:
-        for node_info in rule.walk():
+        for node_info in rule.walk(rules=named_rule_map):
             node = node_info['node']
             if node not in node_ids:
                 prefix = prefix_map.get(type(node), 'n')

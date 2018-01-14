@@ -4,13 +4,14 @@ from recognition.actions.action import Action
 
 class RecognitionResultsTree:
 
-    def __init__(self, root_rule_node, node_ids):
+    def __init__(self, root_rule_node, node_ids, named_rule_map):
         self.root_rule_node = root_rule_node
         self.node_ids = node_ids
+        self.named_rule_map = named_rule_map
         self.initialize_fields()
 
     def walk_tree(self):
-        for node_info in self.root_rule_node.walk():
+        for node_info in self.root_rule_node.walk(rules=self.named_rule_map):
             yield RuleNodeWrapper(node_info['node'], node_info['ancestors'], self.node_ids)
 
     def initialize_fields(self):
@@ -61,13 +62,11 @@ class RecognitionResultsTree:
             return Action(f"'{node.text}'")
         if isinstance(node, astree.Rule) and node.name == '_dictate':
             return Action(f"'{result_text}'")
-        # print(node, result_text)
         # raise TypeError
 
     def action_variables(self, engine_variables):
         results = collections.OrderedDict({path: [] for path in self.variables})
         full_path_engine_variables = self.get_full_path_engine_variables(engine_variables)
-        print(full_path_engine_variables)
         for full_path, action_text in full_path_engine_variables:
             action_path_length = len(full_path)
             action = self.leaf_action(self.node_map[full_path].node, action_text)
@@ -79,7 +78,8 @@ class RecognitionResultsTree:
                             action_path_length = len(variable_path)
                             action = node.action_substitute
                     results[variable_path].append(action)
-        return list(results.values()), [v[1] for v in full_path_engine_variables]
+        var_list, words = list(results.values()), [v[1] for v in full_path_engine_variables]
+        return var_list, words
 
 class RuleNodeWrapper:
 
