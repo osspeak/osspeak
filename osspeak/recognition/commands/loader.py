@@ -39,20 +39,20 @@ async def load_modules(cache, current_window, current_state, initialize=False):
     cache.active_modules = get_active_modules(cache.command_modules, current_window, current_state)
     fire_activation_events(cache.active_modules, previous_active_modules)
     send_module_information_to_ui(cache.command_modules)
-    await load_and_send_grammar(cache)
+    await load_and_send_grammar(cache.active_modules, cache.grammar_commands)
 
-async def load_and_send_grammar(cache):
-    rules, command_rules = get_active_rules(cache.active_modules)
+async def load_and_send_grammar(active_modules, grammar_commands):
+    rules, command_rules = get_active_rules(active_modules)
     all_rules = list(rules.values()) + command_rules
     node_ids = generate_node_ids(all_rules, rules)
-    commands = get_active_commands(cache.active_modules)
+    commands = get_active_commands(active_modules)
     grammar_commands = {}
     for cmd in commands:
         variable_tree = variables.RecognitionResultsTree(cmd.rule, node_ids, rules)
         grammar_commands[node_ids[cmd.rule]] = {'command': cmd, 'variable_tree': variable_tree}
     grammar_xml = build_grammar_xml(all_rules, node_ids, rules)
     grammar_id = str(uuid.uuid4())
-    add_new_grammar(cache.grammar_commands, grammar_commands, grammar_id)
+    add_new_grammar(grammar_commands, grammar_commands, grammar_id)
     await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
 
 
