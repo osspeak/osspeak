@@ -25,6 +25,7 @@ def start_watching_user_state():
 async def watch_user_system_state(msg_list, cache):
     loop = asyncio.get_event_loop()
     previous_window, previous_state = None, state_copy()
+    initial_load_done = False
     while True:
         current_window = api.get_active_window_name().lower()
         is_different_window = current_window != previous_window
@@ -35,7 +36,8 @@ async def watch_user_system_state(msg_list, cache):
             new_active_modules = loader.get_active_modules(cache.command_modules, current_window, current_state)
             if new_active_modules != cache.active_command_modules:
                 reload_files = msg == topics.RELOAD_COMMAND_MODULE_FILES
-                await loader.load_modules(cache, current_window, current_state)
+                await loader.load_modules(cache, current_window, current_state, initialize=not initial_load_done)
+                initial_load_done = True
             elif msg == topics.RELOAD_GRAMMAR:
                 loader.load_and_send_grammar(cache)
             previous_window = current_window

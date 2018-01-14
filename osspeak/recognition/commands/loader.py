@@ -31,11 +31,12 @@ class CommandModuleCache:
         self.command_modules = load_command_modules(self.command_module_json)
         self.scopes = load_scopes(self.command_modules)
 
-async def load_modules(cache, current_window, current_state, reload_files=False):
+async def load_modules(cache, current_window, current_state, initialize=False):
     previous_active_modules = cache.active_command_modules
-    cache.populate()
+    if initialize:
+        cache.populate()
+        load_command_module_information(cache.command_modules, cache.scopes)
     cache.active_modules = get_active_modules(cache.command_modules, current_window, current_state)
-    load_command_module_information(cache.command_modules, cache.scopes)
     fire_activation_events(cache.active_modules, previous_active_modules)
     send_module_information_to_ui(cache.command_modules)
     await load_and_send_grammar(cache)
