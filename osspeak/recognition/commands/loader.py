@@ -32,9 +32,6 @@ class CommandModuleCache:
 
 async def load_modules(cache, current_window, current_state, reload_files=False):
     previous_active_modules = cache.active_command_modules
-    if reload_files:
-        load_initial_user_state(cache.command_modules)
-        cache.command_module_json = load_command_json()
     cache.populate()
     cache.active_modules = get_active_modules(cache.command_modules, current_window, current_state)
     load_command_module_information(cache.command_modules, cache.scopes)
