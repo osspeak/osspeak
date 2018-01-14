@@ -50,7 +50,8 @@ class RepetitionToken(BaseToken):
 class ActionSubstituteToken(BaseToken):
     
     def __init__(self, text, defined_functions=None):
-        self.action = action.Action(text, defined_functions, validator=action_substitute_validator, raise_on_error=False)
+        self.action = action.Action(text, defined_functions=defined_functions,
+            validator=action_substitute_validator, raise_on_error=False)
         if not self.action.expressions:
             raise RuntimeError(f'Unable to parse any Python expressions from string:\n{text}')
         self.consumed_char_count = len(text) - len(self.action.remaining_text)
