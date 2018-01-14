@@ -1,6 +1,6 @@
 import copy
 
-from recognition.rules import ruletokstream, astree, tokens
+from recognition.rules import lexer, astree, tokens
 from profile import Profiler
 
 class RuleParser:
@@ -14,7 +14,7 @@ class RuleParser:
         self.text = text
         self.rules = {} if rules is None else rules
         self.debug = debug
-        self.stream = ruletokstream.RuleTokenStream(self.text, defined_functions=defined_functions)
+        self.stream = lexer.RuleLexer(self.text, defined_functions=defined_functions)
         self.grouping_stack = []
         self.optional_groupings = set()
         self.repeated_nodes = set()

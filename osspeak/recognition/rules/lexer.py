@@ -15,7 +15,7 @@ TOKEN_PATTERNS = tuple((re.compile(p, re.I), _) for p, _ in (
     (r'\]', tokens.OptionalGroupingClosingToken),
 ))
 
-class RuleTokenStream:
+class RuleLexer:
 
     def __init__(self, text, defined_functions=None):
         self.text = text
