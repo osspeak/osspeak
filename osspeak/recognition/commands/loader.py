@@ -1,6 +1,7 @@
 from profile import Profiler
 import itertools
 import uuid
+import profile
 import os
 import collections
 import json
@@ -164,8 +165,6 @@ def load_functions(command_modules, scopes):
         cmd_module.set_function_actions()
 
 def load_rules(command_modules):
-    for cmd_module in command_modules.values():
-        cmd_module.initialize_rules()
     for cmd_module in command_modules.values():
         cmd_module.load_rules()
 

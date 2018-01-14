@@ -17,8 +17,10 @@ class CommandModule:
         self.config = config
         self.path = path
         self.scope = None
+        self.named_rules = {}
         self.rules = []
         self.functions = []
+        self.named_functions = {}
         self.commands = []
         # currently activate and deactivate
         self.events = {}
@@ -31,10 +33,6 @@ class CommandModule:
         for rule_text, action_text in self.config.get('commands', {}):
             cmd = Command(rule_text, action_text, scope=self.scope)
             self.commands.append(cmd)
-
-    def initialize_rules(self):
-        for rule_name, rule_text in self.config.get('rules', {}):
-            self.scope.rules[rule_name] = rule_text
 
     def load_rules(self):
         for rule_name, rule_text in self.config.get('rules', {}):
