@@ -14,7 +14,7 @@ class RuleParser:
         self.text = text
         self.rules = {} if rules is None else rules
         self.debug = debug
-        self.stream = lexer.RuleLexer(self.text, defined_functions=defined_functions)
+        self.lexer = lexer.RuleLexer(self.text, defined_functions=defined_functions)
         self.grouping_stack = []
         self.optional_groupings = set()
         self.repeated_nodes = set()
@@ -35,7 +35,7 @@ class RuleParser:
     def parse_as_rule(self, name=None):
         top_level_rule = astree.Rule(name=name)
         self.grouping_stack = [top_level_rule]
-        for tok in self.stream:
+        for tok in self.lexer:
             self.token_list.append(tok)
             self.parse_map[type(tok)](tok)
         valid_last_grouping = len(self.grouping_stack) == 1 or len(self.grouping_stack) == 2 and not self.grouping_stack[-1].open
