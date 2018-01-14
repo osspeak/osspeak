@@ -57,22 +57,6 @@ class RuleParser:
         rule_reference = astree.RuleReference(tok.name)
         self.top.children.append(rule_reference)
 
-    def parse_named_rule_token(self, tok):
-        from recognition import api
-        self.pop_top_grouping_if_closed()
-        rule_node = self.rules[tok.name]
-        # rule text -> None -> Rule object
-        if isinstance(rule_node, str):
-            # rule node is currently rule text
-            self.rules[tok.name] = None
-            rule_node = api.rule(rule_node, name=tok.name, rules=self.rules)
-            self.rules[tok.name] = rule_node
-        # want a copy to avoid mutating original, ie repeat
-        # Need to figure out a way to make unique ids that
-        # still point to rulerefs
-        rule_copy = rule_node.create_reference()
-        self.top.children.append(rule_copy)
-
     def parse_grouping_opening_token(self, tok):
         self.pop_top_grouping_if_closed()
         grouping_node = astree.GroupingNode()
