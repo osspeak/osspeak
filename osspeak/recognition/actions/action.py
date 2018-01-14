@@ -8,7 +8,7 @@ class Action:
         defined_functions = {} if defined_functions is None else defined_functions
         self.namespace = {**defined_functions, **library.namespace}
         self.literal_expressions, self.remaining_text = self.compile_expressions(action_input, validator, raise_on_error)
-        self.expressions = [asttransform.transform_expression(e, namespace=self.namespace, arguments=arguments) for e in self.literal_expressions]
+        self.expressions = [asttransform.transform_expression(e, arguments=arguments) for e in self.literal_expressions]
 
     @property
     def text(self):

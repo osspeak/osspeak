@@ -110,7 +110,7 @@ def node_path(node):
         return ()
     return node_path(node.value) + (node.attr,)
 
-def transform_expression(expr_text, namespace=None, arguments=None):
+def transform_expression(expr_text, arguments=None):
     arguments = arguments or []
     expr = ast.parse(expr_text, mode='eval')
     new_expr = NameToStringTransformer(expr, arguments).visit(expr)
