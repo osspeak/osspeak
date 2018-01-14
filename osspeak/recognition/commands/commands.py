@@ -9,7 +9,6 @@ from recognition import api
 from interfaces.gui import serializer
 from recognition.commands import scopes
 from recognition.rules import astree
-from recognition.rules.parser import RuleParser
 from log import logger
 
 class CommandModule:
@@ -39,7 +38,7 @@ class CommandModule:
 
     def load_rules(self):
         for rule_name, rule_text in self.config.get('rules', {}):
-            rule = api.rule(rule_text, name=rule_name, rules=self.scope.rules, defined_functions=self.scope.functions)
+            rule = api.rule(rule_text, name=rule_name, defined_functions=self.scope.functions)
             self.scope.rules[rule_name] = rule
             self.rules.append(rule)
 
@@ -77,7 +76,7 @@ class Command:
 
     def init_rule(self, rule_text):
         self.rule_text = rule_text
-        self.rule = api.rule(rule_text, rules=self.scope.rules)
+        self.rule = api.rule(rule_text)
 
     def init_action(self, action_text):
         self.action_text = action_text
