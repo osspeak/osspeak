@@ -14,7 +14,7 @@ class RuleParser:
         self.text = text
         self.rules = {} if rules is None else rules
         self.debug = debug
-        self.lexer = lexer.RuleLexer(self.text, defined_functions=defined_functions)
+        self.lexer = lexer.RuleLexer(self.text)
         self.grouping_stack = []
         self.optional_groupings = set()
         self.repeated_nodes = set()

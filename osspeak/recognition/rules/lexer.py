@@ -17,7 +17,7 @@ TOKEN_PATTERNS = tuple((re.compile(p, re.I), _) for p, _ in (
 
 class RuleLexer:
 
-    def __init__(self, text, defined_functions=None):
+    def __init__(self, text):
         self.text = text
 
     def read_repetition(self, text):
