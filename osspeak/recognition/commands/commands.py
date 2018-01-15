@@ -5,9 +5,9 @@ import json
 
 from recognition.actions.library import state, history
 from recognition.actions import variables
+from recognition.actions.function import Function
 from recognition import api
 from interfaces.gui import serializer
-from recognition.commands import scopes
 from recognition.rules import astree
 from log import logger
 
@@ -16,7 +16,6 @@ class CommandModule:
     def __init__(self, config, path):
         self.config = config
         self.path = path
-        self.scope = None
         self.rules = {}
         self.functions = {}
         self.commands = []
@@ -25,28 +24,27 @@ class CommandModule:
 
     def import_modules(self):
         for module_name in self.config.get("imports", []):
-            self.scope.functions[module_name] = importlib.import_module(module_name)
+            self.functions[module_name] = importlib.import_module(module_name)
 
     def load_commands(self):
         for rule_text, action_text in self.config.get('commands', {}):
-            cmd = Command(rule_text, action_text, scope=self.scope)
+            cmd = Command(rule_text, action_text)
             self.commands.append(cmd)
 
     def load_rules(self):
         for rule_name, rule_text in self.config.get('rules', {}):
             rule = api.rule(rule_text, name=rule_name)
-            self.scope.rules[rule_name] = rule
             self.rules[rule_name] = rule
 
     def define_functions(self):
         for func_signature, func_text in self.config.get('functions', {}):
             user_function = api.function(func_signature, func_text)
-            self.scope.functions[user_function.name] = user_function
             self.functions[user_function.name] = user_function
 
     def set_function_actions(self):
         for func in self.functions.values():
-            func.compile_action()
+            if isinstance(func, Function):
+                func.compile_action()
 
     def load_events(self):
         for event_name, event_text in self.config.get('events', {}).items():
@@ -65,8 +63,7 @@ class CommandModule:
 
 class Command:
     
-    def __init__(self, rule_text, action_text, scope=None):
-        self.scope = scopes.Scope() if scope is None else scope
+    def __init__(self, rule_text, action_text):
         self.init_rule(rule_text)
         self.init_action(action_text)
 
