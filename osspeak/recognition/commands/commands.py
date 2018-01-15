@@ -50,7 +50,7 @@ class CommandModule:
 
     def load_events(self):
         for event_name, event_text in self.config.get('events', {}).items():
-            self.events[event_name] = api.action(event_text, defined_functions=self.scope.functions)
+            self.events[event_name] = api.action(event_text)
 
     @property
     def conditions(self):
@@ -76,4 +76,4 @@ class Command:
 
     def init_action(self, action_text):
         self.action_text = action_text
-        self.action = api.action(action_text, self.scope.functions)
+        self.action = api.action(action_text)

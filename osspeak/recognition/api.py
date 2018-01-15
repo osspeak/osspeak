@@ -9,7 +9,7 @@ def rule(text, name=None):
     rule_obj.raw_text = text
     return rule_obj
 
-def action(text, defined_functions=None):
+def action(text):
     return Action(text)
 
 def function(func_signature, func_action=None, defined_functions=None):
