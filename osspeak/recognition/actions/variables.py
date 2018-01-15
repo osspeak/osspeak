@@ -19,7 +19,8 @@ class RecognitionResultsTree:
         self.variables = []
         for node_wrapper in self.walk_tree():
             is_grouping_variable = isinstance(node_wrapper.node, astree.GroupingNode) and len(node_wrapper.node.children) > 1
-            is_dictation = isinstance(node_wrapper.node, astree.Rule) and node_wrapper.node.name == '_dictate'
+            is_dictation = (isinstance(node_wrapper.node, astree.RuleReference) and
+                            node_wrapper.node.rule_name == '_dictate')
             is_variable = is_grouping_variable or is_dictation
             if is_variable:
                 self.variables.append(node_wrapper.path)
@@ -60,7 +61,7 @@ class RecognitionResultsTree:
             return node.action_substitute
         if isinstance(node, astree.WordNode):
             return Action(f"'{node.text}'")
-        if isinstance(node, astree.Rule) and node.name == '_dictate':
+        if isinstance(node, astree.RuleReference) and node.rule_name == '_dictate':
             return Action(f"'{result_text}'")
         # raise TypeError
 
