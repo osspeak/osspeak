@@ -34,7 +34,7 @@ class CommandModule:
 
     def load_rules(self):
         for rule_name, rule_text in self.config.get('rules', {}):
-            rule = api.rule(rule_text, name=rule_name, defined_functions=self.scope.functions)
+            rule = api.rule(rule_text, name=rule_name)
             self.scope.rules[rule_name] = rule
             self.rules[rule_name] = rule
 

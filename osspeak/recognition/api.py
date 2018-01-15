@@ -3,7 +3,7 @@ from recognition.actions import action, pyexpr, asttransform
 from recognition.actions.action import Action
 from recognition.actions.function import Function
 
-def rule(text, name=None, defined_functions=None):
+def rule(text, name=None):
     parser = RuleParser(text)
     rule_obj = parser.parse_as_rule(name=name)
     rule_obj.raw_text = text

@@ -11,7 +11,7 @@ class TestVariableBase(unittest.TestCase):
     def setUpClass(cls):
         cls.rules = {}
         for rule_name, rule_text in strings.rules:
-            rule = api.rule(rule_text, name=rule_name, rules=cls.rules)
+            rule = api.rule(rule_text, name=rule_name)
             cls.rules[rule_name] = rule
 
     def test_a(self):
