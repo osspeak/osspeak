@@ -155,7 +155,7 @@ def is_command_module_active(cmd_module, current_window, current_state):
 
 def load_command_module_information(command_modules, scopes):
     import_modules(command_modules)
-    load_functions(command_modules, scopes)
+    load_functions(command_modules)
     load_rules(command_modules)
     load_commands(command_modules)
     load_events(command_modules)
@@ -164,8 +164,7 @@ def import_modules(command_modules):
     for cmd_module in command_modules.values():
         cmd_module.import_modules()
 
-def load_functions(command_modules, scopes):
-    load_builtin_functions(scopes)
+def load_functions(command_modules):
     for cmd_module in command_modules.values():
         cmd_module.define_functions()
     for cmd_module in command_modules.values():
@@ -178,11 +177,6 @@ def load_rules(command_modules):
 def load_commands(command_modules):
     for cmd_module in command_modules.values():
         cmd_module.load_commands()
-
-def load_builtin_functions(scopes):
-    from recognition.api import rule
-    global_scope = scopes['']
-    global_scope.rules['_dictate'] = rule('', '_dictate')
 
 def load_events(command_modules):
     for cmd_module in command_modules.values():
