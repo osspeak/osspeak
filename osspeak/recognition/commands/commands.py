@@ -46,7 +46,7 @@ class CommandModule:
 
     def set_function_actions(self):
         for func in self.functions.values():
-            func.compile_action(self.scope.functions)
+            func.compile_action()
 
     def load_events(self):
         for event_name, event_text in self.config.get('events', {}).items():

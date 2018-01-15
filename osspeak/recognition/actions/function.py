@@ -31,7 +31,7 @@ class Function:
             if k != 'self' or len(l) == 1:
                 return v
 
-    def compile_action(self, defined_functions):
+    def compile_action(self):
         from recognition.actions.action import Action
         arguments = set(self.parameters.keys())
         self.action = Action(self.action_text, arguments=arguments)

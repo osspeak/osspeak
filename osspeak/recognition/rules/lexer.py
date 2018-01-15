@@ -19,7 +19,6 @@ class RuleLexer:
 
     def __init__(self, text, defined_functions=None):
         self.text = text
-        self.defined_functions = {} if defined_functions is None else defined_functions
 
     def read_repetition(self, text):
         '''
