@@ -10,7 +10,7 @@ class RuleParser:
     into speech recognition grammar formats like SRGS XML. 
     '''
 
-    def __init__(self, text, rules=None, defined_functions=None, debug=False):
+    def __init__(self, text, rules=None, debug=False):
         self.text = text
         self.rules = {} if rules is None else rules
         self.debug = debug
