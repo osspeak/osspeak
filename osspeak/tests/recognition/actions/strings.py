@@ -20,6 +20,6 @@ VARIABLE3 = 'len($1, $-2) "foo $2"'
 
 LAMBDA_EXPRESSION = '(lambda a, b: a + b)(4, 5)'
 KWARG_EXPRESSION = 'int(x="45")'
-SORTED_EXPR = 'list(sorted([barr, foo, "another string"], key=len))'
+SORTED_EXPR = 'list(sorted([4, 3, 2]))'
 TOP_LEVEL_BUILTIN = 'len'
 INDEX_EXPR = 'x[0]'

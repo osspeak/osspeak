@@ -22,7 +22,7 @@ class TestAstTransform(unittest.TestCase):
 
     def test_sorted(self):
         res = self.evaluate(strings.SORTED_EXPR)
-        self.assertEqual(res, ['foo', 'barr', "another string"])
+        self.assertEqual(res, [2, 3, 4])
 
     def test_top_level_builtin(self):
         res = self.evaluate(strings.TOP_LEVEL_BUILTIN)
