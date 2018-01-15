@@ -10,7 +10,7 @@ def rule(text, name=None, defined_functions=None):
     return rule_obj
 
 def action(text, defined_functions=None):
-    return Action(text, defined_functions)
+    return Action(text)
 
 def function(func_signature, func_action=None, defined_functions=None):
     func = Function(func_signature, func_action)

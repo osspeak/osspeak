@@ -3,11 +3,8 @@ import keyboard
 
 class Action:
 
-    def __init__(self, action_input, defined_functions=None, arguments=None,
+    def __init__(self, action_input, arguments=None,
                  validator=lambda expr: True, raise_on_error=True):
-        defined_functions = {} if defined_functions is None else defined_functions
-        self.namespace = {**defined_functions, **library.namespace}
-        # self.namespace = library.namespace.copy()
         self.literal_expressions, self.remaining_text = self.compile_expressions(action_input, validator, raise_on_error)
         self.expressions = [asttransform.transform_expression(e, arguments=arguments) for e in self.literal_expressions]
 

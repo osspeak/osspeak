@@ -33,7 +33,8 @@ class Function:
 
     def compile_action(self, defined_functions):
         from recognition.actions.action import Action
-        self.action = Action(self.action_text, defined_functions, set(self.parameters.keys()))
+        arguments = set(self.parameters.keys())
+        self.action = Action(self.action_text, arguments=arguments)
 
     def __call__(self, *args, **kwargs):
         self.func(*args, **kwargs)

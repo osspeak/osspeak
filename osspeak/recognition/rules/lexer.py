@@ -5,7 +5,7 @@ from recognition.rules import tokens
 TOKEN_PATTERNS = tuple((re.compile(p, re.I), _) for p, _ in (
     (r'[\n\t ]+', tokens.WhitespaceToken),
     (r'[a-z0-9]+', tokens.WordToken),
-    (r'=.+', lambda text, stream: tokens.ActionSubstituteToken(text[1:], stream.defined_functions)),
+    (r'=.+', lambda text, stream: tokens.ActionSubstituteToken(text[1:])),
     (r'<[a-z_]+[a-z0-9_]*>', lambda text, _: tokens.NamedRuleToken(text[1:-1])),
     (r'_((\d*-\d*)|\d+)', lambda text, stream: stream.read_repetition(text[1:])),
     (r'\|', tokens.OrToken),
