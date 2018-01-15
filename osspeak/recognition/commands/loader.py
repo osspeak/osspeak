@@ -104,7 +104,7 @@ def load_command_json():
 
 def load_json_directory(filenames, command_dir, root):
     directory_modules = {}
-    for fname in (filenames):
+    for fname in filenames:
         if not fname.endswith('.json'):
             continue
         full_path = os.path.join(root, fname)
