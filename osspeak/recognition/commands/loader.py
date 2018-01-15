@@ -12,7 +12,7 @@ from recognition.actions import perform
 import settings
 from interfaces.gui import serializer
 from recognition.actions import variables
-from recognition.commands import commands, scopes
+from recognition.commands import commands
 from recognition.rules.converter import SrgsXmlConverter
 from platforms import api
 import xml.etree.ElementTree as ET
@@ -25,18 +25,16 @@ class CommandModuleCache:
         self.command_module_json = {}
         self.command_modules = {}
         self.active_command_modules = {}
-        self.scopes = {}
 
     def populate(self):
         self.command_module_json = load_command_json()
         self.command_modules = load_command_modules(self.command_module_json)
-        self.scopes = load_scopes(self.command_modules)
 
 async def load_modules(cache, current_window, current_state, initialize=False):
     previous_active_modules = cache.active_command_modules
     if initialize:
         cache.populate()
-        load_command_module_information(cache.command_modules, cache.scopes)
+        load_command_module_information(cache.command_modules)
     cache.active_modules = get_active_modules(cache.command_modules, current_window, current_state)
     fire_activation_events(cache.active_modules, previous_active_modules)
     send_module_information_to_ui(cache.command_modules)
@@ -124,17 +122,6 @@ def load_json_directory(filenames, command_dir, root):
 def load_command_modules(command_module_json):
     return {path: commands.CommandModule(config, path) for path, config in command_module_json.items()}
 
-def load_scopes(command_modules):
-    scope_groupings = {'': scopes.Scope()}
-    for path, cmd_module in command_modules.items():
-        scope_name = cmd_module.config.get('scope', '')
-        if scope_name not in scope_groupings:
-            global_scope = scope_groupings['']
-            scope_groupings[scope_name] = scopes.Scope(global_scope, name=scope_name)
-        scope_groupings[scope_name].command_modules[path] = cmd_module
-        cmd_module.scope = scope_groupings[scope_name]
-    return scope_groupings
-
 def load_initial_user_state(command_modules):
     recognition.actions.library.state.USER_DEFINED_STATE = {}
     for path, cmd_module in command_modules.items():
@@ -153,7 +140,7 @@ def is_command_module_active(cmd_module, current_window, current_state):
     current_window_matches = title_filter is None or title_filter.lower() in current_window.lower() 
     return current_window_matches and cmd_module.state_active(current_state)
 
-def load_command_module_information(command_modules, scopes):
+def load_command_module_information(command_modules):
     import_modules(command_modules)
     load_functions(command_modules)
     load_rules(command_modules)
