@@ -4,8 +4,8 @@ from recognition.actions import library
 
 class RecognitionContext:
 
-    def __init__(self, variables, words):
-        self._meta = RecognitionContextMeta(variables)
+    def __init__(self, variables, words, namespace):
+        self._meta = RecognitionContextMeta(variables, namespace)
         self.words = words
         self.text = ' '.join(words)
 
@@ -25,9 +25,10 @@ class RecognitionContext:
 
 class RecognitionContextMeta:
 
-    def __init__(self, variables):
+    def __init__(self, variables, namespace):
         self.variables = variables
         self.temp_variables = {}
+        self.namespace = namespace
 
     def call_or_type(self, value):
         return CallOrType(value)
@@ -49,7 +50,7 @@ class CallOrType(str):
     def __str__(self):
         return self.func_name
 
-def create_recognition_context(engine_result, variable_tree):
+def create_recognition_context(engine_result, variable_tree, namespace):
     engine_variables = tuple(v for v in engine_result['Variables'] if len(v) == 2)
     var_list, words = variable_tree.action_variables(engine_variables)
-    return RecognitionContext(var_list, words)
+    return RecognitionContext(var_list, words, namespace)

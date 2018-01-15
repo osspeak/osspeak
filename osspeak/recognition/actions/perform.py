@@ -35,10 +35,10 @@ def perform_io(item):
         return True
     return False
 
-def perform_action(command, variable_tree, engine_result):
+def perform_action(command, variable_tree, namespace, engine_result):
     log.logger.info(f'Matched rule: {command.rule.raw_text}')
     # empty variables dict, gets filled based on result
-    recognition_context = context.create_recognition_context(engine_result, variable_tree)
+    recognition_context = context.create_recognition_context(engine_result, variable_tree, namespace)
     recognition_queue.put((command, recognition_context))
 
 def perform_commands(command_results, command_map):
@@ -46,7 +46,8 @@ def perform_commands(command_results, command_map):
     action_results = []
     for result in command_results:
         command_dict = command_map[result['RuleId']]
-        action_result = perform_action(command_dict['command'], command_dict['variable_tree'], result)
+        action_result = perform_action(command_dict['command'], command_dict['variable_tree'],
+            command_dict['namespace'], result)
 
 def var_result(variable_actions, perform_results):
     results = []
