@@ -58,8 +58,11 @@ class CommandModule:
     def initial_state(self):
         return self.config.get('initialState', {})
 
-    def state_active(self, user_state):
-        return 'state' not in self.conditions or eval(self.conditions['state'], {}, user_state)
+    def is_state_active(self, user_state):
+        for key, value in self.conditions.get('state', {}).items():
+            if key not in user_state or value != user_state[key]:
+                return False
+        return True
 
 class Command:
     

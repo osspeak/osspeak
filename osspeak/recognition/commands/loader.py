@@ -125,8 +125,7 @@ def load_command_modules(command_module_json):
 def load_initial_user_state(command_modules):
     recognition.actions.library.state.USER_DEFINED_STATE = {}
     for path, cmd_module in command_modules.items():
-        initial_state = {k: eval(v) for k, v in cmd_module.initial_state.items()}
-        recognition.actions.library.state.USER_DEFINED_STATE.update(initial_state)
+        recognition.actions.library.state.USER_DEFINED_STATE.update(cmd_module.initial_state)
 
 def get_active_modules(command_modules, current_window, current_state):
     active_modules = {}
@@ -138,7 +137,7 @@ def get_active_modules(command_modules, current_window, current_state):
 def is_command_module_active(cmd_module, current_window, current_state):
     title_filter = cmd_module.conditions.get('title')
     current_window_matches = title_filter is None or title_filter.lower() in current_window.lower() 
-    return current_window_matches and cmd_module.state_active(current_state)
+    return current_window_matches and cmd_module.is_state_active(current_state)
 
 def load_command_module_information(command_modules):
     import_modules(command_modules)
@@ -169,8 +168,8 @@ def load_events(command_modules):
     for cmd_module in command_modules.values():
         cmd_module.load_events()
 
-def build_grammar_xml(active_rules, node_ids, named_rule_map):
-    return SrgsXmlConverter(node_ids, named_rule_map).build_grammar(active_rules)
+def build_grammar_xml(all_active_rules, node_ids, named_rule_map):
+    return SrgsXmlConverter(node_ids, named_rule_map).build_grammar(all_active_rules)
 
 def get_active_rules(active_modules):
     rules = {}
