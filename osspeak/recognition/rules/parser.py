@@ -43,24 +43,17 @@ class RuleParser:
         return top_level_rule
 
     def parse_word_token(self, tok):
-        self.pop_top_grouping_if_closed()
-        word_node = astree.WordNode(tok.text)
-        self.top.children.append(word_node)
+        self.add_to_next_grouping(astree.WordNode(tok.text))
 
     def parse_or_token(self, tok):
-        self.pop_top_grouping_if_closed()
-        or_node = astree.OrNode()
-        self.top.children.append(or_node)
+        self.add_to_next_grouping(astree.OrNode())
 
     def parse_named_rule_token(self, tok):
-        self.pop_top_grouping_if_closed()
-        rule_reference = astree.RuleReference(tok.name)
-        self.top.children.append(rule_reference)
+        self.add_to_next_grouping(astree.RuleReference(tok.name))
 
     def parse_grouping_opening_token(self, tok):
-        self.pop_top_grouping_if_closed()
         grouping_node = astree.GroupingNode()
-        self.top.children.append(grouping_node)
+        self.add_to_next_grouping(grouping_node)
         self.grouping_stack.append(grouping_node)
 
     def parse_grouping_closing_token(self, tok):
@@ -112,6 +105,10 @@ class RuleParser:
         self.repeated_nodes.add(node)
         node.repeat_low = low
         node.repeat_high = high
+
+    def add_to_next_grouping(self, node):
+        self.pop_top_grouping_if_closed()
+        self.top.children.append(node)
 
     def croak(self, message):
         raise RuntimeError(message)
