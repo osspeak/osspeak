@@ -12,6 +12,6 @@ def rule(text, name=None):
 def action(text):
     return Action(text)
 
-def function(func_signature, func_action=None, defined_functions=None):
+def function(func_signature, func_action=None):
     func = Function(func_signature, func_action)
     return func
