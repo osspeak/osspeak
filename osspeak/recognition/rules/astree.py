@@ -16,15 +16,7 @@ class Rule(ASTNode):
     def __init__(self, name=None):
         self.name = name
         self.children = []
-        self.base_rule = None
-        self.repeat_low = 1
-        self.repeat_high = 1
         self.open = True
-
-    def create_reference(self):
-        reference_rule = copy.copy(self)
-        reference_rule.base_rule = self.base_rule or self
-        return reference_rule
 
 class WordNode(ASTNode):
 
