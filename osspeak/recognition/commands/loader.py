@@ -21,7 +21,7 @@ from communication import messages, pubsub, topics
 class CommandModuleCache:
 
     def __init__(self):
-        self.grammar_commands = collections.OrderedDict()
+        self.map_grammar_to_commands = collections.OrderedDict()
         self.command_module_json = {}
         self.command_modules = {}
         self.active_command_modules = {}
@@ -38,22 +38,23 @@ async def load_modules(cache, current_window, current_state, initialize=False):
     cache.active_modules = get_active_modules(cache.command_modules, current_window, current_state)
     fire_activation_events(cache.active_modules, previous_active_modules)
     send_module_information_to_ui(cache.command_modules)
-    await load_and_send_grammar(cache.active_modules, cache.grammar_commands)
+    grammar_id, grammar_xml = build_grammar(cache.active_modules, cache.map_grammar_to_commands)
+    await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
 
-async def load_and_send_grammar(active_modules, grammar_commands):
+def build_grammar(active_modules, map_grammar_to_commands):
     rules, command_rules = get_active_rules(active_modules)
     all_rules = list(rules.values()) + command_rules
     node_ids = generate_node_ids(all_rules, rules)
     active_commands = get_active_commands(active_modules)
     namespace = get_namespace(active_modules)
-    commands = {}
+    command_contexts = {}
     for cmd in active_commands:
         variable_tree = variables.RecognitionResultsTree(cmd.rule, node_ids, rules)
-        commands[node_ids[cmd.rule]] = {'command': cmd, 'variable_tree': variable_tree, 'namespace': namespace}
+        command_contexts[node_ids[cmd.rule]] = {'command': cmd, 'variable_tree': variable_tree, 'namespace': namespace}
     grammar_xml = build_grammar_xml(all_rules, node_ids, rules)
     grammar_id = str(uuid.uuid4())
-    add_new_grammar(grammar_commands, commands, grammar_id)
-    await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
+    save_command_contexts(map_grammar_to_commands, command_contexts, grammar_id)
+    return grammar_id, grammar_xml
 
 def get_namespace(active_modules):
     ns = library.namespace.copy()
@@ -61,11 +62,11 @@ def get_namespace(active_modules):
         ns.update(mod.functions)
     return ns
 
-def add_new_grammar(grammar_commands, commands, grammar_id):
+def save_command_contexts(map_grammar_to_commands, command_contexts, grammar_id):
     # remove oldest grammar if needed
-    if len(grammar_commands) > 4:
-        grammar_commands.popitem(last=False)
-    grammar_commands[grammar_id] = commands
+    if len(map_grammar_to_commands) > 4:
+        map_grammar_to_commands.popitem(last=False)
+    map_grammar_to_commands[grammar_id] = command_contexts
 
 def generate_node_ids(rules, named_rule_map):
     from recognition.rules import astree

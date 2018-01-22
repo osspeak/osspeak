@@ -50,7 +50,7 @@ def set_message(msg_list, msg):
 
 def perform_commands(cache, command_results, grammar_id):
     try:
-        command_map = cache.grammar_commands[grammar_id]
+        command_map = cache.map_grammar_to_commands[grammar_id]
     except KeyError:
         log.logger.warning(f'Grammar {grammar_id} no longer exists')
         return
