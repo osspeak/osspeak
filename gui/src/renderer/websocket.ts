@@ -9,7 +9,7 @@ const wsUrl = `ws://localhost:3922`;
 console.log(wsUrl)
 export const ws = new WebSocket(wsUrl);
 // const serverMessageQueue: string[] = [];
-// const outstandingFetches = new Map<string, ServerFetch>();
+const outstandingFetches = new Map<string, ServerFetch>();
 
 ws.onopen = () => {
     console.log('p')
@@ -20,35 +20,33 @@ ws.onopen = () => {
 //     }
 }
 
-// ws.onmessage = (ev) => {
-//     const msg = JSON.parse(ev.data);
-//     if (msg.hasOwnProperty('id')) {
-//         if (!outstandingFetches.has(msg.id)) throw `Missing response id: ${msg.id}`;
-//         const sf = outstandingFetches.get(msg.id) as ServerFetch;
-//         outstandingFetches.delete(msg.id);
-//         if (msg.ok) sf.resolve(msg.data);
-//         else sf.reject(msg.data);
-//     }
-//     else {
-//         serverMessage = msg;
-//     }
-// }
+ws.onmessage = (ev) => {
+    const msg = JSON.parse(ev.data);
+    if (msg.hasOwnProperty('id')) {
+        if (!outstandingFetches.has(msg.id)) throw `Missing response id: ${msg.id}`;
+        const sf = outstandingFetches.get(msg.id) as ServerFetch;
+        outstandingFetches.delete(msg.id);
+        if (msg.ok) sf.resolve(msg.data);
+        else sf.reject(msg.data);
+    }
+    else {
+        // serverMessage = msg;
+    }
+}
  
-export async function wsFetch(type: string, data: any = {}) {
-//     const id = generateUUID();
-//     const msgString = JSON.stringify({type, id, data});
-//     const timestamp = Date.now();
-//     if (ws.readyState === 0) {
-//         serverMessageQueue.push(msgString);
-//     }
-//     else if (ws.readyState === 1) {
-//         ws.send(msgString);
-//     }
-//     const respPromise = new Promise((resolve, reject) => {
-//         const sf: ServerFetch = {timestamp, resolve, reject};
-//         outstandingFetches.set(id, sf);
-//     });
-//     return respPromise;
+export function wsFetch(type: string, args: any = [], kwargs: any = {}) {
+    if (ws.readyState !== WebSocket.OPEN) {
+        throw "Websocket connection not open";
+    }
+    const id = generateUUID();
+    const msgString = JSON.stringify({type, id, args, kwargs});
+    const timestamp = Date.now();
+    ws.send(msgString);
+    const respPromise = new Promise((resolve, reject) => {
+        const sf: ServerFetch = {timestamp, resolve, reject};
+        outstandingFetches.set(id, sf);
+    });
+    return respPromise;
 }
 
 function generateUUID () {
