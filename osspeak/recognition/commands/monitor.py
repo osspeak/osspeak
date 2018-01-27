@@ -34,9 +34,10 @@ async def watch_user_system_state(msg_list, cache):
         msg = msg_list[0]
         if is_different_window or is_different_user_state or msg:
             new_active_modules = loader.get_active_modules(cache.command_modules, current_window, current_state)
-            if new_active_modules != cache.active_command_modules:
-                reload_files = msg == topics.RELOAD_COMMAND_MODULE_FILES
-                await loader.load_modules(cache, current_window, current_state, initialize=not initial_load_done)
+            reload_files = msg == topics.RELOAD_COMMAND_MODULE_FILES
+            if new_active_modules != cache.active_command_modules or reload_files:
+                initialize = not initial_load_done or reload_files
+                await loader.load_modules(cache, current_window, current_state, initialize=initialize)
                 initial_load_done = True
             elif msg == topics.RELOAD_GRAMMAR:
                 loader.load_and_send_grammar(cache)

@@ -1,5 +1,5 @@
-from communication import messages
+from communication import topics, pubsub
 
 def reload():
-    messages.dispatch_sync(messages.RELOAD_COMMAND_MODULE_FILES)
+    pubsub.publish(topics.RELOAD_COMMAND_MODULE_FILES)
 
