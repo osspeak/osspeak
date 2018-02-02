@@ -7,7 +7,7 @@ class RecognitionContext:
     def __init__(self, variables, words, namespace):
         self._meta = RecognitionContextMeta(variables, namespace)
         self.words = words
-        self.text = ' '.join(words)
+        self.text = None if words is None else ' '.join(words)
 
     def var(self, idx, default=None, perform_results=True):
         from recognition.actions import perform
@@ -54,3 +54,6 @@ def create_recognition_context(engine_result, variable_tree, namespace):
     engine_variables = tuple(v for v in engine_result['Variables'] if len(v) == 2)
     var_list, words = variable_tree.action_variables(engine_variables)
     return RecognitionContext(var_list, words, namespace)
+
+def create_event_context(namespace):
+    return RecognitionContext([], None, namespace)

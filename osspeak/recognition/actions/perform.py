@@ -16,13 +16,13 @@ def get_recognition_context():
 
 def recognition_action_worker():
     while True:
-        command, recognition_context = recognition_queue.get()
+        action, recognition_context = recognition_queue.get()
         t = threading.current_thread()
         results_map[t] = {'context': recognition_context}
         try:
-            evaluation = command.action.perform()
+            evaluation = action.perform()
         except Exception as e:
-            log.logger.error(f'Action {command.action.text} errored: {str(e)}')
+            log.logger.error(f'Action {action.text} errored: {str(e)}')
         finally:
             del results_map[t]
 
@@ -35,11 +35,15 @@ def perform_io(item):
         return True
     return False
 
+def perform_action_from_event(action, namespace):
+    recognition_context = context.create_event_context(namespace)
+    recognition_queue.put((action, recognition_context))
+
 def perform_action(command, variable_tree, namespace, engine_result):
     log.logger.info(f'Matched rule: {command.rule.raw_text}')
     # empty variables dict, gets filled based on result
     recognition_context = context.create_recognition_context(engine_result, variable_tree, namespace)
-    recognition_queue.put((command, recognition_context))
+    recognition_queue.put((command.action, recognition_context))
 
 def perform_commands(command_results, command_map):
     log.logger.debug(f'Got commands: {command_results}')

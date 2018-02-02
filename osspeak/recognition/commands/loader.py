@@ -11,7 +11,7 @@ import recognition.actions.library.state
 from recognition.actions import perform
 import settings
 from interfaces.gui import serializer
-from recognition.actions import variables
+from recognition.actions import variables, perform
 from recognition.commands import commands
 from recognition.rules.converter import SrgsXmlConverter
 from platforms import api
@@ -36,7 +36,8 @@ async def load_modules(cache, current_window, current_state, initialize=False):
         cache.populate()
         load_command_module_information(cache.command_modules)
     cache.active_modules = get_active_modules(cache.command_modules, current_window, current_state)
-    fire_activation_events(cache.active_modules, previous_active_modules)
+    namespace = get_namespace(cache.active_modules)
+    fire_activation_events(cache.active_modules, previous_active_modules, namespace)
     send_module_information_to_ui(cache.command_modules)
     grammar_id, grammar_xml = build_grammar(cache.active_modules, cache.map_grammar_to_commands)
     await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
@@ -80,16 +81,18 @@ def generate_node_ids(rules, named_rule_map):
                 node_ids[node] = f'{prefix}{len(node_ids) + 1}'
     return node_ids
 
-def fire_activation_events(active_modules, previous_active_modules):
+def fire_activation_events(active_modules, previous_active_modules, namespace):
     previous_names, current_names = set(previous_active_modules), set(active_modules)
     for deactivated_name in previous_names - current_names:
         cmd_module = previous_active_modules[deactivated_name]
         if 'deactivate' in cmd_module.events:
-            cmd_module.events['deactivate'].perform(variables=[])
+            action = cmd_module.events['deactivate']
+            perform.perform_action_from_event(action, namespace)
     for activated_name in current_names - previous_names:
         cmd_module = active_modules[activated_name]
         if 'activate' in cmd_module.events:
-            cmd_module.events['activate'].perform(variables=[])
+            action = cmd_module.events['activate']
+            perform.perform_action_from_event(action, namespace)
 
 def load_command_json():
     json_module_dicts = {}
