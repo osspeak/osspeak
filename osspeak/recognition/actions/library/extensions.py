@@ -12,10 +12,6 @@ def run(path, alias=None):
     save_as = path if alias is None else alias
     imported_modules[save_as] = load_module(runpath)
 
-def send_message(path, msg):
-    runpath = get_runpath(path)
-    imported_modules[path].module.osspeak_queue.put(msg)
-
 def get_runpath(path):
     if path.endswith('.py'):
         path = path[:-3]
@@ -25,9 +21,6 @@ def get_runpath(path):
 def call(path, function, *args):
     module = imported_modules[path]
     getattr(module, function)(*args)
-
-def close(path):
-    imported_modules[path].shutdown_message_queue.put(None)
 
 def load_module(path):
     # prepare to load module from path

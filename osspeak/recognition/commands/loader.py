@@ -2,21 +2,19 @@ from profile import Profiler
 import itertools
 from recognition.actions import library
 import uuid
-import profile
 import os
+import re
 import collections
 import json
 import log
 import recognition.actions.library.state
 from recognition.actions import perform
 import settings
-from interfaces.gui import serializer
 from recognition.actions import variables, perform
 from recognition.commands import commands
 from recognition.rules.converter import SrgsXmlConverter
-from platforms import api
 import xml.etree.ElementTree as ET
-from communication import messages, pubsub, topics
+from communication import pubsub, topics
 
 class CommandModuleCache:
 
@@ -140,7 +138,7 @@ def get_active_modules(command_modules, current_window, current_state):
 
 def is_command_module_active(cmd_module, current_window, current_state):
     title_filter = cmd_module.conditions.get('title')
-    current_window_matches = title_filter is None or title_filter.lower() in current_window.lower() 
+    current_window_matches = title_filter is None or re.search(title_filter, current_window, flags=re.IGNORECASE)
     return current_window_matches and cmd_module.is_state_active(current_state)
 
 def load_command_module_information(command_modules):
