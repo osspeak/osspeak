@@ -81,12 +81,10 @@ def generate_node_ids(rules, named_rule_map):
 
 def fire_activation_events(active_modules, previous_active_modules, namespace):
     previous_names, current_names = set(previous_active_modules), set(active_modules)
-    print('pn', previous_names, current_names)
     for deactivated_name in previous_names - current_names:
         cmd_module = previous_active_modules[deactivated_name]
         if 'deactivate' in cmd_module.events:
             action = cmd_module.events['deactivate']
-            print('act fast!')
             perform.perform_action_from_event(action, namespace)
     for activated_name in current_names - previous_names:
         cmd_module = active_modules[activated_name]
