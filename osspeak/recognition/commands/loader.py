@@ -33,11 +33,11 @@ async def load_modules(cache, current_window, current_state, initialize=False):
     if initialize:
         cache.populate()
         load_command_module_information(cache.command_modules)
-    cache.active_modules = get_active_modules(cache.command_modules, current_window, current_state)
-    namespace = get_namespace(cache.active_modules)
-    fire_activation_events(cache.active_modules, previous_active_modules, namespace)
+    cache.active_command_modules = get_active_modules(cache.command_modules, current_window, current_state)
+    namespace = get_namespace(cache.active_command_modules)
+    fire_activation_events(cache.active_command_modules, previous_active_modules, namespace)
     send_module_information_to_ui(cache.command_modules)
-    grammar_id, grammar_xml = build_grammar(cache.active_modules, cache.map_grammar_to_commands)
+    grammar_id, grammar_xml = build_grammar(cache.active_command_modules, cache.map_grammar_to_commands)
     await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
 
 def build_grammar(active_modules, map_grammar_to_commands):
@@ -81,10 +81,12 @@ def generate_node_ids(rules, named_rule_map):
 
 def fire_activation_events(active_modules, previous_active_modules, namespace):
     previous_names, current_names = set(previous_active_modules), set(active_modules)
+    print('pn', previous_names, current_names)
     for deactivated_name in previous_names - current_names:
         cmd_module = previous_active_modules[deactivated_name]
         if 'deactivate' in cmd_module.events:
             action = cmd_module.events['deactivate']
+            print('act fast!')
             perform.perform_action_from_event(action, namespace)
     for activated_name in current_names - previous_names:
         cmd_module = active_modules[activated_name]
@@ -137,8 +139,8 @@ def get_active_modules(command_modules, current_window, current_state):
     return active_modules
 
 def is_command_module_active(cmd_module, current_window, current_state):
-    title_filter = cmd_module.conditions.get('title')
-    current_window_matches = title_filter is None or re.search(title_filter, current_window, flags=re.IGNORECASE)
+    title_filter = cmd_module.conditions.get('title', '')
+    current_window_matches = re.search(title_filter, current_window, flags=re.IGNORECASE)
     return current_window_matches and cmd_module.is_state_active(current_state)
 
 def load_command_module_information(command_modules):
