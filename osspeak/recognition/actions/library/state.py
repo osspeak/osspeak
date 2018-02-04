@@ -9,7 +9,10 @@ def set(key, val):
 
 def delete(key):
     with _STATE_LOCK:
-        del USER_DEFINED_STATE[key]
+        try:
+            del USER_DEFINED_STATE[key]
+        except KeyError:
+            pass
 
 def get(key, default=None):
     with _STATE_LOCK:
