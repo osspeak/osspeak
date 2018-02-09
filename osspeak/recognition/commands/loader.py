@@ -16,7 +16,7 @@ from recognition.rules.converter import SrgsXmlConverter
 import xml.etree.ElementTree as ET
 from communication import pubsub, topics
 
-class CommandModuleCache:
+class CommandModuleState:
 
     def __init__(self):
         self.map_grammar_to_commands = collections.OrderedDict()
@@ -28,16 +28,16 @@ class CommandModuleCache:
         self.command_module_json = load_command_json()
         self.command_modules = load_command_modules(self.command_module_json)
 
-async def load_modules(cache, current_window, current_state, initialize=False):
-    previous_active_modules = cache.active_command_modules
+async def load_modules(command_module_state, current_window, current_state, initialize=False):
+    previous_active_modules = command_module_state.active_command_modules
     if initialize:
-        cache.populate()
-        load_command_module_information(cache.command_modules)
-    cache.active_command_modules = get_active_modules(cache.command_modules, current_window, current_state)
-    namespace = get_namespace(cache.active_command_modules)
-    fire_activation_events(cache.active_command_modules, previous_active_modules, namespace)
-    send_module_information_to_ui(cache.command_modules)
-    grammar_id, grammar_xml = build_grammar(cache.active_command_modules, cache.map_grammar_to_commands)
+        command_module_state.populate()
+        load_command_module_information(command_module_state.command_modules)
+    command_module_state.active_command_modules = get_active_modules(command_module_state.command_modules, current_window, current_state)
+    namespace = get_namespace(command_module_state.active_command_modules)
+    fire_activation_events(command_module_state.active_command_modules, previous_active_modules, namespace)
+    send_module_information_to_ui(command_module_state.command_modules)
+    grammar_id, grammar_xml = build_grammar(command_module_state.active_command_modules, command_module_state.map_grammar_to_commands)
     await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, ET.tostring(grammar_xml).decode('utf8'), grammar_id)
 
 def build_grammar(active_modules, map_grammar_to_commands):
