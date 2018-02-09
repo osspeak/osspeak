@@ -3,5 +3,3 @@ export interface ServerFetch {
     resolve: any
     reject: any
 }
-
-const x = Date.now()

@@ -20,7 +20,6 @@ ws.onmessage = (ev) => {
         if (!outstandingFetches.has(msg.id)) throw `Missing response id: ${msg.id}`;
         const sf = outstandingFetches.get(msg.id) as ServerFetch;
         outstandingFetches.delete(msg.id);
-        console.log('msg', msg);
         if (msg.ok) sf.resolve(msg.data);
         else sf.reject(msg.data);
     }
@@ -37,10 +36,8 @@ export function wsFetch(resource: string, args: any = [], kwargs: any = {}) {
     const msgString = JSON.stringify({resource, id, args, kwargs});
     const timestamp = Date.now();
     const respPromise = new Promise((resolve, reject) => {
-        console.log('1', outstandingFetches.has(id))
         const sf: ServerFetch = {timestamp, resolve, reject};
         outstandingFetches.set(id, sf);
-        console.log('2', outstandingFetches.has(id))
     });
     ws.send(msgString);
     return respPromise;

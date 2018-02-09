@@ -1,7 +1,7 @@
 module.exports = {
     target: 'electron-main',
     entry: {
-        app: "./src/renderer/app.tsx",
+        app: "./src/index.tsx",
         preload: "./src/preload.ts"
     },
     output: {
