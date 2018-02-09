@@ -6,18 +6,12 @@ declare var window: any;
 // export const connected = observable(false);
 // const wsUrl = `ws://${window.commandLineArgs.address}/ws`;
 const wsUrl = `ws://localhost:3922`;
-console.log(wsUrl)
 export const ws = new WebSocket(wsUrl);
 // const serverMessageQueue: string[] = [];
 const outstandingFetches = new Map<string, ServerFetch>();
 
 ws.onopen = () => {
-    console.log('p')
-//     // connected.set(true);
-//     for (let msg of serverMessageQueue) {
-//         ws.send(msg);
-//         console.log('m', msg);
-//     }
+    wsFetch('hello')
 }
 
 ws.onmessage = (ev) => {
@@ -26,26 +20,29 @@ ws.onmessage = (ev) => {
         if (!outstandingFetches.has(msg.id)) throw `Missing response id: ${msg.id}`;
         const sf = outstandingFetches.get(msg.id) as ServerFetch;
         outstandingFetches.delete(msg.id);
+        console.log('msg', msg);
         if (msg.ok) sf.resolve(msg.data);
         else sf.reject(msg.data);
     }
     else {
-        // serverMessage = msg;
+        //serverMessage;
     }
 }
  
-export function wsFetch(type: string, args: any = [], kwargs: any = {}) {
+export function wsFetch(resource: string, args: any = [], kwargs: any = {}) {
     if (ws.readyState !== WebSocket.OPEN) {
         throw "Websocket connection not open";
     }
     const id = generateUUID();
-    const msgString = JSON.stringify({type, id, args, kwargs});
+    const msgString = JSON.stringify({resource, id, args, kwargs});
     const timestamp = Date.now();
-    ws.send(msgString);
     const respPromise = new Promise((resolve, reject) => {
+        console.log('1', outstandingFetches.has(id))
         const sf: ServerFetch = {timestamp, resolve, reject};
         outstandingFetches.set(id, sf);
+        console.log('2', outstandingFetches.has(id))
     });
+    ws.send(msgString);
     return respPromise;
 }
 
