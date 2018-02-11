@@ -1,24 +1,33 @@
 import json
 import inspect
+from recognition.commands import resources as command_resources
 
-def hello(*a, **kw):
-    return 'hello'
 resources = {
-    'hello': hello
+    'command modules': command_resources.command_modules
 }
 
 
 ws = None
 
 async def gui_websocket_handler(websocket, path):
-    print(websocket)
     while True:
         msg_string = await websocket.recv()
-        msg = json.loads(msg_string)
-        resource_function = resources[msg['resource']]
-        data = resource_function(*msg['args'], **msg['kwargs'])
-        if inspect.iscoroutinefunction(resource_function):
-            data = await data
+        ok = True
+        try:
+            msg = json.loads(msg_string)
+        except json.JSONDecodeError:
+            ok = False
+            data = f'Unable to decode JSON: {msg_string}'
+        else:
+            try:
+                resource_function = resources[msg['resource']]
+                data = resource_function(*msg['args'], **msg['kwargs'])
+                if inspect.iscoroutinefunction(resource_function):
+                    data = await data
+            except Exception as e:
+                print('resource error')
+                ok = False
+                data = str(e)
         response = json.dumps({
             'id': msg['id'],
             'data': data,

@@ -11,7 +11,11 @@ export const ws = new WebSocket(wsUrl);
 const outstandingFetches = new Map<string, ServerFetch>();
 
 ws.onopen = () => {
-    wsFetch('hello')
+    (async() => {
+        console.log('gay')
+        const resp = await wsFetch('command modules')
+        console.log('res', resp)
+    })()
 }
 
 ws.onmessage = (ev) => {

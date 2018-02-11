@@ -13,6 +13,8 @@ import { Treebeard } from 'react-treebeard';
 //     commandModulesStore
 // }
 
+console.log(wsFetch)
+
 const data = {
     name: 'root',
     toggled: true,
