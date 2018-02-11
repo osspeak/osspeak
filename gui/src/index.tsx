@@ -1,7 +1,8 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { wsFetch } from './websocket';
-import {Button} from 'material-ui'
+import { Button } from 'material-ui'
+import { Treebeard } from 'react-treebeard';
 // import "./app.css"
 // import CommandModulesView from '../command-modules/view';
 // import commandModulesStore from '../command-modules/store';
@@ -12,6 +13,59 @@ import {Button} from 'material-ui'
 //     commandModulesStore
 // }
 
+const data = {
+    name: 'root',
+    toggled: true,
+    children: [
+        {
+            name: 'parent',
+            children: [
+                { name: 'child1' },
+                { name: 'child2' }
+            ]
+        },
+        {
+            name: 'loading parent',
+            loading: true,
+            children: []
+        },
+        {
+            name: 'parent',
+            children: [
+                {
+                    name: 'nested parent',
+                    children: [
+                        { name: 'nested child 1' },
+                        { name: 'nested child 2' }
+                    ]
+                }
+            ]
+        }
+    ]
+};
+
+class TreeExample extends React.Component<any, any> {
+    constructor(props: any) {
+        super(props);
+        this.state = {};
+        this.onToggle = this.onToggle.bind(this);
+    }
+    onToggle(node: any, toggled: any) {
+        if (this.state.cursor) { this.state.cursor.active = false; }
+        node.active = true;
+        if (node.children) { node.toggled = toggled; }
+        this.setState({ cursor: node });
+    }
+    render() {
+        return (
+            <Treebeard
+                data={data}
+                onToggle={this.onToggle}
+            />
+        );
+    }
+}
+
 class App extends React.Component<any, {}> {
 
     componentDidMount() {
@@ -21,8 +75,8 @@ class App extends React.Component<any, {}> {
         return (
             <div id="osspeak-application">
                 <Button>foo</Button>
-                yarr
-                </div>
+                <TreeExample />
+            </div>
         );
     }
 }
