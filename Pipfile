@@ -10,6 +10,7 @@ name = "pypi"
 websockets = "*"
 mouse = "*"
 keyboard = "*"
+pywindow = "*"
 
 
 [dev-packages]

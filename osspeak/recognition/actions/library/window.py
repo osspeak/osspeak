@@ -1,18 +1,22 @@
 import os
 import subprocess
+import pywindow
 
-from platforms import api
-
-def focus(title, result_number=None):
-    if not result_number:
-        result_number = 1
-    api.activate_window(title, int(result_number))
+def focus(title, index=None):
+    title = title.lower()
+    index = 1 if index is None else int(index)
+    if index > 0:
+        index -= 1
+    windows = [(w, w.title.lower()) for w in pywindow.all_windows()]
+    windows = [(w, win_title) for w, win_title in windows if title in win_title]
+    windows.sort(key=lambda x: len(x[1]))
+    windows[index][0].focus()
 
 def close():
-    api.close_active_window()
+    pywindow.foreground_window().close()
 
-def maximise_active():
-    api.maximize_active_window()
+def maximize_active():
+    pywindow.foreground_window().maximize()
 
 def start(name):
     os.startfile(name)
@@ -21,7 +25,7 @@ def shell(text):
     subprocess.run(text.split(), shell=True)
 
 def get_active_window_name():
-    return api.get_active_window_name()
+    return pywindow.foreground_window().title
 
 def external():
     pass
