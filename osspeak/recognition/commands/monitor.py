@@ -1,9 +1,9 @@
+import pywindow
 import log
 import asyncio
 from recognition.actions.library.state import state_copy
 from recognition.commands import loader
 from recognition.actions import perform
-from platforms import api
 from communication import topics, pubsub
 from profile import Profiler
 import time
@@ -28,7 +28,7 @@ async def watch_user_system_state(msg_list):
     previous_window, previous_state = None, state_copy()
     initial_load_done = False
     while True:
-        current_window = api.get_active_window_name().lower()
+        current_window = pywindow.foreground_window().title.lower()
         is_different_window = current_window != previous_window
         current_state = state_copy()
         is_different_user_state = previous_state != current_state
