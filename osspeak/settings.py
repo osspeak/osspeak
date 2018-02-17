@@ -20,12 +20,12 @@ DEFAULT_CONFIG = {
     }
 }
 
-def try_load_json_file(path):
+def try_load_json_file(path, default=dict):
     try:
         with open(path) as f:
             return json.load(f)
     except (FileNotFoundError, json.decoder.JSONDecodeError):
-        return {}
+        return default() if callable(default) else default
 
 def save_settings(settings):
     if not os.path.isdir(OSSPEAK_DIRECTORY):
