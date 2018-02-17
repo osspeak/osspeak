@@ -107,7 +107,7 @@ def load_command_json():
     return json_module_objects
 
 def load_json_directory(path, parent_directory_settings):
-    directory_modules = {}
+    command_modules = {}
     directories = []
     local_settings = settings.try_load_json_file(os.path.join(path, '.osspeak.json'))
     directory_settings = {**parent_directory_settings, **local_settings}
@@ -116,13 +116,14 @@ def load_json_directory(path, parent_directory_settings):
             if entry.name.startswith('.'):
                 continue
             if entry.is_file() and entry.name.endswith('.json'):
-                directory_modules[entry.path] = load_command_module_file(entry.path)
+                command_modules[entry.path] = load_command_module_file(entry.path)
+            # read files in this directory first before recursing down
             elif entry.is_dir():
                 directories.append(entry)
         if directory_settings['recurse']:
             for direntry in directories:
-                directory_modules.update(load_json_directory(direntry.path, directory_settings))
-    return directory_modules
+                command_modules.update(load_json_directory(direntry.path, directory_settings))
+    return command_modules
 
 def load_command_module_file(path):
     with open(path) as f:
