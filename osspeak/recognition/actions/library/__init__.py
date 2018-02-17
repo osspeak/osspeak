@@ -1,5 +1,7 @@
-from recognition.actions.library import (mouse, window, keyboard, state, thread,
+from recognition.actions.library import (window, state, thread,
 extensions, general, text, clipboard, osspeak, conditionals, history, fsystem, math)
+from recognition.actions.library import _mouse as mouse
+from recognition.actions.library import _keyboard as keyboard
 
 builtin_functions = globals().copy()
 from platforms import api
