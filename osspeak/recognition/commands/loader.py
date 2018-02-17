@@ -131,7 +131,7 @@ def load_command_module_file(path):
             module_config = json.load(f)
         except json.decoder.JSONDecodeError as e:
             module_config = {'Error': str(e)}
-            log.logger.warning(f"JSON error loading command module '{partial_path}':\n{e}")
+            log.logger.warning(f"JSON error loading command module '{path}':\n{e}")
     return module_config
 
 def load_command_modules(command_module_json):
