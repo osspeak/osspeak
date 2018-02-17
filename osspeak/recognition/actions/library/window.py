@@ -18,6 +18,9 @@ def close():
 def maximize_active():
     pywindow.foreground_window().maximize()
 
+def minimize_active():
+    pywindow.foreground_window().minimize()
+
 def start(name):
     os.startfile(name)
 
