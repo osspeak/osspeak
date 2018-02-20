@@ -8,10 +8,9 @@ def setup_logger():
     import settings
     logging_directory = os.path.join(settings.OSSPEAK_DIRECTORY, 'logs')
     if not os.path.isdir(logging_directory):
-        os.mkdir(logging_directory)
+        os.makedirs(logging_directory)
     logger = logging.getLogger('root')
     logger.setLevel(logging.DEBUG)
-
     # Add the log message handler to the logger
     log_filename = os.path.join(logging_directory, 'log')
     handler = logging.handlers.RotatingFileHandler(
