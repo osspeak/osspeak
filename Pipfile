@@ -17,3 +17,4 @@ pywindow = "*"
 
 requests = "*"
 pyinstaller = "*"
+"pypiwin32" = "*"
