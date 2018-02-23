@@ -17,6 +17,7 @@ class Rule(ASTNode):
         self.name = name
         self.children = []
         self.open = True
+        self.root = GroupingNode()
 
 class WordNode(ASTNode):
 
