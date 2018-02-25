@@ -44,6 +44,7 @@ def perform_action(command, variable_tree, namespace, engine_result):
     # empty variables dict, gets filled based on result
     recognition_context = context.create_recognition_context(engine_result, variable_tree, namespace)
     recognition_queue.put((command.action, recognition_context))
+    
 
 def perform_commands(command_results, command_map):
     log.logger.debug(f'Got commands: {command_results}')

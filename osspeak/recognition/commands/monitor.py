@@ -2,7 +2,7 @@ import pywindow
 import log
 import asyncio
 from recognition.actions.library.state import state_copy
-from recognition.commands import loader
+from recognition.commands import loader, match
 from recognition.actions import perform
 from communication import topics, pubsub
 from profile import Profiler
@@ -13,7 +13,8 @@ command_module_state = loader.CommandModuleState()
 def create_message_subscriptions(msg_list):
     pubsub.subscribe(topics.RELOAD_COMMAND_MODULE_FILES, lambda: set_message(msg_list, topics.RELOAD_COMMAND_MODULE_FILES))
     pubsub.subscribe(topics.RELOAD_GRAMMAR, lambda: set_message(msg_list, topics.RELOAD_GRAMMAR))
-    pubsub.subscribe(topics.PERFORM_COMMANDS, lambda command_results, grammar_id: perform_commands(command_module_state, command_results, grammar_id))
+    pubsub.subscribe(topics.PERFORM_COMMANDS,
+        lambda command_results, grammar_id, words: perform_commands(command_module_state, command_results, grammar_id, words))
 
 def start_watching_user_state():
     msg_list = [None]
@@ -50,10 +51,13 @@ async def watch_user_system_state(msg_list):
 def set_message(msg_list, msg):
     msg_list[0] = msg
 
-def perform_commands(command_module_state, command_results, grammar_id):
+def perform_commands(command_module_state, command_results, grammar_id, words):
     try:
         command_map = command_module_state.map_grammar_to_commands[grammar_id]
     except KeyError:
         log.logger.warning(f'Grammar {grammar_id} no longer exists')
         return
+    # print('see r', words)
+    word_list = [word['Text'] for word in words]
+    x = match.match_recognition(word_list, command_map)
     perform.perform_commands(command_results, command_map)

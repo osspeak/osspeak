@@ -11,11 +11,13 @@ namespace RecognizerIO.Engines
         public string GrammarId;
         public string Type = "recognition";
         public float Confidence;
+        public List<RecognizedWord> Words;
 
-        public ProcessedRecognitionResult(string semantics, float confidence, string grammarId)
+        public ProcessedRecognitionResult(string semantics, List<RecognizedWord> words, float confidence, string grammarId)
         {
             Confidence = confidence;
             GrammarId = grammarId;
+            Words = words;
             string[] splitCmds = semantics.Split(new[] { "-command-" }, StringSplitOptions.None).Skip(1).ToArray();
             foreach(var cmd in splitCmds)
             {
@@ -24,6 +26,16 @@ namespace RecognizerIO.Engines
                 Commands.Add(new CommandRecognition(cmdPieces[0], cmdVars.Take(cmdVars.Length - 0).ToList()));
 
             }
+        }
+    }
+
+    class RecognizedWord
+    {
+        public string Text { get; set; }
+
+        public RecognizedWord(string text)
+        {
+            Text = text;
         }
     }
 

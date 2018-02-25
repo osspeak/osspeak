@@ -66,8 +66,11 @@ namespace RecognizerIO.Engines
         public void HandleRecognition(RecognitionResult srResult)
         {
             if (srResult == null) return;
+            //srResult.Words.ToList()[0].
+            var recognizedWords = srResult.Words.Select(x => new RecognizedWord(x.Text)).ToList();
             var resultText = srResult.Semantics.Value.ToString().Replace("[object Object]", "");
-            var result = new ProcessedRecognitionResult(resultText, srResult.Confidence, srResult.Grammar.Name);
+            
+            var result = new ProcessedRecognitionResult(resultText, recognizedWords, srResult.Confidence, srResult.Grammar.Name);
             string serializedResult = JsonConvert.SerializeObject(result);
             Console.WriteLine(serializedResult);
         }
