@@ -1,4 +1,5 @@
 import json
+import xml.etree.ElementTree as ET
 import asyncio
 import sys
 from settings import settings
@@ -37,11 +38,12 @@ class EngineProcessHandler:
             msg = json.dumps(msg)
         await self.process.send_message(msg)
 
-    async def load_engine_grammar(self, grammar_xml, grammar_id):
+    async def load_engine_grammar(self, grammar):
+        # grammar_context.xml.tostring(grammar_xml).decode('utf8'), grammar_id
         msg = {
             'Type': topics.LOAD_ENGINE_GRAMMAR,
-            'Grammar': grammar_xml,
-            'Id': grammar_id,
+            'Grammar': ET.tostring(grammar.xml).decode('utf8'),
+            'Id': grammar.uuid,
             'StartEngine': self.engine_running
         }
         await self.send_message(msg)

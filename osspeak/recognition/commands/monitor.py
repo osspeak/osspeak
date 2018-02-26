@@ -53,11 +53,11 @@ def set_message(msg_list, msg):
 
 def perform_commands(command_module_state, command_results, grammar_id, words):
     try:
-        command_map = command_module_state.map_grammar_to_commands[grammar_id]
+        grammar_context = command_module_state.grammars[grammar_id]
     except KeyError:
         log.logger.warning(f'Grammar {grammar_id} no longer exists')
         return
     # print('see r', words)
     word_list = [word['Text'] for word in words]
     x = match.match_recognition(word_list, command_map)
-    perform.perform_commands(command_results, command_map)
+    perform.perform_commands(command_results, grammar_context.command_contexts)
