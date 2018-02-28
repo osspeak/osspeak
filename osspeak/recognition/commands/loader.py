@@ -61,7 +61,7 @@ def build_grammar(active_modules):
     grammar_xml = build_grammar_xml(all_rules, node_ids, rules)
     #grammar_id = str(uuid.uuid4())
 #    save_grammar(map_grammar_to_commands, command_contexts, grammar_id)
-    grammar_context = grammar.GrammarContext(grammar_xml, command_contexts)
+    grammar_context = grammar.GrammarContext(grammar_xml, command_contexts, active_commands, namespace)
     return grammar_context
 
 def get_namespace(active_modules):
