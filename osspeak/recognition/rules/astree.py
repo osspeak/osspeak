@@ -54,7 +54,11 @@ class RuleReference(ASTNode):
         ancestors = ancestors or {}
         if self.rule_name != '_dictate':
             new_ancestors = ancestors + [self]
-            rule = rules[self.rule_name]
-            for child in rule.children:
-                yield from child.walk(new_ancestors, rules)
+            try:
+                rule = rules[self.rule_name]
+            except KeyError:
+                pass
+            else:
+                for child in rule.children:
+                    yield from child.walk(new_ancestors, rules)
         yield {'node': self, 'ancestors': tuple(ancestors)}

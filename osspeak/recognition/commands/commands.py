@@ -33,8 +33,11 @@ class CommandModule:
 
     def load_rules(self):
         for rule_name, rule_text in self.config.get('rules', {}):
-            rule = api.rule(rule_text, name=rule_name)
-            self.rules[rule_name] = rule
+            try:
+                rule = api.rule(rule_text, name=rule_name)
+                self.rules[rule_name] = rule
+            except RuntimeError as e:
+                print(f'Error loading rule "{rule_name}": {e}')
 
     def define_functions(self):
         for func_signature, func_text in self.config.get('functions', {}):
