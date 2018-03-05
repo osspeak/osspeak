@@ -22,8 +22,7 @@ def press(keys):
     keyboard.press(add_keyboard_shortcuts(keys))
 
 def release(keys):
-    keyboard.release(add_keyboard_shortcuts(skeys))
-    keyboard.release(add_keyboard_shortcuts(skeys))
+    keyboard.release(add_keyboard_shortcuts(keys))
 
 def press_and_release(keys):
     send_input('{' + '+'.join(keys) + '}')
