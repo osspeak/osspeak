@@ -12,7 +12,6 @@ const outstandingFetches = new Map<string, ServerFetch>();
 
 ws.onopen = () => {
     (async() => {
-        console.log('gay')
         const resp = await wsFetch('command modules')
         console.log('res', resp)
     })()

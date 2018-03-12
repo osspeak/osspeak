@@ -2,3 +2,4 @@ build/
 dist/
 gui/node_modules/
 osspeak.spec
+.vscode/

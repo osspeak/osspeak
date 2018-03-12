@@ -1,7 +1,8 @@
 from recognition.rules import astree
 from common import binheap
 import heapq
-from typing import List
+from typing import List, Tuple
+import itertools
 
 class RuleTextMatch:
 
@@ -26,14 +27,15 @@ class MatchCollection:
 
 
 def match_recognition(words, grammar_context):
-    print(words, grammar_context.command_rules)
+    # print(words, grammar_context.command_rules)
     rules = grammar_context.command_rules
+    # print()
     seen = {}
-    match = match_rules(rules, words, 0, seen)
+    match = match_rules(grammar_context, words, 0, seen)
 
-def match_rules(rules, words, start, seen):
-    for rule in rules:
-        rule_match = match_rule_node(rule, words, start)
+def match_rules(grammar_context, words, start, seen):
+    for rule in grammar_context.command_rules:
+        rule_match = match_rule_node(rule, words, start, grammar_context.named_rules)
         if rule_match is None:
             continue
         match_key = ()
@@ -41,8 +43,14 @@ def match_rules(rules, words, start, seen):
         pass
         
 
-def match_rule_node(node: astree.ASTNode, words, start) -> MatchCollection:
+def match_rule_node(node: astree.ASTNode, words, start, named_rules) -> MatchCollection:
     return match_grouping_node(node.root, words, start)
+
+def match_sequence(sequence: Tuple[astree.ASTNode], words, word_index, seq_index) -> MatchCollection:
+    match = MatchCollection()
+    for node in itertools.islice(sequence, seq_index, None):
+        node.a
+    return match
 
 def match_grouping_node(node: astree.ASTNode, words, start) -> MatchCollection:
     pass

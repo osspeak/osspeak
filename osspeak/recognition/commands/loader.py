@@ -49,19 +49,19 @@ async def load_modules(command_module_state, current_window, current_state, init
     await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, grammar_context)
 
 def build_grammar(active_modules):
-    rules, command_rules = get_active_rules(active_modules)
-    all_rules = list(rules.values()) + command_rules
-    node_ids = generate_node_ids(all_rules, rules)
+    named_rules, command_rules = get_active_rules(active_modules)
+    all_rules = list(named_rules.values()) + command_rules
+    node_ids = generate_node_ids(all_rules, named_rules)
     active_commands = get_active_commands(active_modules)
     namespace = get_namespace(active_modules)
     command_contexts = {}
     for cmd in active_commands:
-        variable_tree = variables.RecognitionResultsTree(cmd.rule, node_ids, rules)
+        variable_tree = variables.RecognitionResultsTree(cmd.rule, node_ids, named_rules)
         command_contexts[node_ids[cmd.rule]] = {'command': cmd, 'variable_tree': variable_tree, 'namespace': namespace}
-    grammar_xml = build_grammar_xml(all_rules, node_ids, rules)
+    grammar_xml = build_grammar_xml(all_rules, node_ids, named_rules)
     #grammar_id = str(uuid.uuid4())
 #    save_grammar(map_grammar_to_commands, command_contexts, grammar_id)
-    grammar_context = grammar.GrammarContext(grammar_xml, command_contexts, active_commands, namespace)
+    grammar_context = grammar.GrammarContext(grammar_xml, command_contexts, active_commands, namespace, named_rules)
     return grammar_context
 
 def get_namespace(active_modules):
