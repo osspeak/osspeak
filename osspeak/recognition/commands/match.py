@@ -41,10 +41,9 @@ def match_rules(grammar_context, words, start, seen):
         match_key = ()
     else:
         pass
-        
 
 def match_rule_node(node: astree.ASTNode, words, start, named_rules) -> MatchCollection:
-    return match_grouping_node(node.root, words, start)
+    return match_grouping_node(node.root, words, start, named_rules)
 
 def match_sequence(sequence: Tuple[astree.ASTNode], words, word_index, seq_index) -> MatchCollection:
     match = MatchCollection()
@@ -52,8 +51,9 @@ def match_sequence(sequence: Tuple[astree.ASTNode], words, word_index, seq_index
         node.a
     return match
 
-def match_grouping_node(node: astree.ASTNode, words, start) -> MatchCollection:
-    pass
+def match_grouping_node(node: astree.GroupingNode, words, start, named_rules) -> MatchCollection:
+    for seq in node.sequences:
+        print(seq)
 
 def match_word_node(node, words, start):
     pass

@@ -45,6 +45,8 @@ class RuleParser:
         self.add_to_next_grouping(astree.WordNode(tok.text))
 
     def parse_or_token(self, tok):
+        self.top.sequences.append([])
+        
         self.add_to_next_grouping(astree.OrNode())
 
     def parse_named_rule_token(self, tok):
@@ -108,6 +110,15 @@ class RuleParser:
     def add_to_next_grouping(self, node):
         self.pop_top_grouping_if_closed()
         self.top.children.append(node)
+        # remove try/catch when only GroupingNode in grouping stack
+        try:
+            top_sequences = self.top.sequences
+            if not top_sequences:
+                top_sequences.append([])
+            top_sequences[-1].append(node)
+        except AttributeError:
+            assert isinstance(self.top, astree.Rule)
+
 
     def croak(self, message):
         raise RuntimeError(message)
