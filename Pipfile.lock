@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "728552b32cb99c278d17c9169b5025d2d6c86cfbb3f3dfa276ff17d13aaf45c2"
+            "sha256": "4f54baa3245b53f544cd4439824b3c0d2755508401ce65156a30e195d850935c"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -42,12 +42,25 @@
             ],
             "version": "==0.7.0"
         },
+        "parsimonious": {
+            "hashes": [
+                "sha256:ae0869d72a6e57703f24313a5f5748e73ebff836e6fe8b3ddf34ea0dc00d086b"
+            ],
+            "version": "==0.8.0"
+        },
         "pywindow": {
             "hashes": [
                 "sha256:ba5890222d526c793470a40cefbf21dc99541681ae56a5d30b4134085320f0f1",
                 "sha256:1f0e4ceddd39aca48cb57a3438fe851adf53a3af67966b43eaca2ab346978ccc"
             ],
             "version": "==0.0.3"
+        },
+        "six": {
+            "hashes": [
+                "sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb",
+                "sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9"
+            ],
+            "version": "==1.11.0"
         },
         "websockets": {
             "hashes": [

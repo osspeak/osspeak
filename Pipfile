@@ -11,6 +11,7 @@ websockets = "*"
 mouse = "*"
 keyboard = "*"
 pywindow = "*"
+parsimonious = "*"
 
 
 [dev-packages]
