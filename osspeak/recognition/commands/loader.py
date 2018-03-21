@@ -81,8 +81,7 @@ def generate_node_ids(rules, named_rule_map):
     prefix_map = {astree.GroupingNode: 'g', astree.Rule: 'r', astree.WordNode: 'w'}
     node_ids = {}
     for rule in rules:
-        for node_info in rule.walk(rules=named_rule_map):
-            node = node_info['node']
+        for node in rule.walk(rules=named_rule_map):
             if node not in node_ids:
                 prefix = prefix_map.get(type(node), 'n')
                 node_ids[node] = f'{prefix}{len(node_ids) + 1}'

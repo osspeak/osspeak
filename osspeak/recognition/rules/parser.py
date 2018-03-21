@@ -33,12 +33,12 @@ class RuleParser:
 
     def parse_as_rule(self, name=None):
         top_level_rule = astree.Rule(name=name)
-        self.grouping_stack = [top_level_rule]
+        self.grouping_stack = [top_level_rule.root]
         for tok in self.lexer:
             self.token_list.append(tok)
             self.parse_map[type(tok)](tok)
-        valid_last_grouping = len(self.grouping_stack) == 1 or len(self.grouping_stack) == 2 and not self.grouping_stack[-1].open
-        assert self.grouping_stack[0] is top_level_rule and valid_last_grouping
+        # valid_last_grouping = len(self.grouping_stack) == 1 or len(self.grouping_stack) == 2 and not self.grouping_stack[-1].open
+        # assert self.grouping_stack[0] is top_level_rule and valid_last_grouping
         return top_level_rule
 
     def parse_word_token(self, tok):
@@ -46,8 +46,6 @@ class RuleParser:
 
     def parse_or_token(self, tok):
         self.top.sequences.append([])
-        
-        self.add_to_next_grouping(astree.OrNode())
 
     def parse_named_rule_token(self, tok):
         self.add_to_next_grouping(astree.RuleReference(tok.name))
@@ -96,8 +94,8 @@ class RuleParser:
     def modifiable_node(self):
         if not self.top.open:
             return self.top
-        if self.top.children:
-            return self.top.children[-1]
+        if self.top.sequences and self.top.sequences[-1]:
+            return self.top.sequences[-1][-1]
         self.croak('No modifiable rule node exists')
 
     def apply_repetition(self, node, low, high):

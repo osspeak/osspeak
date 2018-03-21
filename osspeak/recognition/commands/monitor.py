@@ -59,5 +59,6 @@ def perform_commands(command_module_state, command_results, grammar_id, words):
         return
     # print('see r', words)
     word_list = [word['Text'] for word in words]
-    x = match.match_recognition(word_list, grammar_context)
-    perform.perform_commands(command_results, grammar_context.command_contexts)
+    print(word_list)
+    # x = match.match_recognition(word_list, grammar_context)
+    # perform.perform_commands(command_results, grammar_context.command_contexts)

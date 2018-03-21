@@ -64,27 +64,24 @@ class SrgsXmlConverter:
         rule = ET.Element('rule', attrib={'id': self.node_ids[rule_node]})
         choices = ET.Element('one-of')
         rule.append(choices)
-        self.fill_choices(rule_node, choices)
+        self.fill_choices(rule_node.root, choices)
         return rule
 
     def fill_choices(self, node, choices):
-        choices.append(ET.Element('item'))
-        for child in node.children:
-            if isinstance(child, astree.OrNode):
-                choices.append(ET.Element('item'))
-            elif isinstance(child, astree.WordNode):
-                if child.action_substitute is not None:
-                    self.add_substitute_word(child, choices)
+        for seq in node.sequences:
+            choices.append(ET.Element('item'))
+            for child in seq:
+                if isinstance(child, astree.WordNode):
+                    if child.action_substitute is not None:
+                        self.add_substitute_word(child, choices)
+                    else:
+                        self.add_text_to_item_elem(choices[-1], child, node)
+                elif isinstance(child, astree.GroupingNode):
+                    self.add_grouping(child, choices)
+                elif isinstance(child, astree.RuleReference):
+                    self.add_rule_reference(child, choices)
                 else:
-                    self.add_text_to_item_elem(choices[-1], child, node)
-            elif isinstance(child, astree.GroupingNode):
-                self.add_grouping(child, choices)
-            elif isinstance(child, astree.Rule):
-                self.add_rule(child, choices)
-            elif isinstance(child, astree.RuleReference):
-                self.add_rule_reference(child, choices)
-            else:
-                raise TypeError(f'Unable to serialize element {child}')
+                    raise TypeError(f'Unable to serialize element {child}')
 
     def add_rule_reference(self, ruleref_node, choices):
         if ruleref_node.rule_name == '_dictate':
@@ -99,20 +96,6 @@ class SrgsXmlConverter:
         base_rule = self.named_rule_map[ruleref_node.rule_name]
         rritem = self.get_ruleref_item(self.node_ids[base_rule], outid=self.node_ids[ruleref_node], text=None,
                 low=ruleref_node.repeat_low, high=ruleref_node.repeat_high)
-        choices[-1].append(rritem)
-
-    def add_rule(self, rule_node, choices):
-        if rule_node.name == '_dictate':
-            # '<ruleref uri="grammar:dictation" type="application/srgs+xml"/><tag>out.SpokenText=rules.latest();</tag>'
-            ruleref = ET.Element('ruleref', attrib={'uri': 'grammar:dictation', 'type': 'application/srgs+xml'})
-            choices[-1].append(ruleref)
-            tag = ET.Element('tag')
-            tag.text = f'out += "dictation-{self.node_ids[rule_node]}=" + rules.latest(); + "|"'
-            choices[-1].append(tag)
-            return
-        # all rule nodes here should be copies that refer to base rule
-        rritem = self.get_ruleref_item(self.node_ids[rule_node.base_rule], outid=self.node_ids[rule_node], text=None,
-                low=rule_node.repeat_low, high=rule_node.repeat_high)
         choices[-1].append(rritem)
         
     def add_grouping(self, child, choices):

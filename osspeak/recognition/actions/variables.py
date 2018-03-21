@@ -8,7 +8,7 @@ class RecognitionResultsTree:
         self.root_rule_node = root_rule_node
         self.node_ids = node_ids
         self.named_rule_map = named_rule_map
-        self.initialize_fields()
+        # self.initialize_fields()
 
     def walk_tree(self):
         for node_info in self.root_rule_node.walk(rules=self.named_rule_map):

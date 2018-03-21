@@ -16,6 +16,6 @@ class GrammarContext:
 
         self.command_rules = [cmd.rule for cmd in active_commands]
         self.rule_to_command_map = {c.rule: c for c in active_commands}
-        self.parsimonious_grammar = _parsimonious.create_parsimonious_grammar(
+        self.parsimonious_grammar = _parsimonious.create_lark_grammar(
             self.command_rules, self.named_rules, self.node_ids)
 

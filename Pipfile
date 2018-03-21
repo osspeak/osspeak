@@ -12,6 +12,7 @@ mouse = "*"
 keyboard = "*"
 pywindow = "*"
 parsimonious = "*"
+lark-parser = "*"
 
 
 [dev-packages]
