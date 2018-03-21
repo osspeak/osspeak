@@ -10,7 +10,6 @@ class Rule(ASTNode):
 
     def __init__(self, name=None):
         self.name = name
-        self.children = []
         self.open = True
         self.root = GroupingNode()
 
@@ -36,7 +35,6 @@ class OrNode(ASTNode):
 class GroupingNode(ASTNode):
 
     def __init__(self):
-        self.children = []
         self.open = True
         self.repeat_low = 1
         self.repeat_high = 1
