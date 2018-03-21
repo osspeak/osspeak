@@ -28,7 +28,3 @@ class RuleAstEncoder(json.JSONEncoder):
             'type': 'word',
             'text': node.text
         }
-    def encode_OrNode(self, node):
-        return {
-            'type': 'or'
-        }

@@ -29,9 +29,6 @@ class WordNode(ASTNode):
     def is_single(self):
         return self.repeat_low == 1 and self.repeat_high == 1
 
-class OrNode(ASTNode):
-    pass
-
 class GroupingNode(ASTNode):
 
     def __init__(self):

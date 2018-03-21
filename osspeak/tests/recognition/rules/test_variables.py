@@ -1,7 +1,7 @@
 import unittest
 
 from recognition.rules import converter, parser, lexer, tokens
-from recognition.rules.astree import GroupingNode, OrNode, WordNode 
+from recognition.rules.astree import GroupingNode, WordNode 
 from recognition import api
 from tests.recognition.rules import strings
 
