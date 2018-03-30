@@ -49,8 +49,7 @@ def perform_commands(grammar_context, words):
     for matched_rule in lark_recognition_tree.children:
         words = []
         rule_id = matched_rule.data
-        command_context = grammar_context.command_contexts[rule_id]
-        variable_tree = command_context['variable_tree']
+        command, variable_tree = grammar_context.command_contexts[rule_id]
         match_variables  = collections.OrderedDict({path: [] for path in variable_tree.variables})
         substitute_paths = set()
         for start_path, text in _lark.yield_paths(matched_rule, variable_tree.node_paths):
@@ -69,7 +68,6 @@ def perform_commands(grammar_context, words):
                 path = path[:-1]
             if is_substitute:
                 substitute_paths.add(start_path)
-        command = command_context['command']
         variables = tuple(match_variables.values())
         action_result = perform_action(command, variables, grammar_context.namespace, tuple(words))
 

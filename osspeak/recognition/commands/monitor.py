@@ -2,7 +2,7 @@ import pywindow
 import log
 import asyncio
 from recognition.actions.library.state import state_copy
-from recognition.commands import loader, match
+from recognition.commands import loader
 from recognition.actions import perform
 from communication import topics, pubsub
 from profile import Profiler

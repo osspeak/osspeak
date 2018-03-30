@@ -2,11 +2,11 @@ import os
 import unittest
 
 from recognition.commands import match, loader
-from recognition.rules import _parsimonious
+from recognition.rules import _lark
 from recognition import api
 from tests.recognition.actions import strings
 
-class TestParsimonious(unittest.TestCase):
+class TextLark(unittest.TestCase):
 
     def grammar_list(self, command_rules=None, named_rules=None):
         command_rules = [api.rule(text) for text in command_rules] if command_rules else []
@@ -14,7 +14,7 @@ class TestParsimonious(unittest.TestCase):
         named_rules = {r.name: r for r in named_rules}
         all_rules = list(named_rules.values()) + command_rules
         node_ids = loader.generate_node_ids(all_rules, named_rules)
-        return _parsimonious.create_lark_grammar_list(command_rules, named_rules, node_ids)
+        return _lark.create_lark_grammar_list(command_rules, named_rules, node_ids)
 
     def test_count_repetition(self):
         command_rules = [

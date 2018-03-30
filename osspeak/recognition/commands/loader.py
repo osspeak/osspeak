@@ -58,10 +58,8 @@ def build_grammar(active_modules):
     command_contexts = {}
     for cmd in active_commands:
         variable_tree = variables.RecognitionResultsTree(cmd.rule, node_ids, named_rules)
-        command_contexts[node_ids[cmd.rule]] = {'command': cmd, 'variable_tree': variable_tree, 'namespace': namespace}
+        command_contexts[node_ids[cmd.rule]] = cmd, variable_tree
     grammar_xml = build_grammar_xml(all_rules, node_ids, named_rules)
-    #grammar_id = str(uuid.uuid4())
-#    save_grammar(map_grammar_to_commands, command_contexts, grammar_id)
     grammar_context = grammar.GrammarContext(grammar_xml, command_contexts, active_commands, namespace, named_rules, node_ids)
     return grammar_context
 
