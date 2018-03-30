@@ -63,7 +63,7 @@ class SrgsXmlConverter:
         self.fill_choices(rule_node.root, choices)
         return rule
 
-    def fill_choices(self, node, choices):
+    def fill_choices(self, node: astree.GroupingNode, choices):
         for seq in node.sequences:
             choices.append(ET.Element('item'))
             for child in seq:
@@ -91,7 +91,7 @@ class SrgsXmlConverter:
                 low=ruleref_node.repeat_low, high=ruleref_node.repeat_high)
         choices[-1].append(rritem)
         
-    def add_grouping(self, child, choices):
+    def add_grouping(self, child: astree.GroupingNode, choices):
         rule = ET.Element('rule', attrib={'id': self.node_ids[child]})
         self.root.append(rule)
         child_choices = ET.Element('one-of')
@@ -111,16 +111,12 @@ class SrgsXmlConverter:
 
     def add_text_to_item_elem(self, parent_elem, word_node, parent_node):
         assert self.get_repeat_vals(parent_elem) == (1, 1)
-        text = word_node.text
         if (not parent_elem or parent_elem[-1].tag != 'item' or
         (parent_elem[-1] and parent_elem[-1].find('ruleref') is not None) or
         not word_node.is_single):
             parent_elem.append(ET.Element('item'))
         self.apply_repeat_attrib(parent_elem[-1], word_node.repeat_low, word_node.repeat_high)
-        self.append_text(parent_elem[-1], text)
-
-    def is_not_named_rule(self, node):
-        return not isinstance(node, astree.Rule) or node.name is None
+        self.append_text(parent_elem[-1], word_node.text)
 
     def apply_repeat_attrib(self, elem, low, high):
         elem.attrib.pop('repeat', None)
