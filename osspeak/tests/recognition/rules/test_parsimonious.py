@@ -12,16 +12,13 @@ class TestParsimonious(unittest.TestCase):
         command_rules = [api.rule(text) for text in command_rules] if command_rules else []
         named_rules = [api.rule(rule_text, name) for name, rule_text in named_rules.items()] if named_rules else []
         named_rules = {r.name: r for r in named_rules}
-        print('wtf', named_rules)
         all_rules = list(named_rules.values()) + command_rules
         node_ids = loader.generate_node_ids(all_rules, named_rules)
-
-        print(node_ids)
         return _parsimonious.create_lark_grammar_list(command_rules, named_rules, node_ids)
 
     def test_count_repetition(self):
         command_rules = [
-            '(<hello> | goodbye universe)_2-4'
+            'go (left={left} | <hello>={right} | up)'
         ]
         named_rules = {'hello': 'hello world'}
         grammar_list = self.grammar_list(command_rules, named_rules)

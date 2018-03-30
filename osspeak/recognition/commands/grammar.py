@@ -1,7 +1,7 @@
 import uuid
 from typing import List, Dict
 from parsimonious.grammar import Grammar
-from recognition.rules import astree, _parsimonious
+from recognition.rules import astree, _lark
 
 class GrammarContext:
     
@@ -16,6 +16,5 @@ class GrammarContext:
 
         self.command_rules = [cmd.rule for cmd in active_commands]
         self.rule_to_command_map = {c.rule: c for c in active_commands}
-        self.parsimonious_grammar = _parsimonious.create_lark_grammar(
+        self.lark_grammar = _lark.create_lark_grammar(
             self.command_rules, self.named_rules, self.node_ids)
-

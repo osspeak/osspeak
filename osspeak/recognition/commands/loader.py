@@ -14,6 +14,7 @@ import settings
 from recognition.actions import variables, perform
 from recognition.commands import commands, grammar
 from recognition.rules.converter import SrgsXmlConverter
+from recognition.rules import astree
 import xml.etree.ElementTree as ET
 from communication import pubsub, topics
 
@@ -83,8 +84,11 @@ def generate_node_ids(rules, named_rule_map):
     for rule in rules:
         for node in rule.walk(rules=named_rule_map):
             if node not in node_ids:
-                prefix = prefix_map.get(type(node), 'n')
-                node_ids[node] = f'{prefix}{len(node_ids) + 1}'
+                if isinstance(node, astree.Rule) and node.name is not None:
+                    node_ids[node] = f'rule_{node.name}'
+                else:
+                    prefix = prefix_map.get(type(node), 'n')
+                    node_ids[node] = f'{prefix}{len(node_ids) + 1}'
     return node_ids
 
 def fire_activation_events(active_modules, previous_active_modules, namespace):
@@ -190,11 +194,15 @@ def build_grammar_xml(all_active_rules, node_ids, named_rule_map):
 
 def get_active_rules(active_modules):
     rules = {}
+    rules.update(special_rules())
     command_rules = []
     for cmd_module in active_modules.values():
         rules.update(cmd_module.rules)
         command_rules.extend(cmd.rule for cmd in cmd_module.commands)
     return rules, command_rules
+
+def special_rules():
+    return {'_dictate': astree.Rule(name='_dictate')}
 
 def get_active_commands(active_modules):
     grouped_commands = [m.commands for m in active_modules.values()]

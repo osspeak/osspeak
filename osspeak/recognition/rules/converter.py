@@ -23,7 +23,8 @@ class SrgsXmlConverter:
         self.root.append(self.build_root_rule())
         top_level_choices = self.build_top_level_choices()
         for rule_node in rules:
-            self.append_rule_node(rule_node, top_level_choices)
+            if rule_node.name is None or not rule_node.name.startswith('_'):
+                self.append_rule_node(rule_node, top_level_choices)
         return self.root
 
     def append_rule_node(self, rule_node, top_level_choices):

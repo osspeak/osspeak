@@ -28,11 +28,11 @@ class RuleLexer:
         '''
         assert text
         if '-' not in text:
-            low, high = text, text
+            low, high = int(text), int(text)
         else:
             low, high = text.split('-')
-            low = low or 0
-            high = high or None
+            low = int(low) if low else 0
+            high = int(high) if high else None
         return tokens.RepetitionToken(low=low, high=high)
 
     def read_next_token(self, pos):

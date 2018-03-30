@@ -57,8 +57,4 @@ def perform_commands(command_module_state, command_results, grammar_id, words):
     except KeyError:
         log.logger.warning(f'Grammar {grammar_id} no longer exists')
         return
-    # print('see r', words)
-    word_list = [word['Text'] for word in words]
-    print(word_list)
-    # x = match.match_recognition(word_list, grammar_context)
-    # perform.perform_commands(command_results, grammar_context.command_contexts)
+    perform.perform_commands(grammar_context, words)
