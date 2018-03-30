@@ -14,7 +14,7 @@ def create_message_subscriptions(msg_list):
     pubsub.subscribe(topics.RELOAD_COMMAND_MODULE_FILES, lambda: set_message(msg_list, topics.RELOAD_COMMAND_MODULE_FILES))
     pubsub.subscribe(topics.RELOAD_GRAMMAR, lambda: set_message(msg_list, topics.RELOAD_GRAMMAR))
     pubsub.subscribe(topics.PERFORM_COMMANDS,
-        lambda command_results, grammar_id, words: perform_commands(command_module_state, command_results, grammar_id, words))
+        lambda grammar_id, words: perform_commands(command_module_state, grammar_id, words))
 
 def start_watching_user_state():
     msg_list = [None]
@@ -51,7 +51,7 @@ async def watch_user_system_state(msg_list):
 def set_message(msg_list, msg):
     msg_list[0] = msg
 
-def perform_commands(command_module_state, command_results, grammar_id, words):
+def perform_commands(command_module_state, grammar_id, words):
     try:
         grammar_context = command_module_state.grammars[grammar_id]
     except KeyError:

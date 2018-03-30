@@ -57,7 +57,7 @@ class EngineProcessHandler:
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition':
             if msg['Confidence'] > settings['engine']['recognitionConfidence']:
-                pubsub.publish(topics.PERFORM_COMMANDS, msg['Commands'], msg['GrammarId'], msg['Words'])
+                pubsub.publish(topics.PERFORM_COMMANDS, msg['GrammarId'], msg['Words'])
         elif msg['Type'] == messages.SET_ENGINE_STATUS:
             messages.dispatch(messages.SET_ENGINE_STATUS, msg)
         elif msg['Type'] == 'error':

@@ -31,13 +31,12 @@ class SrgsXmlConverter:
         rule = self.convert_rule_element(rule_node)
         self.root.append(rule)
         if rule_node.name is None:
-            tag_text = f'out += "-command-{self.node_ids[rule_node]}:" + rules.latest();'
-            top_level_choices.append(self.get_ruleref_item(self.node_ids[rule_node], text=tag_text))
+            top_level_choices.append(self.get_ruleref_item(self.node_ids[rule_node]))
 
     def build_root_rule(self):
         root_rule = ET.Element('rule', attrib={'id': self.grammar_attrib['root']})
         item = ET.Element('item')
-        item.append(self.get_ruleref_item(self.ruleref_container_id, text='out += rules.latest();'))
+        item.append(self.get_ruleref_item(self.ruleref_container_id))
         root_rule.append(item)
         return root_rule
 
@@ -50,15 +49,11 @@ class SrgsXmlConverter:
         ruleref_container.append(repeat_item)
         return top_level_choices
     
-    def get_ruleref_item(self, ruleid, outid=None, text=None, low=1, high=1):
-        outid = ruleid if outid is None else outid
+    def get_ruleref_item(self, ruleid, low=1, high=1):
         ruleref_item = ET.Element('item')
         ruleref = ET.Element('ruleref', attrib={'uri': f'#{ruleid}'})
         self.apply_repeat_attrib(ruleref_item, low, high)
         ruleref_item.append(ruleref)
-        tag = ET.Element('tag')
-        tag.text = f'out += "{outid}=|" + rules.latest();' if text is None else text
-        ruleref_item.append(tag)
         return ruleref_item
 
     def convert_rule_element(self, rule_node):
@@ -89,13 +84,10 @@ class SrgsXmlConverter:
             # '<ruleref uri="grammar:dictation" type="application/srgs+xml"/><tag>out.SpokenText=rules.latest();</tag>'
             ruleref = ET.Element('ruleref', attrib={'uri': 'grammar:dictation', 'type': 'application/srgs+xml'})
             choices[-1].append(ruleref)
-            tag = ET.Element('tag')
-            tag.text = f'out += "dictation-{self.node_ids[ruleref_node]}=" + rules.latest(); + "|"'
-            choices[-1].append(tag)
             return
         # all rule nodes here should be copies that refer to base rule
         base_rule = self.named_rule_map[ruleref_node.rule_name]
-        rritem = self.get_ruleref_item(self.node_ids[base_rule], outid=self.node_ids[ruleref_node], text=None,
+        rritem = self.get_ruleref_item(self.node_ids[base_rule],
                 low=ruleref_node.repeat_low, high=ruleref_node.repeat_high)
         choices[-1].append(rritem)
         
@@ -114,8 +106,7 @@ class SrgsXmlConverter:
         word_item = ET.Element('item')
         word_item.text = child.text
         rule.append(word_item)
-        text = f'out += "{self.node_ids[child]}=" + rules.latest() + "|";'
-        rritem = self.get_ruleref_item(self.node_ids[child], text=text)
+        rritem = self.get_ruleref_item(self.node_ids[child])
         choices[-1].append(rritem)
 
     def add_text_to_item_elem(self, parent_elem, word_node, parent_node):
@@ -125,14 +116,8 @@ class SrgsXmlConverter:
         (parent_elem[-1] and parent_elem[-1].find('ruleref') is not None) or
         not word_node.is_single):
             parent_elem.append(ET.Element('item'))
-            if self.is_not_named_rule(parent_node):
-                parent_elem[-1].append(ET.Element('tag'))
         self.apply_repeat_attrib(parent_elem[-1], word_node.repeat_low, word_node.repeat_high)
         self.append_text(parent_elem[-1], text)
-        if self.is_not_named_rule(parent_node):
-            text_tag = parent_elem[-1].find('tag')
-            # text_tag.text = f'out += "literal-{parent_node.id}={parent_elem[-1].text}|";'
-            text_tag.text = f'out += "{self.node_ids[word_node]}={parent_elem[-1].text}|";'
 
     def is_not_named_rule(self, node):
         return not isinstance(node, astree.Rule) or node.name is None
