@@ -66,15 +66,7 @@ def create_lark_grammar(command_rules, named_rules, node_ids):
     rule_lines.append('%ignore " "')
     rule_lines.append(f'start: ({rule_names})+')
     text = '\n'.join(rule_lines)
-    # import time
-    # time.sleep(3)
-    # print('\n')
-    # print(text)
-    # print('start')
-    # s = time.time()
     gram = Lark(text, start='start')
-    # e = time.time()
-    # print(e - s)
     return gram
 
 def create_lark_grammar_list(command_rules: List, named_rules, node_ids):
