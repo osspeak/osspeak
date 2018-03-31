@@ -15,6 +15,7 @@ DEFAULT_CONFIG = {
     'command_directory': os.path.join(OSSPEAK_DIRECTORY, 'commands'),
     'external_directory': os.path.join(OSSPEAK_DIRECTORY, 'external'),
     'gui_port': 3922,
+    'perform_actions': True,
     'engine': {
         'recognitionConfidence': .9
     }

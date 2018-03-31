@@ -68,8 +68,9 @@ def perform_commands(grammar_context, words):
                 path = path[:-1]
             if is_substitute:
                 substitute_paths.add(start_path)
-        variables = tuple(match_variables.values())
-        action_result = perform_action(command, variables, grammar_context.namespace, tuple(words))
+            variables = tuple(match_variables.values())
+        if settings['perform_actions']:
+            action_result = perform_action(command, variables, grammar_context.namespace, tuple(words))
 
 def get_leaf_action(node, text):
     from recognition import action
