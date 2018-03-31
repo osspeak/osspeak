@@ -6,9 +6,9 @@ import json
 from recognition.actions.library import state, history
 from recognition.actions import variables
 from recognition.actions.function import Function
-from recognition import api
 from interfaces.gui import serializer
 from recognition.rules import astree
+from recognition import action, rule, function
 from log import logger
 
 class CommandModule:
@@ -34,14 +34,13 @@ class CommandModule:
     def load_rules(self):
         for rule_name, rule_text in self.config.get('rules', {}):
             try:
-                rule = api.rule(rule_text, name=rule_name)
-                self.rules[rule_name] = rule
+                self.rules[rule_name] = rule(rule_text, name=rule_name)
             except RuntimeError as e:
                 print(f'Error loading rule "{rule_name}": {e}')
 
     def define_functions(self):
         for func_signature, func_text in self.config.get('functions', {}):
-            user_function = api.function(func_signature, func_text)
+            user_function = function(func_signature, func_text)
             self.functions[user_function.name] = user_function
 
     def set_function_actions(self):
@@ -51,7 +50,7 @@ class CommandModule:
 
     def load_events(self):
         for event_name, event_text in self.config.get('events', {}).items():
-            self.events[event_name] = api.action(event_text)
+            self.events[event_name] = action(event_text)
 
     @property
     def conditions(self):
@@ -75,8 +74,8 @@ class Command:
 
     def init_rule(self, rule_text):
         self.rule_text = rule_text
-        self.rule = api.rule(rule_text)
+        self.rule = rule(rule_text)
 
     def init_action(self, action_text):
         self.action_text = action_text
-        self.action = api.action(action_text)
+        self.action = action(action_text)

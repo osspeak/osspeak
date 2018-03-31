@@ -1,4 +1,3 @@
-
 def rule(text, name=None):
     from recognition.rules.parser import RuleParser
     parser = RuleParser(text)

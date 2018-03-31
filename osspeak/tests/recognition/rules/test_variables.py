@@ -2,7 +2,7 @@ import unittest
 
 from recognition.rules import converter, parser, lexer, tokens
 from recognition.rules.astree import GroupingNode, WordNode 
-from recognition import api
+from recognition import rule
 from tests.recognition.rules import strings
 
 class TestVariableBase(unittest.TestCase):
@@ -11,8 +11,7 @@ class TestVariableBase(unittest.TestCase):
     def setUpClass(cls):
         cls.rules = {}
         for rule_name, rule_text in strings.rules:
-            rule = api.rule(rule_text, name=rule_name)
-            cls.rules[rule_name] = rule
+            cls.rules[rule_name] = rule(rule_text, name=rule_name)
 
     def test_a(self):
         self.assertEqual(1,1)

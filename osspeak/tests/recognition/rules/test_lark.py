@@ -3,14 +3,14 @@
 
 # from recognition.commands import match, loader
 # from recognition.rules import _lark
-# from recognition import api
+# from recognition import rule
 # from tests.recognition.actions import strings
 
 # class TextLark(unittest.TestCase):
 
 #     def grammar_list(self, command_rules=None, named_rules=None):
-#         command_rules = [api.rule(text) for text in command_rules] if command_rules else []
-#         named_rules = [api.rule(rule_text, name) for name, rule_text in named_rules.items()] if named_rules else []
+#         command_rules = [rule(text) for text in command_rules] if command_rules else []
+#         named_rules = [rule(rule_text, name) for name, rule_text in named_rules.items()] if named_rules else []
 #         named_rules = {r.name: r for r in named_rules}
 #         all_rules = list(named_rules.values()) + command_rules
 #         node_ids = loader.generate_node_ids(all_rules, named_rules)

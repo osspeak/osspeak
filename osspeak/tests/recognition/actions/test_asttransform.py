@@ -2,7 +2,6 @@ import os
 import unittest
 
 from recognition.actions import asttransform
-from recognition import api
 from tests.recognition.actions import strings
 
 class TestAstTransform(unittest.TestCase):
