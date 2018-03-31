@@ -1,6 +1,5 @@
 import uuid
 from typing import List, Dict
-from parsimonious.grammar import Grammar
 from recognition.rules import astree, _lark
 
 class GrammarContext:
