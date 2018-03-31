@@ -11,12 +11,11 @@ websockets = "*"
 mouse = "*"
 keyboard = "*"
 pywindow = "*"
-parsimonious = "*"
 lark-parser = "*"
 
 
 [dev-packages]
 
 requests = "*"
-pyinstaller = "*"
+PyInstaller = "*"
 "pypiwin32" = "*"
