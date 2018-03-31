@@ -15,7 +15,6 @@ from recognition.actions import variables, perform
 from recognition.commands import commands, grammar
 from recognition.rules.converter import SrgsXmlConverter
 from recognition.rules import astree
-import xml.etree.ElementTree as ET
 from communication import pubsub, topics
 
 DEFAULT_DIRECTORY_SETTINGS = {
