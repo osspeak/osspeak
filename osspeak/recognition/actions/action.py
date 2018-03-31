@@ -2,9 +2,12 @@ from recognition.actions import library, pyexpr, asttransform, context, perform
 import keyboard
 
 class Action:
+    pass
+
+class SpeechDSLAction(Action):
 
     def __init__(self, action_input, arguments=None,
-                 validator=lambda expr: True, raise_on_error=True):
+                validator=lambda expr: True, raise_on_error=True):
         self.literal_expressions, self.remaining_text = self.compile_expressions(action_input, validator, raise_on_error)
         self.expressions = [asttransform.transform_expression(e, arguments=arguments) for e in self.literal_expressions]
 
@@ -15,11 +18,6 @@ class Action:
     def compile_expressions(self, action_input, validator, raise_on_error):
         if isinstance(action_input, str):
             return pyexpr.compile_python_expressions(action_input, validator=validator, raise_on_error=raise_on_error)
-        literal_expressions = []
-        for text in action_input:
-            exprs, _ = pyexpr.compile_python_expressions(text, validator=validator, raise_on_error=raise_on_error)
-            literal_expressions.extend(exprs)
-        return literal_expressions, None
 
     def perform(self, call_locals=None):
         '''

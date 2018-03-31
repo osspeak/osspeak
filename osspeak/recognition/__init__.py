@@ -5,9 +5,11 @@ def rule(text, name=None):
     rule_obj.raw_text = text
     return rule_obj
 
-def action(text):
-    from recognition.actions.action import Action
-    return Action(text)
+def action(text, *args, **kwargs):
+    from recognition.actions.action import Action, SpeechDSLAction
+    if isinstance(text, str):
+        return SpeechDSLAction(text, *args, **kwargs)
+    raise TypeError
 
 def function(func_signature, func_action=None):
     from recognition.actions.function import Function

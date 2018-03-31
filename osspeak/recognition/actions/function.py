@@ -32,9 +32,9 @@ class Function:
                 return v
 
     def compile_action(self):
-        from recognition.actions.action import Action
+        from recognition import action
         arguments = set(self.parameters.keys())
-        self.action = Action(self.action_text, arguments=arguments)
+        self.action = action(self.action_text, arguments=arguments)
 
     def __call__(self, *args, **kwargs):
         self.func(*args, **kwargs)

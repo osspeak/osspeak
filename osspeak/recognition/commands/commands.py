@@ -68,14 +68,14 @@ class CommandModule:
 
 class Command:
     
-    def __init__(self, rule_text, action_text):
+    def __init__(self, rule_text, action_input):
         self.init_rule(rule_text)
-        self.init_action(action_text)
+        self.init_action(action_input)
 
     def init_rule(self, rule_text):
         self.rule_text = rule_text
         self.rule = rule(rule_text)
 
-    def init_action(self, action_text):
-        self.action_text = action_text
-        self.action = action(action_text)
+    def init_action(self, action_input):
+        self.action_input = action_input
+        self.action = action(action_input)

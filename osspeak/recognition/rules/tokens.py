@@ -49,7 +49,7 @@ class RepetitionToken(BaseToken):
 class ActionSubstituteToken(BaseToken):
     
     def __init__(self, text):
-        self.action = action.Action(text, validator=action_substitute_validator, raise_on_error=False)
+        self.action = action.SpeechDSLAction(text, validator=action_substitute_validator, raise_on_error=False)
         if not self.action.expressions:
             raise RuntimeError(f'Unable to parse any Python expressions from string:\n{text}')
         self.consumed_char_count = len(text) - len(self.action.remaining_text)
