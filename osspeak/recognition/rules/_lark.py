@@ -16,11 +16,12 @@ def build_repeat(node):
     high = 99 if node.repeat_high is None else node.repeat_high 
     return f'~{low}' if low == high else f'~{low}..{high}'
 
-def parse_word(node: astree.WordNode, internal_rules, node_ids):
+def parse_word(node: astree.WordNode, internal_rules, node_ids, named_rules):
     return build_lark_rule(node, f'"{node.text}"', internal_rules, node_ids)
 
-def parse_rule_reference(node: astree.RuleReference, internal_rules, node_ids):
-    referenced_rule_id = f'rule_{node.rule_name}'
+def parse_rule_reference(node: astree.RuleReference, internal_rules, node_ids, named_rules):
+    referenced_rule = named_rules[node.rule_name]
+    referenced_rule_id = node_ids[referenced_rule]
     return build_lark_rule(node, referenced_rule_id, internal_rules, node_ids)
 
 def build_lark_rule(node, parsed_text, internal_rules, node_ids):
@@ -29,16 +30,16 @@ def build_lark_rule(node, parsed_text, internal_rules, node_ids):
     internal_rules[node_id] = parsed_text + repeat
     return node_id
 
-def parse_rule(node, internal_rules, node_ids):
-    lark_text = parse_grouping(node.root, internal_rules, node_ids)
+def parse_rule(node, internal_rules, node_ids, named_rules):
+    lark_text = parse_grouping(node.root, internal_rules, node_ids, named_rules)
     return lark_text
 
-def parse_grouping(node: astree.GroupingNode, internal_rules, node_ids):
+def parse_grouping(node: astree.GroupingNode, internal_rules, node_ids, named_rules):
     sequences = []
     for seq in node.sequences:
         sequence_items = []
         for child in seq:
-            seq_text = wtf[type(child)](child, internal_rules, node_ids)
+            seq_text = parse_functions[type(child)](child, internal_rules, node_ids, named_rules)
             sequence_items.append(seq_text)
         joined_items = ' '.join(sequence_items)
         need_parens = len(sequence_items) > 1
@@ -47,7 +48,7 @@ def parse_grouping(node: astree.GroupingNode, internal_rules, node_ids):
     lark_text = f'({joined_sequences})'
     return build_lark_rule(node, lark_text, internal_rules, node_ids)
 
-wtf = {
+parse_functions = {
     astree.GroupingNode: parse_grouping,
     astree.WordNode: parse_word,
     astree.RuleReference: parse_rule_reference
@@ -58,7 +59,9 @@ def create_lark_grammar(command_rules, named_rules, node_ids):
 
     rule_lines = [f'{rule_name}: {rule_text}' for rule_name, rule_text in lark_rules]
     rule_names = ' | '.join([node_ids[c] for c in command_rules])
-    rule_lines.append(r'rule__dictate: /(.+)+/')
+    dictation_rule = named_rules['_dictate']
+    dictation_rule_id = node_ids[dictation_rule]
+    rule_lines.append(rf'{dictation_rule_id}: /(.+)+/')
     rule_lines.append('%import common.WORD')
     rule_lines.append('%ignore " "')
     rule_lines.append(f'start: ({rule_names})+')
@@ -80,9 +83,9 @@ def create_lark_grammar_list(command_rules: List, named_rules, node_ids):
     lark_internal_rules = {}
     for rule in named_rules.values():
         if not rule.name.startswith('_'):
-            lark_named_rules[node_ids[rule]] = parse_rule(rule, lark_internal_rules, node_ids)
+            lark_named_rules[node_ids[rule]] = parse_rule(rule, lark_internal_rules, node_ids, named_rules)
     for rule in command_rules:
-        lark_command_rules[node_ids[rule]] = parse_rule(rule, lark_internal_rules, node_ids)
+        lark_command_rules[node_ids[rule]] = parse_rule(rule, lark_internal_rules, node_ids, named_rules)
     return [(k, v) for k, v in {**lark_named_rules, **lark_command_rules, **lark_internal_rules}.items()]
 
 def yield_paths(lark_node, node_map, ancestor_path=()):
