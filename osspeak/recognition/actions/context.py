@@ -51,11 +51,3 @@ class CallOrType(str):
 
     def __str__(self):
         return self.func_name
-
-def create_recognition_context(engine_result, variable_tree, namespace):
-    engine_variables = tuple(v for v in engine_result['Variables'] if len(v) == 2)
-    var_list, words = variable_tree.action_variables(engine_variables)
-    return RecognitionContext(var_list, words, namespace)
-
-def create_event_context(namespace):
-    return RecognitionContext([], None, namespace)

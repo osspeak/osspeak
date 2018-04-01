@@ -39,7 +39,7 @@ def perform_io(item):
     return False
 
 def perform_action_from_event(action, namespace):
-    recognition_context = context.create_event_context(namespace)
+    recognition_context = context.RecognitionContext([], None, namespace)
     recognition_queue.put((action, recognition_context))
 
 def perform_commands(grammar_context, words):
