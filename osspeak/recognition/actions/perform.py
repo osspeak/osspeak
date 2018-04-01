@@ -86,7 +86,7 @@ def perform_action(command, variables, namespace, words):
     recognition_context = context.RecognitionContext(variables, words, namespace)
     recognition_queue.put((command.action, recognition_context))
     
-def var_result(variable_actions, perform_results):
+def var_result(variable_actions, perform_results: bool):
     results = []
     for action in variable_actions:
         results.append(action.perform_variable(perform_results=perform_results))

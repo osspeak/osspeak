@@ -2,7 +2,11 @@ from recognition.actions import library, pyexpr, asttransform, context, perform
 import keyboard
 
 class Action:
-    pass
+    
+    @property
+    def globals(self):
+        recognition_context = perform.get_recognition_context()
+        return {'context': recognition_context, **recognition_context._meta.namespace}
 
 class SpeechDSLAction(Action):
 
@@ -38,8 +42,15 @@ class SpeechDSLAction(Action):
         return perform.concat_results(results)
 
     def generate_results(self, call_locals=None):
-        recognition_context = perform.get_recognition_context()
-        action_globals = {'context': recognition_context, **recognition_context._meta.namespace}
         for i, expr in enumerate(self.expressions):
-            result = eval(expr, action_globals, call_locals)
+            result = eval(expr, self.globals, call_locals)
             yield result
+
+class PythonFunctionAction(Action):
+
+    def __init__(self, lines):
+        self.lines = lines
+        self.compiled_code = compile('\n'.join(lines), '', 'exec')
+
+    def perform(self, call_locals=None):
+        exec(self.compiled_code, self.globals, call_locals)

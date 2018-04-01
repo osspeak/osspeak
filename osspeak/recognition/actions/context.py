@@ -22,6 +22,9 @@ class RecognitionContext:
     def set(self, key, value):
         self._meta.temp_variables[key] = value
 
+    def __getitem__(self, i):
+        return self._meta.var(i, perform_results=False)
+
 class RecognitionContextMeta:
 
     def __init__(self, variables, namespace):
@@ -31,6 +34,14 @@ class RecognitionContextMeta:
 
     def call_or_type(self, value):
         return CallOrType(value)
+
+    def var(self, idx, default=None, perform_results=True):
+        from recognition.actions import perform
+        try:
+            variable_actions = self.variables[idx]
+        except IndexError as e:
+            return default
+        return perform.var_result(variable_actions, perform_results) if variable_actions else default
 
 class CallOrType(str):
 
