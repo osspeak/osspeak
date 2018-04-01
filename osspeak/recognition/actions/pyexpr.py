@@ -6,7 +6,7 @@ def varrepl(_, num):
     num = int(num)
     if num > 0:
         num -= 1
-    return f'context.var({num})'
+    return f'context._meta.var({num})'
 
 def keyword_call(kw):
     return f"context._meta.call_or_type('{kw}')"
