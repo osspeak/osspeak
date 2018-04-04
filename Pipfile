@@ -17,5 +17,5 @@ lark-parser = "*"
 [dev-packages]
 
 requests = "*"
-PyInstaller = "*"
+pyinstaller = "*"
 "pypiwin32" = "*"
