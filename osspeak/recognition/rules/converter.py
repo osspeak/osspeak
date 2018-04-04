@@ -68,10 +68,7 @@ class SrgsXmlConverter:
             choices.append(ET.Element('item'))
             for child in seq:
                 if isinstance(child, astree.WordNode):
-                    if child.action_substitute is not None:
-                        self.add_substitute_word(child, choices)
-                    else:
-                        self.add_text_to_item_elem(choices[-1], child, node)
+                    self.add_text_to_item_elem(choices[-1], child, node)
                 elif isinstance(child, astree.GroupingNode):
                     self.add_grouping(child, choices)
                 elif isinstance(child, astree.RuleReference):
@@ -99,16 +96,7 @@ class SrgsXmlConverter:
         rritem = self.get_ruleref_item(self.node_ids[child], low=child.repeat_low, high=child.repeat_high)
         choices[-1].append(rritem)
         self.fill_choices(child, child_choices)
-
-    def add_substitute_word(self, child, choices):
-        rule = ET.Element('rule', attrib={'id': self.node_ids[child]})
-        self.root.append(rule)
-        word_item = ET.Element('item')
-        word_item.text = child.text
-        rule.append(word_item)
-        rritem = self.get_ruleref_item(self.node_ids[child])
-        choices[-1].append(rritem)
-
+    
     def add_text_to_item_elem(self, parent_elem, word_node, parent_node):
         assert self.get_repeat_vals(parent_elem) == (1, 1)
         if (not parent_elem or parent_elem[-1].tag != 'item' or
