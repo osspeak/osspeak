@@ -37,9 +37,9 @@
         },
         "lark-parser": {
             "hashes": [
-                "sha256:d66f5dc38515f2f17266ca292617e92ad4e1ba7ea8d0517bb3fb437f27ab4a72"
+                "sha256:2074f2cda9303167f97da0157eefa6fdf9c0b8c7786d4a24e86c65319b34c0df"
             ],
-            "version": "==0.5.5"
+            "version": "==0.5.6"
         },
         "mouse": {
             "hashes": [
