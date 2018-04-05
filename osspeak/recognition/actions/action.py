@@ -46,11 +46,20 @@ class SpeechDSLAction(Action):
             result = eval(expr, self.globals, call_locals)
             yield result
 
-class PythonFunctionAction(Action):
+class ComplexAction(Action):
 
-    def __init__(self, lines):
-        self.lines = lines
-        self.compiled_code = compile('\n'.join(lines), '', 'exec')
+    def __init__(self, pieces):
+        self.pieces = pieces
 
     def perform(self, call_locals=None):
-        exec(self.compiled_code, self.globals, call_locals)
+        _globals = self.globals
+        for piece in self.pieces:
+            fn = piece_map[piece['name']]
+            fn(piece['data'], _globals, call_locals)
+
+def perform_python(piece, _globals, _locals):
+    exec(piece, _globals, _locals)
+
+piece_map = {
+    'python': perform_python
+}

@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import { wsFetch } from './websocket';
 import { Button } from 'material-ui'
 import { Treebeard } from 'react-treebeard';
+import './command-module/command-module.css';
+import CommandModuleContainer from './command-module/container';
 // import "./app.css"
 // import CommandModulesView from '../command-modules/view';
 // import commandModulesStore from '../command-modules/store';
@@ -77,7 +79,8 @@ class App extends React.Component<any, {}> {
         return (
             <div id="osspeak-application">
                 <Button>foo</Button>
-                <TreeExample />
+                <CommandModuleContainer />
+                {/* <TreeExample /> */}
             </div>
         );
     }

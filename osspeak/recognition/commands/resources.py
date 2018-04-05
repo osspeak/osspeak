@@ -1,33 +1,15 @@
+import os
+from settings import settings
 from recognition.commands import monitor
 
 def command_modules():
+    state = monitor.command_module_state.command_module_json
+    root = settings['command_directory']
+    module_paths = []
+    for path, config in state.items():
+        relpath = os.path.relpath(path, root)
+        split_path = relpath.split(os.sep)[1:]
+        module_paths.append(split_path)
     return {
-    'name': 'root',
-    'toggled': True,
-    'children': [
-        {
-            'name': 'parent',
-            'children': [
-                { 'name': 'child1' },
-                { 'name': 'child2' }
-            ]
-        },
-        {
-            'name': 'loading parent',
-            'loading': True,
-            'children': []
-        },
-        {
-            'name': 'parent',
-            'children': [
-                {
-                    'name': 'nested parent',
-                    'children': [
-                        { 'name': 'nested child 1' },
-                        { 'name': 'nested child 2' }
-                    ]
-                }
-            ]
-        }
-    ]
-}
+        'module_paths': module_paths
+    }

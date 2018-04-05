@@ -6,11 +6,11 @@ def rule(text, name=None):
     return rule_obj
 
 def action(action_input, *args, **kwargs):
-    from recognition.actions.action import Action, SpeechDSLAction, PythonFunctionAction
+    from recognition.actions.action import Action, SpeechDSLAction, ComplexAction
     if isinstance(action_input, str):
         return SpeechDSLAction(action_input, *args, **kwargs)
-    elif isinstance(action_input, dict) and action_input['type'] == 'python':
-        return PythonFunctionAction(action_input['data'], *args, **kwargs)
+    elif isinstance(action_input, dict) and action_input['type'] == 'complex':
+        return ComplexAction(action_input['pieces'], *args, **kwargs)
     raise TypeError
 
 def function(func_signature, func_action=None):

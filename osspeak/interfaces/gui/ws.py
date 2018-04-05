@@ -6,7 +6,6 @@ resources = {
     'command modules': command_resources.command_modules
 }
 
-
 ws = None
 
 async def gui_websocket_handler(websocket, path):
