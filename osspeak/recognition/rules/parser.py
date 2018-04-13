@@ -77,7 +77,7 @@ class RuleParser:
         self.apply_repetition(repeated_node, tok.low, tok.high)
 
     def parse_action_substitute_token(self, tok):
-        self.modifiable_node.action_substitute = tok.action
+        self.modifiable_node.action_piece_substitute = tok.action_piece
 
     def parse_whitespace_token(self, tok):
         pass

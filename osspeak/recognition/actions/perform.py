@@ -16,6 +16,11 @@ def get_recognition_context():
     t = threading.current_thread()
     return results_map[t]['context']
 
+def recognition_namespace():
+    recognition_context = get_recognition_context()
+    return {'context': recognition_context, **recognition_context._meta.namespace}
+
+
 def recognition_action_worker():
     while True:
         action, recognition_context = recognition_queue.get()
@@ -73,12 +78,12 @@ def perform_commands(grammar_context, words):
             action_result = perform_action(command, variables, grammar_context.namespace, tuple(words))
 
 def get_leaf_action(node, text):
-    from recognition import action
+    from recognition.actions import piece
     leaf_action, is_substitute = None, None
-    if getattr(node, 'action_substitute', None) is not None:
-        leaf_action, is_substitute = node.action_substitute, True 
+    if getattr(node, 'action_piece_substitute', None) is not None:
+        leaf_action, is_substitute = node.action_piece_substitute, True 
     elif text is not None:
-        leaf_action, is_substitute = action(f"'{text}'"), False
+        leaf_action, is_substitute = piece.DSLActionPiece(f"'{text}'"), False
     return leaf_action, is_substitute
 
 def perform_action(command, variables, namespace, words):
@@ -86,10 +91,10 @@ def perform_action(command, variables, namespace, words):
     recognition_context = context.RecognitionContext(variables, words, namespace)
     recognition_queue.put((command.action, recognition_context))
     
-def var_result(variable_actions, perform_results: bool):
+def var_result(variable_actions_pieces, perform_results: bool):
     results = []
-    for action in variable_actions:
-        results.append(action.perform_variable(perform_results=perform_results))
+    for action_piece in variable_actions_pieces:
+        results.append(action_piece.perform_variable(perform_results=perform_results))
     if not perform_results:
         return concat_results(results)
 

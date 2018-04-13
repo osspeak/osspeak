@@ -10,7 +10,7 @@ class Function:
         self.parameters = signature(self.func).parameters
         self.action_text = action_text
         self.name = signature_text.split('(', 1)[0].strip()
-        self.action = None
+        self.action_piece = None
 
     def get_call_locals(self, args, kwargs):
         call_args = kwargs.copy()
@@ -39,4 +39,4 @@ class Function:
     def __call__(self, *args, **kwargs):
         self.func(*args, **kwargs)
         call_locals = self.get_call_locals(args, kwargs)
-        return self.action.perform(call_locals)
+        return self.action_piece.perform(call_locals)

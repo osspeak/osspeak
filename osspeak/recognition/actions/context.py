@@ -30,10 +30,10 @@ class RecognitionContextMeta:
     def var(self, idx, default=None, perform_results=True):
         from recognition.actions import perform
         try:
-            variable_actions = self.variables[idx]
+            variable_action_pieces = self.variables[idx]
         except IndexError as e:
             return default
-        return perform.var_result(variable_actions, perform_results) if variable_actions else default
+        return perform.var_result(variable_action_pieces, perform_results) if variable_action_pieces else default
 
 class CallOrType(str):
 

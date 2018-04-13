@@ -23,7 +23,7 @@ class WordNode(ASTNode):
         self.text = text
         self.repeat_low = 1
         self.repeat_high = 1
-        self.action_substitute = None
+        self.action_piece_substitute = None
 
     @property
     def is_single(self):
@@ -35,7 +35,7 @@ class GroupingNode(ASTNode):
         self.open = True
         self.repeat_low = 1
         self.repeat_high = 1
-        self.action_substitute = None
+        self.action_piece_substitute = None
         self.sequences = []
 
     def walk(self):
@@ -50,4 +50,4 @@ class RuleReference(ASTNode):
         self.rule_name = rule_name
         self.repeat_low = 1
         self.repeat_high = 1
-        self.action_substitute = None
+        self.action_piece_substitute = None

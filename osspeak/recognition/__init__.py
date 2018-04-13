@@ -6,12 +6,13 @@ def rule(text, name=None):
     return rule_obj
 
 def action(action_input, *args, **kwargs):
-    from recognition.actions.action import Action, SpeechDSLAction, ComplexAction
-    if isinstance(action_input, str):
-        return SpeechDSLAction(action_input, *args, **kwargs)
-    elif isinstance(action_input, dict) and action_input['type'] == 'complex':
-        return ComplexAction(action_input['pieces'], *args, **kwargs)
-    raise TypeError
+    from recognition.actions.action import Action
+    from recognition.actions import piece
+    if not isinstance (action_input, list):
+        action_input = [action_input]
+    action_objects = [{'type': 'dsl', 'value': x} if isinstance(x, str) else x for x in action_input]
+    action_pieces = [piece.ActionPiece.from_object(obj) for obj in action_objects]
+    return Action(action_pieces)
 
 def function(func_signature, func_action=None):
     from recognition.actions.function import Function
