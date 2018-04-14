@@ -3,6 +3,7 @@ import itertools
 from recognition.actions import library
 import uuid
 import os
+import xml.etree.ElementTree as ET
 import copy
 import re
 import collections
@@ -46,7 +47,8 @@ async def load_modules(command_module_state, current_window, current_state, init
     send_module_information_to_ui(command_module_state.command_modules)
     grammar_context = build_grammar(command_module_state.active_command_modules)
     save_grammar(grammar_context, command_module_state.grammars)
-    await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, grammar_context)
+    grammar_xml, grammar_id = ET.tostring(grammar_context.xml).decode('utf8'), grammar_context.uuid,
+    await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
 
 def build_grammar(active_modules):
     named_rules, command_rules = get_active_rules(active_modules)
