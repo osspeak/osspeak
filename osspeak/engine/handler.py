@@ -33,31 +33,36 @@ class EngineProcessHandler:
         pubsub.subscribe(topics.STOP_MAIN_PROCESS, self.shutdown)
         pubsub.subscribe(topics.EMULATE_RECOGNITION_EVENT, self.emulate_recognition)
         
-    async def send_message(self, msg):
+    async def message_engine(self, msg):
         if isinstance(msg, dict):
             msg = json.dumps(msg)
         await self.process.send_message(msg)
 
     async def load_engine_grammar(self, grammar_xml, grammar_id):
-        # grammar_context.xml.tostring(grammar_xml).decode('utf8'), grammar_id
         msg = {
             'Type': topics.LOAD_ENGINE_GRAMMAR,
             'Grammar': grammar_xml,
             'Id': grammar_id,
             'StartEngine': self.engine_running
         }
-        await self.send_message(msg)
+        await self.message_engine(msg)
 
     def poll_engine_status(self):
         while True:
             self.send_simple_message('GET_ENGINE_STATUS')
             time.sleep(5)
 
+    async def dispatch_engine_message(self, topic, *a, **kw):
+        if self.server is None:
+            pubsub.publish(topic, *a, **kw)
+        else:
+            await self.server.send_message(topic, *a, **kw)
+
     async def on_engine_message(self, msg_string):
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition':
             if msg['Confidence'] > settings['engine']['recognitionConfidence']:
-                pubsub.publish(topics.PERFORM_COMMANDS, msg['GrammarId'], msg['Words'])
+                await self.dispatch_engine_message(topics.PERFORM_COMMANDS, msg['GrammarId'], msg['Words'])
         elif msg['Type'] == messages.SET_ENGINE_STATUS:
             messages.dispatch(messages.SET_ENGINE_STATUS, msg)
         elif msg['Type'] == 'error':
@@ -69,7 +74,7 @@ class EngineProcessHandler:
             await self.send_simple_message(msg['Type'])
 
     async def send_simple_message(self, msg_type):
-        await self.send_message({'Type': msg_type})
+        await self.message_engine({'Type': msg_type})
 
     def shutdown(self):
         if self.process is not None:
@@ -90,4 +95,4 @@ class EngineProcessHandler:
             'Text': text
         }
         await asyncio.sleep(5)
-        await self.send_message(msg)
+        await self.message_engine(msg)

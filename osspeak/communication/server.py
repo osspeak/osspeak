@@ -8,11 +8,11 @@ from log import logger
 
 loop = asyncio.get_event_loop()
 
-def get_websocket_handlers():
+def get_websocket_handlers(remote_server):
     websocket_handlers = []
     if settings['network'] == 'server':
         host, port = common.get_host_and_port(settings['server_address'])
-        handler = RemoteEngineServer().websocket_handler
+        handler = remote_server.websocket_handler
         websocket_handlers.append((handler, host, port))
     if settings['interface'] == 'gui':
         websocket_handlers.append((gui_websocket_handler, 'localhost', settings['gui_port']))

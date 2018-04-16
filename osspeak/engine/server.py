@@ -4,7 +4,7 @@ from log import logger
 import websockets
 import settings
 from settings import settings
-from communication.common import publish_json_message, get_host_and_port
+from communication.common import publish_json_message, get_host_and_port, send_message
 
 class RemoteEngineServer:
     
@@ -26,7 +26,8 @@ class RemoteEngineServer:
                 publish_json_message(msg)
         self.ws = None
 
-    async def send_message(self, topic, content):
-        if not isinstance(msg, str):
-            msg = msg.dumps(msg)
-        await self.ws.send(msg)
+    async def send_message(self, topic, *a, **kw):
+        await send_message(self.ws, topic, *a, **kw)
+        # if not isinstance(msg, str):
+        #     msg = msg.dumps(msg)
+        # await self.ws.send(msg)

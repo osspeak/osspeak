@@ -22,6 +22,7 @@ class RemoteEngineClient:
             topics.ENGINE_START,
             topics.ENGINE_STOP,
             topics.EMULATE_RECOGNITION_EVENT,
+            topics.PERFORM_COMMANDS,
         )
         for sub_topic in sub_topics:
             cb = functools.partial(self.publish, sub_topic)
@@ -32,7 +33,6 @@ class RemoteEngineClient:
         while True:
             try:
                 async with websockets.connect(self.url) as self.ws:                  
-                    print('got the connect')
                     await receive_ws_messages(self.ws)
                 self.ws = None
             except ConnectionRefusedError:
