@@ -6,14 +6,14 @@ import queue
 from log import logger
 from communication import messages
 
-async def send_message(ws, msg_name, *args, **kwargs):
+def topic_message(topic, *args, **kwargs):
     msg = {
-        'topic': msg_name,
+        'topic': topic,
         'args': args,
         'kwargs': kwargs,
     }
-    await ws.send(json.dumps(msg))
-
+    return json.dumps(msg)
+    
 def put_message_in_queue(q, msg):
     while True:
         try:

@@ -3,7 +3,7 @@ import queue
 import functools
 import asyncio
 from communication import pubsub, topics
-from communication.common import publish_json_message, yield_queue_contents, put_message_in_queue, receive_ws_messages
+from communication.common import publish_json_message, yield_queue_contents, put_message_in_queue, receive_ws_messages, topic_message
 import settings
 from communication.server import loop
 
@@ -44,12 +44,7 @@ class RemoteEngineClient:
 
     async def publish_message_to_server(self, topic, *args, **kwargs):
         import websockets
-        msg = {
-            'topic': topic,
-            'args': args,
-            'kwargs': kwargs,
-        }
-        encoded_message = json.dumps(msg)
+        encoded_message = topic_message(topic, *args, **kwargs)
         try:
             await self.ws.send(encoded_message)
         except (AttributeError, websockets.exceptions.ConnectionClosed):
