@@ -39,7 +39,7 @@ worker.start()
 
 def perform_io(item):
     if isinstance(item, (str, float, int)):
-        keyboard.write(str(item))
+        keyboard.write(str(item), delay=.05)
         return True
     return False
 
