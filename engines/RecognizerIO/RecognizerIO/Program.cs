@@ -18,13 +18,12 @@ namespace RecognizerIO
             {
                 try
                 {
-                    var communicatorInput = Console.ReadLine();
+                    string communicatorInput = Console.ReadLine();
                     shutdown = inputHandler.ProcessIncomingInput(communicatorInput);
                 }
                 catch (Exception e)
                 {
                     new Error(e).send();
-                    throw;
                 }
             }
         }

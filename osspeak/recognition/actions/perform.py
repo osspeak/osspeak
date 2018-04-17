@@ -29,7 +29,7 @@ def recognition_action_worker():
         try:
             evaluation = action.perform()
         except Exception as e:
-            log.logger.error(f'Action {action.text} errored: {str(e)}')
+            log.logger.error(f'Action {action} errored: {str(e)}')
             print(e)
         finally:
             del results_map[t]

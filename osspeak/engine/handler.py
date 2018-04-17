@@ -4,6 +4,7 @@ import asyncio
 import sys
 from settings import settings
 from communication import pubsub, topics, messages
+from communication.server import loop
 from communication.procs import ProcessHandler
 from engine import server
 
@@ -24,6 +25,7 @@ class EngineProcessHandler:
     async def create(cls, *a, **kw):
         instance = cls(*a, **kw)
         instance.process = await ProcessHandler.create(ENGINE_PATH, on_output=instance.on_engine_message)
+        asyncio.ensure_future(instance.poll_engine_status(), loop=loop)
         return instance
 
     def create_subscriptions(self):
@@ -47,10 +49,10 @@ class EngineProcessHandler:
         }
         await self.message_engine(msg)
 
-    def poll_engine_status(self):
+    async def poll_engine_status(self):
         while True:
-            self.send_simple_message('GET_ENGINE_STATUS')
-            time.sleep(5)
+            await self.send_simple_message('GET_ENGINE_STATUS')
+            await asyncio.sleep(5)
 
     async def dispatch_engine_message(self, topic, *a, **kw):
         if self.server is None:

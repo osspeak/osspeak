@@ -51,6 +51,7 @@ class ElectronProcessHandler:
             time.sleep(5)
 
     async def on_engine_message(self, msg_string):
+        print(msg_string)
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition':
             if msg['Confidence'] > settings['engine']['recognitionConfidence']:

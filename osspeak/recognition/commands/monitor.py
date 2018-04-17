@@ -1,4 +1,5 @@
 import pywindow
+import collections
 import log
 import asyncio
 from recognition.actions.library.state import state_copy
@@ -20,6 +21,7 @@ def start_watching_user_state():
     msg_list = [None]
     command_module_state.populate()
     loader.load_initial_user_state(command_module_state.command_modules)
+    engine_status_history = collections.deque([], 10)
     create_message_subscriptions(msg_list)
     fut = watch_user_system_state(msg_list)
     asyncio.ensure_future(fut)
