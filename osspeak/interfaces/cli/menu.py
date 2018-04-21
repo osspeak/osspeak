@@ -61,7 +61,7 @@ class MainMenu(Menu):
 
     def reload_command_modules(self):
         print('Reloading command modules...')
-        messages.dispatch(messages.RELOAD_COMMAND_MODULE_FILES)
+        pubsub.dispatch(topics.RELOAD_COMMAND_MODULE_FILES)
         return True
 
     def start(self):

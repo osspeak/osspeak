@@ -14,7 +14,7 @@ class CommandModuleContainer extends React.Component<any, {}> {
     render() {
         return (
             <div id="cm-container">
-                                <CommandModuleList />
+                <CommandModuleList />
                 <CommandModule />
 
             </div>
