@@ -6,7 +6,7 @@ import threading
 import json
 import sys
 from settings import settings
-from communication import messages, pubsub, topics
+from communication import pubsub, topics
 
 class ProcessHandler:
 

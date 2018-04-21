@@ -4,7 +4,6 @@ import socket
 from communication import pubsub
 import queue
 from log import logger
-from communication import messages
 
 def topic_message(topic, *args, **kwargs):
     msg = {

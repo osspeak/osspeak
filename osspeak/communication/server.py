@@ -1,6 +1,6 @@
 import asyncio
 import json
-from communication import procs, messages, common
+from communication import procs, common
 from engine.server import RemoteEngineServer
 from interfaces.gui.ws import gui_websocket_handler
 from settings import settings, get_server_address

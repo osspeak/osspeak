@@ -1,4 +1,4 @@
-from communication import messages, topics, pubsub, common
+from communication import topics, pubsub, common
 import settings
 
 class Menu:

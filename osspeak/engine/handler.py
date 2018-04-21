@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import asyncio
 import sys
 from settings import settings
-from communication import pubsub, topics, messages
+from communication import pubsub, topics
 from communication.server import loop
 from communication.procs import ProcessHandler
 from engine import server
@@ -65,8 +65,8 @@ class EngineProcessHandler:
         if msg['Type'] == 'recognition':
             if msg['Confidence'] > settings['engine']['recognitionConfidence']:
                 await self.dispatch_engine_message(topics.PERFORM_COMMANDS, msg['GrammarId'], msg['Words'])
-        elif msg['Type'] == messages.SET_ENGINE_STATUS:
-            messages.dispatch(messages.SET_ENGINE_STATUS, msg)
+        # elif msg['Type'] == messages.SET_ENGINE_STATUS:
+        #     messages.dispatch(messages.SET_ENGINE_STATUS, msg)
         elif msg['Type'] == 'error':
             print('error!')
             print(msg['Message'])
