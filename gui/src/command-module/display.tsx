@@ -4,7 +4,7 @@ import { wsFetch } from '../websocket';
 import { Button } from 'material-ui'
 import { Treebeard } from 'react-treebeard';
 
-class CommandModule extends React.Component<any, {}> {
+class  CommandModuleDisplay extends React.Component<any, {}> {
 
     componentDidMount() {
     }
@@ -18,4 +18,4 @@ class CommandModule extends React.Component<any, {}> {
     }
 }
 
-export default CommandModule;
+export default CommandModuleDisplay;

@@ -12,8 +12,6 @@ const outstandingFetches = new Map<string, ServerFetch>();
 
 ws.onopen = () => {
     (async() => {
-        const resp = await wsFetch('command modules')
-        console.log('res', resp)
     })()
 }
 
@@ -38,7 +36,7 @@ export function wsFetch(resource: string, args: any = [], kwargs: any = {}) {
     const id = generateUUID();
     const msgString = JSON.stringify({resource, id, args, kwargs});
     const timestamp = Date.now();
-    const respPromise = new Promise((resolve, reject) => {
+    const respPromise = new Promise<any>((resolve, reject) => {
         const sf: ServerFetch = {timestamp, resolve, reject};
         outstandingFetches.set(id, sf);
     });

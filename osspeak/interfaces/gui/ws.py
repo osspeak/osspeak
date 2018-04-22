@@ -3,7 +3,7 @@ import inspect
 from recognition.commands import resources as command_resources
 
 resources = {
-    'command modules': command_resources.command_modules
+    'COMMAND_MODULES': command_resources.command_modules
 }
 
 ws = None

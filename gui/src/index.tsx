@@ -4,6 +4,7 @@ import { wsFetch } from './websocket';
 import { Button } from 'material-ui'
 import { Treebeard } from 'react-treebeard';
 import './command-module/command-module.css';
+import { ws } from './websocket';
 import CommandModuleContainer from './command-module/container';
 // import "./app.css"
 // import CommandModulesView from '../command-modules/view';
@@ -25,7 +26,6 @@ class App extends React.Component<any, {}> {
     render() {
         return (
             <div id="osspeak-application">
-                <Button>foo</Button>
                 <CommandModuleContainer />
                 {/* <TreeExample /> */}
             </div>
@@ -33,9 +33,11 @@ class App extends React.Component<any, {}> {
     }
 }
 
-ReactDOM.render(
-    <App />,
-    document.getElementById('app-root'),
-)
+ws.onopen = () => {
+    ReactDOM.render(
+        <App />,
+        document.getElementById('app-root'),
+    )
+}
 
 // export default App;
