@@ -32,7 +32,7 @@ class RuleParser:
         }
 
     def parse_as_rule(self, name=None):
-        top_level_rule = astree.Rule(name=name)
+        top_level_rule = astree.Rule(name=name, text=self.text)
         self.grouping_stack = [top_level_rule.root]
         for tok in self.lexer:
             self.token_list.append(tok)

@@ -2,19 +2,27 @@ from recognition.actions import library, pyexpr, asttransform, context, perform
 
 class ActionPiece:
 
+    def __init__(self):
+        self.json_object = None
+
     def perform(self):
-        pass
+        raise NotImplementedError
 
     @classmethod
     def from_object(cls, obj):
-        return {
+        factory_map = {
             'dsl': DSLActionPiece
-        }[obj['type']](obj['value'])
+        }
+        constructor = factory_map[obj['type']]
+        instance = constructor(obj['value'])
+        instance.json_object = obj
+        return instance
 
 class DSLActionPiece(ActionPiece):
     
     def __init__(self, action_input, arguments=None,
                 validator=lambda expr: True, raise_on_error=True):
+        super().__init__()
         self.literal_expressions, self.remaining_text = self.compile_expressions(action_input, validator, raise_on_error)
         self.expressions = [asttransform.transform_expression(e, arguments=arguments) for e in self.literal_expressions]
 
@@ -46,3 +54,9 @@ class DSLActionPiece(ActionPiece):
         for i, expr in enumerate(self.expressions):
             result = eval(expr, _globals, call_locals)
             yield result
+
+class Snippet:
+
+    def __init__(self, text):
+        super().__init__()
+        self.text = text

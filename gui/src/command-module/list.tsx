@@ -14,8 +14,8 @@ class CommandModuleList extends React.Component<any, {}> {
         console.log('cml', this.props)
         return (
             <div>
-                {this.props.paths.map((path: string) => {
-                    return <CommandModuleListItem key={path} onClick={this.props.onListItemClick} value={path} />
+                {this.props.paths.map((path: string, i: any) => {
+                    return <CommandModuleListItem key={i} onClick={this.props.onListItemClick} value={path} />
                 })}
             </div>
         );

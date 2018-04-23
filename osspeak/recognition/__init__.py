@@ -2,7 +2,6 @@ def rule(text, name=None):
     from recognition.rules.parser import RuleParser
     parser = RuleParser(text)
     rule_obj = parser.parse_as_rule(name=name)
-    rule_obj.raw_text = text
     return rule_obj
 
 def action(action_input, *args, **kwargs):

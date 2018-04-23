@@ -8,9 +8,10 @@ class ASTNode:
 
 class Rule(ASTNode):
 
-    def __init__(self, name=None):
+    def __init__(self, name=None, text=''):
         self.name = name
         self.open = True
+        self.text = text
         self.root = GroupingNode()
 
     def walk(self, ancestors=None, rules=None):
