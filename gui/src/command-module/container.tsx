@@ -5,7 +5,6 @@ import { Button } from 'material-ui'
 import CommandModulePanel from './panel';
 import CommandModuleList from './list';
 // import {observer} from 'react-mobx';
-import { Treebeard } from 'react-treebeard';
 import { commandModuleStore, CommandModuleStore } from './store'
 import { isEqual } from 'lodash';
 

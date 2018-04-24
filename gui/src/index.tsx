@@ -1,3 +1,4 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { wsFetch } from './websocket';
@@ -6,17 +7,6 @@ import { Treebeard } from 'react-treebeard';
 import './command-module/command-module.css';
 import { ws } from './websocket';
 import CommandModuleContainer from './command-module/container';
-// import "./app.css"
-// import CommandModulesView from '../command-modules/view';
-// import commandModulesStore from '../command-modules/store';
-// import {Provider} from 'mobx-react';
-// console.log('rp', Provider);
-
-// const stores = {
-//     commandModulesStore
-// }
-
-console.log(wsFetch)
 
 class App extends React.Component<any, {}> {
 
