@@ -1,6 +1,6 @@
-from inspect import signature, Parameter
 import inspect
-
+from inspect import signature, Parameter
+from recognition.actions import piece
 
 class Function:
 
@@ -34,7 +34,7 @@ class Function:
     def compile_action(self):
         from recognition import action
         arguments = set(self.parameters.keys())
-        self.action = action(self.action_text, arguments=arguments)
+        self.action_piece = piece.DSLActionPiece(self.action_text, arguments=arguments)
 
     def __call__(self, *args, **kwargs):
         self.func(*args, **kwargs)

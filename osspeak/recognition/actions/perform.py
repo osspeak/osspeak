@@ -3,6 +3,7 @@ import log
 import time
 import queue
 import collections
+import traceback
 import keyboard
 from settings import settings
 import platforms.api
@@ -29,6 +30,7 @@ def recognition_action_worker():
         try:
             evaluation = action.perform()
         except Exception as e:
+            traceback.print_exc()
             log.logger.error(f'Action {action} errored: {str(e)}')
             print(e)
         finally:
@@ -87,7 +89,7 @@ def get_leaf_action(node, text):
     return leaf_action, is_substitute
 
 def perform_action(command, variables, namespace, words):
-    log.logger.info(f'Matched rule: {command.rule.raw_text}')
+    log.logger.info(f'Matched rule: {command.rule.text}')
     recognition_context = context.RecognitionContext(variables, words, namespace)
     recognition_queue.put((command.action, recognition_context))
     

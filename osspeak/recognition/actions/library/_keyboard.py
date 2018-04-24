@@ -1,5 +1,6 @@
 import threading
 import keyboard
+from recognition.actions.library.vocola.vocolakeys import send_input
 from platforms import api
 import time
 import threading
@@ -24,5 +25,6 @@ def release(keys):
     keyboard.release(add_keyboard_shortcuts(keys))
 
 def press_and_release(keys):
-    new_keys = add_keyboard_shortcuts(keys)
-    keyboard.press_and_release(new_keys)
+    send_input('{' + '+'.join(keys) + '}')
+    # new_keys = add_keyboard_shortcuts(keys)
+    # keyboard.press_and_release(new_keys)
