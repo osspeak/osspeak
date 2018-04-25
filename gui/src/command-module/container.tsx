@@ -5,12 +5,9 @@ import { Button } from 'material-ui'
 import CommandModulePanel from './panel';
 import CommandModuleList from './list';
 // import {observer} from 'react-mobx';
-import { commandModuleStore, CommandModuleStore } from './store'
 import { isEqual } from 'lodash';
 
 class CommandModuleContainer extends React.Component<any, any> {
-
-    // store: CommandModuleStore
 
     constructor(params: any) {
         super(params);
@@ -19,7 +16,6 @@ class CommandModuleContainer extends React.Component<any, any> {
             selectedCommandModule: null,
             activeCommandModules: [],
         }
-        // this.store = commandModuleStore;
     }
 
     get nestedPaths() {

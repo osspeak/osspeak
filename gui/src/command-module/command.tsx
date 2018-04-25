@@ -1,14 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
-import { Table } from 'reactstrap'
+import { Input } from 'reactstrap'
+import Rule from './rule';
+import Action from './action';
 
 class Command extends React.Component<any, any> {
 
     constructor(params: any) {
         super(params);
         this.state = {
-            commands: []
         }
     }
 
@@ -17,8 +18,9 @@ class Command extends React.Component<any, any> {
 
     render() {
         return (
-            <div>
-                {this.props.rule.text}
+            <div className="command">
+                <Rule text={this.props.rule.text} />
+                <Action pieces={this.props.action.pieces} />
             </div>
         );
     }

@@ -30,5 +30,3 @@ def command_module(path):
     return {
         'commands': commands
     }
-    print(dir(module))
-    return 'banan'

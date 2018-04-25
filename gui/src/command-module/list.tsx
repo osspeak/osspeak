@@ -11,7 +11,6 @@ class CommandModuleList extends React.Component<any, {}> {
     }
     
     render() {
-        console.log('cml', this.props)
         return (
             <div>
                 {this.props.paths.map((path: string, i: any) => {

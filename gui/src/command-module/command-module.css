@@ -1,3 +1,8 @@
 #cm-container {
     display: flex;
 }
+
+.command {
+    display: flex;
+    flex-direction: row;
+}
