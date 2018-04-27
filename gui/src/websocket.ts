@@ -9,6 +9,7 @@ const wsUrl = `ws://localhost:3922`;
 export const ws = new WebSocket(wsUrl);
 // const serverMessageQueue: string[] = [];
 const outstandingFetches = new Map<string, ServerFetch>();
+const remote = require('electron').remote;
 
 ws.onopen = () => {
     (async() => {
@@ -27,6 +28,11 @@ ws.onmessage = (ev) => {
     else {
         //serverMessage;
     }
+}
+
+ws.onclose = () => {
+    var window = remote.getCurrentWindow();
+    window.close();
 }
  
 export function wsFetch(resource: string, args: any = [], kwargs: any = {}) {
