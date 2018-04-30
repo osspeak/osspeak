@@ -7,7 +7,6 @@ declare var window: any;
 // const wsUrl = `ws://${window.commandLineArgs.address}/ws`;
 const wsUrl = `ws://localhost:3922`;
 export const ws = new WebSocket(wsUrl);
-// const serverMessageQueue: string[] = [];
 const outstandingFetches = new Map<string, ServerFetch>();
 const remote = require('electron').remote;
 

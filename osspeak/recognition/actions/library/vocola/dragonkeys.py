@@ -30,7 +30,7 @@ def senddragonkeys_to_events(input, ignore_unknown_names=True):
     for c in chords:
         try:
             events += chord_to_events(c)
-        except (LookupError, e):
+        except LookupError as e:
             if not ignore_unknown_names: 
                 raise
             if not c[0] and not c[2] and len(c[1])==1:

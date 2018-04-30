@@ -4,13 +4,18 @@ import { wsFetch } from '../websocket';
 import { Button } from 'material-ui'
 import CommandModulePanel from './panel';
 import CommandModuleList from './list';
-// import {observer} from 'react-mobx';
+import {observable} from 'mobx';
+import {observer} from 'mobx-react';
 import { isEqual } from 'lodash';
+import {CommandModuleStore, store} from './store';
 
-class CommandModuleContainer extends React.Component<any, any> {
+@observer class CommandModuleContainer extends React.Component<any, any> {
 
-    constructor(params: any) {
-        super(params);
+    store: CommandModuleStore
+
+    constructor(props: any) {
+        super(props);
+        this.store = store;
         this.state = {
             paths: [],
             selectedCommandModule: null,
