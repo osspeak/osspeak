@@ -1,8 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { wsFetch } from '../websocket';
-import { Button } from 'material-ui'
-import { Treebeard } from 'react-treebeard';
 
 class CommandModuleListItem extends React.Component<any, {}> {
 
