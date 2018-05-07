@@ -1,10 +1,10 @@
 import json
+import traceback
 import inspect
 from recognition.commands import resources as command_resources
 
 resources = {
-    'COMMAND_MODULES': command_resources.command_modules,
-    'COMMAND_MODULE': command_resources.command_module,
+    'COMMAND_MODULE_INDEX': command_resources.command_module_index,
 }
 
 ws = None
@@ -26,6 +26,7 @@ async def gui_websocket_handler(websocket, path):
                 if inspect.iscoroutinefunction(resource_function):
                     data = await data
             except Exception as e:
+                traceback.print_exc()
                 print('resource error')
                 ok = False
                 data = str(e)

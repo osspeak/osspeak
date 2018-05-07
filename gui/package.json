@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/skellock/typescript-with-electron-react-kit#readme",
   "devDependencies": {
+    "@types/react-redux": "^5.0.19",
     "awesome-typescript-loader": "^3.5.0",
     "css-loader": "^0.28.11",
     "electron": "^1.8.4",
@@ -40,7 +41,11 @@
     "mobx-react": "^5.0.0",
     "react": "^16.3.0",
     "react-dom": "^16.3.0",
+    "react-redux": "^5.0.7",
+    "react-stateful": "^1.0.1",
     "react-treebeard": "^2.1.0",
-    "reactstrap": "^5.0.0"
+    "reactstrap": "^5.0.0",
+    "redux": "^4.0.0",
+    "redux-thunk": "^2.2.0"
   }
 }

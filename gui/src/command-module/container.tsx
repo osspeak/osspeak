@@ -1,21 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import { Button } from 'material-ui'
 import CommandModulePanel from './panel';
 import CommandModuleList from './list';
 import {observable} from 'mobx';
 import {observer} from 'mobx-react';
 import { isEqual } from 'lodash';
-import {CommandModuleStore, store} from './store';
 
-@observer class CommandModuleContainer extends React.Component<any, any> {
-
-    store: CommandModuleStore
+class CommandModuleContainer extends React.Component<any, any> {
 
     constructor(props: any) {
         super(props);
-        this.store = store;
         this.state = {
             paths: [],
             selectedCommandModule: null,
@@ -42,12 +40,7 @@ import {CommandModuleStore, store} from './store';
 
 
     componentDidMount() {
-        this.loadCommandModules();
-    }
-
-    async loadCommandModules() {
-        const commandModules = await wsFetch('COMMAND_MODULES');
-        this.setState({ paths: commandModules.paths })
+        
     }
 
     render() {
@@ -63,5 +56,11 @@ import {CommandModuleStore, store} from './store';
         );
     }
 }
+
+function mapStateToProps() { 
+
+}
+
+
 
 export default CommandModuleContainer;

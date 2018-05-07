@@ -1,24 +1,34 @@
+import json
 import os
 from settings import settings
 from recognition.commands import monitor
 
-def command_modules():
+def command_module_paths():
     state_json = monitor.command_module_state.command_module_json
     root = settings['command_directory']
     module_paths = []
     for path, config in state_json.items():
         relpath = os.path.relpath(path, root)
-        split_path = relpath.split(os.sep)[:]
-        module_paths.append(split_path)
+        module_paths.append(relpath)
     return {
-        'paths': module_paths
+        'paths': module_paths,
+        'osSep': os.sep
     }
-
-def command_module(path):
-    full_path = os.path.join(settings['command_directory'], *path)
-    module = monitor.command_module_state.command_modules[full_path]
+def command_module_index():
+    command_modules = monitor.command_module_state.command_modules
+    root = settings['command_directory']
+    command_modules = {}
+    for path, command_module in monitor.command_module_state.command_modules.items():
+        relpath = os.path.relpath(path, root)
+        command_modules[relpath] = command_module_object(command_module)
+    return {
+        'commandModules': command_modules,
+        'osSep': os.sep
+    }
+    
+def command_module_object(command_module):
     commands = []
-    for cmd in module.commands:
+    for cmd in command_module.commands:
         rule = {'text': cmd.rule.text}
         action = {'pieces': []}
         for piece in cmd.action.pieces:
