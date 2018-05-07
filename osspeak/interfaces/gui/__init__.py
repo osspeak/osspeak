@@ -1,5 +1,6 @@
 import sys
 import os
+import json
 from communication import pubsub, topics, server
 
 from communication.procs import ProcessHandler
@@ -15,7 +16,8 @@ async def close():
     sys.exit()
 
 async def start_electron():
-    proc = await ProcessHandler.create(ELECTRON_PATH, APP_PATH, on_output=foo, on_exit=close)
+    args = {'osSep': os.sep}
+    proc = await ProcessHandler.create(ELECTRON_PATH, APP_PATH, json.dumps(args), on_output=foo, on_exit=close)
     
 async def foo(a):
     print(a)

@@ -1,1 +1,0 @@
-export const LOAD_MODULE_MAP = 'LOAD_MODULE_MAP';

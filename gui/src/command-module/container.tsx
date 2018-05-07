@@ -3,44 +3,37 @@ import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { Button } from 'material-ui'
 import CommandModulePanel from './panel';
 import CommandModuleList from './list';
 import {observable} from 'mobx';
 import {observer} from 'mobx-react';
 import { isEqual } from 'lodash';
+import { CommandModuleContainerProps, CommandModuleContainerState } from "./types";
 
-class CommandModuleContainer extends React.Component<any, any> {
+class CommandModuleContainer extends React.Component<CommandModuleContainerProps, CommandModuleContainerState> {
 
     constructor(props: any) {
         super(props);
         this.state = {
-            paths: [],
             selectedCommandModule: null,
             activeCommandModules: [],
         }
     }
 
     get nestedPaths() {
-        return this.state.paths
+        return Object.keys(this.props.commandModules);
     }
 
-    onListItemClick = (clickedPath: [string]) => {
-        const updatedState: any = { selectedCommandModule: clickedPath };
-        let pathOpen = false;
-        for (const path of this.state.activeCommandModules) {
-            if (isEqual(path, clickedPath)) {
-                pathOpen = true;
-                break;
-            };
-        }
+    onListItemClick = (clickedPath: string) => {
+        const updatedState: any = { selectedCommandModule: clickedPath }
+        const pathOpen = this.state.activeCommandModules.includes(clickedPath);
         if (!pathOpen) updatedState.activeCommandModules = this.state.activeCommandModules.concat([clickedPath])
         this.setState(updatedState);
     }
 
 
     componentDidMount() {
-        
+
     }
 
     render() {
@@ -56,11 +49,5 @@ class CommandModuleContainer extends React.Component<any, any> {
         );
     }
 }
-
-function mapStateToProps() { 
-
-}
-
-
 
 export default CommandModuleContainer;

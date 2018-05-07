@@ -1,17 +1,10 @@
-import { NormalizedObjects } from "../types";
-
 export interface CommandModuleContainerProps {
-    
+    commandModules: any    
 }
 
 export interface CommandModuleContainerState {
-
-}
-
-export interface CommandModuleState {
-    modules: NormalizedObjects<CommandModule>
-    selected?: string
-    osSep?: string
+    selectedCommandModule: null | string
+    activeCommandModules: string[]
 }
 
 export interface CommandModule {

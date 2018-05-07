@@ -3,7 +3,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { createStore, } from "redux";
 import { Provider } from "react-redux";
-import allReducers from "./reducer";
 import { ws, wsFetch } from './websocket';
 import { Button } from 'material-ui'
 import { Treebeard } from 'react-treebeard';
@@ -32,7 +31,6 @@ class App extends React.Component<any, any> {
         return (
             <div id="osspeak-application">
                 <CommandModuleContainer commandModules={this.state.commandModules} />
-                {/* <TreeExample /> */}
             </div>
         );
     }
