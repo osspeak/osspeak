@@ -9,12 +9,12 @@ class ActionPiece:
         raise NotImplementedError
 
     @classmethod
-    def from_object(cls, obj):
+    def from_object(cls, obj, *a, **kw):
         factory_map = {
             'dsl': DSLActionPiece
         }
         constructor = factory_map[obj['type']]
-        instance = constructor(obj['value'])
+        instance = constructor(obj['value'], *a, **kw)
         instance.json_object = obj
         return instance
 
