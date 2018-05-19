@@ -3,8 +3,8 @@ export interface CommandModuleContainerProps {
 }
 
 export interface CommandModuleContainerState {
-    selectedCommandModule: null | string
-    activeCommandModules: string[]
+    selectedPath: null | string
+    activePaths: string[]
 }
 
 export interface CommandModule {

@@ -2,13 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
 import { Input } from 'reactstrap'
+import { ActionProps } from "./types";
 
-class Action extends React.Component<any, any> {
+class Action extends React.Component<ActionProps, any> {
 
     render() {
         return (
             <div>
-                Action
+                {this.props.pieces.map((piece) => {
+                    return <div>{piece.value}</div>
+                })}
             </div>
         );
     }

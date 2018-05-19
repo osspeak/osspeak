@@ -1,21 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
+import { Table } from 'reactstrap'
+import Command from './command';
+import {isEqual} from 'lodash'
 
-import CommandModuleContents from './contents';
-import CommandModuleTabs from './tabs';
+class CommandModulePanel extends React.Component<any, any> {
 
-class CommandModulePanel extends React.Component<any, {}> {
+    constructor(props: any) {
+        super(props);
+        this.state = {
 
-    componentDidMount() {
+        }
     }
 
     render() {
+        const {commands} = this.props.module;
         return (
             <div id="command-module-panel">
-                <CommandModuleTabs paths={this.props.commandModules} />
-                <CommandModuleContents path={this.props.path} />
-           </div>
+                {commands.map((cmd: any, i: Number) =>
+                    <Command key={i.toString()} rule={cmd.rule} action={cmd.action} />
+                )}
+            </div>
         );
     }
 }

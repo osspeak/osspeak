@@ -6,3 +6,11 @@
     display: flex;
     flex-direction: row;
 }
+
+#command-module-contents {
+    flex-grow: 1;
+}
+
+#command-module-panel {
+    /* flex-grow: 1; */
+}

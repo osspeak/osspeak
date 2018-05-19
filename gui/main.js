@@ -14,7 +14,7 @@ function createWindow () {
   global.args = process.argv;
   const options = {width: 8000, height: 6000, webPreferences: webPrefs}
   win = new BrowserWindow(options)
-  win.openDevTools({mode: 'bottom'});
+  // win.openDevTools({mode: 'bottom'});
 
   // and load the index.html of the app.
   win.loadURL(url.format({

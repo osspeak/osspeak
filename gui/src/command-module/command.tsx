@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
 import { Input } from 'reactstrap'
 import Rule from './rule';
-import Action from './action';
+import Action from '../action/action';
 
 class Command extends React.Component<any, any> {
 
