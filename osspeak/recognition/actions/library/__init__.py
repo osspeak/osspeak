@@ -1,5 +1,5 @@
 from recognition.actions.library import (window, state, thread,
-extensions, general, text, clipboard, osspeak, conditionals, history, fsystem, math)
+extensions, general, text, clipboard, osspeak, conditionals, history, fsystem, math, directinput)
 from recognition.actions.library import _mouse as mouse
 from recognition.actions.library import _keyboard as keyboard
 
