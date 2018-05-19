@@ -36,10 +36,13 @@ class DSLActionPiece(ActionPiece):
         '''
         typed_previous_result = False
         _globals = perform.recognition_namespace()
+        results = []
         for result in self.generate_results(_globals, call_locals):
+            results.append(result)
             if typed_previous_result and isinstance(result, str):
                 result = ' ' + result
             typed_previous_result = perform.perform_io(result)
+        return perform.concat_results(results)
 
     def perform_variable(self, call_locals=None, perform_results=False):
         results = []
