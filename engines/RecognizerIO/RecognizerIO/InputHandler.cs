@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using Newtonsoft.Json;
+using System.Xml;
 using System.Collections.Generic;
 using System.Speech.Recognition;
+using System.Speech.Recognition.SrgsGrammar;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,10 +38,13 @@ namespace RecognizerIO
                     string grammarXml = jsonMsg.Grammar;
                     string grammarId = jsonMsg.Id;
                     bool startEngine = jsonMsg.StartEngine;
-                    string tmpPath = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".xml";
-                    System.IO.File.WriteAllText(tmpPath, grammarXml);
-                    EngManager.LoadGrammar(tmpPath, grammarId);
-                    System.IO.File.Delete(tmpPath);
+                    using (var strReader = new StringReader(grammarXml))
+                    using (XmlReader xmlReader = XmlReader.Create(strReader))
+                    {
+                        var document = new SrgsDocument(xmlReader);
+                        var grammar = new Grammar(document);
+                        EngManager.LoadGrammar(grammar, grammarId);
+                    }
                     if (!EngManager.IsRunning && startEngine) EngManager.Begin();
                     break;
                 case "LOAD_SETTINGS":

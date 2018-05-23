@@ -36,9 +36,8 @@ namespace RecognizerIO.Engines
             }
         }
 
-        public void LoadGrammar(string path, string grammarId)
+        public void LoadGrammar(Grammar gram, string grammarId)
         {
-            var gram = new Grammar(path);
             gram.Name = grammarId;
             if (ActiveGrammar != null)
             {
