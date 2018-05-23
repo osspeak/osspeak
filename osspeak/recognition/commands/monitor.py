@@ -46,8 +46,8 @@ async def watch_user_system_state(msg_list):
             elif msg == topics.RELOAD_GRAMMAR:
                 loader.load_and_send_grammar(command_module_state)
             previous_window = current_window
-            previous_state = current_state
             msg_list[0] = None
+        previous_state = current_state
         await asyncio.sleep(1)
 
 def set_message(msg_list, msg):
