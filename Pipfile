@@ -1,21 +1,17 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 websockets = "*"
 mouse = "*"
 keyboard = "*"
 pywindow = "*"
 lark-parser = "*"
-
+screengrid = "==0.0.7"
 
 [dev-packages]
-
 requests = "*"
 pyinstaller = "*"
 "pypiwin32" = "*"
