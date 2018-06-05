@@ -9,7 +9,7 @@ mouse = "*"
 keyboard = "*"
 pywindow = "*"
 lark-parser = "*"
-screengrid = "==0.0.7"
+screengrid = "==0.0.10"
 
 [dev-packages]
 requests = "*"
