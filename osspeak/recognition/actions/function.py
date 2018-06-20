@@ -8,10 +8,9 @@ class Function:
         self.signature_text = signature_text
         self.func = self.define_function()
         self.parameters = signature(self.func).parameters
-        self.name = signature_text.split('(', 1)[0].strip()
+        self.name = self.func.__name__
         self.action_input = action_input
         self.action_pieces = None
-        # self.action_pieces = action_input
 
     def get_call_locals(self, args, kwargs):
         call_args = kwargs.copy()
