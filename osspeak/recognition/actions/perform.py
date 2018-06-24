@@ -103,7 +103,7 @@ def var_result(variable_actions_pieces, perform_results: bool):
 def concat_results(results):
     acc = None
     for res in results:
-        if acc is None:
+        if None in (acc, res):
             acc = res
         else:
             try:

@@ -25,4 +25,4 @@ class Timer:
     def stop(self):
         stop_time = time.time()
 
-with Timer.get('foo').section('tokenize')
+# with Timer.get('foo').section('tokenize')
