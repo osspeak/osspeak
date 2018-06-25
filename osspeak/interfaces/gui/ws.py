@@ -4,7 +4,7 @@ import inspect
 from recognition.commands import resources as command_resources
 
 resources = {
-    'COMMAND_MODULE_INDEX': command_resources.command_module_index,
+    'RECOGNITION_INDEX': command_resources.recognition_index,
 }
 
 ws = None

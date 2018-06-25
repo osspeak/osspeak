@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
 import { Table } from 'reactstrap'
 import Command from './command';
-import {isEqual} from 'lodash'
+import { CommandModulePanelProps } from "./types";
 
 class CommandModulePanel extends React.Component<any, any> {
 

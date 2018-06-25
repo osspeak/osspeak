@@ -1,5 +1,5 @@
 export interface CommandModuleContainerProps {
-    commandModules: any    
+    recognitionIndex: RecognitionIndex
 }
 
 export interface CommandModuleContainerState {
@@ -9,4 +9,13 @@ export interface CommandModuleContainerState {
 
 export interface CommandModule {
     id: string
+}
+
+export interface RecognitionIndex {
+    commandModules: { [s: string]: CommandModule },
+    osSep: string
+}
+
+export interface CommandModulePanelProps {
+    commandModule: CommandModule
 }

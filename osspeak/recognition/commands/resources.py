@@ -14,7 +14,7 @@ def command_module_paths():
         'paths': module_paths,
         'osSep': os.sep
     }
-def command_module_index():
+def recognition_index():
     command_modules = monitor.command_module_state.command_modules
     root = settings['command_directory']
     command_modules = {}

@@ -6,15 +6,16 @@ import { Provider } from "react-redux";
 import { ws, wsFetch } from './websocket';
 import { Button } from 'material-ui'
 import { Treebeard } from 'react-treebeard';
+import { AppState } from "./types";
 import './command-module/command-module.css';
 import CommandModuleContainer from './command-module/container';
 
-class App extends React.Component<any, any> {
+class App extends React.Component<any, AppState> {
 
     constructor(props: any) {
         super(props);
         this.state = {
-            commandModules: {}
+            recognitionIndex: {}
         }
     }
 
@@ -23,14 +24,14 @@ class App extends React.Component<any, any> {
     }
 
     async loadIndex() {
-        const {commandModules} = await wsFetch('COMMAND_MODULE_INDEX');
-        this.setState({commandModules});
+        const {recognitionIndex} = await wsFetch('RECOGNITION_INDEX');
+        this.setState({recognitionIndex});
     }
     
     render() {
         return (
             <div id="osspeak-application">
-                <CommandModuleContainer commandModules={this.state.commandModules} />
+                <CommandModuleContainer recognitionIndex={this.state.recognitionIndex} />
             </div>
         );
     }

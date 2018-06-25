@@ -22,7 +22,7 @@ class CommandModuleContainer extends React.Component<CommandModuleContainerProps
     }
 
     get nestedPaths() {
-        return Object.keys(this.props.commandModules);
+        return Object.keys(this.props.recognitionIndex.commandModules);
     }
 
     onListItemClick = (clickedPath: string) => {
@@ -39,13 +39,15 @@ class CommandModuleContainer extends React.Component<CommandModuleContainerProps
     }
 
     render() {
+        const cmdModules = this.props.recognitionIndex.commandModules;
+        const module = this.state.selectedPath === null ? null : cmdModules[this.state.selectedPath]
         return (
             <div id="cm-container">
                 <CommandModuleList onListItemClick={this.onListItemClick} paths={this.nestedPaths} />
                 {this.state.selectedPath && (
                     <div id="command-module-contents">
                         <CommandModuleTabs paths={this.state.activePaths} />
-                        <CommandModulePanel module={this.props.commandModules[this.state.selectedPath]} />
+                        {<CommandModulePanel module={module} />}
                     </div>
                 )}
                 {this.state.activePaths}
