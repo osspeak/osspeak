@@ -53,6 +53,13 @@ def perform_commands(grammar_context, words):
     word_list = [word['Text'] for word in words]
     utterance = ' '.join(word_list)
     lark_recognition_tree = grammar_context.lark_grammar.parse(utterance)
+    recognition_contexts = get_recognition_contexts(lark_recognition_tree, grammar_context)
+    if settings['perform_actions']:
+        for recognition_context, command in recognition_contexts:
+            recognition_queue.put((command.action, recognition_context))
+
+def get_recognition_contexts(lark_recognition_tree, grammar_context):
+    recognition_contexts = []
     for matched_rule in lark_recognition_tree.children:
         words = []
         rule_id = matched_rule.data
@@ -75,10 +82,11 @@ def perform_commands(grammar_context, words):
                 path = path[:-1]
             if is_substitute:
                 substitute_paths.add(start_path)
-            variables = tuple(match_variables.values())
+        variables = tuple(match_variables.values())
         log.logger.info(f'Matched rule: {command.rule.text}')
-        if settings['perform_actions']:
-            action_result = perform_action(command, variables, grammar_context.namespace, tuple(words))
+        rec_context = context.RecognitionContext(variables, words, grammar_context.namespace)
+        recognition_contexts.append((rec_context, command))
+    return recognition_contexts
 
 def get_leaf_action(node, text):
     from recognition.actions import piece
@@ -89,10 +97,6 @@ def get_leaf_action(node, text):
         leaf_action, is_substitute = piece.DSLActionPiece(f"'{text}'"), False
     return leaf_action, is_substitute
 
-def perform_action(command, variables, namespace, words):
-    recognition_context = context.RecognitionContext(variables, words, namespace)
-    recognition_queue.put((command.action, recognition_context))
-    
 def var_result(variable_actions_pieces, perform_results: bool):
     results = []
     for action_piece in variable_actions_pieces:
