@@ -76,6 +76,7 @@ def perform_commands(grammar_context, words):
             if is_substitute:
                 substitute_paths.add(start_path)
             variables = tuple(match_variables.values())
+        log.logger.info(f'Matched rule: {command.rule.text}')
         if settings['perform_actions']:
             action_result = perform_action(command, variables, grammar_context.namespace, tuple(words))
 
@@ -89,7 +90,6 @@ def get_leaf_action(node, text):
     return leaf_action, is_substitute
 
 def perform_action(command, variables, namespace, words):
-    log.logger.info(f'Matched rule: {command.rule.text}')
     recognition_context = context.RecognitionContext(variables, words, namespace)
     recognition_queue.put((command.action, recognition_context))
     
