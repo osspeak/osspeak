@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
 import { Table } from 'reactstrap'
-import Command from './command';
+import CommandPreview from './command-preview';
 import { CommandModulePanelProps } from "./types";
 
 class CommandModulePanel extends React.Component<any, any> {
@@ -10,7 +10,7 @@ class CommandModulePanel extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.state = {
-
+            commandBeingEditedIndex: null,
         }
     }
 
@@ -19,7 +19,7 @@ class CommandModulePanel extends React.Component<any, any> {
         return (
             <div id="command-module-panel">
                 {commands.map((cmd: any, i: Number) =>
-                    <Command key={i.toString()} rule={cmd.rule} action={cmd.action} />
+                    <CommandPreview key={i.toString()} command={cmd} />
                 )}
             </div>
         );

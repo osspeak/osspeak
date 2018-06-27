@@ -9,7 +9,6 @@ class CommandModuleListItem extends React.Component<any, {}> {
     render() {
         return (
             <div className="cm-list-item" onClick={() => this.props.onClick(this.props.value)}>
-                foo
                 {this.props.value}
             </div>
         );

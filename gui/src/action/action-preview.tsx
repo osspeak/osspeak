@@ -4,11 +4,11 @@ import { wsFetch } from '../websocket';
 import { Input } from 'reactstrap'
 import { ActionProps } from "./types";
 
-class Action extends React.Component<ActionProps, any> {
+class ActionPreview extends React.Component<ActionProps, any> {
 
     render() {
         return (
-            <div>
+            <div className="action-preview">
                 {this.props.pieces.map((piece) => {
                     return <div>{piece.value}</div>
                 })}
@@ -17,4 +17,4 @@ class Action extends React.Component<ActionProps, any> {
     }
 }
 
-export default Action;
+export default ActionPreview;

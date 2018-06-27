@@ -23,12 +23,13 @@
   "homepage": "https://github.com/skellock/typescript-with-electron-react-kit#readme",
   "devDependencies": {
     "@types/react-redux": "^5.0.19",
-    "awesome-typescript-loader": "^3.5.0",
+    "awesome-typescript-loader": "^5.2.0",
     "css-loader": "^0.28.11",
     "electron": "^1.8.4",
     "style-loader": "^0.20.3",
     "typescript": "^2.8.1",
-    "webpack": "^3.11.0"
+    "webpack": "^4.12.2",
+    "webpack-cli": "^3.0.8"
   },
   "dependencies": {
     "@types/lodash": "^4.14.107",

@@ -8,6 +8,7 @@ import { Button } from 'material-ui'
 import { Treebeard } from 'react-treebeard';
 import { AppState } from "./types";
 import './command-module/command-module.css';
+import './action/action.css';
 import CommandModuleContainer from './command-module/container';
 
 class App extends React.Component<any, AppState> {

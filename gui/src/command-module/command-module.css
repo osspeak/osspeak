@@ -2,9 +2,15 @@
     display: flex;
 }
 
-.command {
+.command-preview {
     display: flex;
     flex-direction: row;
+}
+
+.rule-input {
+    width: 50%;
+    /* flex-grow: 1;
+    flex-shrink: 0; */
 }
 
 #command-module-contents {

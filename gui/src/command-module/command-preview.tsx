@@ -3,8 +3,9 @@ import { Collapse, Card, CardBody } from "reactstrap";
 import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
 import { Input } from 'reactstrap'
+import CommandHeader from './command-header';
 import Rule from './rule';
-import Action from '../action/action';
+import ActionPreview from '../action/action-preview';
 
 class CommandPreview extends React.Component<any, any> {
 
@@ -18,10 +19,11 @@ class CommandPreview extends React.Component<any, any> {
     }
 
     render() {
+        const { action, rule } = this.props.command
         return (
             <div className="command-preview">
-                <Rule text={this.props.rule.text} />
-                <Action pieces={this.props.action.pieces} />
+                <Rule text={rule.text} />
+                <ActionPreview pieces={action.pieces} />
             </div>
         );
     }

@@ -7,7 +7,9 @@ class Rule extends React.Component<any, any> {
 
     render() {
         return (
-            <Input value={this.props.text} />
+            <div className="rule-input">
+                {this.props.text}
+            </div>
         );
     }
 }

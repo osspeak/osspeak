@@ -4,6 +4,7 @@ module.exports = {
         app: "./src/index.tsx",
         preload: "./src/preload.ts"
     },
+    mode: 'development',
     output: {
         filename: "bundle.[name].js",
         path: __dirname + "/dist"
