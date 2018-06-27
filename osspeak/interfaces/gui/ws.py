@@ -21,7 +21,6 @@ async def gui_websocket_handler(websocket, path):
         else:
             try:
                 resource_function = resources[msg['resource']]
-                print(msg)
                 data = resource_function(*msg['args'], **msg['kwargs'])
                 if inspect.iscoroutinefunction(resource_function):
                     data = await data
@@ -33,7 +32,7 @@ async def gui_websocket_handler(websocket, path):
         response = json.dumps({
             'id': msg['id'],
             'data': data,
-            'ok': True
+            'ok': ok
         })
         await websocket.send(response)
     

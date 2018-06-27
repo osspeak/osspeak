@@ -15,7 +15,7 @@ class App extends React.Component<any, AppState> {
     constructor(props: any) {
         super(props);
         this.state = {
-            recognitionIndex: {}
+            recognitionIndex: null
         }
     }
 
@@ -24,14 +24,15 @@ class App extends React.Component<any, AppState> {
     }
 
     async loadIndex() {
-        const {recognitionIndex} = await wsFetch('RECOGNITION_INDEX');
+        const recognitionIndex = await wsFetch('RECOGNITION_INDEX');
+        console.log(recognitionIndex)
         this.setState({recognitionIndex});
     }
     
     render() {
         return (
             <div id="osspeak-application">
-                <CommandModuleContainer recognitionIndex={this.state.recognitionIndex} />
+                {this.state.recognitionIndex !== null && <CommandModuleContainer recognitionIndex={this.state.recognitionIndex} />}
             </div>
         );
     }
