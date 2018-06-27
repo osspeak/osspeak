@@ -1,6 +1,6 @@
 import uuid
 from typing import List, Dict
-from lark import Lark, Tree
+import lark
 from recognition.rules import astree
 
 def build_repeat(node):
@@ -66,7 +66,7 @@ def create_lark_grammar(command_rules, named_rules, node_ids):
     rule_lines.append('%ignore " "')
     rule_lines.append(f'start: ({rule_names})+')
     text = '\n'.join(rule_lines)
-    gram = Lark(text, start='start')
+    gram = lark.Lark(text, start='start')
     return gram
 
 def create_lark_grammar_list(command_rules: List, named_rules, node_ids):
@@ -86,7 +86,7 @@ def yield_paths(lark_node, node_map, ancestor_path=()):
     matched_text = node_text(node, lark_node)
     yield path, matched_text
     for child in lark_node.children:
-        if isinstance(child, Tree):
+        if isinstance(child, lark.Tree):
             yield from yield_paths(child, node_map, path)
 
 def node_text(node, lark_node):
