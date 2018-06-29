@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
 import { ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap'
 import ActionList from './action-list';
+import RuleInput from './rule-input';
 import { CommandModulePanelProps } from "./types";
 
 class CommandEditor extends React.Component<any, any> {
@@ -25,6 +26,7 @@ class CommandEditor extends React.Component<any, any> {
             <>
                 <ModalHeader toggle={this.toggle}>Edit Command</ModalHeader>
                 <ModalBody>
+                    <RuleInput rule={this.props.command.rule} />
                     <ActionList />
                 </ModalBody>
                 <ModalFooter>
