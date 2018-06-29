@@ -24,7 +24,7 @@
   "devDependencies": {
     "awesome-typescript-loader": "^5.2.0",
     "css-loader": "^0.28.11",
-    "electron": "^1.8.7",
+    "electron": "^2.0.3",
     "style-loader": "^0.20.3",
     "typescript": "^2.9.2",
     "webpack": "^4.13.0",
