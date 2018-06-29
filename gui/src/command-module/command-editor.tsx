@@ -9,8 +9,6 @@ class CommandEditor extends React.Component<any, any> {
 
     constructor(props: any) {
         super(props);
-        this.state = {
-        }
     }
 
     onModuleSelected = (index: Number) => {

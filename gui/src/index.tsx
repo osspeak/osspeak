@@ -9,11 +9,12 @@ import CommandModuleContainer from './command-module/container';
 
 class App extends React.Component<any, AppState> {
 
+    state: AppState = {
+        recognitionIndex: null
+    }
+
     constructor(props: any) {
         super(props);
-        this.state = {
-            recognitionIndex: null
-        }
     }
 
     componentDidMount() {

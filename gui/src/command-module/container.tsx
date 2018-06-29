@@ -9,12 +9,14 @@ import { CommandModuleContainerProps, CommandModuleContainerState } from "./type
 
 class CommandModuleContainer extends React.Component<CommandModuleContainerProps, CommandModuleContainerState> {
 
+    state: CommandModuleContainerState = {
+        selectedPath: null,
+        activePaths: [],
+    }
+
     constructor(props: any) {
         super(props);
-        this.state = {
-            selectedPath: null,
-            activePaths: [],
-        }
+        this.state.selectedPath
     }
 
     get nestedPaths() {

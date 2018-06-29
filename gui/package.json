@@ -24,20 +24,20 @@
   "devDependencies": {
     "awesome-typescript-loader": "^5.2.0",
     "css-loader": "^0.28.11",
-    "electron": "^1.8.4",
+    "electron": "^1.8.7",
     "style-loader": "^0.20.3",
-    "typescript": "^2.8.1",
-    "webpack": "^4.12.2",
+    "typescript": "^2.9.2",
+    "webpack": "^4.13.0",
     "webpack-cli": "^3.0.8"
   },
   "dependencies": {
-    "@types/lodash": "^4.14.107",
-    "@types/react": "^16.1.0",
-    "@types/react-dom": "^16.0.4",
-    "bootstrap": "^4.1.0",
-    "lodash": "^4.17.5",
-    "react": "^16.3.0",
-    "react-dom": "^16.3.0",
+    "@types/lodash": "^4.14.110",
+    "@types/react": "^16.4.4",
+    "@types/react-dom": "^16.0.6",
+    "bootstrap": "^4.1.1",
+    "lodash": "^4.17.10",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
     "react-stateful": "^1.0.1",
     "reactstrap": "^5.0.0"
   }

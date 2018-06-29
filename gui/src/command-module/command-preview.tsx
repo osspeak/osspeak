@@ -8,10 +8,11 @@ import ActionPreview from '../action/action-preview';
 
 class CommandPreview extends React.Component<any, any> {
 
+    state = {
+    }
+
     constructor(params: any) {
         super(params);
-        this.state = {
-        }
     }
 
     onSelect = () => {

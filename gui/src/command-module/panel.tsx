@@ -8,11 +8,12 @@ import CommandEditor from "./command-editor";
 
 class CommandModulePanel extends React.Component<any, any> {
 
+    state = {
+        commandBeingEditedIndex: null,
+    }
+
     constructor(props: any) {
         super(props);
-        this.state = {
-            commandBeingEditedIndex: null,
-        }
     }
 
     onModuleSelected = (index: Number) => {
