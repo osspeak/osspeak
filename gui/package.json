@@ -39,6 +39,6 @@
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-stateful": "^1.0.1",
-    "reactstrap": "^5.0.0"
+    "reactstrap": "^6.2.0"
   }
 }
