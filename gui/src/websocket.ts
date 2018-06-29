@@ -1,4 +1,3 @@
-// import {observable} from 'mobx';
 import {ServerFetch} from './types';
 declare var window: any;
 

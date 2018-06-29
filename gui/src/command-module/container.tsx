@@ -1,13 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
 import CommandModulePanel from './panel';
 import CommandModuleTabs from './tabs';
 import CommandModuleList from './list/list';
-import { observable } from 'mobx';
-import { observer } from 'mobx-react';
 import { isEqual } from 'lodash';
 import { CommandModuleContainerProps, CommandModuleContainerState } from "./types";
 

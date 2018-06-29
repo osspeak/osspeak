@@ -1,11 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore, } from "redux";
-import { Provider } from "react-redux";
 import { ws, wsFetch } from './websocket';
-import { Button } from 'material-ui'
-import { Treebeard } from 'react-treebeard';
 import { AppState } from "./types";
 import './command-module/command-module.css';
 import './action/action.css';
