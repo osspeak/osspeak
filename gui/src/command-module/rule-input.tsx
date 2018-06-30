@@ -1,24 +1,20 @@
 import React from 'react';
 import { Input } from 'reactstrap'
+import { Rule } from "./types";
 
-class RuleInput extends React.Component<any, any> {
+interface RuleInputProps {
+    text: string 
+}
 
-    constructor(props: any) {
-        super(props);
-    }
+class RuleInput extends React.Component<RuleInputProps, any> {
 
-    onModuleSelected = (index: Number) => {
-        this.setState({ commandBeingEditedIndex: index })
-    }
-
-    toggle = () => {
-        this.setState({ commandBeingEditedIndex: null });
+    onChange = (evt: any) => {
     }
 
     render() {
         // const { commands } = this.props.module;
         return (
-            <Input value={this.props.rule.text}>foo</Input>
+            <Input value={this.props.text}></Input>
         );
     }
 }

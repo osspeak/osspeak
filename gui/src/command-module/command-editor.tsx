@@ -2,24 +2,30 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
 import { ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap'
-import ActionList from './action-list';
+import ActionPieceList from './action-piece-list';
 import RuleInput from './rule-input';
-import ActionEditor from './action-editor'
-import { CommandEditorProps, CommandEditorState } from "./types";
+import ActionPieceEditor from './action-piece-editor'
+import {Command } from "./types";
 import { cloneDeep } from "lodash";
+
+export interface CommandEditorProps {
+    command: Command
+ }
+
+export interface CommandEditorState {
+    commandCopy: Command
+ }
 
 class CommandEditor extends React.Component<CommandEditorProps, CommandEditorState> {
 
-    constructor(props: any) {
+    constructor(props: CommandEditorProps) {
         super(props);
-    }
-
-    onModuleSelected = (index: Number) => {
-        this.setState({ commandBeingEditedIndex: index })
+        this.state = {
+            commandCopy: cloneDeep(props.command)
+        }
     }
 
     toggle = () => {
-        this.setState({ commandBeingEditedIndex: null });
     }
 
     render() {
@@ -28,12 +34,12 @@ class CommandEditor extends React.Component<CommandEditorProps, CommandEditorSta
             <>
                 <ModalHeader toggle={this.toggle}>Edit Command</ModalHeader>
                 <ModalBody>
-                    <RuleInput rule={this.props.command.rule} />
-                    <ActionList actions={this.props.command.action} />
-                    <ActionEditor />
+                    <RuleInput text={this.props.command.rule.text} />
+                    <ActionPieceList actionPieces={this.props.command.action.pieces} />
+                    <ActionPieceEditor />
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="primary" onClick={this.toggle}>Do Something</Button>{' '}
+                    <Button color="primary" onClick={this.toggle}>Save</Button>{' '}
                     <Button color="secondary" onClick={this.toggle}>Cancel</Button>
                 </ModalFooter>
             </>

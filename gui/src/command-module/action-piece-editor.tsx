@@ -1,24 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { wsFetch } from '../websocket';
-import { ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap'
-import ActionList from './action-list';
-import RuleInput from './rule-input';
-import { CommandModulePanelProps } from "./types";
 
-declare var CodeMirror: any
 
 // import * as monaco from 'monaco-editor';
 
 
-class ActionEditor extends React.Component<any, any> {
+class ActionPieceEditor extends React.Component<any, any> {
 
     constructor(props: any) {
         super(props);
     }
 
     componentDidMount() {
-        const el = ReactDOM.findDOMNode(this) as HTMLDivElement;
         // var editor = CodeMirror.fromTextArea(el, {
         //     lineNumbers: true,
         //     lineWrapping: true,
@@ -45,4 +38,4 @@ class ActionEditor extends React.Component<any, any> {
     }
 }
 
-export default ActionEditor;
+export default ActionPieceEditor;

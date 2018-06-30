@@ -5,7 +5,17 @@ import CommandModulePanel from './panel';
 import CommandModuleTabs from './tabs';
 import CommandModuleList from './list/list';
 import { isEqual } from 'lodash';
-import { CommandModuleContainerProps, CommandModuleContainerState } from "./types";
+import { RecognitionIndex } from "./types";
+
+export interface CommandModuleContainerProps {
+    recognitionIndex: RecognitionIndex
+}
+
+export interface CommandModuleContainerState {
+    selectedPath: null | string
+    activePaths: string[]
+}
+
 
 class CommandModuleContainer extends React.Component<CommandModuleContainerProps, CommandModuleContainerState> {
 
@@ -52,7 +62,7 @@ class CommandModuleContainer extends React.Component<CommandModuleContainerProps
                             onTabClick={this.onTabClick}
                             paths={this.state.activePaths}
                         />
-                        {<CommandModulePanel module={module} />}
+                        {module !== null && <CommandModulePanel commandModule={module} />}
                     </div>
                 )}
             </div>

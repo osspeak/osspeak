@@ -2,8 +2,14 @@ import { Nav, NavItem, NavLink } from "reactstrap";
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
-import { CommandModuleTabsProps } from "./types";
+import { } from "./types";
 import classnames from 'classnames';
+
+export interface CommandModuleTabsProps {
+    selected: string
+    onTabClick: (name: string) => void
+    paths: string[]
+}
 
 class CommandModuleTabs extends React.Component<CommandModuleTabsProps, {}> {
 
@@ -11,7 +17,6 @@ class CommandModuleTabs extends React.Component<CommandModuleTabsProps, {}> {
     }
 
     render() {
-        console.log(this.props.paths)
         return (
             <div id="command-module-tabs">
                 <Nav tabs>

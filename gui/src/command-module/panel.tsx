@@ -3,10 +3,14 @@ import ReactDOM from 'react-dom';
 import { wsFetch } from '../websocket';
 import { Modal } from 'reactstrap'
 import CommandPreview from './command-preview';
-import { CommandModulePanelProps } from "./types";
+import { CommandModule } from "./types";
 import CommandEditor from "./command-editor";
 
-class CommandModulePanel extends React.Component<any, any> {
+export interface CommandModulePanelProps {
+    commandModule: CommandModule
+}
+
+class CommandModulePanel extends React.Component<CommandModulePanelProps, any> {
 
     state = {
         commandBeingEditedIndex: null,
@@ -25,7 +29,7 @@ class CommandModulePanel extends React.Component<any, any> {
     }
 
     render() {
-        const { commands } = this.props.module;
+        const { commands } = this.props.commandModule;
         const editIndex = this.state.commandBeingEditedIndex
         const commandBeingEdited = editIndex === null ? null : commands[editIndex]
         return (
@@ -33,8 +37,8 @@ class CommandModulePanel extends React.Component<any, any> {
                 {commands.map((cmd: any, i: Number) =>
                     <CommandPreview key={i.toString()} command={cmd} onSelect={() => this.onModuleSelected(i)} />
                 )}
-                <Modal isOpen={commandBeingEdited !== null} toggle={this.toggle} className={this.props.className}>
-                    <CommandEditor command={commandBeingEdited} />
+                <Modal isOpen={commandBeingEdited !== null} toggle={this.toggle}>
+                    {commandBeingEdited && <CommandEditor command={commandBeingEdited} />}
                 </Modal>
             </div>
         );

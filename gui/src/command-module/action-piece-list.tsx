@@ -1,12 +1,7 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { wsFetch } from '../websocket';
-import { ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap'
-import CommandPreview from './command-preview';
-import { CommandModulePanelProps } from "./types";
 import { ListGroup, ListGroupItem } from 'reactstrap';
 
-class ActionList extends React.Component<any, any> {
+class ActionPieceList extends React.Component<any, any> {
     
       render() {
         return (
@@ -21,4 +16,4 @@ class ActionList extends React.Component<any, any> {
       }
     }
 
-export default ActionList;
+export default ActionPieceList;
