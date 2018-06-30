@@ -16,7 +16,10 @@ class CommandModuleContainer extends React.Component<CommandModuleContainerProps
 
     constructor(props: any) {
         super(props);
-        this.state.selectedPath
+    }
+
+    onTabClick = (name: string) => {
+        this.setState({ selectedPath: name });
     }
 
     get nestedPaths() {
@@ -44,11 +47,14 @@ class CommandModuleContainer extends React.Component<CommandModuleContainerProps
                 <CommandModuleList onListItemClick={this.onListItemClick} paths={this.nestedPaths} />
                 {this.state.selectedPath && (
                     <div id="command-module-contents">
-                        <CommandModuleTabs paths={this.state.activePaths} />
+                        <CommandModuleTabs
+                            selected={this.state.selectedPath}
+                            onTabClick={this.onTabClick}
+                            paths={this.state.activePaths}
+                        />
                         {<CommandModulePanel module={module} />}
                     </div>
                 )}
-                {this.state.activePaths}
             </div>
         );
     }

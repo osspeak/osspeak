@@ -1,3 +1,5 @@
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+
 module.exports = {
     target: 'electron-main',
     entry: {
@@ -33,4 +35,7 @@ module.exports = {
     //     "react": "React",
     //     "react-dom": "ReactDOM"
     // },
+    plugins: [
+        // new MonacoWebpackPlugin()
+    ]
 };
