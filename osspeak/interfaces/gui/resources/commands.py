@@ -3,7 +3,7 @@ import os
 from settings import settings
 from recognition.commands import monitor
 
-def command_module_paths():
+async def command_module_paths():
     state_json = monitor.command_module_state.command_module_json
     root = settings['command_directory']
     module_paths = []
@@ -14,7 +14,7 @@ def command_module_paths():
         'paths': module_paths,
         'osSep': os.sep
     }
-def recognition_index():
+async def recognition_index():
     command_modules = monitor.command_module_state.command_modules
     root = settings['command_directory']
     command_modules = {}
