@@ -28,13 +28,58 @@ class CommandModuleState:
     def __init__(self):
         self.grammars = collections.OrderedDict()
         self.map_grammar_to_commands = collections.OrderedDict()
-        self.command_module_json = {}
         self.command_modules = {}
         self.active_command_modules = {}
+        self.command_module_loader = CommandModuleLoader()
 
     def populate(self):
-        self.command_module_json = load_command_json()
-        self.command_modules = load_command_modules(self.command_module_json)
+        self.command_modules = self.command_module_loader.load_command_modules()
+
+class CommandModuleLoader:
+
+    def __init__(self):
+        pass
+
+    def load_command_modules(self):
+        command_module_json = self.load_command_json()
+        command_modules = {path: commands.CommandModule(config, path) for path, config in command_module_json.items()}
+        return command_modules
+
+    def load_command_json(self):
+        json_module_objects = {}
+        command_dir = settings.settings['command_directory']
+        if not os.path.isdir(command_dir):
+            os.makedirs(command_dir)
+        json_module_objects = self.load_json_directory(command_dir, DEFAULT_DIRECTORY_SETTINGS)
+        return json_module_objects
+
+    def load_json_directory(self, path, parent_directory_settings):
+        command_modules = {}
+        directories = []
+        local_settings = settings.try_load_json_file(os.path.join(path, '.osspeak.json'))
+        directory_settings = {**parent_directory_settings, **local_settings}
+        with os.scandir(path) as i:
+            for entry in sorted(i, key=lambda x: x.name):
+                if entry.name.startswith('.'):
+                    continue
+                if entry.is_file() and entry.name.endswith('.json'):
+                    command_modules[entry.path] = self.load_command_module_file(entry.path)
+                # read files in this directory first before recursing down
+                elif entry.is_dir():
+                    directories.append(entry)
+            if directory_settings['recurse']:
+                for direntry in directories:
+                    command_modules.update(self.load_json_directory(direntry.path, directory_settings))
+        return command_modules
+
+    def load_command_module_file(self, path):
+        with open(path) as f:
+            try:
+                module_config = json.load(f)
+            except json.decoder.JSONDecodeError as e:
+                module_config = {'Error': str(e)}
+                log.logger.warning(f"JSON error loading command module '{path}':\n{e}")
+        return module_config
 
 async def load_modules(command_module_state, current_window, current_state, initialize=False):
     previous_active_modules = command_module_state.active_command_modules
@@ -98,41 +143,6 @@ def fire_activation_events(active_modules, previous_active_modules, namespace):
             action = cmd_module.events['activate']
             perform.perform_action_from_event(action, namespace)
 
-def load_command_json():
-    json_module_objects = {}
-    command_dir = settings.settings['command_directory']
-    if not os.path.isdir(command_dir):
-        os.makedirs(command_dir)
-    json_module_objects = load_json_directory(command_dir, DEFAULT_DIRECTORY_SETTINGS)
-    return json_module_objects
-
-def load_json_directory(path, parent_directory_settings):
-    command_modules = {}
-    directories = []
-    local_settings = settings.try_load_json_file(os.path.join(path, '.osspeak.json'))
-    directory_settings = {**parent_directory_settings, **local_settings}
-    with os.scandir(path) as i:
-        for entry in sorted(i, key=lambda x: x.name):
-            if entry.name.startswith('.'):
-                continue
-            if entry.is_file() and entry.name.endswith('.json'):
-                command_modules[entry.path] = load_command_module_file(entry.path)
-            # read files in this directory first before recursing down
-            elif entry.is_dir():
-                directories.append(entry)
-        if directory_settings['recurse']:
-            for direntry in directories:
-                command_modules.update(load_json_directory(direntry.path, directory_settings))
-    return command_modules
-
-def load_command_module_file(path):
-    with open(path) as f:
-        try:
-            module_config = json.load(f)
-        except json.decoder.JSONDecodeError as e:
-            module_config = {'Error': str(e)}
-            log.logger.warning(f"JSON error loading command module '{path}':\n{e}")
-    return module_config
 
 def load_command_modules(command_module_json):
     return {path: commands.CommandModule(config, path) for path, config in command_module_json.items()}

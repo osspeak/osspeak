@@ -4,7 +4,7 @@ from settings import settings
 from recognition.commands import monitor
 
 async def command_module_paths():
-    state_json = monitor.command_module_state.command_module_json
+    state_json = {path: mod.config for path, mod in monitor.command_module_state.command_modules.items()}
     root = settings['command_directory']
     module_paths = []
     for path, config in state_json.items():
