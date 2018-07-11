@@ -34,8 +34,8 @@ class CommandEditor extends React.Component<CommandEditorProps, CommandEditorSta
             <>
                 <ModalHeader toggle={this.toggle}>Edit Command</ModalHeader>
                 <ModalBody>
-                    <RuleInput text={this.props.command.rule.text} />
-                    <ActionPieceList actionPieces={this.props.command.action.pieces} />
+                    <RuleInput text={this.state.commandCopy.rule.text} />
+                    <ActionPieceList actionPieces={this.state.commandCopy.action.pieces} />
                     <ActionPieceEditor />
                 </ModalBody>
                 <ModalFooter>

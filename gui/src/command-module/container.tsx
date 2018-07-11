@@ -12,16 +12,16 @@ export interface CommandModuleContainerProps {
 }
 
 export interface CommandModuleContainerState {
-    selectedPath: null | string
-    activePaths: string[]
+    focusedPath: null | string
+    selectedPaths: string[]
 }
 
 
 class CommandModuleContainer extends React.Component<CommandModuleContainerProps, CommandModuleContainerState> {
 
     state: CommandModuleContainerState = {
-        selectedPath: null,
-        activePaths: [],
+        focusedPath: null,
+        selectedPaths: [],
     }
 
     constructor(props: any) {
@@ -29,7 +29,7 @@ class CommandModuleContainer extends React.Component<CommandModuleContainerProps
     }
 
     onTabClick = (name: string) => {
-        this.setState({ selectedPath: name });
+        this.setState({ focusedPath: name });
     }
 
     get nestedPaths() {
@@ -38,9 +38,9 @@ class CommandModuleContainer extends React.Component<CommandModuleContainerProps
 
     onListItemClick = (clickedPath: string) => {
         // const updatedState: Partial<CommandModuleContainerState> = { selectedPath: clickedPath }
-        const updatedState: any = { selectedPath: clickedPath }
-        const pathOpen = this.state.activePaths.includes(clickedPath);
-        if (!pathOpen) updatedState.activePaths = this.state.activePaths.concat([clickedPath])
+        const updatedState: any = { focusedPath: clickedPath }
+        const pathOpen = this.state.selectedPaths.includes(clickedPath);
+        if (!pathOpen) updatedState.selectedPaths = this.state.selectedPaths.concat([clickedPath])
         this.setState(updatedState);
     }
 
@@ -50,17 +50,21 @@ class CommandModuleContainer extends React.Component<CommandModuleContainerProps
     }
 
     render() {
-        const cmdModules = this.props.recognitionIndex.commandModules;
-        const module = this.state.selectedPath === null ? null : cmdModules[this.state.selectedPath]
+        const {commandModules, activeCommandModules} = this.props.recognitionIndex;
+        const module = this.state.focusedPath === null ? null : commandModules[this.state.focusedPath];
         return (
             <div id="cm-container">
-                <CommandModuleList onListItemClick={this.onListItemClick} paths={this.nestedPaths} />
-                {this.state.selectedPath && (
+                <CommandModuleList
+                    onListItemClick={this.onListItemClick}
+                    paths={this.nestedPaths}
+                    activePaths={new Set(activeCommandModules)}
+                />
+                {this.state.focusedPath && (
                     <div id="command-module-contents">
                         <CommandModuleTabs
-                            selected={this.state.selectedPath}
+                            focused={this.state.focusedPath}
                             onTabClick={this.onTabClick}
-                            paths={this.state.activePaths}
+                            paths={this.state.selectedPaths}
                         />
                         {module !== null && <CommandModulePanel commandModule={module} />}
                     </div>

@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import classnames from 'classnames';
+import './list.css'
 
 class CommandModuleListItem extends React.Component<any, {}> {
 
@@ -7,8 +9,13 @@ class CommandModuleListItem extends React.Component<any, {}> {
     }
 
     render() {
+        console.log(this.props.focused)
+        const className = classnames({
+            "cm-list-item": true,
+            focused: this.props.focused,
+        })
         return (
-            <div className="cm-list-item" onClick={() => this.props.onClick(this.props.value)}>
+            <div className={className} onClick={() => this.props.onClick(this.props.value)}>
                 {this.props.value}
             </div>
         );

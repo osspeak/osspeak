@@ -2,13 +2,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ws, wsFetch, subscribe, ServerSubscription } from './server';
-import { } from "./types";
+import { RecognitionIndex } from "./command-module/types";
 import './command-module/command-module.css';
 import './action/action.css';
 import CommandModuleContainer from './command-module/container';
 
 export interface AppState {
-    recognitionIndex: any
+    recognitionIndex: RecognitionIndex | null
 }
 
 class App extends React.Component<any, AppState> {
@@ -25,7 +25,8 @@ class App extends React.Component<any, AppState> {
     }
 
     componentDidMount() {
-        this.indexSubscription = subscribe('RECOGNITION_INDEX', (index: any) => this.setState({recognitionIndex: index}));
+        this.indexSubscription = subscribe('RECOGNITION_INDEX',
+            (index: RecognitionIndex) => this.setState({recognitionIndex: index}));
         this.loadIndex();
     }
 
@@ -36,9 +37,12 @@ class App extends React.Component<any, AppState> {
     }
     
     render() {
+        console.log('rendar')
         return (
             <div id="osspeak-application">
-                {this.state.recognitionIndex !== null && <CommandModuleContainer recognitionIndex={this.state.recognitionIndex} />}
+                {this.state.recognitionIndex !== null && <CommandModuleContainer
+                    recognitionIndex={this.state.recognitionIndex}
+                />}
             </div>
         );
     }

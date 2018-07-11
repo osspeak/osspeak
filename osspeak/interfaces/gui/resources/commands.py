@@ -10,14 +10,16 @@ async def delete_command_module(path):
         pass
 
 async def recognition_index(grammar_id=None):
-    command_modules = monitor.command_module_state.command_modules
     root = settings['command_directory']
+    state = monitor.command_module_state
     command_modules = {}
-    for path, command_module in monitor.command_module_state.command_modules.items():
+    for path, command_module in state.command_modules.items():
         relpath = os.path.relpath(path, root)
         command_modules[relpath] = command_module_object(command_module)
+    active_command_modules = [os.path.relpath(name, root) for name in state.active_command_modules]
     return {
         'commandModules': command_modules,
+        'activeCommandModules': active_command_modules,
         'osSep': os.sep
     }
     

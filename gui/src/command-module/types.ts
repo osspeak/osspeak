@@ -15,9 +15,11 @@ export interface Action {
 }
 export interface ActionPiece {
     type: 'dsl'
+    value: any
 }
 
 export interface RecognitionIndex {
     commandModules: { [path: string]: CommandModule },
+    activeCommandModules: string[],
     osSep: string
 }

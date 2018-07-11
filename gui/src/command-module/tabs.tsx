@@ -6,7 +6,7 @@ import { } from "./types";
 import classnames from 'classnames';
 
 export interface CommandModuleTabsProps {
-    selected: string
+    focused: string
     onTabClick: (name: string) => void
     paths: string[]
 }
@@ -23,7 +23,7 @@ class CommandModuleTabs extends React.Component<CommandModuleTabsProps, {}> {
                     {this.props.paths.map((path) => (
                         <NavItem key={path}>
                             <NavLink
-                                className={classnames({ active: this.props.selected === path })}
+                                className={classnames({ active: this.props.focused === path })}
                                 onClick={() => this.props.onTabClick(path)}
                             >
                                 {path}
