@@ -1,7 +1,7 @@
 import { Nav, NavItem, NavLink } from "reactstrap";
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { wsFetch } from '../websocket';
+import { wsFetch } from '../server';
 import { } from "./types";
 import classnames from 'classnames';
 

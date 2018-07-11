@@ -25,6 +25,12 @@ ws.onmessage = (ev) => {
     }
     else {
         //serverMessage;
+        const subs = wsSubscriptions.get(msg.topic)
+        if (subs !== undefined) {
+            for (const sub of subs) {
+                sub.callback(msg.data);
+            }
+        }
     }
 }
 
@@ -56,4 +62,25 @@ function generateUUID () {
         d = Math.floor(d / 16);
         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
+}
+
+export class ServerSubscription {
+
+    topic: string;
+    callback: (data: any) => any;
+
+    constructor(topic: string, callback: any) {
+        this.topic = topic;
+        this.callback = callback
+    }
+}
+
+const wsSubscriptions = new Map<string, ServerSubscription[]>()
+
+export function subscribe(topic: string, callback: (data: any) => any) {
+    const sub = new ServerSubscription(topic, callback);
+    if (!wsSubscriptions.has(topic)) wsSubscriptions.set(topic, []);
+    const topicSubs = wsSubscriptions.get(topic) as ServerSubscription[];
+    topicSubs.push(sub);
+    return sub
 }

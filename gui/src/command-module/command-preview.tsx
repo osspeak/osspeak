@@ -1,7 +1,7 @@
 import React from 'react';
 import { Collapse, Card, CardBody } from "reactstrap";
 import ReactDOM from 'react-dom';
-import { wsFetch } from '../websocket';
+import { wsFetch } from '../server';
 import { Input } from 'reactstrap'
 import Rule from './rule';
 import ActionPreview from '../action/action-preview';

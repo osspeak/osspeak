@@ -103,6 +103,7 @@ async def load_modules(command_module_state, current_window, current_state, init
     grammar_context = build_grammar(command_module_state.active_command_modules)
     save_grammar(grammar_context, command_module_state.grammars)
     grammar_xml, grammar_id = ET.tostring(grammar_context.xml).decode('utf8'), grammar_context.uuid,
+    pubsub.publish(topics.RECOGNITION_INDEX, grammar_id)
     await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
 
 def build_grammar(active_modules):

@@ -18,11 +18,6 @@ def publish(topic, *args, **kwargs):
         if inspect.iscoroutinefunction(sub.callback):
             task = asyncio.ensure_future(res, loop=loop)
             tasks.append(task)
-        # else:
-        #     print(type(res))
-        #     print(type(sub.callback))
-        #     task = asyncio.ensure_future(res, loop=loop)
-        #     tasks.append(task)
     return tasks
 
 async def publish_async(topic, *args, **kwargs):
@@ -39,6 +34,3 @@ class Subscription:
     def __init__(self, topic: str, callback):
         self.topic = topic
         self.callback = callback
-
-def wtf():
-    print('wtf')

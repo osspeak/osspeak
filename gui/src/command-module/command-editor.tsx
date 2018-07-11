@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { wsFetch } from '../websocket';
+import { wsFetch } from '../server';
 import { ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap'
 import ActionPieceList from './action-piece-list';
 import RuleInput from './rule-input';

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { wsFetch } from '../websocket';
+import { wsFetch } from '../server';
 import { Input } from 'reactstrap'
 
 class Rule extends React.Component<any, any> {

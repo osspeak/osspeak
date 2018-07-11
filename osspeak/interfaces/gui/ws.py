@@ -1,15 +1,32 @@
 import json
 import traceback
+import functools
 import inspect
 from interfaces.gui.resources import commands
-
-resources = {
-    'RECOGNITION_INDEX': commands.recognition_index,
-}
+from communication import topics, pubsub, server
 
 ws = None
 
+resources = {
+    topics.RECOGNITION_INDEX: commands.recognition_index
+}
+
+def resource_coroutine(topic):
+    async def resource(*a, **kw):
+        if ws is None:
+            return
+        data = await resources[topic](*a, **kw)
+        msg = json.dumps({'topic': topic, 'data': data})
+        await ws.send(msg)
+    return resource
+
+for topic in resources:
+    coro = resource_coroutine(topic)
+    pubsub.subscribe(topic, coro)
+
 async def gui_websocket_handler(websocket, path):
+    global ws
+    ws = websocket
     while True:
         msg_string = await websocket.recv()
         response = await get_resource(msg_string)

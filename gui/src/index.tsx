@@ -1,13 +1,19 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ws, wsFetch } from './websocket';
-import { AppState } from "./types";
+import { ws, wsFetch, subscribe, ServerSubscription } from './server';
+import { } from "./types";
 import './command-module/command-module.css';
 import './action/action.css';
 import CommandModuleContainer from './command-module/container';
 
+export interface AppState {
+    recognitionIndex: any
+}
+
 class App extends React.Component<any, AppState> {
+
+    indexSubscription: ServerSubscription | null
 
     state: AppState = {
         recognitionIndex: null
@@ -15,9 +21,11 @@ class App extends React.Component<any, AppState> {
 
     constructor(props: any) {
         super(props);
+        this.indexSubscription = null;
     }
 
     componentDidMount() {
+        this.indexSubscription = subscribe('RECOGNITION_INDEX', (index: any) => this.setState({recognitionIndex: index}));
         this.loadIndex();
     }
 

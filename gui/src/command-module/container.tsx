@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { wsFetch } from '../websocket';
+import { wsFetch } from '../server';
 import CommandModulePanel from './panel';
 import CommandModuleTabs from './tabs';
 import CommandModuleList from './list/list';

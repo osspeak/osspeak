@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { wsFetch } from '../websocket';
+import { wsFetch } from '../server';
 import { Modal } from 'reactstrap'
 import CommandPreview from './command-preview';
 import { CommandModule } from "./types";

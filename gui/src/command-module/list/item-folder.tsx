@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { wsFetch } from '../../websocket';
+import { wsFetch } from '../../server';
 
 class CommandModuleListItemFolder extends React.Component<any, {}> {
 
