@@ -1,15 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import CommandModuleList from './list';
+import {CommandModuleList, CommandModuleListProps} from './list';
 
-class CommandModuleListContainer extends React.Component<any, {}> {
+interface CommandModuleListContainerProps extends CommandModuleListProps {
+
+}
+
+class CommandModuleListContainer extends React.Component<CommandModuleListContainerProps, any> {
 
     componentDidMount() {
     }
 
     render() {
         return (
-            <CommandModuleList />
+            <CommandModuleList {...this.props} />
         );
     }
 }

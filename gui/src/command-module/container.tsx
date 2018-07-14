@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { wsFetch } from '../server';
 import CommandModulePanel from './panel';
 import CommandModuleTabs from './tabs';
-import CommandModuleList from './list/list';
+import CommandModuleList from './list/container';
 import { isEqual } from 'lodash';
 import { RecognitionIndex } from "./types";
 

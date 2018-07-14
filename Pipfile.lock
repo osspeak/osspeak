@@ -25,10 +25,10 @@
         },
         "lark-parser": {
             "hashes": [
-                "sha256:2074f2cda9303167f97da0157eefa6fdf9c0b8c7786d4a24e86c65319b34c0df"
+                "sha256:4755dd07027102289ab8458d707717773bec669f3a2623574cf313f95166d5d9"
             ],
             "index": "pypi",
-            "version": "==0.5.6"
+            "version": "==0.6.1"
         },
         "mouse": {
             "hashes": [

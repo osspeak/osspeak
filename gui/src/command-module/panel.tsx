@@ -38,7 +38,7 @@ class CommandModulePanel extends React.Component<CommandModulePanelProps, any> {
                     <CommandPreview key={i.toString()} command={cmd} onSelect={() => this.onModuleSelected(i)} />
                 )}
                 <Modal isOpen={commandBeingEdited !== null} toggle={this.toggle}>
-                    {commandBeingEdited && <CommandEditor command={commandBeingEdited} />}
+                    {commandBeingEdited && <CommandEditor index={editIndex} command={commandBeingEdited} />}
                 </Modal>
             </div>
         );
