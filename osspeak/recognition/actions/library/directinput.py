@@ -8,6 +8,18 @@ import time
 
 SendInput = ctypes.windll.user32.SendInput
 
+mouse_button_down_mapping = {
+    'left': 0x0002,
+    'middle': 0x0020,
+    'right': 0x0008
+}
+
+mouse_button_up_mapping = {
+    'left': 0x0004,
+    'middle': 0x0040,
+    'right': 0x0010
+}
+
 CODES = {
     'esc': 0x01,
     'escape': 0x01,
@@ -90,14 +102,38 @@ def send(*keys):
         ReleaseKey(code)
         time.sleep(delay)
 
-# if __name__ == '__main__':
-#     time.sleep(5)
-#     for i in range(100):
-#         PressKey(ONE)
-#         time.sleep(1)
-#         ReleaseKey(ONE)
-#         time.sleep(1)
-#         PressKey(TWO)
-#         time.sleep(1)
-#         ReleaseKey(TWO)
-#         time.sleep(1)
+
+def click_down(button='left'):
+    extra = ctypes.c_ulong(0)
+    ii_ = Input_I()
+    ii_.mi = MouseInput(0, 0, 0, mouse_button_down_mapping[button], 0, ctypes.pointer(extra))
+    x = Input(ctypes.c_ulong(0), ii_)
+    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
+def click_up(button='left'):
+    extra = ctypes.c_ulong(0)
+    ii_ = Input_I()
+    ii_.mi = MouseInput(0, 0, 0, mouse_button_up_mapping[button], 0, ctypes.pointer(extra))
+    x = Input(ctypes.c_ulong(0), ii_)
+    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
+def click(button='left', duration=0.05):
+    click_down(button=button)
+    time.sleep(duration)
+    click_up(button=button)
+
+if __name__ == '__main__':
+    time.sleep(5)
+    # click() 
+    for i in range(100):
+        PressKey(CODES['w'])
+        time.sleep(5)
+        ReleaseKey(CODES['w'])
+        time.sleep(5)
+        # PressKey(ONE)
+        # ReleaseKey(ONE)
+        # time.sleep(1)
+        # PressKey(TWO)
+        # time.sleep(1)
+        # ReleaseKey(TWO)
+        # time.sleep(1)
