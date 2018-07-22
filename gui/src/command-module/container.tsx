@@ -1,76 +1,33 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { wsFetch } from '../server';
-import CommandModulePanel from './panel';
-import CommandModuleTabs from './tabs';
-import CommandModuleList from './list/container';
-import { isEqual } from 'lodash';
-import { RecognitionIndex } from "./types";
+import { Modal } from 'reactstrap'
+import CommandPreview from './command-preview';
+import { CommandModule, Command } from "./types";
+import CommandModulePanel from "./panel";
 
 export interface CommandModuleContainerProps {
-    recognitionIndex: RecognitionIndex
+    commandModule: CommandModule
 }
-
 export interface CommandModuleContainerState {
-    focusedPath: null | string
-    selectedPaths: string[]
 }
-
 
 class CommandModuleContainer extends React.Component<CommandModuleContainerProps, CommandModuleContainerState> {
-
-    state: CommandModuleContainerState = {
-        focusedPath: null,
-        selectedPaths: [],
-    }
 
     constructor(props: any) {
         super(props);
     }
 
-    onTabClick = (name: string) => {
-        this.setState({ focusedPath: name });
-    }
-
-    get nestedPaths() {
-        return Object.keys(this.props.recognitionIndex.commandModules);
-    }
-
-    onListItemClick = (clickedPath: string) => {
-        // const updatedState: Partial<CommandModuleContainerState> = { selectedPath: clickedPath }
-        const updatedState: any = { focusedPath: clickedPath }
-        const pathOpen = this.state.selectedPaths.includes(clickedPath);
-        if (!pathOpen) updatedState.selectedPaths = this.state.selectedPaths.concat([clickedPath])
-        this.setState(updatedState);
-    }
-
-
-    componentDidMount() {
-
+    save = async () => {
+        const kwargs = {}
+        const toUpdate = [this.props.commandModule]
+        const result = await wsFetch('SAVE_MODULE_CHANGES', [toUpdate, []]);
+        console.log('save', result);
     }
 
     render() {
-        const {commandModules, activeCommandModules} = this.props.recognitionIndex;
-        const module = this.state.focusedPath === null ? null : commandModules[this.state.focusedPath];
-        return (
-            <div id="cm-container">
-                <CommandModuleList
-                    onListItemClick={this.onListItemClick}
-                    paths={this.nestedPaths}
-                    activePaths={new Set(activeCommandModules)}
-                />
-                {this.state.focusedPath && (
-                    <div id="command-module-contents">
-                        <CommandModuleTabs
-                            focused={this.state.focusedPath}
-                            onTabClick={this.onTabClick}
-                            paths={this.state.selectedPaths}
-                        />
-                        {module !== null && <CommandModulePanel commandModule={module} />}
-                    </div>
-                )}
-            </div>
-        );
+        console.log(this.props.commandModule.path, 'abc')
+        return <CommandModulePanel save={this.save} commandModule={this.props.commandModule} />
     }
 }
 

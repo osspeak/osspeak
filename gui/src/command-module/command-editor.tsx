@@ -9,8 +9,9 @@ import {Command } from "./types";
 import { cloneDeep } from "lodash";
 
 export interface CommandEditorProps {
-    index: Number
+    index: number
     command: Command
+    save: any
  }
 
 export interface CommandEditorState {
@@ -26,8 +27,10 @@ class CommandEditor extends React.Component<CommandEditorProps, CommandEditorSta
         }
     }
 
-    save = () => {
-
+    save = async () => {
+    //     console.log('save')
+    //     const toUpdate = {[this.props.command}
+    //     const res = await wsFetch('SAVE_COMMAND_MODULES', );
     }
 
     toggle = () => {
@@ -44,7 +47,7 @@ class CommandEditor extends React.Component<CommandEditorProps, CommandEditorSta
                     <ActionPieceEditor />
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="primary" onClick={this.save}>Save</Button>{' '}
+                    <Button color="primary" onClick={this.props.save}>Save</Button>{' '}
                     <Button color="secondary" onClick={this.toggle}>Cancel</Button>
                 </ModalFooter>
             </>

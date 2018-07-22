@@ -8,7 +8,8 @@ from communication import topics, pubsub, server
 ws = None
 
 resources = {
-    topics.RECOGNITION_INDEX: commands.recognition_index
+    topics.RECOGNITION_INDEX: commands.recognition_index,
+    'SAVE_MODULE_CHANGES': commands.save_module_changes
 }
 
 def resource_coroutine(topic):

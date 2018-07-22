@@ -39,7 +39,7 @@ ws.onclose = () => {
     window.close();
 }
  
-export function wsFetch(resource: string, args: any = [], kwargs: any = {}) {
+export function wsFetch(resource: string, args: any[] = [], kwargs: any = {}) {
     if (ws.readyState !== WebSocket.OPEN) {
         throw "Websocket connection not open";
     }

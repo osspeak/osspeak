@@ -1,7 +1,12 @@
 export interface CommandModule {
-    id: string
-    commands: Command[]
+    path: string
+    config: CommandModuleConfig
 }
+
+export interface CommandModuleConfig {
+    commands: Command[]
+} 
+
 export interface Command {
     rule: Rule
     action: Action
@@ -19,7 +24,7 @@ export interface ActionPiece {
 }
 
 export interface RecognitionIndex {
-    commandModules: { [path: string]: CommandModule },
+    commandModules: { [path: string]: CommandModuleConfig },
     activeCommandModules: string[],
     osSep: string
 }

@@ -9,6 +9,10 @@ async def delete_command_module(path):
     except OSError:
         pass
 
+async def save_module_changes(to_update, to_delete):
+    print(to_update)
+    return 4
+
 async def recognition_index(grammar_id=None):
     root = settings['command_directory']
     state = monitor.command_module_state

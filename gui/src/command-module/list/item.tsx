@@ -9,7 +9,6 @@ class CommandModuleListItem extends React.Component<any, {}> {
     }
 
     render() {
-        console.log(this.props.focused)
         const className = classnames({
             "cm-list-item": true,
             focused: this.props.focused,

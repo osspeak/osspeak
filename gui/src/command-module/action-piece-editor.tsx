@@ -20,7 +20,7 @@ class ActionPieceEditor extends React.Component<any, any> {
           
     }
 
-    onModuleSelected = (index: Number) => {
+    onModuleSelected = (index: number) => {
         this.setState({ commandBeingEditedIndex: index })
     }
 
