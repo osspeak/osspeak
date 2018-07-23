@@ -3,7 +3,8 @@ import { Input } from 'reactstrap'
 import { Rule } from "./types";
 
 interface RuleInputProps {
-    text: string 
+    text: string
+    onChange: any
 }
 
 class RuleInput extends React.Component<RuleInputProps, any> {
@@ -14,7 +15,10 @@ class RuleInput extends React.Component<RuleInputProps, any> {
     render() {
         // const { commands } = this.props.module;
         return (
-            <Input value={this.props.text}></Input>
+            <Input
+                onChange={(evt: any) => this.props.onChange(evt.target.value)}
+                value={this.props.text}>
+            </Input>
         );
     }
 }

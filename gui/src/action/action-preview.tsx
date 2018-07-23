@@ -9,8 +9,8 @@ class ActionPreview extends React.Component<ActionProps, any> {
     render() {
         return (
             <div className="action-preview">
-                {this.props.pieces.map((piece) => {
-                    return <div>{piece.value}</div>
+                {this.props.pieces.map((piece, i) => {
+                    return <div key={i}>{piece.value}</div>
                 })}
             </div>
         );

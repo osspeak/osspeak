@@ -5,6 +5,12 @@ import { wsFetch } from '../server';
 import { Input } from 'reactstrap'
 import Rule from './rule';
 import ActionPreview from '../action/action-preview';
+import {Command} from './types'
+
+export interface CommandPreviewProps {
+    onSelect: any
+    command: Command
+}
 
 class CommandPreview extends React.Component<any, any> {
 

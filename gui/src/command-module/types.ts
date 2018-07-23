@@ -5,6 +5,8 @@ export interface CommandModule {
 
 export interface CommandModuleConfig {
     commands: Command[]
+    rules?: Rule[]
+    functions?: any[]
 } 
 
 export interface Command {
