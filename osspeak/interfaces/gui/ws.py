@@ -9,7 +9,7 @@ ws = None
 
 resources = {
     topics.RECOGNITION_INDEX: commands.recognition_index,
-    'SAVE_MODULE_CHANGES': commands.save_module_changes
+    'SAVE_COMMAND': commands.save_command
 }
 
 def resource_coroutine(topic):

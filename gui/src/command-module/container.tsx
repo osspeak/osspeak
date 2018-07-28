@@ -21,10 +21,11 @@ class CommandModuleContainer extends React.Component<CommandModuleContainerProps
         }
     }
 
-    updateCommand = (command: Command, index: number) => {
-        console.log(command, index);
+    updateCommand = async (command: Command, index: number) => {
         const commands = [...this.state.commands];
         commands[index] = command;
+        const args = [command, index, this.props.commandModule.path]
+        const result = await wsFetch('SAVE_COMMAND', args);
         this.setState({commands}, this.saveModule);
     }
 
