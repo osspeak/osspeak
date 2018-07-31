@@ -1,7 +1,7 @@
 import json
 import os
 from settings import settings
-from communication import topics
+from communication import topics, pubsub
 import copy
 from recognition.commands import monitor
 
@@ -12,16 +12,25 @@ async def delete_command_module(path):
         pass
 
 async def save_command(command, index, command_module_path):
-    command_config = ['hello world', 'click']
     state = monitor.command_module_state
-    command_module = state.command_modules[command_module_path]
-    commands = copy.copy(command_module.config.get('commands', []))
-    commands[index] = = translated_client_command(command) 
-    monitor.set_message(topics.RELOAD_COMMAND_MODULE_FILES)
-    print(command)
+    full_path = os.path.join(settings['command_directory'], command_module_path)
+    command_module = state.command_modules[full_path]
+    config = copy.copy(command_module.config)
+    config['commands'] = copy.copy(config.get('commands', []))
+    config['commands'][index] = translated_client_command(command)
+    with open(full_path, 'w') as f:
+        json.dump(config, f)
+    pubsub.publish(topics.RELOAD_COMMAND_MODULE_FILES)
 
 def translated_client_command(client_command):
-    rule, action = client_command
+    rule = client_command['rule']['text']
+    pieces = client_command['action']['pieces']
+    if len(pieces) == 1:
+        action = pieces[0]['value']
+    else:
+        action = pieces
+    return [rule, action]
+    # rule, action = client_command
 
 def save_module_changes(to_update, to_delete):
     print(to_update)

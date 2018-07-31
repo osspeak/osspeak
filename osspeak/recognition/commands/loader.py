@@ -64,6 +64,7 @@ def load_json_directory(path, parent_directory_settings):
                 path = entry.path
                 file = CONFIG_FILE_CACHE.get(path, CommandModuleFile(path))
                 file.load_config()
+                CONFIG_FILE_CACHE[path] = file
                 command_modules[path] = file.config
             # read files in this directory first before recursing down
             elif entry.is_dir():
