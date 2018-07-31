@@ -11,7 +11,8 @@ class ActionPiece:
     @classmethod
     def from_object(cls, obj, *a, **kw):
         factory_map = {
-            'dsl': DSLActionPiece
+            'dsl': DSLActionPiece,
+            'python': PythonExec
         }
         constructor = factory_map[obj['type']]
         instance = constructor(obj['value'], *a, **kw)
@@ -63,3 +64,15 @@ class Snippet:
     def __init__(self, text):
         super().__init__()
         self.text = text
+
+class PythonExec(ActionPiece):
+
+    def __init__(self, text):
+        super().__init__()
+        self.text = text
+        self.ast = compile(text, '<string>', 'exec')
+
+    def perform(self):
+        _globals = perform.recognition_namespace()
+        print(_globals['context'])
+        exec(self.ast, _globals)
