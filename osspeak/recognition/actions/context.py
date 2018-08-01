@@ -3,8 +3,8 @@ from recognition.actions import library
 
 class RecognitionContext:
 
-    def __init__(self, variables, words, namespace):
-        self._meta = RecognitionContextMeta(variables, namespace)
+    def __init__(self, variables, words, namespace, variable_words):
+        self._meta = RecognitionContextMeta(variables, namespace, variable_words)
         self.words = words
         self.text = None if words is None else ' '.join(words)
 
@@ -14,15 +14,13 @@ class RecognitionContext:
     def set(self, key, value):
         self._meta.temp_variables[key] = value
 
-    def __getitem__(self, i):
-        return self._meta.var(i, perform_results=False)
-
 class RecognitionContextMeta:
 
-    def __init__(self, variables, namespace):
+    def __init__(self, variables, namespace, variable_words):
         self.variables = variables
         self.temp_variables = {}
         self.namespace = namespace
+        self.variable_words = variable_words
 
     def call_or_type(self, value):
         return CallOrType(value)
