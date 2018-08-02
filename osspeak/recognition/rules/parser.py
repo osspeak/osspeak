@@ -1,5 +1,3 @@
-import copy
-
 from recognition.rules import lexer, astree, tokens
 from profile import Profiler
 
