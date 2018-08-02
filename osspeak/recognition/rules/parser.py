@@ -17,6 +17,7 @@ class RuleParser:
         self.grouping_stack = []
         self.optional_groupings = set()
         self.repeated_nodes = set()
+        self.closed_nodes = set()
         self.token_list = []
         self.parse_map = {
             tokens.WordToken: self.parse_word_token,
@@ -59,7 +60,7 @@ class RuleParser:
         self.pop_top_grouping_if_closed()
         if self.top in self.optional_groupings:
             self.croak("Can't match '[' with ')'")
-        self.top.open = False
+        self.closed_nodes.add(self.top)
 
     def parse_optional_grouping_opening_token(self, tok):
         self.parse_grouping_opening_token(tok)
@@ -70,7 +71,7 @@ class RuleParser:
         if self.top not in self.optional_groupings:
             self.croak("Can't match '(' with ']'")
         self.pop_top_grouping_if_closed()
-        self.top.open = False
+        self.closed_nodes.add(self.top)
 
     def parse_repetition_token(self, tok):
         repeated_node = self.modifiable_node
@@ -83,7 +84,7 @@ class RuleParser:
         pass
 
     def pop_top_grouping_if_closed(self):
-        if not self.top.open:
+        if self.top in self.closed_nodes:
             grouping = self.grouping_stack.pop()
 
     @property
@@ -92,7 +93,7 @@ class RuleParser:
 
     @property
     def modifiable_node(self):
-        if not self.top.open:
+        if self.top in self.closed_nodes:
             return self.top
         if self.top.sequences and self.top.sequences[-1]:
             return self.top.sequences[-1][-1]
