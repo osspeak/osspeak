@@ -15,13 +15,13 @@ def get_args():
     if __main__.__file__ == 'buildit.py':
         return
     parser = argparse.ArgumentParser()
-    parser.add_argument('--interface', default=Nil)
+    parser.add_argument('-i', '--interface', default=Nil)
     parser.add_argument('--network', default=Nil) # or remote
     parser.add_argument('--server_address', default=Nil)
     parser.add_argument('--type_delay', default=Nil)
-    parser.add_argument('--perform_actions',type=str2bool, nargs='?',
+    parser.add_argument('-a', '--perform_actions', type=str2bool, nargs='?',
                         const=True, default=True,
-                        help="Activate nice mode.")
+                        help="Perform recognized speech actions")
     parser.add_argument('--debug', default=Nil, action='store_true')
     res = vars(parser.parse_args())
     return {k: v for (k, v) in res.items() if v is not Nil}
