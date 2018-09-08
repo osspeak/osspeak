@@ -71,7 +71,7 @@ def build_gui():
 
 def build_osspeak():
     lark_path = os.path.dirname(os.path.abspath(lark.__file__))
-    grammar_path = os.path.join(lark_path, 'grammars', 'common.g')
+    grammar_path = os.path.join(lark_path, 'grammars', 'common.lark')
     dest_path = os.path.join('lark', 'grammars')
     subprocess.call(['pyinstaller', OSSPEAK_MAIN_PATH, '--clean', '-F',
     '--paths', OSSPEAK_SRC_FOLDER, '--add-data', f'{grammar_path};{dest_path}', '-n', 'osspeak'])
