@@ -1,8 +1,8 @@
-export interface ActionPiece {
-    type: 'dsl'
-    value: string
-}
+// export interface ActionPiece {
+//     type: 'dsl'
+//     value: string
+// }
 
-export interface ActionProps {
-    pieces: ActionPiece[]
-}
+// export interface ActionProps {
+//     pieces: ActionPiece[]
+// }

@@ -1,19 +1,24 @@
 import React from 'react';
 import { ListGroup, ListGroupItem } from 'reactstrap';
+import { ActionPiece } from './types';
 
-class ActionPieceList extends React.Component<any, any> {
-    
-      render() {
+interface ActionPieceListProps {
+    actionPieces: ActionPiece[]
+}
+
+class ActionPieceList extends React.Component<ActionPieceListProps, any> {
+
+    render() {
+        console.log(this.props.actionPieces)
+
         return (
-          <ListGroup>
-            <ListGroupItem>Cras justo odio</ListGroupItem>
-            <ListGroupItem>Dapibus ac facilisis in</ListGroupItem>
-            <ListGroupItem>Morbi leo risus</ListGroupItem>
-            <ListGroupItem>Porta ac consectetur ac</ListGroupItem>
-            <ListGroupItem>Vestibulum at eros</ListGroupItem>
-          </ListGroup>
+            <ListGroup>
+                {this.props.actionPieces.map((piece, i) =>
+                    <ListGroupItem key={i}>{piece.value}</ListGroupItem>
+                )}
+            </ListGroup>
         );
-      }
     }
+}
 
 export default ActionPieceList;

@@ -36,6 +36,7 @@ class CommandEditor extends React.Component<CommandEditorProps, CommandEditorSta
 
     save = () => {
         const command = {...this.state}
+        console.log(command)
         this.props.save(command);
     //     console.log('save')
     //     const toUpdate = {[this.props.command}
