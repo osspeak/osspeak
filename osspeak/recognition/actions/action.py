@@ -1,5 +1,4 @@
 from recognition.actions import library, pyexpr, asttransform, context, perform
-import keyboard
 
 class Action:
     

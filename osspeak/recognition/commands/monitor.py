@@ -53,7 +53,7 @@ async def watch_user_system_state(msg_list):
 def set_message(msg_list, msg):
     msg_list[0] = msg
 
-def perform_commands(command_module_state, grammar_id, words):
+def perform_commands(command_module_state: loader.CommandModuleState, grammar_id: str, words):
     try:
         grammar_context = command_module_state.grammars[grammar_id]
     except KeyError:

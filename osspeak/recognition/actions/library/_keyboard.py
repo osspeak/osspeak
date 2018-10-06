@@ -1,5 +1,5 @@
 import threading
-import keyboard
+from lib import keyboard
 from recognition.actions.library.vocola.vocolakeys import send_input
 from platforms import api
 import time

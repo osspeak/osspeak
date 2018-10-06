@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 websockets = "*"
 mouse = "*"
-keyboard = "*"
 pywindow = "*"
 lark-parser = "*"
 screengrid = "==0.0.10"
