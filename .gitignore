@@ -3,3 +3,5 @@ dist/
 gui/node_modules/
 osspeak.spec
 .vscode/
+Lib/
+Scripts/
