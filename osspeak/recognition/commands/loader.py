@@ -51,7 +51,7 @@ def load_command_json():
     json_module_objects = load_json_directory(command_dir, DEFAULT_DIRECTORY_SETTINGS)
     return json_module_objects
 
-def load_json_directory(path, parent_directory_settings):
+def load_json_directory(path: str, parent_directory_settings):
     command_modules = {}
     directories = []
     local_settings = settings.try_load_json_file(os.path.join(path, '.osspeak.json'))
@@ -92,7 +92,7 @@ class CommandModuleFile:
                     self.config = {'Error': str(e)}
                     log.logger.warning(f"JSON error loading command module '{path}':\n{e}")
 
-async def load_modules(command_module_state, current_window, current_state, initialize=False):
+async def load_modules(command_module_state: CommandModuleState, current_window, current_state, initialize: bool=False):
     previous_active_modules = command_module_state.active_command_modules
     if initialize:
         command_module_state.populate()
@@ -107,7 +107,7 @@ async def load_modules(command_module_state, current_window, current_state, init
     pubsub.publish(topics.RECOGNITION_INDEX, grammar_id)
     await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
 
-def build_grammar(active_modules):
+def build_grammar(active_modules) -> grammar.GrammarContext:
     named_rules, command_rules = get_active_rules(active_modules)
     all_rules = list(named_rules.values()) + command_rules
     node_ids = generate_node_ids(all_rules, named_rules)
@@ -161,14 +161,14 @@ def load_initial_user_state(command_modules):
     for path, cmd_module in command_modules.items():
         recognition.actions.library.state.USER_DEFINED_STATE.update(cmd_module.initial_state)
 
-def get_active_modules(command_modules, current_window, current_state):
+def get_active_modules(command_modules: {str: commands.CommandModule}, current_window: str, current_state):
     active_modules = {}
     for path, cmd_module in command_modules.items():
         if is_command_module_active(cmd_module, current_window, current_state):
             active_modules[path] = cmd_module
     return active_modules
 
-def is_command_module_active(cmd_module, current_window, current_state):
+def is_command_module_active(cmd_module: commands.CommandModule, current_window: str, current_state):
     title_filter = cmd_module.conditions.get('title', '')
     current_window_matches = re.search(title_filter, current_window, flags=re.IGNORECASE)
     return current_window_matches and cmd_module.is_state_active(current_state)
