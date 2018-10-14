@@ -1,7 +1,7 @@
 Voice control language/IDE.
 
 <h2>Installation</h2>
-Osspeak uses Python 3.6 and Pipenv.
+Osspeak uses Python 3.7.
 <h4>From source</h4>
 
 ```
