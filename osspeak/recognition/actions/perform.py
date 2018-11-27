@@ -97,7 +97,8 @@ def get_leaf_action(node, text):
     if getattr(node, 'action_piece_substitute', None) is not None:
         leaf_action, is_substitute = node.action_piece_substitute, True 
     elif text is not None:
-        leaf_action, is_substitute = piece.DSLActionPiece(f"'{text}'"), False
+        escaped = text.replace("'", "\\'")
+        leaf_action, is_substitute = piece.DSLActionPiece(f"'{escaped}'"), False
     return leaf_action, is_substitute
 
 def var_result(variable_actions_pieces, perform_results: bool):
