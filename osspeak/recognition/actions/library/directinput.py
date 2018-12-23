@@ -33,6 +33,9 @@ CODES = {
     '8': 0x09,
     '9': 0x10,
     'w': 0x11,
+    'a': 0x1E,
+    's': 0x1F,
+    'd': 0x20,
     'ctrl': 0x1D,
     'alt': 0x38,
 }
@@ -92,16 +95,15 @@ def ReleaseKey(hexKeyCode):
     x = Input( ctypes.c_ulong(1), ii_ )
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
-def send(*keys):
-    delay = .1
+def send(keys):
+    delay = .01
     keycodes = [CODES[str(k)] for k in keys]
     for code in keycodes:
         PressKey(code)
         time.sleep(delay)
-    for code in keycodes:
         ReleaseKey(code)
-        time.sleep(delay)
-
+    # for code in keycodes:
+    #     time.sleep(delay)
 
 def click_down(button='left'):
     extra = ctypes.c_ulong(0)
@@ -123,13 +125,15 @@ def click(button='left', duration=0.05):
     click_up(button=button)
 
 if __name__ == '__main__':
-    time.sleep(5)
-    # click() 
-    for i in range(100):
-        PressKey(CODES['w'])
-        time.sleep(5)
-        ReleaseKey(CODES['w'])
-        time.sleep(5)
+    time.sleep(10)
+    click() 
+    # send(['w'])
+    # for i in range(100):
+    #     send('wasd')
+    #     PressKey(CODES['w'])
+    #     time.sleep(5)
+    #     ReleaseKey(CODES['w'])
+    #     time.sleep(5)
         # PressKey(ONE)
         # ReleaseKey(ONE)
         # time.sleep(1)
