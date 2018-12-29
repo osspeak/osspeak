@@ -12,6 +12,7 @@ async def delete_command_module(path):
         pass
 
 async def save_command(command, index, command_module_path):
+    print('save', command, index)
     state = monitor.command_module_state
     full_path = os.path.join(settings['command_directory'], command_module_path)
     command_module = state.command_modules[full_path]
@@ -19,7 +20,7 @@ async def save_command(command, index, command_module_path):
     config['commands'] = copy.copy(config.get('commands', []))
     config['commands'][index] = translated_client_command(command)
     with open(full_path, 'w') as f:
-        json.dump(config, f)
+        json.dump(config, f, indent=4, sort_keys=True)
     pubsub.publish(topics.RELOAD_COMMAND_MODULE_FILES)
 
 def translated_client_command(client_command):
