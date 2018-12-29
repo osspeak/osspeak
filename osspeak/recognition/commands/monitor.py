@@ -37,6 +37,7 @@ async def watch_user_system_state(msg_list):
         is_different_user_state = previous_state != current_state
         msg = msg_list[0]
         if is_different_window or is_different_user_state or msg:
+            msg_list[0] = None
             new_active_modules = loader.get_active_modules(command_module_state.command_modules, current_window, current_state)
             reload_files = msg == topics.RELOAD_COMMAND_MODULE_FILES
             if new_active_modules != command_module_state.active_command_modules or reload_files:
@@ -46,7 +47,6 @@ async def watch_user_system_state(msg_list):
             elif msg == topics.RELOAD_GRAMMAR:
                 loader.load_and_send_grammar(command_module_state)
             previous_window = current_window
-            msg_list[0] = None
         previous_state = current_state
         await asyncio.sleep(1)
 
