@@ -5,3 +5,4 @@ osspeak.spec
 .vscode/
 Lib/
 Scripts/
+engines/RecognizerIO/RecognizerIO/obj/Debug/project.razor.json
