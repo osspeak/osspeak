@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { ActionPiece } from "./types";
 
-
-// import * as monaco from 'monaco-editor';
-
+interface ActionPieceEditorProps {
+    piece: ActionPiece
+}
 
 class ActionPieceEditor extends React.Component<any, any> {
 
@@ -12,6 +13,7 @@ class ActionPieceEditor extends React.Component<any, any> {
     }
 
     componentDidMount() {
+        console.log('tp', this.props.piece)
         // var editor = CodeMirror.fromTextArea(el, {
         //     lineNumbers: true,
         //     lineWrapping: true,
@@ -33,6 +35,7 @@ class ActionPieceEditor extends React.Component<any, any> {
         return (
             // <textarea style={{height: '200px', width: '200px'}}>
             <textarea >
+                
             </textarea>
         );
     }

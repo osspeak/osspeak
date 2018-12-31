@@ -16,6 +16,7 @@ export interface CommandEditorProps {
 export interface CommandEditorState {
     action: Action
     rule: Rule
+    selectedActionPieceIndex: null | number
  }
 
 class CommandEditor extends React.Component<CommandEditorProps, CommandEditorState> {
@@ -25,8 +26,13 @@ class CommandEditor extends React.Component<CommandEditorProps, CommandEditorSta
         const {action, rule} = cloneDeep(props.command)
         this.state = {
             action,
-            rule
+            rule,
+            selectedActionPieceIndex: null,
         }
+    }
+
+    onActionPieceClick = (index: number) => {
+        this.setState({selectedActionPieceIndex: index});
     }
 
     onRuleTextChanged = (text: string) => {
@@ -48,13 +54,14 @@ class CommandEditor extends React.Component<CommandEditorProps, CommandEditorSta
 
     render() {
         // const { commands } = this.props.module;
+        const selectedActionPiece = this.state.selectedActionPieceIndex === null ? null : this.state.action.pieces[this.state.selectedActionPieceIndex]
         return (
             <>
                 <ModalHeader toggle={this.toggle}>Edit Command</ModalHeader>
                 <ModalBody>
                     <RuleInput onChange={this.onRuleTextChanged} text={this.state.rule.text} />
-                    <ActionPieceList actionPieces={this.state.action.pieces} />
-                    <ActionPieceEditor />
+                    <ActionPieceList onPieceClick={this.onActionPieceClick} actionPieces={this.state.action.pieces} />
+                    {selectedActionPiece && <ActionPieceEditor piece={selectedActionPiece} />}
                 </ModalBody>
                 <ModalFooter>
                     <Button color="primary" onClick={this.save}>Save</Button>{' '}
