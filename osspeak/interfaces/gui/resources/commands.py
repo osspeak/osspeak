@@ -12,7 +12,6 @@ async def delete_command_module(path):
         pass
 
 async def save_command(command, index, command_module_path):
-    print('save', command, index)
     state = monitor.command_module_state
     full_path = os.path.join(settings['command_directory'], command_module_path)
     command_module = state.command_modules[full_path]
