@@ -47,6 +47,7 @@ class CommandModulePanel extends React.Component<CommandModulePanelProps, Comman
                     {commandBeingEdited && <CommandEditor
                         save={this.updateCommand}
                         command={commandBeingEdited}
+                        toggle={this.toggle}
                     />}
                 </Modal>
             </div>

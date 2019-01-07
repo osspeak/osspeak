@@ -39,7 +39,6 @@ class ActionPieceList extends React.Component<ActionPieceListProps, ActionPieceL
     }
 
     render() {
-        console.log(this.props.actionPieces)
         return (
             <ListGroup>
                 {this.props.actionPieces.map((piece, i) => this.actionPiece(piece.value, i))}

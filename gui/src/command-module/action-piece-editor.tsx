@@ -4,11 +4,12 @@ import { ActionPiece } from "./types";
 
 interface ActionPieceEditorProps {
     piece: ActionPiece
+    onChange: (value: any) => void
 }
 
-class ActionPieceEditor extends React.Component<any, any> {
+class ActionPieceEditor extends React.Component<ActionPieceEditorProps, any> {
 
-    constructor(props: any) {
+    constructor(props: ActionPieceEditorProps) {
         super(props);
     }
 
@@ -19,7 +20,7 @@ class ActionPieceEditor extends React.Component<any, any> {
         //     lineWrapping: true,
         //     mode: "markdown"
         //   });
-          
+
     }
 
     onModuleSelected = (index: number) => {
@@ -34,8 +35,7 @@ class ActionPieceEditor extends React.Component<any, any> {
         // const { commands } = this.props.module;
         return (
             // <textarea style={{height: '200px', width: '200px'}}>
-            <textarea >
-                
+            <textarea onChange={evt => this.props.onChange(evt.target.value)} value={this.props.piece.value}>
             </textarea>
         );
     }
