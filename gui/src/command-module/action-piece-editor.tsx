@@ -7,14 +7,18 @@ interface ActionPieceEditorProps {
     onChange: (value: any) => void
 }
 
-class ActionPieceEditor extends React.Component<ActionPieceEditorProps, any> {
+interface ActionPieceEditorState {
+
+}
+
+class ActionPieceEditor extends React.Component<ActionPieceEditorProps, ActionPieceEditorState> {
 
     constructor(props: ActionPieceEditorProps) {
         super(props);
     }
 
     componentDidMount() {
-        console.log('tp', this.props.piece)
+        this.focus();
         // var editor = CodeMirror.fromTextArea(el, {
         //     lineNumbers: true,
         //     lineWrapping: true,
@@ -23,18 +27,15 @@ class ActionPieceEditor extends React.Component<ActionPieceEditorProps, any> {
 
     }
 
-    onModuleSelected = (index: number) => {
-        this.setState({ commandBeingEditedIndex: index })
-    }
-
-    toggle = () => {
-        this.setState({ commandBeingEditedIndex: null });
+    focus() {
+        const el = ReactDOM.findDOMNode(this);
+        if (el !== null) {
+            (el as HTMLElement).focus();
+        }
     }
 
     render() {
-        // const { commands } = this.props.module;
         return (
-            // <textarea style={{height: '200px', width: '200px'}}>
             <textarea onChange={evt => this.props.onChange(evt.target.value)} value={this.props.piece.value}>
             </textarea>
         );

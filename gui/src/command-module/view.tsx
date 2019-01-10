@@ -25,7 +25,7 @@ class CommandModuleView extends React.Component<CommandModuleContainerProps, Com
         selectedPaths: [],
     }
 
-    constructor(props: any) {
+    constructor(props: CommandModuleContainerProps) {
         super(props);
     }
 

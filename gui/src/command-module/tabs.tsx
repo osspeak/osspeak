@@ -10,8 +10,11 @@ export interface CommandModuleTabsProps {
     onTabClick: (name: string) => void
     paths: string[]
 }
+export interface CommandModuleTabsState {
 
-class CommandModuleTabs extends React.Component<CommandModuleTabsProps, {}> {
+}
+
+class CommandModuleTabs extends React.Component<CommandModuleTabsProps, CommandModuleTabsState> {
 
     componentDidMount() {
     }

@@ -71,14 +71,18 @@ class CommandEditor extends React.Component<CommandEditorProps, CommandEditorSta
 
     render() {
         // const { commands } = this.props.module;
-        const {rule, actionPieces} = this.state;
+        const {rule, actionPieces, selectedActionPieceIndex} = this.state;
         const selectedActionPiece = this.state.selectedActionPieceIndex === null ? null : actionPieces[this.state.selectedActionPieceIndex]
         return (
             <>
                 <ModalHeader toggle={this.toggle}>Edit Command</ModalHeader>
                 <ModalBody>
                     <RuleInput onChange={this.onRuleTextChanged} text={rule.text} />
-                    <ActionPieceList onPieceClick={this.onActionPieceClick} actionPieces={actionPieces} />
+                    <ActionPieceList
+                        onPieceClick={this.onActionPieceClick}
+                        actionPieces={actionPieces}
+                        selectedIndex={selectedActionPieceIndex}
+                    />
                     {selectedActionPiece && <ActionPieceEditor piece={selectedActionPiece} onChange={this.onActionPieceChange} />}
                 </ModalBody>
                 <ModalFooter>

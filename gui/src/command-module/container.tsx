@@ -31,7 +31,7 @@ class CommandModuleContainer extends React.Component<CommandModuleContainerProps
 
     saveModule = async () => {
         const toUpdate = [this.props.commandModule]
-        console.log('ti', toUpdate[0])
+        console.log('ti', toUpdate[0]);
         // const result = await wsFetch('SAVE_MODULE_CHANGES', [toUpdate, []]);
         // console.log('save', result);
     }

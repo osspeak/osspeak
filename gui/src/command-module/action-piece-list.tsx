@@ -5,35 +5,29 @@ import { ActionPiece } from './types';
 interface ActionPieceListProps {
     actionPieces: ActionPiece[]
     onPieceClick: any
+    selectedIndex: null | number
 }
 interface ActionPieceListState {
-    selectedPieceIndex: null | number
 }
 
 class ActionPieceList extends React.Component<ActionPieceListProps, ActionPieceListState> {
 
     onClick(index: number) {
-        this.setState({ selectedPieceIndex: index });
     }
 
     constructor(props: ActionPieceListProps) {
         super(props);
-        this.state = {
-            selectedPieceIndex: null
-        }
     }
 
     actionPiece = (pieceValue: string, index: number) => {
-        // if (index === this.state.selectedPieceIndex) {
-        //     return <Input key={index} value={pieceValue} onChange={() => null}></Input>
-        // }
+        const isActive = index === this.props.selectedIndex;
         return (
             <ListGroupItem
+                active={isActive}
                 key={index}
                 onClick={() => this.props.onPieceClick(index)}
             >
-            {pieceValue}
-                {/* <Input key={index} value={pieceValue} onChange={() => null}></Input> */}
+                {pieceValue}
             </ListGroupItem>
         )
     }
