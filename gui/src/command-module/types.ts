@@ -4,10 +4,10 @@ export interface CommandModule {
 }
 
 export interface CommandModuleConfig {
-    commands: Command[]
+    commands: [string, string | ActionPieceConfig[]]
     rules?: Rule[]
     functions?: any[]
-} 
+}
 
 export interface Command {
     rule: Rule
@@ -19,6 +19,10 @@ export interface Rule {
 }
 export interface Action {
     pieces: ActionPiece[]
+}
+export interface ActionPieceConfig {
+    type: 'dsl'
+    value: any
 }
 export interface ActionPiece {
     type: 'dsl'

@@ -16,8 +16,9 @@ class CommandModuleContainer extends React.Component<CommandModuleContainerProps
     constructor(props: CommandModuleContainerProps) {
         super(props);
         const {commands} = cloneDeep(props.commandModule.config)
+        console.log('prp', props);
         this.state = {
-            commands
+            commands: []
         }
     }
 

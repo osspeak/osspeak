@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { wsFetch } from '../server';
 import CommandModulePanel from './panel';
-import CommandModuleContainer from './container';
+import CommandModuleContainer from './command-module-container';
 import CommandModuleTabs from './tabs';
 import CommandModuleList from './list/container';
 import { isEqual } from 'lodash';
@@ -18,7 +18,7 @@ export interface CommandModuleContainerState {
 }
 
 
-class CommandModuleView extends React.Component<CommandModuleContainerProps, CommandModuleContainerState> {
+class AppView extends React.Component<CommandModuleContainerProps, CommandModuleContainerState> {
 
     state: CommandModuleContainerState = {
         focusedPath: null,
@@ -81,4 +81,4 @@ class CommandModuleView extends React.Component<CommandModuleContainerProps, Com
     }
 }
 
-export default CommandModuleView;
+export default AppView;
