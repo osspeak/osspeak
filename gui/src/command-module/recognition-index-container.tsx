@@ -8,9 +8,12 @@ import CommandModuleTabs from './tabs';
 import CommandModuleList from './list/container';
 import { isEqual } from 'lodash';
 import { RecognitionIndex, CommandModule } from "./types";
-
+const Ajv = require('ajv');
+declare var window: any
+const VALIDATE = new Ajv().compile(JSON.parse(window.commandLineArgs.jsonModuleSchema))
+console.log(VALIDATE)
 export interface RecognitionIndexContainerProps {
-    
+
 }
 
 export interface RecognitionIndexContainerState {
@@ -24,14 +27,22 @@ class RecognitionIndexContainer extends React.Component<RecognitionIndexContaine
 
     componentDidMount() {
         this.indexSubscription = subscribe('RECOGNITION_INDEX',
-            (index: RecognitionIndex) => this.setState({recognitionIndex: index}));
+            (index: RecognitionIndex) => this.setState({ recognitionIndex: index }));
         this.loadIndex();
     }
 
     async loadIndex() {
         const recognitionIndex = await wsFetch('RECOGNITION_INDEX');
         console.log('ri', recognitionIndex)
-        this.setState({recognitionIndex});
+        this.validateCommandModules(recognitionIndex);
+        this.setState({ recognitionIndex });
+    }
+
+    validateCommandModules(index: RecognitionIndex) {
+        for (const [path, commandModule] of Object.entries(index.commandModules)) {
+            console.log(VALIDATE(commandModule));
+            
+        }
     }
 
     constructor(props: RecognitionIndexContainerProps) {
@@ -45,7 +56,7 @@ class RecognitionIndexContainer extends React.Component<RecognitionIndexContaine
     render() {
         return (
             <div id="cm-container">
-                {this.state.recognitionIndex !== null && <AppView recognitionIndex={this.state.recognitionIndex}/>}
+                {this.state.recognitionIndex !== null && <AppView recognitionIndex={this.state.recognitionIndex} />}
             </div>
         );
     }

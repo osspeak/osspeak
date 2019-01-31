@@ -16,7 +16,9 @@ async def close():
     sys.exit()
 
 async def start_electron():
-    args = {'osSep': os.sep}
+    with open(os.path.join('recognition', 'command-module-schema.json')) as f:
+        json_module_schema = f.read()
+    args = {'osSep': os.sep, 'jsonModuleSchema': json_module_schema}
     proc = await ProcessHandler.create(ELECTRON_PATH, APP_PATH, json.dumps(args), on_output=foo, on_exit=close)
     
 async def foo(a):

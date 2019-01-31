@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@types/lodash": "^4.14.110",
+    "ajv": "^6.7.0",
     "bootstrap": "^4.1.1",
     "classnames": "^2.2.6",
     "codemirror": "^5.39.0",
