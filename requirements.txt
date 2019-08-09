@@ -7,7 +7,7 @@ colorama==0.3.9
 future==0.16.0
 idna==2.7
 keyboard==0.13.2
-lark-parser==0.6.4
+lark-parser==0.7.2
 macholib==1.11
 more-itertools==4.3.0
 mouse==0.7.0
