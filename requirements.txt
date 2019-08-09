@@ -14,7 +14,7 @@ mouse==0.7.0
 pefile==2018.8.8
 pluggy==0.7.1
 py==1.6.0
-PyInstaller==3.4
+PyInstaller==3.5
 pypiwin32==223
 pytest==3.8.2
 pywin32==224
