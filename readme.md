@@ -7,5 +7,12 @@ Osspeak uses Python 3.7.
 ```
 git clone https://github.com/osspeak/osspeak.git
 cd osspeak
-pipenv install
+scripts\activate
+pip install -r requirements.txt
+```
+
+<h4>Create Executable</h4>
+
+```
+python buildit.py
 ```
