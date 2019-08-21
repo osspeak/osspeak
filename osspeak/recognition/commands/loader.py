@@ -8,10 +8,12 @@ import xml.etree.ElementTree as ET
 import copy
 import re
 import collections
+import lark.tree
 import json
 import log
 import recognition.actions.library.state
 from recognition.actions import perform
+from recognition import lark_parser
 import settings
 from recognition.actions import variables, perform
 from recognition.commands import commands, grammar
@@ -26,6 +28,10 @@ DEFAULT_DIRECTORY_SETTINGS = {
 }
 
 CONFIG_FILE_CACHE = limited_size_dict.LimitedSizeDict(size_limit=1000)
+
+class CommandModuleCollection:
+
+    
 
 class CommandModuleState:
 
@@ -60,12 +66,12 @@ def load_json_directory(path: str, parent_directory_settings):
         for entry in sorted(i, key=lambda x: x.name):
             if entry.name.startswith('.'):
                 continue
-            if entry.is_file() and entry.name.endswith('.json'):
+            if entry.is_file() and entry.name.endswith(('.json', '.speak')):
                 path = entry.path
                 file = CONFIG_FILE_CACHE.get(path, CommandModuleFile(path))
-                file.load_config()
+                file.parse_file_contents()
                 CONFIG_FILE_CACHE[path] = file
-                command_modules[path] = file.config
+                command_modules[path] = file.parsed_contents
             # read files in this directory first before recursing down
             elif entry.is_dir():
                 directories.append(entry)
@@ -78,19 +84,25 @@ class CommandModuleFile:
 
     def __init__(self, path):
         self.path = path
-        self.config_timestamp = None
-        self.config = None
+        self.read_timestamp = None
+        self.parsed_contents = None
 
-    def load_config(self):
+    def parse_file_contents(self):
         last_modified = os.path.getmtime(self.path)
-        if self.config_timestamp is None or last_modified > self.config_timestamp:
-            self.config_timestamp = last_modified
+        if self.read_timestamp is None or last_modified > self.read_timestamp:
+            self.read_timestamp = last_modified
             with open(self.path) as f:
-                try:
-                    self.config = json.load(f)
-                except json.decoder.JSONDecodeError as e:
-                    self.config = {'Error': str(e)}
-                    log.logger.warning(f"JSON error loading command module '{path}':\n{e}")
+                if self.path.endswith('.speak'):
+                    tree = lark_parser.lark_grammar.parse(f.read())
+                    self.parsed_contents = tree
+                    self.parsed_contents = {}
+                elif self.path.endswith('.json'):
+                    try:
+                        self.parsed_contents = json.load(f)
+                    except json.decoder.JSONDecodeError as e:
+                        self.parsed_contents = {'Error': str(e)}
+                        log.logger.warning(f"JSON error loading command module '{path}':\n{e}")
+            
 
 async def load_modules(command_module_state: CommandModuleState, current_window, current_state, initialize: bool=False):
     previous_active_modules = command_module_state.active_command_modules
