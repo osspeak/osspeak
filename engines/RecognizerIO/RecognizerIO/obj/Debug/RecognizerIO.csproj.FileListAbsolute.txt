@@ -28,3 +28,15 @@ C:\Users\evan\projects\osspeak\engines\RecognizerIO\RecognizerIO\obj\Debug\Recog
 C:\Users\evan\projects\osspeak\engines\RecognizerIO\RecognizerIO\obj\Debug\RecognizerIO.csproj.CoreCompileInputs.cache
 C:\Users\evan\projects\osspeak\engines\RecognizerIO\RecognizerIO\obj\Debug\RecognizerIO.exe
 C:\Users\evan\projects\osspeak\engines\RecognizerIO\RecognizerIO\obj\Debug\RecognizerIO.pdb
+C:\Users\evfre\wp\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.exe.config
+C:\Users\evfre\wp\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.exe
+C:\Users\evfre\wp\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\RecognizerIO.pdb
+C:\Users\evfre\wp\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\NAudio.dll
+C:\Users\evfre\wp\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\Newtonsoft.Json.dll
+C:\Users\evfre\wp\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\NAudio.xml
+C:\Users\evfre\wp\osspeak\engines\RecognizerIO\RecognizerIO\bin\Debug\Newtonsoft.Json.xml
+C:\Users\evfre\wp\osspeak\engines\RecognizerIO\RecognizerIO\obj\Debug\RecognizerIO.csprojAssemblyReference.cache
+C:\Users\evfre\wp\osspeak\engines\RecognizerIO\RecognizerIO\obj\Debug\RecognizerIO.csproj.CoreCompileInputs.cache
+C:\Users\evfre\wp\osspeak\engines\RecognizerIO\RecognizerIO\obj\Debug\RecognizerIO.csproj.CopyComplete
+C:\Users\evfre\wp\osspeak\engines\RecognizerIO\RecognizerIO\obj\Debug\RecognizerIO.exe
+C:\Users\evfre\wp\osspeak\engines\RecognizerIO\RecognizerIO\obj\Debug\RecognizerIO.pdb

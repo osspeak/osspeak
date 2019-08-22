@@ -43,7 +43,7 @@ async def watch_user_system_state(msg_list):
             if new_active_modules != command_module_state.active_command_modules or reload_files:
                 initialize = not initial_load_done or reload_files
                 await loader.load_modules(command_module_state, current_window, current_state, initialize=initialize)
-                initial_load_done = True
+                initial_load_done = False
             elif msg == topics.RELOAD_GRAMMAR:
                 loader.load_and_send_grammar(command_module_state)
             previous_window = current_window
