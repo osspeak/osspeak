@@ -45,7 +45,7 @@ namespace RecognizerIO
                         var grammar = new Grammar(document);
                         EngManager.LoadGrammar(grammar, grammarId);
                     }
-                    if (!EngManager.IsRunning && startEngine) EngManager.Begin();
+                    if (!EngManager.IsRunning && EngManager.AudioInputDeviceConnected && startEngine) EngManager.Begin();
                     break;
                 case "LOAD_SETTINGS":
                     break;

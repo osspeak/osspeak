@@ -23,7 +23,7 @@ namespace RecognizerIO
                 }
                 catch (Exception e)
                 {
-                    new Error(e).send();
+                    Debug.sendMessage(e.ToString(), "error");
                 }
             }
         }

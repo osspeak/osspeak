@@ -16,6 +16,7 @@ namespace RecognizerIO.Engines
         public string GrammarId;
         public Boolean IsRunning = false;
         public DeviceEventRaiser eventRaiser;
+        public Boolean AudioInputDeviceConnected;
 
         public EngineManager()
         {
@@ -27,7 +28,16 @@ namespace RecognizerIO.Engines
             Engine = new SpeechRecognitionEngine();
             Engine.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(recognizer_SpeechRecognized);
             Engine.RecognizerUpdateReached += new EventHandler<RecognizerUpdateReachedEventArgs>(recognizer_RecognizerUpdateReached);
-            Engine.SetInputToDefaultAudioDevice();
+            AudioInputDeviceConnected = false;
+            try
+            {
+                Engine.SetInputToDefaultAudioDevice();
+            }
+            catch (InvalidOperationException e) {
+                Debug.sendMessage("No audio input device detected");
+                return;
+            }
+            AudioInputDeviceConnected = true;
             IsRunning = false;
             if (ActiveGrammar != null)
             {
@@ -97,4 +107,5 @@ namespace RecognizerIO.Engines
         }
 
     }
+
 }
