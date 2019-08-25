@@ -1,9 +1,9 @@
 from lark import Lark
 
-grammar = '''start: ([block] NEWLINE)* [block]
+grammar = '''start: ([block] _NEWLINE)* [block]
 block: (command | named_utterance | comment)
 comment: /\s*#.*/
-NEWLINE: /\\n/
+_NEWLINE: /\\n/
 _SPACE: (" " | "\\t")
 _optsp: _SPACE*
 NAME: /[a-zA-Z][a-zA-Z0-9]*/

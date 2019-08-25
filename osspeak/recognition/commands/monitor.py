@@ -1,4 +1,5 @@
 import pywindow
+import settings
 import collections
 import log
 import asyncio
@@ -19,6 +20,10 @@ def create_message_subscriptions(msg_list):
 
 def start_watching_user_state():
     msg_list = [None]
+    command_dir = settings.settings['command_directory']
+    ast_provider = loader.StaticFileAstProvider(command_dir)
+    command_module_controller = loader.CommandModuleController(ast_provider)
+    command_module_controller.load_initial_modules()
     command_module_state.populate()
     loader.load_initial_user_state(command_module_state.command_modules)
     engine_status_history = collections.deque([], 10)

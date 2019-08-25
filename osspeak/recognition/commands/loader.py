@@ -13,7 +13,7 @@ import json
 import log
 import recognition.actions.library.state
 from recognition.actions import perform
-from recognition import lark_parser
+from recognition import lark_parser, command_module
 import settings
 from recognition.actions import variables, perform
 from recognition.commands import commands, grammar
@@ -29,8 +29,14 @@ DEFAULT_DIRECTORY_SETTINGS = {
 
 CONFIG_FILE_CACHE = limited_size_dict.LimitedSizeDict(size_limit=1000)
 
-class CommandModuleCollection:
+class CommandModuleController:
 
+    def __init__(self, ast_provider):
+        self.ast_provider = ast_provider
+
+    def load_initial_modules(self):
+        for path, ast in self.ast_provider.asts.items():
+            module = command_module.CommandModule(ast, path)
     
 
 class CommandModuleState:
@@ -66,7 +72,7 @@ def load_json_directory(path: str, parent_directory_settings):
         for entry in sorted(i, key=lambda x: x.name):
             if entry.name.startswith('.'):
                 continue
-            if entry.is_file() and entry.name.endswith(('.json', '.speak')):
+            if entry.is_file() and entry.name.endswith('.json'):
                 path = entry.path
                 file = CONFIG_FILE_CACHE.get(path, CommandModuleFile(path))
                 file.parse_file_contents()
@@ -95,7 +101,6 @@ class CommandModuleFile:
                 if self.path.endswith('.speak'):
                     tree = lark_parser.lark_grammar.parse(f.read())
                     self.parsed_contents = tree
-                    self.parsed_contents = {}
                 elif self.path.endswith('.json'):
                     try:
                         self.parsed_contents = json.load(f)
@@ -250,3 +255,44 @@ def fetch_module_map(command_modules):
     with self.lock:
         payload = {'modules': command_modules}
     pubsub.publish(topics.LOAD_MODULE_MAP, payload)
+
+class StaticFileAstProvider:
+
+    def __init__(self, root):
+        self.root = root
+        self.file_cache = limited_size_dict.LimitedSizeDict(size_limit=1000)
+
+    @property
+    def asts(self):
+        syntax_trees = self.load_asts_from_files()
+        return syntax_trees
+
+    def load_asts_from_files(self):
+        json_module_objects = {}
+        if not os.path.isdir(self.root):
+            os.makedirs(self.root)
+        json_module_objects = self.load_directory(self.root, DEFAULT_DIRECTORY_SETTINGS)
+        return json_module_objects
+
+    def load_directory(self, path: str, parent_directory_settings):
+        command_modules = {}
+        directories = []
+        local_settings = settings.try_load_json_file(os.path.join(path, '.osspeak.json'))
+        directory_settings = {**parent_directory_settings, **local_settings}
+        with os.scandir(path) as i:
+            for entry in sorted(i, key=lambda x: x.name):
+                if entry.name.startswith('.'):
+                    continue
+                if entry.is_file() and entry.name.endswith('.speak'):
+                    path = entry.path
+                    file = self.file_cache.get(path, CommandModuleFile(path))
+                    file.parse_file_contents()
+                    self.file_cache[path] = file
+                    command_modules[path] = file.parsed_contents
+                # read files in this directory first before recursing down
+                elif entry.is_dir():
+                    directories.append(entry)
+            if directory_settings['recurse']:
+                for direntry in directories:
+                    command_modules.update(self.load_directory(direntry.path, directory_settings))
+        return command_modules
