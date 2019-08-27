@@ -43,7 +43,10 @@ def load_user_settings():
         user_settings.update(args)
     return user_settings
 
-settings = load_user_settings()
+try:
+    settings = load_user_settings()
+except:
+    settings = DEFAULT_CONFIG.copy()
 
 def get_server_address():
     address = settings['server_address'].rsplit(':', 1)

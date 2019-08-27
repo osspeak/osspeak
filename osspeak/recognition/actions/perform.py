@@ -8,7 +8,7 @@ from lib import keyboard
 from settings import settings
 import platforms.api
 from recognition.actions import context
-from recognition.rules import _lark, astree
+from recognition.rules import _lark
 
 recognition_queue = queue.Queue()
 results_map = {}

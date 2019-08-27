@@ -1,6 +1,6 @@
 import uuid
 from typing import List, Dict
-from recognition.rules import astree, _lark
+from recognition.rules import _lark
 
 class GrammarContext:
     

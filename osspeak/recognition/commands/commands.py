@@ -6,8 +6,6 @@ import json
 from recognition.actions.library import state, history
 from recognition.actions import variables
 from recognition.actions.function import Function
-from interfaces.gui import serializer
-from recognition.rules import astree
 from recognition import action, rule, function
 from log import logger
 

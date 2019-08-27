@@ -134,7 +134,6 @@ def save_grammar(grammar, grammars):
     grammars[grammar.uuid] = grammar
 
 def generate_node_ids(rules, named_rule_map):
-    from recognition.rules import astree
     node_ids = {}
     for rule in rules:
         for node in rule.walk(rules=named_rule_map):
