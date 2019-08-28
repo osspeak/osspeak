@@ -53,24 +53,6 @@ class RuleReference(ASTNode):
         self.repeat_high = 1
         self.action_piece_substitute = None
 
-def check_equal(obj1, obj2, attrs):
-    if type(obj1) is not type(obj2):
-        return False
-    equal, not_equal = compare_attributes(obj1, obj2, attrs)
-    if not_equal:
-        return False
-    return True
-
-def compare_attributes(o1, o2, attrs):
-    equal = []
-    not_equal = []
-    for attr in attrs:
-        if getattr(o1, attr) == getattr(o2, attr):
-            equal.append(attr)
-        else:
-            not_equal.append(attr)
-    return equal, not_equal
-
 def rule_from_ast(lark_ast):
     rule = Rule()
     rule.root = grouping_from_choice_items(lark_ast.children[0])
