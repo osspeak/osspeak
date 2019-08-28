@@ -10,7 +10,6 @@ from recognition.commands import monitor
 from communication import server, pubsub, topics
 import settings
 from interfaces.cli import menu
-from interfaces.gui import start_electron
 from engine.handler import EngineProcessHandler
 from engine.client import RemoteEngineClient
 import threading
@@ -25,8 +24,6 @@ def main():
     ws_handlers = server.get_websocket_handlers(engine_server)
     if ws_handlers:
         server.loop.run_until_complete(server.start_websockets(ws_handlers))
-    if settings.settings['interface'] == 'gui':
-        electron = server.loop.run_until_complete(start_electron())
     server.loop.run_forever()
 
 @atexit.register
@@ -45,7 +42,7 @@ async def initialize_speech_engine_connector():
         return await EngineProcessHandler.create(remote=is_server)
 
 def get_cli_loop():
-    no_cli = settings.settings['interface'] == 'gui' or settings.settings['network'] == 'server'
+    no_cli = settings.settings['network'] == 'server'
     if no_cli:
         input_blocker = lambda: input('')
     else:

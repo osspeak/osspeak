@@ -1,7 +1,28 @@
-def rule(text, name=None):
+from recognition import lark_parser
+import json
+import time
+
+def rule(text):
     from recognition.rules.parser import RuleParser
+    from recognition.rules import astree
     parser = RuleParser(text)
-    rule_obj = parser.parse_as_rule(name=name)
+    rule_obj = parser.parse_as_rule()
+    try:
+        lark_ast = lark_parser.parse_utterance(text)
+    except Exception as e:
+        print(e)
+        print(text)
+    # print(lark_ast.pretty())
+    # print(text)
+    # rule_obj_from_lark = astree.rule_from_ast(lark_ast)
+    # try:
+    #     assert rule_obj == rule_obj_from_lark
+    # except AssertionError as e:
+    #     with open('larkParser.json', 'w') as f:
+    #         json.dump(rule_obj_from_lark, f, cls=astree.RuleEncoder, sort_keys=True, indent=4)
+    #     with open('handrolledParser.json', 'w') as f:
+    #         json.dump(rule_obj, f, cls=astree.RuleEncoder, sort_keys=True, indent=4)
+    #     raise e
     return rule_obj
 
 def action(action_input, *args, **kwargs):

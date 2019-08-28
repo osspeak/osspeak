@@ -16,39 +16,38 @@ grammar = f'''start: ([block] _NEWLINE)* [block]
 block: (command | named_utterance | comment)
 comment: /\\s*#.*/
 _NEWLINE: /\\n/
-_SPACE: (" " | "\\t")
-_optsp: _SPACE*
 NAME: /[_a-zA-Z][_a-zA-Z0-9]*/
-named_utterance: utterance_name _optsp ":=" _optsp utterance
-utterance: _optsp {UTTERANCE_CHOICE_ITEMS} _optsp
-utterance_sequence: utterance_piece (_optsp utterance_piece)*
+named_utterance: utterance_name ":=" utterance
+utterance: {UTTERANCE_CHOICE_ITEMS} 
+utterance_sequence: utterance_piece ( utterance_piece)*
 utterance_piece: ({UTTERANCE_WORD} | {UTTERANCE_REFERENCE} | {UTTERANCE_CHOICES}) [{UTTERANCE_REPETITION}] [action_substitute]
-{UTTERANCE_CHOICES}: "(" _optsp {UTTERANCE_CHOICE_ITEMS} _optsp ")"
-{UTTERANCE_CHOICE_ITEMS}: utterance_sequence (_optsp "|" _optsp utterance_sequence _optsp)* 
-utterance_name: /[a-z]+/
-{UTTERANCE_WORD}: /[a-z]+/
+{UTTERANCE_CHOICES}: "(" {UTTERANCE_CHOICE_ITEMS} ")"
+{UTTERANCE_CHOICE_ITEMS}: utterance_sequence ( "|" utterance_sequence )* 
+utterance_name: /[a-zA-Z_]+/
+{UTTERANCE_WORD}: /[a-z0-9]+/
 {UTTERANCE_REFERENCE}: "<" utterance_name ">"
-action_substitute: "=" _optsp action
+action_substitute: "=" action
 {UTTERANCE_REPETITION}: "_" ({ZERO_OR_POSITIVE_INT} | {UTTERANCE_RANGE})
-{UTTERANCE_RANGE}: {ZERO_OR_POSITIVE_INT} "-" {ZERO_OR_POSITIVE_INT}
+{UTTERANCE_RANGE}: {ZERO_OR_POSITIVE_INT} "-" [{ZERO_OR_POSITIVE_INT}]
 
-command: utterance "=" _optsp action _optsp
+command: utterance "=" action 
 
-action: _optsp ({EXPR} _SPACE+)* {EXPR} _optsp
+action: {EXPR}+ 
 BOOL: ("True" | "False")
-{EXPR}: (string | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | chain | call | BOOL)
+{EXPR}: (list | string | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | chain | call | BOOL)
 expr_grouping: "(" {EXPR} ")"
-binop: {EXPR} _optsp ("+" | "-" | "*" | "/" | "//" | "%" | "==" | "!=") _optsp {EXPR}
-keypress: "{{" {EXPR} ("," _optsp {EXPR})* "}}"
+binop: {EXPR} ("+" | "-" | "*" | "/" | "//" | "%" | "==" | "!=") {EXPR}
+list: "[" [{EXPR} ["," {EXPR}]] "]"
+keypress: "{{" {EXPR} ("," {EXPR})* "}}"
 {VARIABLE}: "$" INTEGER 
 {ZERO_OR_POSITIVE_INT}: /[0-9]+/
 INTEGER: /-?[0-9]+/
 FLOAT: /-?([0-9]+)?\\.[0-9]+/
 literal.-1: /[a-zA-Z]+/
-call: NAME "(" _optsp ((arg_list ["," _optsp kwarg_list]) | [kwarg_list]) _optsp ")"
-arg_list: {EXPR} ( _optsp "," _optsp {EXPR})*
-kwarg_list: kwarg ( _optsp "," _optsp kwarg)* 
-kwarg: NAME _optsp "=" _optsp {EXPR}
+call: NAME "(" ((arg_list ["," kwarg_list]) | [kwarg_list]) ")"
+arg_list: {EXPR} ( "," {EXPR})*
+kwarg_list: kwarg ( "," kwarg)* 
+kwarg: NAME "=" {EXPR}
 _chainable: (call | NAME)
 chain: _chainable ("." _chainable)+
 
@@ -58,7 +57,8 @@ STRING_SINGLE: "'" _STRING_ESC_INNER "'"
 STRING_DOUBLE: "\\"" _STRING_ESC_INNER "\\""
 string: (STRING_SINGLE | STRING_DOUBLE | literal)
 
-%import common.WORD   // imports from terminal library
+%import common.WORD  // imports from terminal library
+%ignore " "
 '''
 
 lark_grammar = Lark(grammar)
@@ -73,6 +73,10 @@ class Foo(Transformer):
         if isinstance(child, Tree) and child.data =='literal':
             return str(child.children[0])
         return child[1:-1]
+
+def parse_utterance(text: str):
+    ast = utterance_grammar.parse(text)
+    return ast
 
 def parse_action(text: str):
     ast = action_grammar.parse(text)

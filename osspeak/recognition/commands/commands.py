@@ -6,7 +6,7 @@ import json
 from recognition.actions.library import state, history
 from recognition.actions import variables
 from recognition.actions.function import Function
-from recognition import action, rule, function
+from recognition import action, rule, function, lark_parser
 from log import logger
 
 class CommandModule:
@@ -26,13 +26,18 @@ class CommandModule:
 
     def load_commands(self):
         for rule_text, action_text in self.config.get('commands', {}):
+            try:
+                lark_parser.parse_utterance(rule_text)
+            except Exception as e:
+                print(rule_text)
+                print(e)
             cmd = Command(rule_text, action_text)
             self.commands.append(cmd)
 
     def load_rules(self):
         for rule_name, rule_text in self.config.get('rules', {}):
             try:
-                self.rules[rule_name] = rule(rule_text, name=rule_name)
+                self.rules[rule_name] = rule(rule_text)
             except RuntimeError as e:
                 print(f'Error loading rule "{rule_name}": {e}')
 

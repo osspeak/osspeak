@@ -4,7 +4,7 @@ from pprint import pprint
 
 class SrgsXmlConverter:
 
-    def __init__(self, node_ids, named_rule_map):
+    def __init__(self, node_ids, named_rules):
         self.grammar_attrib = {
             'version': '1.0',
             'mode': 'voice',
@@ -14,7 +14,8 @@ class SrgsXmlConverter:
             'tag-format': 'semantics/1.0'
         }
         self.node_ids = node_ids
-        self.named_rule_map = named_rule_map
+        self.named_rules = named_rules
+        self.map_rule_node_to_name = {v: k for k, v in named_rules.items()}
         self.root = ET.Element('grammar', attrib=self.grammar_attrib)
         self.ruleref_container_id = 'ruleref_container'
 
@@ -23,14 +24,15 @@ class SrgsXmlConverter:
         self.root.append(self.build_root_rule())
         top_level_choices = self.build_top_level_choices()
         for rule_node in rules:
-            if rule_node.name is None or not rule_node.name.startswith('_'):
+            rule_name = self.map_rule_node_to_name.get(rule_node)
+            if rule_name is None or not rule_name.startswith('_'):
                 self.append_rule_node(rule_node, top_level_choices)
         return self.root
 
     def append_rule_node(self, rule_node, top_level_choices):
         rule = self.convert_rule_element(rule_node)
         self.root.append(rule)
-        if rule_node.name is None:
+        if rule_node not in self.map_rule_node_to_name:
             top_level_choices.append(self.get_ruleref_item(self.node_ids[rule_node]))
 
     def build_root_rule(self):
@@ -83,7 +85,7 @@ class SrgsXmlConverter:
             choices[-1].append(ruleref)
             return
         # all rule nodes here should be copies that refer to base rule
-        base_rule = self.named_rule_map[ruleref_node.rule_name]
+        base_rule = self.named_rules[ruleref_node.rule_name]
         rritem = self.get_ruleref_item(self.node_ids[base_rule],
                 low=ruleref_node.repeat_low, high=ruleref_node.repeat_high)
         choices[-1].append(rritem)

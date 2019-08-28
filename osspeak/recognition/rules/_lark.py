@@ -73,24 +73,24 @@ def create_lark_grammar_list(command_rules: List, named_rules, node_ids):
     lark_named_rules = {}
     lark_command_rules = {}
     lark_internal_rules = {}
-    for rule in named_rules.values():
-        if not rule.name.startswith('_'):
+    for rule_name, rule in named_rules.items():
+        if not rule_name.startswith('_'):
             lark_named_rules[node_ids[rule]] = parse_rule(rule, lark_internal_rules, node_ids, named_rules)
     for rule in command_rules:
         lark_command_rules[node_ids[rule]] = parse_rule(rule, lark_internal_rules, node_ids, named_rules)
     return [(k, v) for k, v in {**lark_named_rules, **lark_command_rules, **lark_internal_rules}.items()]
 
-def yield_paths(lark_node, node_map, ancestor_path=()):
+def yield_paths(lark_node, node_map, named_rules, ancestor_path=()):
     path = ancestor_path + (lark_node.data,)
     node = node_map[path]
-    matched_text = node_text(node, lark_node)
+    matched_text = node_text(node, lark_node, named_rules)
     yield path, matched_text
     for child in lark_node.children:
         if isinstance(child, lark.Tree):
-            yield from yield_paths(child, node_map, path)
+            yield from yield_paths(child, node_map, named_rules, path)
 
-def node_text(node, lark_node):
+def node_text(node, lark_node, named_rules):
     if isinstance(node, astree.WordNode):
         return node.text
-    elif isinstance(node, astree.Rule) and node.name == '_dictate':
+    elif isinstance(node, astree.Rule) and named_rules['_dictate'] is node:
         return lark_node.children[0]

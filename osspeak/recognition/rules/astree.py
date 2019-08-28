@@ -1,5 +1,6 @@
 import collections
 import copy
+import json
 from recognition import lark_parser
 
 class ASTNode:
@@ -7,28 +8,15 @@ class ASTNode:
     def walk(self):
         yield self
 
-    def __eq__(self, other):
-        raise NotImplementedError
-
-    def __hash__(self):
-        return id(self)
-
 class Rule(ASTNode):
 
-    def __init__(self, name=None, text=''):
-        self.name = name
+    def __init__(self, text=''):
         self.text = text
         self.root = GroupingNode()
 
     def walk(self, ancestors=None, rules=None):
         yield self
         yield from self.root.walk()
-
-    def __eq__(self, other):
-        return self.root == other.root
-
-    def __hash__(self):
-        return id(self)
 
 
 class WordNode(ASTNode):
@@ -42,13 +30,6 @@ class WordNode(ASTNode):
     @property
     def is_single(self):
         return self.repeat_low == 1 and self.repeat_high == 1
-
-    def __eq__(self, other):
-        return check_equal(self, other, ('repeat_low', 'repeat_high'))
-
-    def __hash__(self):
-        return id(self)
-
 
 class GroupingNode(ASTNode):
 
@@ -64,12 +45,6 @@ class GroupingNode(ASTNode):
             for node in seq:
                 yield from node.walk()
 
-    def __eq__(self, other):
-        return check_equal(self, other, ('repeat_low', 'repeat_high', 'sequences'))
-
-    def __hash__(self):
-        return id(self)
-
 class RuleReference(ASTNode):
 
     def __init__(self, rule_name):
@@ -77,12 +52,6 @@ class RuleReference(ASTNode):
         self.repeat_low = 1
         self.repeat_high = 1
         self.action_piece_substitute = None
-
-    def __eq__(self, other):
-        return check_equal(self, other, ('repeat_low', 'repeat_high', 'rule_name'))
-
-    def __hash__(self):
-        return id(self)
 
 def check_equal(obj1, obj2, attrs):
     if type(obj1) is not type(obj2):
@@ -121,6 +90,7 @@ def sequence_from_ast_sequence(ast):
     return seq
 
 def node_from_utterance_piece(ast):
+    import lark.lexer
     wrapped_ast = ast.children[0]
     node = None
     if wrapped_ast.data == lark_parser.UTTERANCE_WORD:
@@ -148,3 +118,17 @@ def parse_repetition(ast):
         low = int(child.children[0])
         high = int(child.children[1])
     return low, high
+
+def same_json(o1, o2):
+    return json.dumps(o1, cls=RuleEncoder, sort_keys=True) == json.dumps(o2, cls=RuleEncoder, sort_keys=True)
+
+class RuleEncoder(json.JSONEncoder):
+
+    def default(self, o):
+        d = o.__dict__.copy()
+        d['type'] = o.__class__.__name__
+        try:
+            del d['action_piece_substitute']
+        except KeyError:
+            pass
+        return d

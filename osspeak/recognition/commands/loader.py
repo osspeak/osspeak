@@ -201,8 +201,8 @@ def load_events(command_modules):
     for cmd_module in command_modules.values():
         cmd_module.load_events()
 
-def build_grammar_xml(all_active_rules, node_ids, named_rule_map):
-    return SrgsXmlConverter(node_ids, named_rule_map).build_grammar(all_active_rules)
+def build_grammar_xml(all_active_rules, node_ids, named_rules):
+    return SrgsXmlConverter(node_ids, named_rules).build_grammar(all_active_rules)
 
 def get_active_rules(active_modules):
     rules = {}
@@ -214,7 +214,7 @@ def get_active_rules(active_modules):
     return rules, command_rules
 
 def special_rules():
-    return {'_dictate': astree.Rule(name='_dictate')}
+    return {'_dictate': astree.Rule()}
 
 def get_active_commands(active_modules):
     grouped_commands = [m.commands for m in active_modules.values()]

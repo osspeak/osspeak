@@ -30,8 +30,8 @@ class RuleParser:
             tokens.WhitespaceToken: self.parse_whitespace_token,
         }
 
-    def parse_as_rule(self, name=None):
-        top_level_rule = astree.Rule(name=name, text=self.text)
+    def parse_as_rule(self):
+        top_level_rule = astree.Rule(text=self.text)
         self.grouping_stack = [top_level_rule.root]
         for tok in self.lexer:
             self.token_list.append(tok)
