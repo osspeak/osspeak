@@ -2,11 +2,12 @@ import collections
 import importlib
 import itertools
 import json
+import lark.exceptions
 
 from recognition.actions.library import state, history
 from recognition.actions import variables
 from recognition.actions.function import Function
-from recognition import action, rule, function, lark_parser
+from recognition import action as _action, rule as _rule, function, lark_parser
 from log import logger
 
 class CommandModule:
@@ -31,13 +32,20 @@ class CommandModule:
             except Exception as e:
                 print(rule_text)
                 print(e)
-            cmd = Command(rule_text, action_text)
+            rule = _rule(rule_text)
+            action = _action(action_text)
+            # try:
+            #     lark_ast = lark_parser.parse_action(action_text)
+            # except lark.exceptions.UnexpectedCharacters as e:
+            #     print(e)
+            #     print(action_text)
+            cmd = Command(rule, rule_text, action, action_text)
             self.commands.append(cmd)
 
     def load_rules(self):
         for rule_name, rule_text in self.config.get('rules', {}):
             try:
-                self.rules[rule_name] = rule(rule_text)
+                self.rules[rule_name] = _rule(rule_text)
             except RuntimeError as e:
                 print(f'Error loading rule "{rule_name}": {e}')
 
@@ -53,7 +61,7 @@ class CommandModule:
 
     def load_events(self):
         for event_name, event_text in self.config.get('events', {}).items():
-            self.events[event_name] = action(event_text)
+            self.events[event_name] = _action(event_text)
 
     @property
     def conditions(self):
@@ -71,14 +79,8 @@ class CommandModule:
 
 class Command:
     
-    def __init__(self, rule_text, action_input):
-        self.init_rule(rule_text)
-        self.init_action(action_input)
-
-    def init_rule(self, rule_text):
+    def __init__(self, r, rule_text, a, action_input):
+        self.rule = r
         self.rule_text = rule_text
-        self.rule = rule(rule_text)
-
-    def init_action(self, action_input):
+        self.action = a
         self.action_input = action_input
-        self.action = action(action_input)

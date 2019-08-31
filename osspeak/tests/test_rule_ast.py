@@ -48,4 +48,4 @@ def compare_string_to_ast(text):
     rule_from_string = rule(text)
     lark_ast = utterance_grammar.parse(text)
     rule_from_ast = astree.rule_from_ast(lark_ast)
-    assert rule_from_ast == rule_from_string
+    assert astree.same_json(rule_from_ast, rule_from_string)

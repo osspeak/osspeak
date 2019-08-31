@@ -10,8 +10,7 @@ class ASTNode:
 
 class Rule(ASTNode):
 
-    def __init__(self, text=''):
-        self.text = text
+    def __init__(self):
         self.root = GroupingNode()
 
     def walk(self, ancestors=None, rules=None):
@@ -26,6 +25,7 @@ class WordNode(ASTNode):
         self.repeat_low = 1
         self.repeat_high = 1
         self.action_piece_substitute = None
+        self.action = None
 
     @property
     def is_single(self):
@@ -37,6 +37,7 @@ class GroupingNode(ASTNode):
         self.repeat_low = 1
         self.repeat_high = 1
         self.action_piece_substitute = None
+        self.action = None
         self.sequences = []
 
     def walk(self):
@@ -52,6 +53,7 @@ class RuleReference(ASTNode):
         self.repeat_low = 1
         self.repeat_high = 1
         self.action_piece_substitute = None
+        self.action = None
 
 def rule_from_ast(lark_ast):
     rule = Rule()
@@ -98,7 +100,10 @@ def parse_repetition(ast):
         low, high = int(child), int(child)
     elif child.data == lark_parser.UTTERANCE_RANGE:
         low = int(child.children[0])
-        high = int(child.children[1])
+        try:
+            high = int(child.children[1])
+        except IndexError:
+            high = None
     return low, high
 
 def same_json(o1, o2):

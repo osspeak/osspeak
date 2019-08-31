@@ -34,28 +34,30 @@ command: utterance "=" action
 
 action: {EXPR}+ 
 BOOL: ("True" | "False")
-{EXPR}: (list | string | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | chain | call | BOOL)
+{EXPR}: ["-"] (index | attribute | literal | list | string | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | BOOL)
+_chainable: (NAME | attribute | call | index | list)
 expr_grouping: "(" {EXPR} ")"
 binop: {EXPR} ("+" | "-" | "*" | "/" | "//" | "%" | "==" | "!=") {EXPR}
-list: "[" [{EXPR} ["," {EXPR}]] "]"
 keypress: "{{" {EXPR} ("," {EXPR})* "}}"
 {VARIABLE}: "$" INTEGER 
 {ZERO_OR_POSITIVE_INT}: /[0-9]+/
 INTEGER: /-?[0-9]+/
 FLOAT: /-?([0-9]+)?\\.[0-9]+/
-literal.-1: /[a-zA-Z]+/
-call: NAME "(" ((arg_list ["," kwarg_list]) | [kwarg_list]) ")"
+literal.-1: /[a-zA-Z0-9]+/
+
+list: "[" [{EXPR} ["," {EXPR}]] "]"
+index: _chainable "[" {EXPR} "]"
+attribute.2: _chainable "." NAME
+call.3: _chainable "(" ((arg_list ["," kwarg_list]) | [kwarg_list]) ")"
 arg_list: {EXPR} ( "," {EXPR})*
 kwarg_list: kwarg ( "," kwarg)* 
 kwarg: NAME "=" {EXPR}
-_chainable: (call | NAME)
-chain: _chainable ("." _chainable)+
 
 _STRING_INNER: /.*?/
 _STRING_ESC_INNER: _STRING_INNER /(?<!\\\\)(\\\\\\\\)*?/ 
 STRING_SINGLE: "'" _STRING_ESC_INNER "'"
 STRING_DOUBLE: "\\"" _STRING_ESC_INNER "\\""
-string: (STRING_SINGLE | STRING_DOUBLE | literal)
+string: (STRING_SINGLE | STRING_DOUBLE)
 
 %import common.WORD  // imports from terminal library
 %ignore " "
@@ -68,12 +70,11 @@ action_grammar = Lark(grammar, start='action')
 class Foo(Transformer):
 
     def string(self, children):
-        print(children)
         child = children[0]
         if isinstance(child, Tree) and child.data =='literal':
             return str(child.children[0])
         return child[1:-1]
-
+    
 def parse_utterance(text: str):
     ast = utterance_grammar.parse(text)
     return ast
@@ -81,6 +82,4 @@ def parse_utterance(text: str):
 def parse_action(text: str):
     ast = action_grammar.parse(text)
     transformed = Foo().transform(ast)
-    print(ast)
-    print(transformed)
     return transformed
