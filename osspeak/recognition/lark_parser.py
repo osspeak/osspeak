@@ -2,70 +2,79 @@ from lark import Lark, Transformer, v_args, Token, Tree
 
 UTTERANCE_CHOICES = 'utterance_choices'
 UTTERANCE_CHOICE_ITEMS = 'utterance_choices_items'
-UTTERANCE_WORD = 'utterance_word'
+UTTERANCE_WORD = 'UTTERANCE_WORD'
 UTTERANCE_REFERENCE = 'utterance_reference'
 UTTERANCE_REPETITION = 'utterance_repetition'
 UTTERANCE_RANGE = 'utterance_range'
+UTTERANCE_NAME = 'utterance_name'
 
 ZERO_OR_POSITIVE_INT = 'ZERO_OR_POSITIVE_INT'
 
-EXPR = '_expr'
+EXPR = 'expr'
 VARIABLE = 'variable'
+ARG_LIST = 'arg_list'
+KWARG_LIST = 'kwarg_list'
+UNARY_OPERATOR = 'UNARY_OPERATOR'
 
 grammar = f'''start: ([block] _NEWLINE)* [block]
 block: (command | named_utterance | comment)
 comment: /\\s*#.*/
+_WS: /\\s+/
+WS: /\\s+/
 _NEWLINE: /\\n/
 NAME: /[_a-zA-Z][_a-zA-Z0-9]*/
-named_utterance: utterance_name ":=" utterance
+named_utterance: {UTTERANCE_NAME} ":=" utterance
 utterance: {UTTERANCE_CHOICE_ITEMS} 
-utterance_sequence: utterance_piece ( utterance_piece)*
+utterance_sequence: utterance_piece (_WS utterance_piece)*
 utterance_piece: ({UTTERANCE_WORD} | {UTTERANCE_REFERENCE} | {UTTERANCE_CHOICES}) [{UTTERANCE_REPETITION}] [action_substitute]
 {UTTERANCE_CHOICES}: "(" {UTTERANCE_CHOICE_ITEMS} ")"
-{UTTERANCE_CHOICE_ITEMS}: utterance_sequence ( "|" utterance_sequence )* 
-utterance_name: /[a-zA-Z_]+/
+{UTTERANCE_CHOICE_ITEMS}: utterance_sequence ("|" utterance_sequence)* 
+{UTTERANCE_NAME}: NAME
 {UTTERANCE_WORD}: /[a-z0-9]+/
-{UTTERANCE_REFERENCE}: "<" utterance_name ">"
+{UTTERANCE_REFERENCE}: "<" {UTTERANCE_NAME} ">"
 action_substitute: "=" action
 {UTTERANCE_REPETITION}: "_" ({ZERO_OR_POSITIVE_INT} | {UTTERANCE_RANGE})
 {UTTERANCE_RANGE}: {ZERO_OR_POSITIVE_INT} "-" [{ZERO_OR_POSITIVE_INT}]
 
 command: utterance "=" action 
 
-action: {EXPR}+ 
+action: {EXPR} (_WS {EXPR})*
 BOOL: ("True" | "False")
-{EXPR}: ["-"] (index | attribute | literal | list | string | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | BOOL)
-_chainable: (NAME | attribute | call | index | list)
+{EXPR}: [{UNARY_OPERATOR}] (index | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | BOOL)
+_chainable: (NAME | attribute | call | index | list | {VARIABLE})
 expr_grouping: "(" {EXPR} ")"
-binop: {EXPR} ("+" | "-" | "*" | "/" | "//" | "%" | "==" | "!=") {EXPR}
+BINARY_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%" | "==" | "!=")
+{UNARY_OPERATOR}: ("+" | "-")
+binop: {EXPR} BINARY_OPERATOR {EXPR}
 keypress: "{{" {EXPR} ("," {EXPR})* "}}"
 {VARIABLE}: "$" INTEGER 
 {ZERO_OR_POSITIVE_INT}: /[0-9]+/
 INTEGER: /-?[0-9]+/
-FLOAT: /-?([0-9]+)?\\.[0-9]+/
-literal.-1: /[a-zA-Z0-9]+/
+FLOAT: SIGNED_FLOAT
+LITERAL_PIECE: /[a-zA-Z0-9]+/ 
+literal.-100: LITERAL_PIECE (WS LITERAL_PIECE)*
 
 list: "[" [{EXPR} ["," {EXPR}]] "]"
-index: _chainable "[" {EXPR} "]"
+index.-3: _chainable "[" {EXPR} "]"
 attribute.2: _chainable "." NAME
-call.3: _chainable "(" ((arg_list ["," kwarg_list]) | [kwarg_list]) ")"
-arg_list: {EXPR} ( "," {EXPR})*
-kwarg_list: kwarg ( "," kwarg)* 
+call.3: _chainable "(" (({ARG_LIST} ["," {KWARG_LIST}]) | [{KWARG_LIST}]) ")"
+{ARG_LIST}: {EXPR} ("," {EXPR})*
+{KWARG_LIST}: kwarg ("," kwarg)* 
 kwarg: NAME "=" {EXPR}
 
 _STRING_INNER: /.*?/
 _STRING_ESC_INNER: _STRING_INNER /(?<!\\\\)(\\\\\\\\)*?/ 
 STRING_SINGLE: "'" _STRING_ESC_INNER "'"
 STRING_DOUBLE: "\\"" _STRING_ESC_INNER "\\""
-string: (STRING_SINGLE | STRING_DOUBLE)
 
 %import common.WORD  // imports from terminal library
+%import common.SIGNED_FLOAT  // imports from terminal library
 %ignore " "
 '''
 
 lark_grammar = Lark(grammar)
-utterance_grammar = Lark(grammar, start='utterance')
-action_grammar = Lark(grammar, start='action')
+utterance_grammar = Lark(grammar, start='utterance', propagate_positions=True)
+action_grammar = Lark(grammar, start='action', propagate_positions=True)
 
 class Foo(Transformer):
 
@@ -81,5 +90,10 @@ def parse_utterance(text: str):
 
 def parse_action(text: str):
     ast = action_grammar.parse(text)
+    return ast
     transformed = Foo().transform(ast)
     return transformed
+
+def lark_node_type(lark_ir):
+    type_attr = 'data' if isinstance(lark_ir, Tree) else 'type'
+    return getattr(lark_ir, type_attr)

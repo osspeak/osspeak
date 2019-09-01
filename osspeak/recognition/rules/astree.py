@@ -25,7 +25,7 @@ class WordNode(ASTNode):
         self.repeat_low = 1
         self.repeat_high = 1
         self.action_piece_substitute = None
-        self.action = None
+        self.action_substitute = None
 
     @property
     def is_single(self):
@@ -37,7 +37,7 @@ class GroupingNode(ASTNode):
         self.repeat_low = 1
         self.repeat_high = 1
         self.action_piece_substitute = None
-        self.action = None
+        self.action_substitute = None
         self.sequences = []
 
     def walk(self):
@@ -53,7 +53,7 @@ class RuleReference(ASTNode):
         self.repeat_low = 1
         self.repeat_high = 1
         self.action_piece_substitute = None
-        self.action = None
+        self.action_substitute = None
 
 def rule_from_ast(lark_ast):
     rule = Rule()
@@ -75,18 +75,20 @@ def sequence_from_ast_sequence(ast):
 
 def node_from_utterance_piece(ast):
     import lark.lexer
-    wrapped_ast = ast.children[0]
-    node = None
-    if wrapped_ast.data == lark_parser.UTTERANCE_WORD:
-        word = str(wrapped_ast.children[0])
-        node = WordNode(word)
-    elif wrapped_ast.data == lark_parser.UTTERANCE_CHOICES:
-        choice_items = wrapped_ast.children[0]
+    wrapped_node = ast.children[0]
+    wrapped_type = lark_parser.lark_node_type(wrapped_node)
+    if wrapped_type == lark_parser.UTTERANCE_WORD:
+        word_text = str(wrapped_node)
+        node = WordNode(word_text)
+    elif wrapped_type == lark_parser.UTTERANCE_CHOICES:
+        choice_items = wrapped_node.children[0]
         node = grouping_from_choice_items(choice_items)
-    elif wrapped_ast.data == lark_parser.UTTERANCE_REFERENCE:
-        ref = wrapped_ast.children[0]
+    elif wrapped_type == lark_parser.UTTERANCE_REFERENCE:
+        ref = wrapped_node.children[0]
         ref_name = ref.children[0]
         node = RuleReference(ref_name)
+    else:
+        raise ValueError(f'Unrecognized utterance piece type: {wrapped_type}')
     rep = list(ast.find_data(lark_parser.UTTERANCE_REPETITION))
     if rep:
         node.repeat_low, node.repeat_high = parse_repetition(rep[0])

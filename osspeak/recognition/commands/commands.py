@@ -7,6 +7,7 @@ import lark.exceptions
 from recognition.actions.library import state, history
 from recognition.actions import variables
 from recognition.actions.function import Function
+import recognition.actions.astree
 from recognition import action as _action, rule as _rule, function, lark_parser
 from log import logger
 
@@ -26,6 +27,7 @@ class CommandModule:
             self.functions[module_name] = importlib.import_module(module_name)
 
     def load_commands(self):
+        
         for rule_text, action_text in self.config.get('commands', {}):
             try:
                 lark_parser.parse_utterance(rule_text)
@@ -34,11 +36,15 @@ class CommandModule:
                 print(e)
             rule = _rule(rule_text)
             action = _action(action_text)
-            # try:
-            #     lark_ast = lark_parser.parse_action(action_text)
-            # except lark.exceptions.UnexpectedCharacters as e:
-            #     print(e)
-            #     print(action_text)
+            try:
+                lark_ir = lark_parser.parse_action(action_text)
+            except lark.exceptions.UnexpectedCharacters as e:
+                # print(e)
+                # print(action_text)
+                pass
+            else:
+                print(action_text)
+                action_from_lark = recognition.actions.astree.action_from_lark_ir(lark_ir, action_text)
             cmd = Command(rule, rule_text, action, action_text)
             self.commands.append(cmd)
 
@@ -79,8 +85,8 @@ class CommandModule:
 
 class Command:
     
-    def __init__(self, r, rule_text, a, action_input):
-        self.rule = r
+    def __init__(self, rule, rule_text, action, action_input):
+        self.rule = rule
         self.rule_text = rule_text
-        self.action = a
+        self.action = action
         self.action_input = action_input
