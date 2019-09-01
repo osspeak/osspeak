@@ -5,7 +5,9 @@ import json
 
 
 def parse_expr(lark_ir):
-    print(lark_ir)
+    if isinstance(lark_ir, lark.lexer.Token):
+        value_ast = parse_map[lark_ir.type](lark_ir)
+        return value_ast
     value_ir = lark_ir.children[-1]
     type_attr = 'data' if isinstance(value_ir, lark.tree.Tree) else 'type'
     node_type = getattr(value_ir, type_attr)
