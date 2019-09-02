@@ -33,3 +33,8 @@ lambda_arguments = set([tuple(x.split('.')) for x in [
 
 builtins = __builtins__ if isinstance(__builtins__, dict) else dir(__builtins__)
 namespace = {**builtin_functions, **builtins}
+
+namespace = {
+    'keypress': lambda *k: keyboard.press_and_release(list(k)),
+    'window': window
+}

@@ -4,7 +4,9 @@ from recognition.actions import library
 class RecognitionContext:
 
     def __init__(self, variables, words, namespace, variable_words):
+        self.variables = variables
         self._meta = RecognitionContextMeta(variables, namespace, variable_words)
+        self.namespace = namespace
         self.words = words
         self.text = None if words is None else ' '.join(words)
 

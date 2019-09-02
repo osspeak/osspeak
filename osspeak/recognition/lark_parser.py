@@ -45,7 +45,7 @@ _chainable: (NAME | attribute | call | index | list | {VARIABLE})
 expr_grouping: "(" {EXPR} ")"
 BINARY_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%" | "==" | "!=")
 {UNARY_OPERATOR}: ("+" | "-")
-binop: {EXPR} BINARY_OPERATOR {EXPR}
+binop.2: {EXPR} BINARY_OPERATOR {EXPR}
 keypress: "{{" {EXPR} ("," {EXPR})* "}}"
 {VARIABLE}: "$" INTEGER 
 {ZERO_OR_POSITIVE_INT}: /[0-9]+/

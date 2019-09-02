@@ -39,13 +39,10 @@ class CommandModule:
             try:
                 lark_ir = lark_parser.parse_action(action_text)
             except lark.exceptions.UnexpectedCharacters as e:
-                # print(e)
-                # print(action_text)
-                pass
+                action_from_lark = None
             else:
-                print(action_text)
                 action_from_lark = recognition.actions.astree.action_from_lark_ir(lark_ir, action_text)
-            cmd = Command(rule, rule_text, action, action_text)
+            cmd = Command(rule, rule_text, action, action_text, action_from_lark)
             self.commands.append(cmd)
 
     def load_rules(self):
@@ -85,8 +82,9 @@ class CommandModule:
 
 class Command:
     
-    def __init__(self, rule, rule_text, action, action_input):
+    def __init__(self, rule, rule_text, _action, action_input, action):
         self.rule = rule
         self.rule_text = rule_text
-        self.action = action
+        self._action = _action
         self.action_input = action_input
+        self.action = action

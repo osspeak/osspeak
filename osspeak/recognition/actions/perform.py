@@ -7,7 +7,7 @@ import traceback
 from lib import keyboard
 from settings import settings
 import platforms.api
-from recognition.actions import context
+from recognition.actions import context, astree
 from recognition.rules import _lark
 
 recognition_queue = queue.Queue()
@@ -25,10 +25,11 @@ def recognition_namespace():
 def recognition_action_worker():
     while True:
         action, recognition_context = recognition_queue.get()
+        print(action)
         t = threading.current_thread()
         results_map[t] = {'context': recognition_context}
         try:
-            evaluation = action.perform()
+            evaluation = action.perform(recognition_context)
         except Exception as e:
             traceback.print_exc()
             log.logger.error(f'Action {action} errored: {str(e)}')
@@ -94,11 +95,10 @@ def get_recognition_contexts(lark_recognition_tree, grammar_context):
 def get_leaf_action(node, text):
     from recognition.actions import piece
     leaf_action, is_substitute = None, None
-    if getattr(node, 'action_piece_substitute', None) is not None:
-        leaf_action, is_substitute = node.action_piece_substitute, True 
+    if getattr(node, 'action_substitute', None) is not None:
+        leaf_action, is_substitute = node.action_substitute, True 
     elif text is not None:
-        escaped = text.replace("'", "\\'")
-        leaf_action, is_substitute = piece.DSLActionPiece(f"'{escaped}'"), False
+        leaf_action, is_substitute = astree.action_from_text(text), False
     return leaf_action, is_substitute
 
 def var_result(variable_actions_pieces, perform_results: bool):

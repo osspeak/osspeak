@@ -3,6 +3,8 @@ from typing import List, Dict
 import lark
 from recognition.rules import astree
 
+grammar_cache = {}
+
 def build_repeat(node):
     if node.repeat_low == 1 and node.repeat_high == 1:
         return ''
@@ -66,7 +68,11 @@ def create_lark_grammar(command_rules, named_rules, node_ids):
     rule_lines.append('%ignore " "')
     rule_lines.append(f'start: ({rule_names})+')
     text = '\n'.join(rule_lines)
-    gram = lark.Lark(text, start='start')
+    if text in grammar_cache:
+        gram = grammar_cache[text]
+    else:
+        gram = lark.Lark(text, start='start')
+        grammar_cache[text] = gram
     return gram
 
 def create_lark_grammar_list(command_rules: List, named_rules, node_ids):
