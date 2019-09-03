@@ -1,4 +1,5 @@
 import collections
+import re
 import importlib
 import itertools
 import json
@@ -79,6 +80,11 @@ class CommandModule:
             if key not in user_state or value != user_state[key]:
                 return False
         return True
+
+    def is_active(self, current_window: str, current_state):
+        title_filter = self.conditions.get('title', '')
+        current_window_matches = re.search(title_filter, current_window, flags=re.IGNORECASE)
+        return current_window_matches and self.is_state_active(current_state)
 
 class Command:
     
