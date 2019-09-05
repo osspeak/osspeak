@@ -28,7 +28,6 @@ class CommandModule:
             self.functions[module_name] = importlib.import_module(module_name)
 
     def load_commands(self):
-        
         for rule_text, action_text in self.config.get('commands', {}):
             try:
                 lark_parser.parse_utterance(rule_text)

@@ -147,7 +147,6 @@ class CommandModuleController:
                 action = cmd_module.events['activate']
                 perform.perform_action_from_event(action, namespace)
 
-
     def build_grammar_xml(self, all_active_rules, node_ids, named_rules):
         return SrgsXmlConverter(node_ids, named_rules).build_grammar(all_active_rules)
 
@@ -171,7 +170,7 @@ class StaticFileCommandModuleLoader:
 
     def __init__(self, root):
         self.root = root
-        self.config_file_cache = limited_size_dict.LimitedSizeDict(size_limit=1000)
+        self.file_cache = limited_size_dict.LimitedSizeDict(size_limit=1000)
 
     def load_files(self):
         json_module_objects = {}
@@ -192,10 +191,10 @@ class StaticFileCommandModuleLoader:
                     continue
                 if entry.is_file() and entry.name.endswith('.json'):
                     path = entry.path
-                    file = self.config_file_cache.get(path, CommandModuleFile(path))
-                    file.load_config()
-                    self.config_file_cache[path] = file
-                    command_modules[path] = file.config
+                    file = self.file_cache.get(path, CommandModuleFile(path))
+                    file.load_contents()
+                    self.file_cache[path] = file
+                    command_modules[path] = file.contents
                 # read files in this directory first before recursing down
                 elif entry.is_dir():
                     directories.append(entry)
@@ -204,21 +203,20 @@ class StaticFileCommandModuleLoader:
                     command_modules.update(self.load_json_directory(direntry.path, directory_settings))
         return command_modules
 
-
 class CommandModuleFile:
 
     def __init__(self, path):
         self.path = path
-        self.config_timestamp = None
-        self.config = None
+        self.last_modified = None
+        self.contents = None
 
-    def load_config(self):
+    def load_contents(self):
         last_modified = os.path.getmtime(self.path)
-        if self.config_timestamp is None or last_modified > self.config_timestamp:
-            self.config_timestamp = last_modified
+        if self.last_modified is None or last_modified > self.last_modified:
+            self.last_modified = last_modified
             with open(self.path) as f:
                 try:
-                    self.config = json.load(f)
+                    self.contents = json.load(f)
                 except json.decoder.JSONDecodeError as e:
-                    self.config = {'Error': str(e)}
+                    self.contents = {'Error': str(e)}
                     log.logger.warning(f"JSON error loading command module '{path}':\n{e}")
