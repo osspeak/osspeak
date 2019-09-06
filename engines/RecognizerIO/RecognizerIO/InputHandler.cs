@@ -63,7 +63,7 @@ namespace RecognizerIO
                     EngManager.ResetDevice();
                     break;
                 case "ENGINE_START":
-                    if (!EngManager.IsRunning) EngManager.Begin();
+                    if (!EngManager.IsRunning && EngManager.AudioInputDeviceConnected) EngManager.Begin();
                     break;
                 case "ENGINE_STOP":
                     EngManager.Stop();

@@ -22,6 +22,7 @@ def start_watching_user_state():
     module_loader = loader.StaticFileCommandModuleLoader(settings.settings['command_directory'])
     command_module_controller = loader.CommandModuleController(module_loader)
     command_module_controller.populate()
+    command_module_controller.fil
     command_module_controller.load_initial_user_state()
     engine_status_history = collections.deque([], 10)
     create_message_subscriptions(msg_list, command_module_controller)
@@ -44,8 +45,9 @@ async def watch_user_system_state(msg_list, command_module_controller):
             reload_files = msg == topics.RELOAD_COMMAND_MODULE_FILES
             if new_active_modules != command_module_controller.active_command_modules or reload_files:
                 initialize = not initial_load_done or reload_files
+                print(initialize)
                 await command_module_controller.load_modules(current_window, current_state, initialize=initialize)
-                initial_load_done = False
+                initial_load_done = True
             elif msg == topics.RELOAD_GRAMMAR:
                 raise NotImplementedError
                 command_module_controller.load_and_send_grammar()

@@ -63,7 +63,6 @@ class CommandModuleController:
         grammar_context = self.build_grammar()
         self.save_grammar(grammar_context)
         grammar_xml, grammar_id = ET.tostring(grammar_context.xml).decode('utf8'), grammar_context.uuid
-        pubsub.publish(topics.RECOGNITION_INDEX, grammar_id)
         await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
 
     def load_command_module_information(self):
