@@ -55,7 +55,7 @@ class RuleReference(ASTNode):
         self.action_piece_substitute = None
         self.action_substitute = None
 
-def rule_from_ast(lark_ast):
+def rule_from_lark_ir(lark_ast):
     rule = Rule()
     rule.root = grouping_from_choice_items(lark_ast.children[0])
     return rule

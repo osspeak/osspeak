@@ -18,6 +18,7 @@ from recognition.commands import grammar
 from recognition import command_module
 from recognition.rules.converter import SrgsXmlConverter
 from recognition.rules import astree
+from recognition import lark_parser
 from communication import pubsub, topics
 from common import limited_size_dict
 
@@ -35,15 +36,24 @@ class CommandModuleController:
         self.grammars = collections.OrderedDict()
         self.map_grammar_to_commands = collections.OrderedDict()
         self.command_modules = {}
+        self.lark_module_trees = {} # path -> lark_ir
         self.active_command_modules = {}
 
-    def populate(self):
-        self.command_modules = self.initialize_command_modules()
-
     def initialize_command_modules(self):
-        command_module_json = self.module_loader.load_files()
-        command_modules = {path: command_module.CommandModule(config, path) for path, config in command_module_json.items()}
+        files = self.module_loader.load_files()
+        yay_me = {}
+        command_modules = {}
+        for file_name, text in files.items():
+            if file_name.endswith('.json'):
+                yay_me[file_name] = json.loads(text)
+            elif file_name.endswith('.speak'):
+                module_ir = lark_parser.parse_command_module(text)
+                cmd_module = command_module.command_module_from_lark_ir(module_ir, text)
+
+                command_modules[file_name] = cmd_module
+        # _command_modules = {path: command_module.CommandModule(config, path) for path, config in yay_me.items()}
         return command_modules
+        return _command_modules
         
     def get_active_modules(self, current_window: str, current_state):
         active_modules = {}
@@ -52,11 +62,10 @@ class CommandModuleController:
                 active_modules[path] = cmd_module
         return active_modules
 
-    async def load_modules(self, current_window, current_state, initialize: bool=False):
+    async def load_modules(self, current_window, current_state, initialize_modules: bool=False):
         previous_active_modules = self.active_command_modules
-        if initialize:
+        if initialize_modules:
             self.populate()
-            self.load_command_module_information()
         self.active_command_modules = self.get_active_modules(current_window, current_state)
         namespace = self.get_namespace()
         self.fire_activation_events(previous_active_modules, namespace)
@@ -172,14 +181,13 @@ class StaticFileCommandModuleLoader:
         self.file_cache = limited_size_dict.LimitedSizeDict(size_limit=1000)
 
     def load_files(self):
-        json_module_objects = {}
-        command_dir = settings.settings['command_directory']
-        if not os.path.isdir(command_dir):
-            os.makedirs(command_dir)
-        json_module_objects = self.load_json_directory(self.root, DEFAULT_DIRECTORY_SETTINGS)
-        return json_module_objects
+        directory_contents = {}
+        if not os.path.isdir(self.root):
+            os.makedirs(self.root)
+        directory_contents = self.load_directory(self.root, DEFAULT_DIRECTORY_SETTINGS)
+        return directory_contents
 
-    def load_json_directory(self, path: str, parent_directory_settings):
+    def load_directory(self, path: str, parent_directory_settings):
         command_modules = {}
         directories = []
         local_settings = settings.try_load_json_file(os.path.join(path, '.osspeak.json'))
@@ -188,10 +196,9 @@ class StaticFileCommandModuleLoader:
             for entry in sorted(i, key=lambda x: x.name):
                 if entry.name.startswith('.'):
                     continue
-                if entry.is_file() and entry.name.endswith('.json'):
+                if entry.is_file() and (entry.name.endswith('.json') or entry.name.endswith('.speak')):
                     path = entry.path
                     file = self.file_cache.get(path, CommandModuleFile(path))
-                    file.load_contents()
                     self.file_cache[path] = file
                     command_modules[path] = file.contents
                 # read files in this directory first before recursing down
@@ -199,7 +206,7 @@ class StaticFileCommandModuleLoader:
                     directories.append(entry)
             if directory_settings['recurse']:
                 for direntry in directories:
-                    command_modules.update(self.load_json_directory(direntry.path, directory_settings))
+                    command_modules.update(self.load_directory(direntry.path, directory_settings))
         return command_modules
 
 class CommandModuleFile:
@@ -207,15 +214,18 @@ class CommandModuleFile:
     def __init__(self, path):
         self.path = path
         self.last_modified = None
-        self.contents = None
+        self._contents = None
 
-    def load_contents(self):
+    @property
+    def contents(self):
         last_modified = os.path.getmtime(self.path)
-        if self.last_modified is None or last_modified > self.last_modified:
+        if self._contents is None or last_modified > self.last_modified:
             self.last_modified = last_modified
             with open(self.path) as f:
-                try:
-                    self.contents = json.load(f)
-                except json.decoder.JSONDecodeError as e:
-                    self.contents = {'Error': str(e)}
-                    log.logger.warning(f"JSON error loading command module '{path}':\n{e}")
+                self._contents = f.read()
+        return self._contents
+                # try:
+                #     self.contents = json.load(f)
+                # except json.decoder.JSONDecodeError as e:
+                #     self.contents = {'Error': str(e)}
+                #     log.logger.warning(f"JSON error loading command module '{path}':\n{e}")

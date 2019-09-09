@@ -2,6 +2,7 @@ import lark.lexer
 from lib import keyboard
 from recognition import lark_parser
 import lark.tree
+import types
 import json
 
 def parse_node(lark_ir):
@@ -13,7 +14,7 @@ def parse_node(lark_ir):
 def parse_expr(lark_ir):
     value_ir = lark_ir.children[-1]
     value_ast = parse_node(value_ir)
-    unary_ir = find_type(lark_ir, lark_parser.UNARY_OPERATOR)
+    unary_ir = lark_parser.find_type(lark_ir, lark_parser.UNARY_OPERATOR)
     if unary_ir is not None:
         return UnaryOp('usub', value_ast)
     return value_ast
@@ -31,10 +32,9 @@ def parse_index(lark_ir):
 
 def parse_call(lark_ir):
     fn = parse_node(lark_ir.children[0])
-    args_ir = find_type(lark_ir, lark_parser.ARG_LIST)
+    args_ir = lark_parser.find_type(lark_ir, lark_parser.ARG_LIST)
     args = [parse_node(x) for x in args_ir.children] if args_ir else []
-    kwargs_ir = find_type(lark_ir, lark_parser.KWARG_LIST) or {}
-    # kwargs = [parse_node(x) for (arg, value) in args_ir.children] if args_ir else []
+    kwargs_ir = lark_parser.find_type(lark_ir, lark_parser.KWARG_LIST) or {}
     kwargs = {}
     return Call(fn, args, kwargs)
 
@@ -89,9 +89,17 @@ class Action(BaseActionNode):
         self.expressions = expressions
 
     def perform(self, context):
-        for result in self.evaluate(context):
+        gen = self.evaluate(context)
+        for result in self.exhaust_generator(gen):
             if isinstance(result, (str, float, int)):
                 keyboard.write(str(result), delay=.05)
+
+    def exhaust_generator(self, gen):
+        for item in gen:
+            if isinstance(item, types.GeneratorType):
+                yield from self.exhaust_generator(item)
+            else:
+                yield item
 
     def evaluate(self, context):
         for expr in self.expressions:
@@ -152,7 +160,6 @@ class Attribute(BaseActionNode):
         self.attribute_of = attribute_of
         self.name = name
 
-
     def evaluate(self, context):
         attribute_of_value = self.attribute_of.evaluate(context)
         return getattr(attribute_of_value, self.name)
@@ -165,9 +172,11 @@ class Call(BaseActionNode):
         self.kwargs = kwargs
 
     def evaluate(self, context):
-        function_to_call = self.fn.evaluate(context)
         arg_values = [arg.evaluate(context) for arg in self.args]
         kwarg_values = {}
+        function_to_call = self.fn.evaluate(context)
+        if isinstance(function_to_call, FunctionDefinition):
+            return function_to_call(context, *arg_values, **kwarg_values)
         return function_to_call(*arg_values, **kwarg_values)
 
 class Name(BaseActionNode):
@@ -177,6 +186,17 @@ class Name(BaseActionNode):
 
     def evaluate(self, context):
         return context.namespace[self.value]
+
+class FunctionDefinition:
+
+    def __init__(self, name: str, parameters, action):
+        self.name = name
+        self.parameters = parameters
+        self.action = action
+    
+    def __call__(self, context, *args, **kwargs):
+        print(self.action.evaluate(context))
+        return self.action.evaluate(context)
 
 class Variable(BaseActionNode):
 
@@ -206,12 +226,16 @@ def action_from_lark_ir(root_lark_ir, text):
         expressions.append(expr)
     return Action(expressions)
 
-def find_type(lark_tree, _type):
-    for child in lark_tree.children:
-        child_type_attr = 'data' if isinstance(child, lark.tree.Tree) else 'type'
-        child_type = getattr(child, child_type_attr)
-        if child_type == _type:
-            return child
+def function_definition_from_lark_ir(lark_ir):
+    name = str(lark_ir.children[0])
+    action_ir = lark_parser.find_type(lark_ir, 'action')
+    positional_parameters = lark_parser.find_type(lark_ir, 'positional_parameters')
+    params = []
+    if positional_parameters:
+        for param_ir in positional_parameters.children:
+            params.append({'name': str(param_ir)})
+    action = action_from_lark_ir(action_ir, '')
+    return FunctionDefinition(name, params, action)
 
 def to_json_string(action):
     return json.dumps(action, cls=ActionEncoder, sort_keys=True, indent=4)

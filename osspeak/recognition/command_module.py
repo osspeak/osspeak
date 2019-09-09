@@ -9,14 +9,14 @@ from recognition.actions.library import state, history
 from recognition.actions import variables
 from recognition.actions.function import Function
 import recognition.actions.astree
+import recognition.rules.astree
 from recognition import action as _action, rule as _rule, function, lark_parser
 from log import logger
 
 class CommandModule:
 
-    def __init__(self, config, path):
+    def __init__(self, config):
         self.config = config
-        self.path = path
         self.rules = {}
         self.functions = {}
         self.commands = []
@@ -93,3 +93,22 @@ class Command:
         self._action = _action
         self.action_input = action_input
         self.action = action
+
+def command_module_from_lark_ir(module_ir, text_by_line):
+    cmd_module = CommandModule({})
+    for child in module_ir.children:
+        ir_type = lark_parser.lark_node_type(child)
+        if ir_type == 'command':
+            utterance_ir, action_ir = child.children 
+            utterance_text = lark_parser.lark_node_text(utterance_ir, text_by_line)
+            utterance = recognition.rules.astree.rule_from_lark_ir(utterance_ir)
+            action_text = lark_parser.lark_node_text(action_ir, text_by_line)
+            action = recognition.actions.astree.action_from_lark_ir(action_ir, action_text)
+            cmd = Command(utterance, utterance_text, action, action_text, action)
+            cmd_module.commands.append(cmd)
+        elif ir_type == 'function_definition':
+            print(child.pretty())
+            func = recognition.actions.astree.function_definition_from_lark_ir(child)
+            cmd_module.functions[func.name] = func
+
+    return cmd_module

@@ -25,7 +25,6 @@ def recognition_namespace():
 def recognition_action_worker():
     while True:
         action, recognition_context = recognition_queue.get()
-        print(action)
         t = threading.current_thread()
         results_map[t] = {'context': recognition_context}
         try:

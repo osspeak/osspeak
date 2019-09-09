@@ -8,7 +8,7 @@ def test_hello_world():
     text = 'hello world'
     rule_from_string = rule(text)
     lark_ast = utterance_grammar.parse(text)
-    rule_from_ast = astree.rule_from_ast(lark_ast)
+    rule_from_lark_ir = astree.rule_from_lark_ir(lark_ast)
     sequences = rule_from_string.root.sequences
     compare_string_to_ast(text)
     assert len(sequences) == 1
@@ -47,5 +47,5 @@ def test_grouping_sequences():
 def compare_string_to_ast(text):
     rule_from_string = rule(text)
     lark_ast = utterance_grammar.parse(text)
-    rule_from_ast = astree.rule_from_ast(lark_ast)
-    assert astree.same_json(rule_from_ast, rule_from_string)
+    rule_from_lark_ir = astree.rule_from_lark_ir(lark_ast)
+    assert astree.same_json(rule_from_lark_ir, rule_from_string)

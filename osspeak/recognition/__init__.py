@@ -14,7 +14,7 @@ def rule(text):
         print(text)
     # print(lark_ast.pretty())
     # print(text)
-    # rule_obj_from_lark = astree.rule_from_ast(lark_ast)
+    # rule_obj_from_lark = astree.rule_from_lark_ir(lark_ast)
     # try:
     #     assert rule_obj == rule_obj_from_lark
     # except AssertionError as e:

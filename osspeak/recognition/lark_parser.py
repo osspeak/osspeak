@@ -16,11 +16,11 @@ ARG_LIST = 'arg_list'
 KWARG_LIST = 'kwarg_list'
 UNARY_OPERATOR = 'UNARY_OPERATOR'
 
-grammar = f'''start: ([block] _NEWLINE)* [block]
-block: (command | named_utterance | comment)
-comment: /\\s*#.*/
-_WS: /\\s+/
-WS: /\\s+/
+grammar = f'''start: ([_block] _NEWLINE)* [_block]
+_block: (command | function_definition |     named_utterance | comment)
+comment: /[ \t]*#.*/
+_WS: /[ \t]+/
+WS: /[ \t]+/
 _NEWLINE: /\\n/
 NAME: /[_a-zA-Z][_a-zA-Z0-9]*/
 named_utterance: {UTTERANCE_NAME} ":=" utterance
@@ -62,6 +62,9 @@ call.3: _chainable "(" (({ARG_LIST} ["," {KWARG_LIST}]) | [{KWARG_LIST}]) ")"
 {KWARG_LIST}: kwarg ("," kwarg)* 
 kwarg: NAME "=" {EXPR}
 
+function_definition: NAME "(" [positional_parameters] ")" "=>" action
+positional_parameters: NAME ("," NAME)*
+
 _STRING_INNER: /.*?/
 _STRING_ESC_INNER: _STRING_INNER /(?<!\\\\)(\\\\\\\\)*?/ 
 STRING_SINGLE: "'" _STRING_ESC_INNER "'"
@@ -72,7 +75,7 @@ STRING_DOUBLE: "\\"" _STRING_ESC_INNER "\\""
 %ignore " "
 '''
 
-lark_grammar = Lark(grammar)
+lark_grammar = Lark(grammar, propagate_positions=True)
 utterance_grammar = Lark(grammar, start='utterance', propagate_positions=True)
 action_grammar = Lark(grammar, start='action', propagate_positions=True)
 
@@ -83,6 +86,10 @@ class Foo(Transformer):
         if isinstance(child, Tree) and child.data =='literal':
             return str(child.children[0])
         return child[1:-1]
+
+def parse_command_module(text: str):
+    ir = lark_grammar.parse(text)
+    return ir
     
 def parse_utterance(text: str):
     ast = utterance_grammar.parse(text)
@@ -97,3 +104,13 @@ def parse_action(text: str):
 def lark_node_type(lark_ir):
     type_attr = 'data' if isinstance(lark_ir, Tree) else 'type'
     return getattr(lark_ir, type_attr)
+
+def lark_node_text(lark_ir, text):
+    return 'foo'
+
+def find_type(lark_tree, _type):
+    for child in lark_tree.children:
+        child_type_attr = 'data' if isinstance(child, Tree) else 'type'
+        child_type = getattr(child, child_type_attr)
+        if child_type == _type:
+            return child
