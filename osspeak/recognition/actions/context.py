@@ -5,8 +5,8 @@ class RecognitionContext:
 
     def __init__(self, variables, words, namespace, variable_words):
         self.variables = variables
-        self._meta = RecognitionContextMeta(variables, namespace, variable_words)
         self.namespace = namespace
+        self.arguments = {}
         self.words = words
         self.text = None if words is None else ' '.join(words)
 
@@ -15,39 +15,3 @@ class RecognitionContext:
 
     def set(self, key, value):
         self._meta.temp_variables[key] = value
-
-class RecognitionContextMeta:
-
-    def __init__(self, variables, namespace, variable_words):
-        self.variables = variables
-        self.temp_variables = {}
-        self.namespace = namespace
-        self.variable_words = variable_words
-
-    def call_or_type(self, value):
-        return CallOrType(value)
-
-    def var(self, idx, default=None, perform_results=True):
-        from recognition.actions import perform
-        try:
-            variable_action_pieces = self.variables[idx]
-        except IndexError as e:
-            return default
-        return perform.var_result(variable_action_pieces, perform_results) if variable_action_pieces else default
-
-class CallOrType(str):
-
-    FUNC_MAP = {
-        'if': library.flow.osspeak_if,
-        'while': library.flow.osspeak_while
-    }
-
-    def __init__(self, func_name):
-        self.func_name = func_name
-        self.func = self.FUNC_MAP[func_name]
-
-    def __call__(self, *args, **kwargs):
-        return self.func(*args, **kwargs)
-
-    def __str__(self):
-        return self.func_name

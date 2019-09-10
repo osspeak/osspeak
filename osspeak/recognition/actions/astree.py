@@ -74,7 +74,8 @@ parse_map = {
     'variable': lambda x: Variable(int(x.children[0])),
     'NAME': lambda x: Name(str(x)),
     'INTEGER': lambda x: Integer(int(x)),
-    'FLOAT': lambda x: Float(float(x))
+    'FLOAT': lambda x: Float(float(x)), 
+    lark_parser.ARGUMENT_REFERENCE: lambda x: ArgumentReference(str(x.children[0]))
 }
 
 class BaseActionNode:
@@ -83,13 +84,17 @@ class BaseActionNode:
         print(type(self))
         raise NotImplementedError
 
+    def evaluate_lazy(self, context):
+        return self.evaluate(context)
+
+
 class Action(BaseActionNode):
 
     def __init__(self, expressions):
         self.expressions = expressions
 
     def perform(self, context):
-        gen = self.evaluate(context)
+        gen = self.evaluate_lazy(context)
         for result in self.exhaust_generator(gen):
             if isinstance(result, (str, float, int)):
                 keyboard.write(str(result), delay=.05)
@@ -102,9 +107,23 @@ class Action(BaseActionNode):
                 yield item
 
     def evaluate(self, context):
+        last = None
+        for result in self.evaluate_lazy(context):
+            last = result
+        return last
+
+    def evaluate_lazy(self, context):
         for expr in self.expressions:
             result = expr.evaluate(context)
             yield result
+
+class ArgumentReference(BaseActionNode):
+
+    def __init__(self, value: str):
+        self.value = value
+
+    def evaluate(self, context):
+        return context.arguments[self.value]
 
 class String(BaseActionNode):
 
@@ -171,13 +190,26 @@ class Call(BaseActionNode):
         self.args = args
         self.kwargs = kwargs
 
-    def evaluate(self, context):
+    def evaluate_from_attr(self, context, attr):
         arg_values = [arg.evaluate(context) for arg in self.args]
         kwarg_values = {}
         function_to_call = self.fn.evaluate(context)
         if isinstance(function_to_call, FunctionDefinition):
-            return function_to_call(context, *arg_values, **kwarg_values)
+            current_arguments = context.arguments
+            context.arguments = context.arguments.copy()
+            for i, arg_value in enumerate(arg_values):
+                param = function_to_call.parameters[i]
+                context.arguments[param['name']] = arg_value
+            result = getattr(function_to_call.action, attr)(context)
+            context.arguments = current_arguments
+            return result
         return function_to_call(*arg_values, **kwarg_values)
+
+    def evaluate(self, context):
+        return self.evaluate_from_attr(context, 'evaluate')
+
+    def evaluate_lazy(self, context):
+        return self.evaluate_from_attr(context, 'evaluate_lazy')
 
 class Name(BaseActionNode):
 
@@ -194,14 +226,13 @@ class FunctionDefinition:
         self.parameters = parameters
         self.action = action
     
-    def __call__(self, context, *args, **kwargs):
-        print(self.action.evaluate(context))
-        return self.action.evaluate(context)
-
 class Variable(BaseActionNode):
 
     def __init__(self, value):
         self.value = value
+
+    def get_actions(self, idx):
+        pass
 
     def evaluate(self, context):
         index = self.value - 1 if self.value > 0 else self.value
@@ -211,9 +242,17 @@ class Variable(BaseActionNode):
             return
         last_result = None
         for action in var_actions:
-            for result in action.evaluate(context):
-                last_result = result
+            last_result = action.evaluate(context)
         return last_result
+
+    def evaluate_lazy(self, context):
+        index = self.value - 1 if self.value > 0 else self.value
+        try:
+            var_actions = context.variables[index]
+        except IndexError:
+            return
+        for action in var_actions:
+            yield from action.evaluate_lazy(context)
 
 def action_from_text(text):
     lark_ir = lark_parser.parse_action(text)

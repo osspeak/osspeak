@@ -188,6 +188,7 @@ def test_binop1():
     ],
     "type": "Action"
 })
+
 def test_float1():
     text = "-4.5 .23 0.2"
     action = text_to_action(text)
@@ -208,6 +209,24 @@ def test_float1():
         {
             "type": "Float",
             "value": 0.2
+        }
+    ],
+    "type": "Action"
+})
+
+def test_argument_reference():
+    text = "$foo $bar"
+    action = text_to_action(text)
+    to_clipboard(action)
+    assert_equal(action,  {
+    "expressions": [
+        {
+            "type": "ArgumentReference",
+            "value": "foo"
+        },
+        {
+            "type": "ArgumentReference",
+            "value": "bar"
         }
     ],
     "type": "Action"

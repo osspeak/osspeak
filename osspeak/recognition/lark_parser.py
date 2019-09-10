@@ -15,6 +15,7 @@ VARIABLE = 'variable'
 ARG_LIST = 'arg_list'
 KWARG_LIST = 'kwarg_list'
 UNARY_OPERATOR = 'UNARY_OPERATOR'
+ARGUMENT_REFERENCE = 'argument_reference'
 
 grammar = f'''start: ([_block] _NEWLINE)* [_block]
 _block: (command | function_definition |     named_utterance | comment)
@@ -40,14 +41,15 @@ command: utterance "=" action
 
 action: {EXPR} (_WS {EXPR})*
 BOOL: ("True" | "False")
-{EXPR}: [{UNARY_OPERATOR}] (index | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | BOOL)
+{EXPR}: [{UNARY_OPERATOR}] (index | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | BOOL | {ARGUMENT_REFERENCE})
 _chainable: (NAME | attribute | call | index | list | {VARIABLE})
 expr_grouping: "(" {EXPR} ")"
 BINARY_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%" | "==" | "!=")
 {UNARY_OPERATOR}: ("+" | "-")
 binop.2: {EXPR} BINARY_OPERATOR {EXPR}
 keypress: "{{" {EXPR} ("," {EXPR})* "}}"
-{VARIABLE}: "$" INTEGER 
+{VARIABLE}: "$" INTEGER
+{ARGUMENT_REFERENCE}: "$" NAME
 {ZERO_OR_POSITIVE_INT}: /[0-9]+/
 INTEGER: /-?[0-9]+/
 FLOAT: SIGNED_FLOAT

@@ -107,7 +107,6 @@ def command_module_from_lark_ir(module_ir, text_by_line):
             cmd = Command(utterance, utterance_text, action, action_text, action)
             cmd_module.commands.append(cmd)
         elif ir_type == 'function_definition':
-            print(child.pretty())
             func = recognition.actions.astree.function_definition_from_lark_ir(child)
             cmd_module.functions[func.name] = func
 
