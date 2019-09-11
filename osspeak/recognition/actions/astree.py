@@ -25,11 +25,6 @@ def parse_list(lark_ir):
         list_items.append(parse_node(child))
     return List(list_items)
 
-def parse_index(lark_ir):
-    index_of = parse_node(lark_ir.children[0])
-    index_key = parse_node(lark_ir.children[1])
-    return Index(index_of, index_key)
-
 def parse_call(lark_ir):
     fn = parse_node(lark_ir.children[0])
     args_ir = lark_parser.find_type(lark_ir, lark_parser.ARG_LIST)
@@ -66,7 +61,6 @@ parse_map = {
     'STRING_SINGLE': lambda x: String(str(x)[1:-1]),
     'list': parse_list,
     'expr': parse_expr,
-    'index': parse_index,
     'attribute': parse_attribute,
     'call': parse_call,
     'keypress': parse_keypress,
@@ -163,15 +157,6 @@ class List(BaseActionNode):
 
     def __init__(self, items):
         self.items = items
-
-class Index(BaseActionNode):
-
-    def __init__(self, index_of, index_key):
-        self.index_of = index_of
-        self.index_key = index_key
-
-    def evaluate(self, context):
-        return self.index_of.evaluate(context)[self.index_key.evaluate(context)]
 
 class Attribute(BaseActionNode):
 

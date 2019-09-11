@@ -41,8 +41,8 @@ command: utterance "=" action
 
 action: {EXPR} (_WS {EXPR})*
 BOOL: ("True" | "False")
-{EXPR}: [{UNARY_OPERATOR}] (index | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | BOOL | {ARGUMENT_REFERENCE})
-_chainable: (NAME | attribute | call | index | list | {VARIABLE})
+{EXPR}: [{UNARY_OPERATOR}] (attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | BOOL | {ARGUMENT_REFERENCE})
+_chainable: (NAME | attribute | call | list | {VARIABLE})
 expr_grouping: "(" {EXPR} ")"
 BINARY_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%" | "==" | "!=")
 {UNARY_OPERATOR}: ("+" | "-")
@@ -57,7 +57,6 @@ LITERAL_PIECE: /[a-zA-Z0-9]+/
 literal.-100: LITERAL_PIECE (WS LITERAL_PIECE)*
 
 list: "[" [{EXPR} ["," {EXPR}]] "]"
-index.-3: _chainable "[" {EXPR} "]"
 attribute.2: _chainable "." NAME
 call.3: _chainable "(" (({ARG_LIST} ["," {KWARG_LIST}]) | [{KWARG_LIST}]) ")"
 {ARG_LIST}: {EXPR} ("," {EXPR})*

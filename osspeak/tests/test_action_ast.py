@@ -59,20 +59,6 @@ def test_lists():
             {"items": [{"type": "Integer", "value": 3}], "type": "List"}
         ],
     })
-def test_index():
-    text = "[1, 2][3]"
-    action = text_to_action(text)
-    assert_equal(action,  {
-        'expressions': [
-            {'index_key': {'type': 'Integer', 'value': 3},
-            'index_of': {
-                'items': [{'type': 'Integer', 'value': 1}, {'type': 'Integer', 'value': 2}],
-                'type': 'List'
-            },
-        'type': 'Index'}
-        ],
-        'type': 'Action'
-    })
 
 def test_call1():
     text = "repeat({$1}, $2)"
