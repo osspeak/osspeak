@@ -24,7 +24,9 @@ def recognition_namespace():
 def perform_action(action, context):
     context.argument_frames.append({})
     gen = action.evaluate_lazy(context)
-    for result in action.evaluate_lazy(context):
+    for node, result in action.evaluate_lazy(context):
+        print(node)
+        assert isinstance(node, astree.BaseActionNode)
         if isinstance(result, (str, float, int)):
             keyboard.write(str(result), delay=.05)
     context.argument_frames.pop()
@@ -93,26 +95,19 @@ def get_recognition_contexts(lark_recognition_tree, grammar_context):
                 substitute_paths.add(start_path)
         variables = tuple(match_variables.values())
         log.logger.info(f'Matched rule: {command.rule_text}')
-        formatted_variable_words = tuple(' '.join(x) for x in variable_words.values())
+        # formatted_variable_words = tuple(' '.join(x) for x in variable_words.values())
+        formatted_variable_words = ()
         rec_context = context.RecognitionContext(variables, words, grammar_context.namespace, formatted_variable_words)
         recognition_contexts.append((rec_context, command))
     return recognition_contexts
 
 def get_leaf_action(node, text):
-    from recognition.actions import piece
     leaf_action, is_substitute = None, None
     if getattr(node, 'action_substitute', None) is not None:
         leaf_action, is_substitute = node.action_substitute, True 
     elif text is not None:
         leaf_action, is_substitute = astree.action_root_from_text(text), False
     return leaf_action, is_substitute
-
-def var_result(variable_actions_pieces, perform_results: bool):
-    results = []
-    for action_piece in variable_actions_pieces:
-        results.append(action_piece.perform_variable(perform_results=perform_results))
-    if not perform_results:
-        return concat_results(results)
 
 def concat_results(results):
     acc = None

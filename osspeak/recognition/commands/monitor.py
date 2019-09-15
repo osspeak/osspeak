@@ -21,8 +21,6 @@ def start_watching_user_state():
     module_loader = loader.StaticFileCommandModuleLoader(settings.settings['command_directory'])
     command_module_controller = loader.CommandModuleController(module_loader)
     command_module_controller.command_modules = command_module_controller.initialize_command_modules()
-    command_module_controller.load_command_module_information()
-    command_module_controller.load_initial_user_state()
     engine_status_history = collections.deque([], 10)
     create_message_subscriptions(msg_list, command_module_controller)
     fut = watch_user_system_state(msg_list, command_module_controller)

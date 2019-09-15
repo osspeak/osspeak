@@ -89,7 +89,7 @@ parse_map = {
 def evaluate_generator(gen):
     assert isinstance(gen, types.GeneratorType)
     last = None
-    for item in exhaust_generator(gen):
+    for node, item in exhaust_generator(gen):
         last = item
     return last
 
@@ -108,7 +108,7 @@ class BaseActionNode:
         raise NotImplementedError
 
     def evaluate_lazy(self, context):
-        yield self.evaluate(context)
+        yield self, self.evaluate(context)
 
 class ExpressionSequence(BaseActionNode):
 
@@ -128,6 +128,9 @@ class ExpressionSequence(BaseActionNode):
     def evaluate_lazy(self, context):
         for expr in self.expressions:
             yield from exhaust_generator(expr.evaluate_lazy(context))
+
+class Literal(BaseActionNode):
+    pass
 
 class ArgumentReference(BaseActionNode):
 
@@ -241,7 +244,7 @@ class Call(BaseActionNode):
             if isinstance(result, types.GeneratorType):
                 yield from exhaust_generator(result)
             else:
-                yield result
+                yield self, result
 
 class Name(BaseActionNode):
 

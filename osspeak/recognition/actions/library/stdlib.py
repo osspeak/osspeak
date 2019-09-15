@@ -11,14 +11,14 @@ def wait(n):
     time.sleep(n)
 
 namespace = {
-    'keypress': lambda *k: keyboard.press_and_release(list(k)),
-    'window': window,
+    'click': mouse.click,
     'if': flow.osspeak_if,
+    'keypress': lambda *k: keyboard.press_and_release(list(k)),
     'loop': flow.loop,
+    'print': print,
+    'state': SimpleNamespace(),
     'wait': wait,
     'window': window,
-    'click': mouse.click,
-    'state': SimpleNamespace()
 }
 namespace['setState'] = lambda name, value: setattr(namespace['state'], name, value)
 

@@ -74,38 +74,6 @@ class CommandModuleController:
         grammar_xml, grammar_id = ET.tostring(grammar_context.xml).decode('utf8'), grammar_context.uuid
         await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
 
-    def load_command_module_information(self):
-        self.import_modules()
-        self.load_functions()
-        self.load_rules()
-        self.load_commands()
-        self.load_events()
-
-    def import_modules(self):
-        for cmd_module in self.command_modules.values():
-            cmd_module.import_modules()
-
-    def load_functions(self):
-        for cmd_module in self.command_modules.values():
-            cmd_module.define_functions()
-        for cmd_module in self.command_modules.values():
-            cmd_module.set_function_actions()
-
-    def load_rules(self):
-        for cmd_module in self.command_modules.values():
-            cmd_module.load_rules()
-
-    def load_commands(self):
-        for cmd_module in self.command_modules.values():
-            cmd_module.load_commands()
-
-    def load_events(self):
-        for cmd_module in self.command_modules.values():
-            cmd_module.load_events()
-
-    def load_initial_user_state(self):
-        return
-
     def build_grammar(self) -> grammar.GrammarContext:
         named_rules, command_rules = self.get_active_rules()
         all_rules = list(named_rules.values()) + command_rules
@@ -144,13 +112,13 @@ class CommandModuleController:
         previous_names, current_names = set(previous_active_modules), set(self.active_command_modules)
         for deactivated_name in previous_names - current_names:
             cmd_module = previous_active_modules[deactivated_name]
-            if 'deactivate' in cmd_module.events:
-                action = cmd_module.events['deactivate']
+            if 'on_deactivate' in cmd_module.functions:
+                action = cmd_module.functions['on_deactivate'].action
                 perform.perform_action_from_event(action, namespace)
         for activated_name in current_names - previous_names:
             cmd_module = self.active_command_modules[activated_name]
-            if 'activate' in cmd_module.events:
-                action = cmd_module.events['activate']
+            if 'on_activate' in cmd_module.functions:
+                action = cmd_module.functions['on_activate'].action
                 perform.perform_action_from_event(action, namespace)
 
     def build_grammar_xml(self, all_active_rules, node_ids, named_rules):

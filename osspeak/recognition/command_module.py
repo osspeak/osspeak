@@ -7,7 +7,6 @@ import lark.exceptions
 
 from recognition.actions.library import history, window
 from recognition.actions import variables
-from recognition.actions.function import Function
 import recognition.actions.astree
 import recognition.actions.context
 import recognition.rules.astree
