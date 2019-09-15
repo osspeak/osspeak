@@ -24,7 +24,6 @@ class WordNode(ASTNode):
         self.text = text
         self.repeat_low = 1
         self.repeat_high = 1
-        self.action_piece_substitute = None
         self.action_substitute = None
 
     @property
@@ -36,7 +35,6 @@ class GroupingNode(ASTNode):
     def __init__(self):
         self.repeat_low = 1
         self.repeat_high = 1
-        self.action_piece_substitute = None
         self.action_substitute = None
         self.sequences = []
 
@@ -52,7 +50,6 @@ class RuleReference(ASTNode):
         self.rule_name = rule_name
         self.repeat_low = 1
         self.repeat_high = 1
-        self.action_piece_substitute = None
         self.action_substitute = None
 
 def rule_from_lark_ir(lark_ast):
@@ -92,6 +89,9 @@ def node_from_utterance_piece(ast):
     rep = list(ast.find_data(lark_parser.UTTERANCE_REPETITION))
     if rep:
         node.repeat_low, node.repeat_high = parse_repetition(rep[0])
+    # substitute = list(ast.find_data(lark_parser.))
+    # if rep:
+    #     node.repeat_low, node.repeat_high = parse_repetition(rep[0])
     return node
 
 def parse_repetition(ast):

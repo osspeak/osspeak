@@ -7,10 +7,12 @@ UTTERANCE_REFERENCE = 'utterance_reference'
 UTTERANCE_REPETITION = 'utterance_repetition'
 UTTERANCE_RANGE = 'utterance_range'
 UTTERANCE_NAME = 'utterance_name'
+ACTION_SUBSTITUTE = 'action_substitute'
 
 ZERO_OR_POSITIVE_INT = 'ZERO_OR_POSITIVE_INT'
 
 EXPR = 'expr'
+EXPR_SEQUENCE = 'expr_sequence'
 VARIABLE = 'variable'
 ARG_LIST = 'arg_list'
 KWARG_LIST = 'kwarg_list'
@@ -20,28 +22,28 @@ ARGUMENT_REFERENCE = 'argument_reference'
 grammar = f'''start: ([_block] _NEWLINE)* [_block]
 _block: (command | function_definition |     named_utterance | comment)
 comment: /[ \t]*#.*/
-_WS: /[ \t]+/
-WS: /[ \t]+/
+_WS: /[ \t]/
+WS: /[ \t]/
 _NEWLINE: /\\n/
 NAME: /[_a-zA-Z][_a-zA-Z0-9]*/
 named_utterance: {UTTERANCE_NAME} ":=" utterance
 utterance: {UTTERANCE_CHOICE_ITEMS} 
-utterance_sequence: utterance_piece (_WS utterance_piece)*
-utterance_piece: ({UTTERANCE_WORD} | {UTTERANCE_REFERENCE} | {UTTERANCE_CHOICES}) [{UTTERANCE_REPETITION}] [action_substitute]
+utterance_sequence: utterance_piece (_WS+ utterance_piece)*
+utterance_piece: ({UTTERANCE_WORD} | {UTTERANCE_REFERENCE} | {UTTERANCE_CHOICES}) [{UTTERANCE_REPETITION}] [{ACTION_SUBSTITUTE}]
 {UTTERANCE_CHOICES}: "(" {UTTERANCE_CHOICE_ITEMS} ")"
 {UTTERANCE_CHOICE_ITEMS}: utterance_sequence ("|" utterance_sequence)* 
 {UTTERANCE_NAME}: NAME
 {UTTERANCE_WORD}: /[a-z0-9]+/
 {UTTERANCE_REFERENCE}: "<" {UTTERANCE_NAME} ">"
-action_substitute: "=" action
+{ACTION_SUBSTITUTE}: "=" action
 {UTTERANCE_REPETITION}: "_" ({ZERO_OR_POSITIVE_INT} | {UTTERANCE_RANGE})
 {UTTERANCE_RANGE}: {ZERO_OR_POSITIVE_INT} "-" [{ZERO_OR_POSITIVE_INT}]
 
 command: utterance "=" action 
 
-action: {EXPR} (_WS {EXPR})*
-BOOL: ("True" | "False")
-{EXPR}: [{UNARY_OPERATOR}] (attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | BOOL | {ARGUMENT_REFERENCE})
+action: ({EXPR} | {EXPR_SEQUENCE})
+{EXPR_SEQUENCE}.-99: {EXPR} (WS* {EXPR})+
+{EXPR}: [{UNARY_OPERATOR}] ({EXPR_SEQUENCE} | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 _chainable: (NAME | attribute | call | list | {VARIABLE})
 expr_grouping: "(" {EXPR} ")"
 BINARY_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%" | "==" | "!=")
@@ -53,8 +55,8 @@ keypress: "{{" {EXPR} ("," {EXPR})* "}}"
 {ZERO_OR_POSITIVE_INT}: /[0-9]+/
 INTEGER: /-?[0-9]+/
 FLOAT: SIGNED_FLOAT
-LITERAL_PIECE: /[a-zA-Z0-9]+/ 
-literal.-100: LITERAL_PIECE (WS LITERAL_PIECE)*
+LITERAL_PIECE: /[a-zA-Z0-9!]+/ 
+literal.-100: LITERAL_PIECE (WS+ LITERAL_PIECE)*
 
 list: "[" [{EXPR} ["," {EXPR}]] "]"
 attribute.2: _chainable "." NAME

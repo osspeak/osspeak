@@ -1,4 +1,5 @@
 import lark.lexer
+from recognition.actions.library import stdlib
 from lib import keyboard
 from recognition import lark_parser
 import lark.tree
@@ -6,17 +7,29 @@ import types
 import json
 
 def parse_node(lark_ir):
-    type_attr = 'data' if isinstance(lark_ir, lark.tree.Tree) else 'type'
-    node_type = getattr(lark_ir, type_attr)
+    node_type = lark_parser.lark_node_type(lark_ir)
     value_ast = parse_map[node_type](lark_ir)
     return value_ast
 
+def parse_expression_sequence(lark_ir):
+    expressions = []
+    last_ws = None
+    for i, child in enumerate(lark_ir.children):
+        node_type = lark_parser.lark_node_type(child)
+        expr = parse_expr(child)
+        expressions.append(expr)
+    return ExpressionSequence(expressions)
+
 def parse_expr(lark_ir):
-    value_ir = lark_ir.children[-1]
-    value_ast = parse_node(value_ir)
-    unary_ir = lark_parser.find_type(lark_ir, lark_parser.UNARY_OPERATOR)
-    if unary_ir is not None:
-        return UnaryOp('usub', value_ast)
+    node_type = lark_parser.lark_node_type(lark_ir)
+    if isinstance(lark_ir, lark.tree.Tree):
+        value_ir = lark_ir.children[-1]
+        value_ast = parse_node(value_ir)
+        unary_ir = lark_parser.find_type(lark_ir, lark_parser.UNARY_OPERATOR)
+        if unary_ir is not None:
+            return UnaryOp('usub', value_ast)
+    else:
+        value_ast = parse_node(lark_ir)
     return value_ast
 
 def parse_list(lark_ir):
@@ -46,7 +59,6 @@ def parse_keypress(lark_ir):
 def parse_unaryop(lark_ir):
     op = 'usub'
     operand = parse_node(lark_ir.children[1])
-    # right = parse_node(lark_ir.children[2])
     return BinOp(op, operand)
 
 def parse_binop(lark_ir):
@@ -69,8 +81,25 @@ parse_map = {
     'NAME': lambda x: Name(str(x)),
     'INTEGER': lambda x: Integer(int(x)),
     'FLOAT': lambda x: Float(float(x)), 
-    lark_parser.ARGUMENT_REFERENCE: lambda x: ArgumentReference(str(x.children[0]))
+    'WS': lambda x: Whitespace(str(x)),
+    lark_parser.ARGUMENT_REFERENCE: lambda x: ArgumentReference(str(x.children[0])),
+    lark_parser.EXPR_SEQUENCE: parse_expression_sequence,
 }
+
+def evaluate_generator(gen):
+    assert isinstance(gen, types.GeneratorType)
+    last = None
+    for item in exhaust_generator(gen):
+        last = item
+    return last
+
+def exhaust_generator(gen):
+    assert isinstance(gen, types.GeneratorType)
+    for item in gen:
+        if isinstance(item, types.GeneratorType):
+            yield from exhaust_generator(item)
+        else:
+            yield item
 
 class BaseActionNode:
     
@@ -79,37 +108,26 @@ class BaseActionNode:
         raise NotImplementedError
 
     def evaluate_lazy(self, context):
-        return self.evaluate(context)
+        yield self.evaluate(context)
 
-
-class Action(BaseActionNode):
+class ExpressionSequence(BaseActionNode):
 
     def __init__(self, expressions):
         self.expressions = expressions
 
-    def perform(self, context):
-        gen = self.evaluate_lazy(context)
-        for result in self.exhaust_generator(gen):
-            if isinstance(result, (str, float, int)):
-                keyboard.write(str(result), delay=.05)
-
-    def exhaust_generator(self, gen):
-        for item in gen:
-            if isinstance(item, types.GeneratorType):
-                yield from self.exhaust_generator(item)
-            else:
-                yield item
-
     def evaluate(self, context):
         last = None
-        for result in self.evaluate_lazy(context):
-            last = result
+        for expr in self.expressions(context):
+            result = expr.evaluate(context)
+            if isinstance(last, str) and isinstance(result, str):
+                last += result
+            else:
+                last = result
         return last
 
     def evaluate_lazy(self, context):
         for expr in self.expressions:
-            result = expr.evaluate(context)
-            yield result
+            yield from exhaust_generator(expr.evaluate_lazy(context))
 
 class ArgumentReference(BaseActionNode):
 
@@ -117,7 +135,15 @@ class ArgumentReference(BaseActionNode):
         self.value = value
 
     def evaluate(self, context):
-        return context.arguments[self.value]
+        return context.argument_frames[-1][self.value]
+
+class Whitespace(BaseActionNode):
+
+    def __init__(self, value: str):
+        self.value = value
+
+    def evaluate(self, context):
+        return self.value
 
 class String(BaseActionNode):
 
@@ -175,26 +201,47 @@ class Call(BaseActionNode):
         self.args = args
         self.kwargs = kwargs
 
-    def evaluate_from_attr(self, context, attr):
-        arg_values = [arg.evaluate(context) for arg in self.args]
+    def prepare_call(self, context):
         kwarg_values = {}
         function_to_call = self.fn.evaluate(context)
-        if isinstance(function_to_call, FunctionDefinition):
-            current_arguments = context.arguments
-            context.arguments = context.arguments.copy()
-            for i, arg_value in enumerate(arg_values):
-                param = function_to_call.parameters[i]
-                context.arguments[param['name']] = arg_value
-            result = getattr(function_to_call.action, attr)(context)
-            context.arguments = current_arguments
-            return result
-        return function_to_call(*arg_values, **kwarg_values)
+        if function_to_call in stdlib.deferred_arguments_eval:
+            arg_values = [context] + self.args
+        else:
+            arg_values = [arg.evaluate(context) for arg in self.args]
+        return arg_values, kwarg_values, function_to_call
+
+    def add_argument_frame(self, context, function_to_call, arg_values):
+        frame = context.argument_frames[-1].copy()
+        for i, arg_value in enumerate(arg_values):
+            param = function_to_call.parameters[i]
+            frame[param['name']] = arg_value
+        context.argument_frames.append(frame)
 
     def evaluate(self, context):
-        return self.evaluate_from_attr(context, 'evaluate')
+        arg_values, kwarg_values, function_to_call = self.prepare_call(context)
+        if isinstance(function_to_call, FunctionDefinition):
+            self.add_argument_frame(context, function_to_call, arg_values)
+            result = function_to_call.action.evaluate(context)
+            print(result)
+            context.argument_frames.pop()
+            return result
+        result = function_to_call(*arg_values, **kwarg_values)
+        if isinstance(result, types.GeneratorType):
+            return evaluate_generator(result)
+        return result
 
     def evaluate_lazy(self, context):
-        return self.evaluate_from_attr(context, 'evaluate_lazy')
+        arg_values, kwarg_values, function_to_call = self.prepare_call(context)
+        if isinstance(function_to_call, FunctionDefinition):
+            self.add_argument_frame(context, function_to_call, arg_values)
+            yield from function_to_call.action.evaluate_lazy(context)
+            context.argument_frames.pop()
+        else:
+            result = function_to_call(*arg_values, **kwarg_values)
+            if isinstance(result, types.GeneratorType):
+                yield from exhaust_generator(result)
+            else:
+                yield result
 
 class Name(BaseActionNode):
 
@@ -237,18 +284,16 @@ class Variable(BaseActionNode):
         except IndexError:
             return
         for action in var_actions:
-            yield from action.evaluate_lazy(context)
+            yield from exhaust_generator(action.evaluate_lazy(context))
 
-def action_from_text(text):
+def action_root_from_text(text):
     lark_ir = lark_parser.parse_action(text)
     return action_from_lark_ir(lark_ir, text)
 
 def action_from_lark_ir(root_lark_ir, text):
-    expressions = []
-    for child in root_lark_ir.children:
-        expr = parse_node(child)
-        expressions.append(expr)
-    return Action(expressions)
+    assert len(root_lark_ir.children) == 1
+    root = parse_node(root_lark_ir.children[0])
+    return root
 
 def function_definition_from_lark_ir(lark_ir):
     name = str(lark_ir.children[0])
@@ -269,8 +314,4 @@ class ActionEncoder(json.JSONEncoder):
     def default(self, o):
         d = o.__dict__.copy()
         d['type'] = o.__class__.__name__
-        # try:
-        #     del d['action_piece_substitute']
-        # except KeyError:
-        #     pass
         return d

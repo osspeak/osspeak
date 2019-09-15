@@ -3,25 +3,28 @@ All of the arguments in these functions are wrapped in
 lambdas in recognition.asttransform.py to prevent early binding
 '''
 
-def repeat(*args):
-    from recognition.actions import perform
-    count = args[-1]()
+def loop(context, *args):
+    from recognition.actions.astree import exhaust_generator
+    count = args[-1].evaluate(context)
     try:
         count = int(count)
     except (TypeError, ValueError):
         count = 1
-    lambda_args = args[:-1]
+    eval_args = args[:-1]
     for i in range(count):
-        for lambda_arg in lambda_args:
-            perform.perform_io(lambda_arg())
+        for eval_arg in eval_args:
+            yield from exhaust_generator(eval_arg.evaluate_lazy(context))
 
-def osspeak_if(*args):
+def osspeak_if(context, *args):
+    from recognition.actions.astree import exhaust_generator
     assert 1 < len(args) < 4
-    condition_evaluation = args[0]()
+    condition_evaluation = args[0].evaluate(context)
     if condition_evaluation:
-        return args[1]()
-    if len(args) == 3:
-        return args[2]()
+        yield from exhaust_generator(args[1].evaluate_lazy(context))
+        # return args[1].evaluate_lazy(context)
+    if len(args) == 4:
+        yield from exhaust_generator(args[2].evaluate_lazy(context))
+        # return args[2].evaluate(context)
 
 def osspeak_while(*args):
     action_args = args[1:]

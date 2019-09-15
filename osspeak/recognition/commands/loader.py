@@ -11,6 +11,7 @@ import collections
 import json
 import log
 import recognition.actions.library.state
+import recognition.actions.library.stdlib
 from recognition.actions import perform
 import settings
 from recognition.actions import variables, perform
@@ -123,7 +124,7 @@ class CommandModuleController:
         return grammar_context
 
     def get_namespace(self):
-        ns = library.namespace.copy()
+        ns = recognition.actions.library.stdlib.namespace.copy()
         for mod in self.active_command_modules.values():
             ns.update(mod.functions)
         return ns

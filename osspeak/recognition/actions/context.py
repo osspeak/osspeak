@@ -6,7 +6,7 @@ class RecognitionContext:
     def __init__(self, variables, words, namespace, variable_words):
         self.variables = variables
         self.namespace = namespace
-        self.arguments = {}
+        self.argument_frames = []
         self.words = words
         self.text = None if words is None else ' '.join(words)
 

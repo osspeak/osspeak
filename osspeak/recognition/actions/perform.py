@@ -21,6 +21,13 @@ def recognition_namespace():
     recognition_context = get_recognition_context()
     return {'context': recognition_context, **recognition_context._meta.namespace}
 
+def perform_action(action, context):
+    context.argument_frames.append({})
+    gen = action.evaluate_lazy(context)
+    for result in action.evaluate_lazy(context):
+        if isinstance(result, (str, float, int)):
+            keyboard.write(str(result), delay=.05)
+    context.argument_frames.pop()
 
 def recognition_action_worker():
     while True:
@@ -28,7 +35,7 @@ def recognition_action_worker():
         t = threading.current_thread()
         results_map[t] = {'context': recognition_context}
         try:
-            evaluation = action.perform(recognition_context)
+            evaluation = perform_action(action, recognition_context)
         except Exception as e:
             traceback.print_exc()
             log.logger.error(f'Action {action} errored: {str(e)}')
@@ -97,7 +104,7 @@ def get_leaf_action(node, text):
     if getattr(node, 'action_substitute', None) is not None:
         leaf_action, is_substitute = node.action_substitute, True 
     elif text is not None:
-        leaf_action, is_substitute = astree.action_from_text(text), False
+        leaf_action, is_substitute = astree.action_root_from_text(text), False
     return leaf_action, is_substitute
 
 def var_result(variable_actions_pieces, perform_results: bool):
