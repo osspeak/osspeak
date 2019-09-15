@@ -20,7 +20,7 @@ UNARY_OPERATOR = 'UNARY_OPERATOR'
 ARGUMENT_REFERENCE = 'argument_reference'
 
 grammar = f'''start: ([_block] _NEWLINE)* [_block]
-_block: (command | function_definition |     named_utterance | comment)
+_block: (command | function_definition | named_utterance | comment)
 comment: /[ \t]*#.*/
 _WS: /[ \t]/
 WS: /[ \t]/

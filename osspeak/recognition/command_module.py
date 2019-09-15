@@ -116,5 +116,9 @@ def command_module_from_lark_ir(module_ir, text_by_line):
         elif ir_type == 'function_definition':
             func = recognition.actions.astree.function_definition_from_lark_ir(child)
             cmd_module.functions[func.name] = func
-
+        elif ir_type == 'named_utterance':
+            name = str(lark_parser.find_type(child, 'utterance_name').children[0])
+            utterance_ir = lark_parser.find_type(child, 'utterance')
+            utterance = recognition.rules.astree.rule_from_lark_ir(utterance_ir)
+            cmd_module.rules[name] = utterance
     return cmd_module
