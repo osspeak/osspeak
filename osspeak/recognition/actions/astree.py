@@ -291,13 +291,11 @@ def action_root_from_text(text):
     return action_from_lark_ir(lark_ir, text)
 
 def action_from_lark_ir(root_lark_ir, text):
-    assert len(root_lark_ir.children) == 1
-    root = parse_node(root_lark_ir.children[0])
-    return root
+    return parse_node(root_lark_ir)
 
 def function_definition_from_lark_ir(lark_ir):
     name = str(lark_ir.children[0])
-    action_ir = lark_parser.find_type(lark_ir, 'action')
+    action_ir = lark_ir.children[-1]
     positional_parameters = lark_parser.find_type(lark_ir, 'positional_parameters')
     params = []
     if positional_parameters:
@@ -307,9 +305,9 @@ def function_definition_from_lark_ir(lark_ir):
     return FunctionDefinition(name, params, action)
 
 def to_json_string(action):
-    return json.dumps(action, cls=ActionEncoder, sort_keys=True, indent=4)
+    return json.dumps(action, cls=SimpleJsonEncoder, sort_keys=True, indent=4)
 
-class ActionEncoder(json.JSONEncoder):
+class SimpleJsonEncoder(json.JSONEncoder):
 
     def default(self, o):
         d = o.__dict__.copy()

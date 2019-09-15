@@ -35,13 +35,13 @@ utterance_piece: ({UTTERANCE_WORD} | {UTTERANCE_REFERENCE} | {UTTERANCE_CHOICES}
 {UTTERANCE_NAME}: NAME
 {UTTERANCE_WORD}: /[a-z0-9]+/
 {UTTERANCE_REFERENCE}: "<" {UTTERANCE_NAME} ">"
-{ACTION_SUBSTITUTE}: "=" action
+{ACTION_SUBSTITUTE}: "=" _action
 {UTTERANCE_REPETITION}: "_" ({ZERO_OR_POSITIVE_INT} | {UTTERANCE_RANGE})
 {UTTERANCE_RANGE}: {ZERO_OR_POSITIVE_INT} "-" [{ZERO_OR_POSITIVE_INT}]
 
-command: utterance "=" action 
+command: utterance "=" _action 
 
-action: ({EXPR} | {EXPR_SEQUENCE})
+_action: ({EXPR} | {EXPR_SEQUENCE})
 {EXPR_SEQUENCE}.-99: {EXPR} (WS* {EXPR})+
 {EXPR}: [{UNARY_OPERATOR}] ({EXPR_SEQUENCE} | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 _chainable: (NAME | attribute | call | list | {VARIABLE})
@@ -65,7 +65,7 @@ call.3: _chainable "(" (({ARG_LIST} ["," {KWARG_LIST}]) | [{KWARG_LIST}]) ")"
 {KWARG_LIST}: kwarg ("," kwarg)* 
 kwarg: NAME "=" {EXPR}
 
-function_definition: NAME "(" [positional_parameters] ")" "=>" action
+function_definition: NAME "(" [positional_parameters] ")" "=>" _action
 positional_parameters: NAME ("," NAME)*
 
 _STRING_INNER: /.*?/
@@ -80,7 +80,7 @@ STRING_DOUBLE: "\\"" _STRING_ESC_INNER "\\""
 
 lark_grammar = Lark(grammar, propagate_positions=True)
 utterance_grammar = Lark(grammar, start='utterance', propagate_positions=True)
-action_grammar = Lark(grammar, start='action', propagate_positions=True)
+action_grammar = Lark(grammar, start='_action', propagate_positions=True)
 
 class Foo(Transformer):
 
@@ -100,7 +100,7 @@ def parse_utterance(text: str):
 
 def parse_action(text: str):
     ast = action_grammar.parse(text)
-    return ast
+    return ast.children[0]
     transformed = Foo().transform(ast)
     return transformed
 

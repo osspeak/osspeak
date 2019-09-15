@@ -52,9 +52,9 @@ class RuleReference(ASTNode):
         self.repeat_high = 1
         self.action_substitute = None
 
-def rule_from_lark_ir(lark_ast):
+def rule_from_lark_ir(lark_ir):
     rule = Rule()
-    rule.root = grouping_from_choice_items(lark_ast.children[0])
+    rule.root = grouping_from_choice_items(lark_ir.children[0])
     return rule
 
 def grouping_from_choice_items(ast):
@@ -70,9 +70,10 @@ def sequence_from_ast_sequence(ast):
         seq.append(node_from_utterance_piece(utterance_piece))
     return seq
 
-def node_from_utterance_piece(ast):
+def node_from_utterance_piece(lark_ir):
     import lark.lexer
-    wrapped_node = ast.children[0]
+    import recognition.actions.astree
+    wrapped_node = lark_ir.children[0]
     wrapped_type = lark_parser.lark_node_type(wrapped_node)
     if wrapped_type == lark_parser.UTTERANCE_WORD:
         word_text = str(wrapped_node)
@@ -86,12 +87,12 @@ def node_from_utterance_piece(ast):
         node = RuleReference(ref_name)
     else:
         raise ValueError(f'Unrecognized utterance piece type: {wrapped_type}')
-    rep = list(ast.find_data(lark_parser.UTTERANCE_REPETITION))
+    rep = lark_parser.find_type(lark_ir, lark_parser.UTTERANCE_REPETITION)
     if rep:
         node.repeat_low, node.repeat_high = parse_repetition(rep[0])
-    # substitute = list(ast.find_data(lark_parser.))
-    # if rep:
-    #     node.repeat_low, node.repeat_high = parse_repetition(rep[0])
+    substitute = lark_parser.find_type(lark_ir, lark_parser.ACTION_SUBSTITUTE)
+    if substitute:
+        node.action_substitute = recognition.actions.astree.action_from_lark_ir(substitute.children[0], 'foo')
     return node
 
 def parse_repetition(ast):
