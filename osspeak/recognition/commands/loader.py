@@ -10,7 +10,6 @@ import re
 import collections
 import json
 import log
-import recognition.actions.library.state
 import recognition.actions.library.stdlib
 from recognition.actions import perform
 import settings
@@ -56,18 +55,18 @@ class CommandModuleController:
         return command_modules
         return _command_modules
         
-    def get_active_modules(self, current_window: str, current_state):
+    def get_active_modules(self, current_window: str):
         active_modules = {}
         for path, cmd_module in self.command_modules.items():
-            if cmd_module.is_active(current_window, current_state):
+            if cmd_module.is_active(current_window):
                 active_modules[path] = cmd_module
         return active_modules
 
-    async def load_modules(self, current_window, current_state, initialize_modules: bool=False):
+    async def load_modules(self, current_window, initialize_modules: bool=False):
         previous_active_modules = self.active_command_modules
         if initialize_modules:
             self.populate()
-        self.active_command_modules = self.get_active_modules(current_window, current_state)
+        self.active_command_modules = self.get_active_modules(current_window)
         namespace = self.get_namespace()
         self.fire_activation_events(previous_active_modules, namespace)
         grammar_context = self.build_grammar()
@@ -105,9 +104,7 @@ class CommandModuleController:
             cmd_module.load_events()
 
     def load_initial_user_state(self):
-        recognition.actions.library.state.USER_DEFINED_STATE = {}
-        for path, cmd_module in self.command_modules.items():
-            recognition.actions.library.state.USER_DEFINED_STATE.update(cmd_module.initial_state)
+        return
 
     def build_grammar(self) -> grammar.GrammarContext:
         named_rules, command_rules = self.get_active_rules()

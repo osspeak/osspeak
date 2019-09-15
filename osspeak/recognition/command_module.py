@@ -5,10 +5,11 @@ import itertools
 import json
 import lark.exceptions
 
-from recognition.actions.library import state, history
+from recognition.actions.library import history, window
 from recognition.actions import variables
 from recognition.actions.function import Function
 import recognition.actions.astree
+import recognition.actions.context
 import recognition.rules.astree
 from recognition import action as _action, rule as _rule, function, lark_parser
 from log import logger
@@ -80,10 +81,16 @@ class CommandModule:
                 return False
         return True
 
-    def is_active(self, current_window: str, current_state):
-        title_filter = self.conditions.get('title', '')
-        current_window_matches = re.search(title_filter, current_window, flags=re.IGNORECASE)
-        return current_window_matches and self.is_state_active(current_state)
+    def is_active(self, current_window: str):
+        test_fn = self.functions.get('is_active')
+        if test_fn:
+            context = recognition.actions.context.empty_recognition_context()
+            eval_result = test_fn.action.evaluate(context)
+            if isinstance(eval_result, str):
+                current_window_matches = re.search(eval_result, current_window, flags=re.IGNORECASE)
+                return current_window_matches
+            return bool(eval_result)
+        return True
 
 class Command:
     

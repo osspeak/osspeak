@@ -15,3 +15,6 @@ class RecognitionContext:
 
     def set(self, key, value):
         self._meta.temp_variables[key] = value
+
+def empty_recognition_context():
+    return RecognitionContext([], [], {}, [])
