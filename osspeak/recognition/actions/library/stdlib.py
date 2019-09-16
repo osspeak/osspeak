@@ -13,6 +13,7 @@ def wait(n):
 namespace = {
     'click': mouse.click,
     'if': flow.osspeak_if,
+    'index': lambda obj, key: obj[key],
     'keypress': lambda *k: keyboard.press_and_release(list(k)),
     'loop': flow.loop,
     'print': print,

@@ -68,7 +68,7 @@ def parse_binop(lark_ir):
     return BinOp(op, left, right)
 
 parse_map = {
-    'literal': lambda x: String(''.join(str(s) for s in x.children)),
+    'literal': lambda x: Literal(''.join(str(s) for s in x.children)),
     'STRING_DOUBLE': lambda x: String(str(x)[1:-1]),
     'STRING_SINGLE': lambda x: String(str(x)[1:-1]),
     'list': parse_list,
@@ -82,6 +82,7 @@ parse_map = {
     'INTEGER': lambda x: Integer(int(x)),
     'FLOAT': lambda x: Float(float(x)), 
     'WS': lambda x: Whitespace(str(x)),
+    lark_parser.EXPR_SEQUENCE_SEPARATOR: lambda x: ExprSequenceSeparator(str(x)),
     lark_parser.ARGUMENT_REFERENCE: lambda x: ArgumentReference(str(x.children[0])),
     lark_parser.EXPR_SEQUENCE: parse_expression_sequence,
 }
@@ -116,8 +117,13 @@ class ExpressionSequence(BaseActionNode):
         self.expressions = expressions
 
     def evaluate(self, context):
+        evaluated_nodes = []
         last = None
-        for expr in self.expressions(context):
+        for i, expr in enumerate(self.expressions(context)):
+            if isinstance(node, astree.Literal) and i > 1:
+                second_previous, previous = self.expressions[i - 2:i]
+                if isinstance(second_previous, astree.Literal) and isinstance(previous, astree.ExprSequenceSeparator):
+                    last += previous.value
             result = expr.evaluate(context)
             if isinstance(last, str) and isinstance(result, str):
                 last += result
@@ -130,7 +136,12 @@ class ExpressionSequence(BaseActionNode):
             yield from exhaust_generator(expr.evaluate_lazy(context))
 
 class Literal(BaseActionNode):
-    pass
+    
+    def __init__(self, value: str):
+        self.value = value
+
+    def evaluate(self, context):
+        return self.value
 
 class ArgumentReference(BaseActionNode):
 
@@ -147,6 +158,14 @@ class Whitespace(BaseActionNode):
 
     def evaluate(self, context):
         return self.value
+
+class ExprSequenceSeparator(BaseActionNode):
+
+    def __init__(self, value: str):
+        self.value = value
+
+    def evaluate(self, context):
+        return None
 
 class String(BaseActionNode):
 
@@ -166,8 +185,12 @@ class Integer(BaseActionNode):
 
 class Float(BaseActionNode):
 
-    def __init__(self, value: int):
+    def __init__(self, value: float):
         self.value = value
+
+    def evaluate(self, context):
+        return self.value
+
 
 class UnaryOp(BaseActionNode):
 
@@ -225,7 +248,6 @@ class Call(BaseActionNode):
         if isinstance(function_to_call, FunctionDefinition):
             self.add_argument_frame(context, function_to_call, arg_values)
             result = function_to_call.action.evaluate(context)
-            print(result)
             context.argument_frames.pop()
             return result
         result = function_to_call(*arg_values, **kwarg_values)
@@ -277,7 +299,11 @@ class Variable(BaseActionNode):
             return
         last_result = None
         for action in var_actions:
-            last_result = action.evaluate(context)
+            result = action.evaluate(context)
+            if isinstance(last_result, str) and isinstance(result, str):
+                last_result += result
+            else:
+                last_result = result
         return last_result
 
     def evaluate_lazy(self, context):

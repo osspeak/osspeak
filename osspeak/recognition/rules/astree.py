@@ -89,15 +89,22 @@ def node_from_utterance_piece(lark_ir):
         raise ValueError(f'Unrecognized utterance piece type: {wrapped_type}')
     rep = lark_parser.find_type(lark_ir, lark_parser.UTTERANCE_REPETITION)
     if rep:
-        node.repeat_low, node.repeat_high = parse_repetition(rep[0])
+        node.repeat_low, node.repeat_high = parse_repetition(rep)
     substitute = lark_parser.find_type(lark_ir, lark_parser.ACTION_SUBSTITUTE)
     if substitute:
         node.action_substitute = recognition.actions.astree.action_from_lark_ir(substitute.children[0], 'foo')
     return node
 
-def parse_repetition(ast):
+def parse_repetition(lark_ir):
+    if lark_ir.children[0] == '*':
+        return 0, None
+    if lark_ir.children[0] == '?':
+        return 0, 1
+    if lark_ir.children[0] == '+':
+        return 1, None
+    print(lark_ir)
     import lark.lexer
-    child = ast.children[0]
+    child = lark_ir.children[1]
     low, high = 1, 1
     if isinstance(child, lark.lexer.Token) and child.type == lark_parser.ZERO_OR_POSITIVE_INT:
         low, high = int(child), int(child)

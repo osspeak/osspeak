@@ -24,11 +24,18 @@ def recognition_namespace():
 def perform_action(action, context):
     context.argument_frames.append({})
     gen = action.evaluate_lazy(context)
-    for node, result in action.evaluate_lazy(context):
-        print(node)
+    evaluated_nodes = []
+    written_nodes = []
+    for i, (node, result) in enumerate(action.evaluate_lazy(context)):
         assert isinstance(node, astree.BaseActionNode)
         if isinstance(result, (str, float, int)):
+            if isinstance(node, astree.Literal) and i > 1:
+                previous = evaluated_nodes[i - 1]
+                if written_nodes and isinstance(written_nodes[-1], astree.Literal) and isinstance(previous, astree.ExprSequenceSeparator):
+                    keyboard.write(previous.value, delay=.05)
             keyboard.write(str(result), delay=.05)
+            written_nodes.append(node)
+        evaluated_nodes.append(node)
     context.argument_frames.pop()
 
 def recognition_action_worker():
@@ -107,6 +114,7 @@ def get_leaf_action(node, text):
         leaf_action, is_substitute = node.action_substitute, True 
     elif text is not None:
         leaf_action, is_substitute = astree.action_root_from_text(text), False
+        leaf_action, is_substitute = astree.String(text), False
     return leaf_action, is_substitute
 
 def concat_results(results):

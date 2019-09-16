@@ -13,6 +13,7 @@ ZERO_OR_POSITIVE_INT = 'ZERO_OR_POSITIVE_INT'
 
 EXPR = 'expr'
 EXPR_SEQUENCE = 'expr_sequence'
+EXPR_SEQUENCE_SEPARATOR = 'EXPR_SEQUENCE_SEPARATOR'
 VARIABLE = 'variable'
 ARG_LIST = 'arg_list'
 KWARG_LIST = 'kwarg_list'
@@ -24,6 +25,7 @@ _block: (command | function_definition | named_utterance | comment)
 comment: /[ \t]*#.*/
 _WS: /[ \t]/
 WS: /[ \t]/
+
 _NEWLINE: /\\n/
 NAME: /[_a-zA-Z][_a-zA-Z0-9]*/
 named_utterance: {UTTERANCE_NAME} ":=" utterance
@@ -36,13 +38,14 @@ utterance_piece: ({UTTERANCE_WORD} | {UTTERANCE_REFERENCE} | {UTTERANCE_CHOICES}
 {UTTERANCE_WORD}: /[a-z0-9]+/
 {UTTERANCE_REFERENCE}: "<" {UTTERANCE_NAME} ">"
 {ACTION_SUBSTITUTE}: "=" _action
-{UTTERANCE_REPETITION}: "_" ({ZERO_OR_POSITIVE_INT} | {UTTERANCE_RANGE})
+!{UTTERANCE_REPETITION}: (("_" ({ZERO_OR_POSITIVE_INT} | {UTTERANCE_RANGE})) | "*" | "?" | "+")
 {UTTERANCE_RANGE}: {ZERO_OR_POSITIVE_INT} "-" [{ZERO_OR_POSITIVE_INT}]
 
 command: utterance "=" _action 
 
 _action: ({EXPR} | {EXPR_SEQUENCE})
-{EXPR_SEQUENCE}.-99: {EXPR} (WS* {EXPR})+
+{EXPR_SEQUENCE_SEPARATOR}: /[ \t]/
+{EXPR_SEQUENCE}.-99: {EXPR} ({EXPR_SEQUENCE_SEPARATOR}* {EXPR})+
 {EXPR}: [{UNARY_OPERATOR}] ({EXPR_SEQUENCE} | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 _chainable: (NAME | attribute | call | list | {VARIABLE})
 expr_grouping: "(" {EXPR} ")"
