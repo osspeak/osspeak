@@ -41,19 +41,13 @@ class CommandModuleController:
 
     def initialize_command_modules(self):
         files = self.module_loader.load_files()
-        yay_me = {}
         command_modules = {}
         for file_name, text in files.items():
-            if file_name.endswith('.json'):
-                yay_me[file_name] = json.loads(text)
-            elif file_name.endswith('.speak'):
+            if file_name.endswith('.speak'):
                 module_ir = lark_parser.parse_command_module(text)
                 cmd_module = command_module.command_module_from_lark_ir(module_ir, text)
-
                 command_modules[file_name] = cmd_module
-        # _command_modules = {path: command_module.CommandModule(config, path) for path, config in yay_me.items()}
         return command_modules
-        return _command_modules
         
     def get_active_modules(self, current_window: str):
         active_modules = {}
@@ -190,8 +184,3 @@ class CommandModuleFile:
             with open(self.path) as f:
                 self._contents = f.read()
         return self._contents
-                # try:
-                #     self.contents = json.load(f)
-                # except json.decoder.JSONDecodeError as e:
-                #     self.contents = {'Error': str(e)}
-                #     log.logger.warning(f"JSON error loading command module '{path}':\n{e}")

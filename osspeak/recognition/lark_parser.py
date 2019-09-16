@@ -1,6 +1,7 @@
 from lark import Lark, Transformer, v_args, Token, Tree
 
 UTTERANCE_CHOICES = 'utterance_choices'
+UTTERANCE_CHOICES_OPTIONAL = 'utterance_choices_optional'
 UTTERANCE_CHOICE_ITEMS = 'utterance_choices_items'
 UTTERANCE_WORD = 'UTTERANCE_WORD'
 UTTERANCE_REFERENCE = 'utterance_reference'
@@ -31,7 +32,8 @@ NAME: /[_a-zA-Z][_a-zA-Z0-9]*/
 named_utterance: {UTTERANCE_NAME} ":=" utterance
 utterance: {UTTERANCE_CHOICE_ITEMS} 
 utterance_sequence: utterance_piece (_WS+ utterance_piece)*
-utterance_piece: ({UTTERANCE_WORD} | {UTTERANCE_REFERENCE} | {UTTERANCE_CHOICES}) [{UTTERANCE_REPETITION}] [{ACTION_SUBSTITUTE}]
+utterance_piece: ({UTTERANCE_WORD} | {UTTERANCE_REFERENCE} | {UTTERANCE_CHOICES} | {UTTERANCE_CHOICES_OPTIONAL}) [{UTTERANCE_REPETITION}] [{ACTION_SUBSTITUTE}]
+{UTTERANCE_CHOICES_OPTIONAL}: "[" {UTTERANCE_CHOICE_ITEMS} "]"
 {UTTERANCE_CHOICES}: "(" {UTTERANCE_CHOICE_ITEMS} ")"
 {UTTERANCE_CHOICE_ITEMS}: utterance_sequence ("|" utterance_sequence)* 
 {UTTERANCE_NAME}: NAME

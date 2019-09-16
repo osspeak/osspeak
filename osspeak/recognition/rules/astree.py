@@ -81,6 +81,10 @@ def node_from_utterance_piece(lark_ir):
     elif wrapped_type == lark_parser.UTTERANCE_CHOICES:
         choice_items = wrapped_node.children[0]
         node = grouping_from_choice_items(choice_items)
+    elif wrapped_type == lark_parser.UTTERANCE_CHOICES_OPTIONAL:
+        choice_items = wrapped_node.children[0]
+        node = grouping_from_choice_items(choice_items)
+        node.repeat_low, node.repeat_low = 0, 1
     elif wrapped_type == lark_parser.UTTERANCE_REFERENCE:
         ref = wrapped_node.children[0]
         ref_name = ref.children[0]
@@ -102,7 +106,6 @@ def parse_repetition(lark_ir):
         return 0, 1
     if lark_ir.children[0] == '+':
         return 1, None
-    print(lark_ir)
     import lark.lexer
     child = lark_ir.children[1]
     low, high = 1, 1
