@@ -113,18 +113,5 @@ def get_leaf_action(node, text):
     if getattr(node, 'action_substitute', None) is not None:
         leaf_action, is_substitute = node.action_substitute, True 
     elif text is not None:
-        leaf_action, is_substitute = astree.action_root_from_text(text), False
         leaf_action, is_substitute = astree.String(text), False
     return leaf_action, is_substitute
-
-def concat_results(results):
-    acc = None
-    for res in results:
-        if None in (acc, res):
-            acc = res
-        else:
-            try:
-                acc += res
-            except TypeError:
-                pass
-    return acc
