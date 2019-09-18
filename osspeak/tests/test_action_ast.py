@@ -43,220 +43,174 @@ from recognition.lark_parser import action_grammar
 def test_literal():
     text = "hello \tworld"
     action = text_to_action(text)
-    to_clipboard(action.root)
-    assert_equal(action.root, [
-        {
-            "type": "String",
-            "value": "hello \tworld"
-        }
-    ])
+    assert_equal(action, {
+        "type": "Literal",
+        "value": "hello \tworld"
+    })
 
 def test_literal2():
-    text = "Hello, $1"
+    text = "Hello ',' $1"
     action = text_to_action(text)
-    assert_equal(action.root, [
-        {
-            "expressions": [
-                {
-                    "type": "String",
-                    "value": "Hello,"
-                },
-                {
-                    "type": "Whitespace",
-                    "value": " "
-                },
-                {
-                    "type": "Variable",
-                    "value": 1
-                }
-            ],
-            "type": "ExpressionSequence"
-        }
-    ])
-
-def test_lists():
-    text = "[1, 2] [3]"
-    action = text_to_action(text)
-    assert_equal(action.root, [
-        {
-            "expressions": [
-                {
-                    "items": [
-                        {
-                            "type": "Integer",
-                            "value": 1
-                        },
-                        {
-                            "type": "Integer",
-                            "value": 2
-                        }
-                    ],
-                    "type": "List"
-                },
-                {
-                    "type": "Whitespace",
-                    "value": " "
-                },
-                {
-                    "items": [
-                        {
-                            "type": "Integer",
-                            "value": 3
-                        }
-                    ],
-                    "type": "List"
-                }
-            ],
-            "type": "ExpressionSequence"
-        }
-    ])
+    assert_equal(action, {
+        "expressions": [
+            {
+                "type": "Literal",
+                "value": "Hello"
+            },
+            {
+                "type": "ExprSequenceSeparator",
+                "value": " "
+            },
+            {
+                "type": "String",
+                "value": ","
+            },
+            {
+                "type": "ExprSequenceSeparator",
+                "value": " "
+            },
+            {
+                "type": "Variable",
+                "value": 1
+            }
+        ],
+        "type": "ExpressionSequence"
+    })
 
 def test_call1():
     text = "repeat({$1}, $2)"
     action = text_to_action(text)
-    assert_equal(action.root,  [
-        {
-            "args": [
-                {
-                    "args": [
-                        {
-                            "type": "Variable",
-                            "value": 1
-                        }
-                    ],
-                    "fn": {
-                        "type": "Name",
-                        "value": "keypress"
-                    },
-                    "kwargs": {},
-                    "type": "Call"
+    assert_equal(action, {
+        "args": [
+            {
+                "args": [
+                    {
+                        "type": "Variable",
+                        "value": 1
+                    }
+                ],
+                "fn": {
+                    "type": "Name",
+                    "value": "keypress"
                 },
-                {
-                    "type": "Variable",
-                    "value": 2
-                }
-            ],
-            "fn": {
-                "type": "Name",
-                "value": "repeat"
+                "kwargs": {},
+                "type": "Call"
             },
-            "kwargs": {},
-            "type": "Call"
-        }
-    ])
+            {
+                "type": "Variable",
+                "value": 2
+            }
+        ],
+        "fn": {
+            "type": "Name",
+            "value": "repeat"
+        },
+        "kwargs": {},
+        "type": "Call"
+    })
 
 def test_variable1():
     text = "4 + $1"
     action = text_to_action(text)
-    assert_equal(action.root,  [
-        {
-            "left": {
-                "type": "Integer",
-                "value": 4
-            },
-            "operation": "add",
-            "right": {
-                "type": "Variable",
-                "value": 1
-            },
-            "type": "BinOp"
-        }
-    ])
+    assert_equal(action,  {
+        "left": {
+            "type": "Integer",
+            "value": 4
+        },
+        "operation": "add",
+        "right": {
+            "type": "Variable",
+            "value": 1
+        },
+        "type": "BinOp"
+    })
 
 def test_attribute1():
     text = "$1.upper()"
     action = text_to_action(text)
-    assert_equal(action.root, [
-        {
-            "args": [],
-            "fn": {
-                "attribute_of": {
-                    "type": "Variable",
-                    "value": 1
-                },
-                "name": "upper",
-                "type": "Attribute"
+    assert_equal(action, {
+        "args": [],
+        "fn": {
+            "attribute_of": {
+                "type": "Variable",
+                "value": 1
             },
-            "kwargs": {},
-            "type": "Call"
-        }
-    ])
+            "name": "upper",
+            "type": "Attribute"
+        },
+        "kwargs": {},
+        "type": "Call"
+    })
 
 def test_string1():
     text = "'http://news.ycombinator.com'"
     action = text_to_action(text)
-    assert_equal(action.root,  [
-        {
-            "type": "String",
-            "value": "http://news.ycombinator.com"
-        }
-    ])
+    assert_equal(action,  {
+        "type": "String",
+        "value": "http://news.ycombinator.com"
+    })
 
 def test_binop1():
     text = "4 + 5"
     action = text_to_action(text)
-    assert_equal(action.root,  [
-        {
-            "left": {
-                "type": "Integer",
-                "value": 4
-            },
-            "operation": "add",
-            "right": {
-                "type": "Integer",
-                "value": 5
-            },
-            "type": "BinOp"
-        }
-    ])
+    assert_equal(action,  {
+        "left": {
+            "type": "Integer",
+            "value": 4
+        },
+        "operation": "add",
+        "right": {
+            "type": "Integer",
+            "value": 5
+        },
+        "type": "BinOp"
+    })
 
 def test_float1():
     text = "-4.5 .23 0.2"
     action = text_to_action(text)
-    assert_equal(action.root,  [
-        {
-            "operand": {
-                "expressions": [
-                    {
-                        "type": "Float",
-                        "value": 4.5
-                    },
-                    {
-                        "type": "Whitespace",
-                        "value": " "
-                    },
-                    {
-                        "type": "Float",
-                        "value": 0.23
-                    },
-                    {
-                        "type": "Whitespace",
-                        "value": " "
-                    },
-                    {
-                        "type": "Float",
-                        "value": 0.2
-                    }
-                ],
-                "type": "ExpressionSequence"
-            },
-            "operation": "usub",
-            "type": "UnaryOp"
-        }
-    ])
+    to_clipboard(action)
+    assert_equal(action,  {
+        "operand": {
+            "expressions": [
+                {
+                    "type": "Float",
+                    "value": 4.5
+                },
+                {
+                    "type": "ExprSequenceSeparator",
+                    "value": " "
+                },
+                {
+                    "type": "Float",
+                    "value": 0.23
+                },
+                {
+                    "type": "ExprSequenceSeparator",
+                    "value": " "
+                },
+                {
+                    "type": "Float",
+                    "value": 0.2
+                }
+            ],
+            "type": "ExpressionSequence"
+        },
+        "operation": "usub",
+        "type": "UnaryOp"
+    })
 
 def test_argument_reference():
     text = "$foo $bar"
     action = text_to_action(text)
-    assert_equal(action.root,  [
-    {
+    assert_equal(action, {
         "expressions": [
             {
                 "type": "ArgumentReference",
                 "value": "foo"
             },
             {
-                "type": "Whitespace",
+                "type": "ExprSequenceSeparator",
                 "value": " "
             },
             {
@@ -265,16 +219,15 @@ def test_argument_reference():
             }
         ],
         "type": "ExpressionSequence"
-    }
-])
+    })
+
 def test_multiple_args():
     text = "loop(hello, 10)"
     action = text_to_action(text)
-    to_clipboard(action.root)
-    assert_equal(action.root,  {
+    assert_equal(action,  {
         "args": [
             {
-                "type": "String",
+                "type": "Literal",
                 "value": "hello"
             },
             {
@@ -290,30 +243,30 @@ def test_multiple_args():
         "type": "Call"
     })
 
-def test_order_of_operations1():
-    text = "1+2*3"
-    action = text_to_action(text)
-    to_clipboard(action.root)
-    assert_equal(action.root, {
-        "left": {
-            "type": "Integer",
-            "value": 1
-        },
-        "operation": "add",
-        "right": {
-            "left": {
-                "type": "Integer",
-                "value": 2
-            },
-            "operation": "add",
-            "right": {
-                "type": "Integer",
-                "value": 3
-            },
-            "type": "BinOp"
-        },
-        "type": "BinOp"
-    })
+# def test_order_of_operations1():
+#     text = "1+2*3"
+#     action = text_to_action(text)
+#     to_clipboard(action)
+#     assert_equal(action, {
+#         "left": {
+#             "type": "Integer",
+#             "value": 1
+#         },
+#         "operation": "add",
+#         "right": {
+#             "left": {
+#                 "type": "Integer",
+#                 "value": 2
+#             },
+#             "operation": "add",
+#             "right": {
+#                 "type": "Integer",
+#                 "value": 3
+#             },
+#             "type": "BinOp"
+#         },
+#         "type": "BinOp"
+#     })
 
 def to_clipboard(action):
     recognition.actions.library.clipboard.set(astree.to_json_string(action))

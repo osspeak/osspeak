@@ -59,7 +59,6 @@ keypress: "{{" {EXPR} ("," {EXPR})* "}}"
 {ARGUMENT_REFERENCE}: "$" NAME
 {ZERO_OR_POSITIVE_INT}: /[0-9]+/
 INTEGER: /-?[0-9]+/
-FLOAT: SIGNED_FLOAT
 LITERAL_PIECE: /[a-zA-Z0-9!]+/ 
 literal.-100: LITERAL_PIECE (WS+ LITERAL_PIECE)*
 
@@ -79,7 +78,7 @@ STRING_SINGLE: "'" _STRING_ESC_INNER "'"
 STRING_DOUBLE: "\\"" _STRING_ESC_INNER "\\""
 
 %import common.WORD  // imports from terminal library
-%import common.SIGNED_FLOAT  // imports from terminal library
+%import common.FLOAT  // imports from terminal library
 %ignore " "
 '''
 
