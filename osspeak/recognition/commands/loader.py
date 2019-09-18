@@ -36,7 +36,6 @@ class CommandModuleController:
         self.grammars = collections.OrderedDict()
         self.map_grammar_to_commands = collections.OrderedDict()
         self.command_modules = {}
-        self.lark_module_trees = {} # path -> lark_ir
         self.active_command_modules = {}
 
     def initialize_command_modules(self):
