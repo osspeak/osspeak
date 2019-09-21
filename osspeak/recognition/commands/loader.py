@@ -21,6 +21,7 @@ from recognition.rules import astree
 from recognition import lark_parser
 from communication import pubsub, topics
 from common import limited_size_dict
+import recognition.cache
 
 DEFAULT_DIRECTORY_SETTINGS = {
     'recurse': True,
@@ -39,13 +40,21 @@ class CommandModuleController:
         self.active_command_modules = {}
 
     def initialize_command_modules(self):
+        command_module_cache = recognition.cache.load_cache()
+        new_cache = recognition.cache.empty_cache()
         files = self.module_loader.load_files()
         command_modules = {}
         for file_name, text in files.items():
             if file_name.endswith('.speak'):
-                module_ir = lark_parser.parse_command_module(text)
-                cmd_module = command_module.command_module_from_lark_ir(module_ir, text)
+                if text in command_module_cache['command_modules']:
+                    cmd_module_json_str = command_module_cache['command_modules'][text]
+                    cmd_module = recognition.cache.from_text(cmd_module_json_str)
+                else:
+                    module_ir = lark_parser.parse_command_module(text)
+                    cmd_module = command_module.command_module_from_lark_ir(module_ir, text)
                 command_modules[file_name] = cmd_module
+                new_cache['command_modules'][text] = recognition.cache.to_json_string(cmd_module)
+        recognition.cache.save_cache(new_cache)
         return command_modules
         
     def get_active_modules(self, current_window: str):
@@ -75,8 +84,8 @@ class CommandModuleController:
         namespace = self.get_namespace()
         command_contexts = {}
         for cmd in active_commands:
-            variable_tree = variables.RecognitionResultsTree(cmd.rule, node_ids, named_rules)
-            command_contexts[node_ids[cmd.rule]] = cmd, variable_tree
+            variable_tree = variables.RecognitionResultsTree(cmd.utterance, node_ids, named_rules)
+            command_contexts[node_ids[cmd.utterance]] = cmd, variable_tree
         grammar_xml = self.build_grammar_xml(all_rules, node_ids, named_rules)
         grammar_context = grammar.GrammarContext(grammar_xml, command_contexts, active_commands, namespace, named_rules, node_ids)
         return grammar_context
@@ -118,13 +127,13 @@ class CommandModuleController:
         return SrgsXmlConverter(node_ids, named_rules).build_grammar(all_active_rules)
 
     def get_active_rules(self):
-        rules = {}
-        rules.update(self.special_rules())
-        command_rules = []
+        named_utterances = {}
+        named_utterances.update(self.special_rules())
+        command_utterances = []
         for cmd_module in self.active_command_modules.values():
-            rules.update(cmd_module.rules)
-            command_rules.extend(cmd.rule for cmd in cmd_module.commands)
-        return rules, command_rules
+            named_utterances.update(cmd_module.named_utterances)
+            command_utterances.extend(cmd.utterance for cmd in cmd_module.commands)
+        return named_utterances, command_utterances
 
     def special_rules(self):
         return {'_dictate': astree.Rule()}
@@ -155,7 +164,7 @@ class StaticFileCommandModuleLoader:
             for entry in sorted(i, key=lambda x: x.name):
                 if entry.name.startswith('.'):
                     continue
-                if entry.is_file() and (entry.name.endswith('.json') or entry.name.endswith('.speak')):
+                if entry.is_file() and entry.name.endswith('.speak'):
                     path = entry.path
                     file = self.file_cache.get(path, CommandModuleFile(path))
                     self.file_cache[path] = file

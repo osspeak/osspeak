@@ -54,7 +54,7 @@ class RuleReference(ASTNode):
         self.action_substitute = None
         self.ignore_ambiguities = False
 
-def rule_from_lark_ir(lark_ir):
+def utterance_from_lark_ir(lark_ir):
     rule = Rule()
     rule.root = grouping_from_choice_items(lark_ir.children[0])
     return rule
@@ -74,7 +74,7 @@ def sequence_from_ast_sequence(ast):
 
 def node_from_utterance_piece(lark_ir):
     import lark.lexer
-    import recognition.actions.astree
+    import recognition.actions.astree_constructor
     wrapped_node = lark_ir.children[0]
     wrapped_type = lark_parser.lark_node_type(wrapped_node)
     ignore_ambiguities = lark_parser.find_type(wrapped_node, lark_parser.IGNORE_AMBIGUITIES)
@@ -101,7 +101,7 @@ def node_from_utterance_piece(lark_ir):
         node.repeat_low, node.repeat_high = parse_repetition(rep)
     substitute = lark_parser.find_type(lark_ir, lark_parser.ACTION_SUBSTITUTE)
     if substitute:
-        node.action_substitute = recognition.actions.astree.action_from_lark_ir(substitute.children[0], 'foo')
+        node.action_substitute = recognition.actions.astree_constructor.action_from_lark_ir(substitute.children[0], 'foo')
     return node
 
 def parse_repetition(lark_ir):

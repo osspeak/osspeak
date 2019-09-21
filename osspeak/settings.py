@@ -14,6 +14,7 @@ DEFAULT_CONFIG = {
     "type_delay": .05,
     'command_directory': os.path.join(OSSPEAK_DIRECTORY, 'commands'),
     'external_directory': os.path.join(OSSPEAK_DIRECTORY, 'external'),
+    'cache': os.path.join(OSSPEAK_DIRECTORY, '.cache.json'),
     'gui_port': 3922,
     'perform_actions': True,
     'engine': {

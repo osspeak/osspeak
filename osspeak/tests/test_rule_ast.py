@@ -7,8 +7,8 @@ from recognition.lark_parser import utterance_grammar
 
 def utterance_from_text(text):
     lark_ir = utterance_grammar.parse(text)
-    rule_from_lark_ir = astree.rule_from_lark_ir(lark_ir)
-    return rule_from_lark_ir
+    utterance_from_lark_ir = astree.utterance_from_lark_ir(lark_ir)
+    return utterance_from_lark_ir
 
 def test_hello_world():
     text = 'hello world'
@@ -34,10 +34,11 @@ def test_grouping_sequences():
 def test_action_substitute():
     text = "go to (google='http://google.com' | reddit='http://reddit.com')"
     utterance = utterance_from_text(text)
-    print(utterance.root.action_substitute)
+    to_clipboard(utterance)
     assert_equal(utterance, {
     "root": {
         "action_substitute": None,
+        "ignore_ambiguities": False,
         "repeat_high": 1,
         "repeat_low": 1,
         "sequences": [
@@ -58,6 +59,7 @@ def test_action_substitute():
                 },
                 {
                     "action_substitute": None,
+                    "ignore_ambiguities": False,
                     "repeat_high": 1,
                     "repeat_low": 1,
                     "sequences": [
@@ -105,13 +107,13 @@ def pretty(d, indent=0):
 
 def utterance_from_text(text):
     lark_ir = lark_parser.parse_utterance(text)
-    return astree.rule_from_lark_ir(lark_ir)
+    return astree.utterance_from_lark_ir(lark_ir)
 
 def to_clipboard(utterance):
     import recognition.actions.library.clipboard
     s = to_json_string(utterance)
     formatted = to_json_string(json.loads(s))
-    recognition.actions.library.clipboard.set(formatted.replace('null', 'None'))
+    recognition.actions.library.clipboard.set(formatted.replace('null', 'None').replace('false', 'False').replace('true', 'True'))
 
 def to_json_string(node):
     return json.dumps(node, cls=SimpleJsonEncoder, sort_keys=True, indent=4)
