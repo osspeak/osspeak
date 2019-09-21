@@ -132,8 +132,4 @@ class RuleEncoder(json.JSONEncoder):
     def default(self, o):
         d = o.__dict__.copy()
         d['type'] = o.__class__.__name__
-        try:
-            del d['action_piece_substitute']
-        except KeyError:
-            pass
         return d

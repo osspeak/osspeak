@@ -28,8 +28,6 @@ DEFAULT_DIRECTORY_SETTINGS = {
     'conditions': {},
 }
 
-CONFIG_FILE_CACHE = limited_size_dict.LimitedSizeDict(size_limit=1000)
-
 class CommandModuleController:
 
     def __init__(self, module_loader):
@@ -102,10 +100,10 @@ class CommandModuleController:
             self.grammars.popitem(last=False)
         self.grammars[grammar.uuid] = grammar
 
-    def generate_node_ids(self, rules, named_rule_map):
+    def generate_node_ids(self, utterances, named_rule_map):
         node_ids = {}
-        for rule in rules:
-            for node in rule.walk(rules=named_rule_map):
+        for utterance in utterances:
+            for node in utterance.walk(rules=named_rule_map):
                 if node not in node_ids:
                     node_ids[node] = f'n{len(node_ids) + 1}'
         return node_ids
