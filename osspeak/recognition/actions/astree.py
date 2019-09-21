@@ -67,10 +67,22 @@ def parse_binop(lark_ir):
     right = parse_node(lark_ir.children[2])
     return BinOp(op, left, right)
 
+def parse_compare(lark_ir):
+    left = parse_expr(lark_ir.children[0])
+    ops = []
+    comparators = []
+    for i, child in enumerate(lark_ir.children[1:], start=1):
+        if i % 2 == 1:
+            ops.append(str(child))
+        else:
+            comparators.append(parse_expr(child))
+    return Compare(left, ops, comparators)
+
 parse_map = {
     'literal': lambda x: Literal(''.join(str(s) for s in x.children)),
     'STRING_DOUBLE': lambda x: String(str(x)[1:-1]),
     'STRING_SINGLE': lambda x: String(str(x)[1:-1]),
+    'compare': parse_compare,
     'list': parse_list,
     'expr': parse_expr,
     'attribute': parse_attribute,
@@ -119,15 +131,15 @@ class ExpressionSequence(BaseActionNode):
     def evaluate(self, context):
         evaluated_nodes = []
         last = None
-        for i, expr in enumerate(self.expressions(context)):
-            if isinstance(node, astree.Literal) and i > 1:
+        for i, expr in enumerate(self.expressions):
+            if isinstance(expr, Literal) and i > 1:
                 second_previous, previous = self.expressions[i - 2:i]
-                if isinstance(second_previous, astree.Literal) and isinstance(previous, astree.ExprSequenceSeparator):
+                if isinstance(second_previous, Literal) and isinstance(previous, ExprSequenceSeparator):
                     last += previous.value
             result = expr.evaluate(context)
             if isinstance(last, str) and isinstance(result, str):
                 last += result
-            else:
+            elif result is not None:
                 last = result
         return last
 
@@ -204,6 +216,13 @@ class BinOp(BaseActionNode):
         self.operation = operation
         self.left = left
         self.right = right
+
+class Compare(BaseActionNode):
+
+    def __init__(self, left, ops, comparators):
+        self.left = left
+        self.ops = ops
+        self.comparators = comparators
 
 class List(BaseActionNode):
 
@@ -302,7 +321,7 @@ class Variable(BaseActionNode):
             result = action.evaluate(context)
             if isinstance(last_result, str) and isinstance(result, str):
                 last_result += result
-            else:
+            elif result is not None:
                 last_result = result
         return last_result
 

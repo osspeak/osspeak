@@ -21,10 +21,8 @@ def osspeak_if(context, *args):
     condition_evaluation = args[0].evaluate(context)
     if condition_evaluation:
         yield from exhaust_generator(args[1].evaluate_lazy(context))
-        # return args[1].evaluate_lazy(context)
-    if len(args) == 4:
+    elif len(args) >= 3:
         yield from exhaust_generator(args[2].evaluate_lazy(context))
-        # return args[2].evaluate(context)
 
 def osspeak_while(*args):
     action_args = args[1:]

@@ -243,10 +243,58 @@ def test_multiple_args():
         "type": "Call"
     })
 
+def test_compare1():
+    text = "$1 < 1 + 2 + 3 < $1"
+    action = text_to_action(text)
+    to_clipboard(action)
+    assert_equal(action,  {
+    "comparators": [
+        {
+            "comparators": [
+                {
+                    "type": "Variable",
+                    "value": 1
+                }
+            ],
+            "left": {
+                "left": {
+                    "type": "Integer",
+                    "value": 1
+                },
+                "operation": "add",
+                "right": {
+                    "left": {
+                        "type": "Integer",
+                        "value": 2
+                    },
+                    "operation": "add",
+                    "right": {
+                        "type": "Integer",
+                        "value": 3
+                    },
+                    "type": "BinOp"
+                },
+                "type": "BinOp"
+            },
+            "ops": [
+                "<"
+            ],
+            "type": "Compare"
+        }
+    ],
+    "left": {
+        "type": "Variable",
+        "value": 1
+    },
+    "ops": [
+        "<"
+    ],
+    "type": "Compare"
+})
+
 # def test_order_of_operations1():
 #     text = "1+2*3"
 #     action = text_to_action(text)
-#     to_clipboard(action)
 #     assert_equal(action, {
 #         "left": {
 #             "type": "Integer",

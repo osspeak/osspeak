@@ -4,6 +4,7 @@ UTTERANCE_CHOICES = 'utterance_choices'
 UTTERANCE_CHOICES_OPTIONAL = 'utterance_choices_optional'
 UTTERANCE_CHOICE_ITEMS = 'utterance_choices_items'
 UTTERANCE_WORD = 'UTTERANCE_WORD'
+IGNORE_AMBIGUITIES = 'IGNORE_AMBIGUITIES'
 UTTERANCE_REFERENCE = 'utterance_reference'
 UTTERANCE_REPETITION = 'utterance_repetition'
 UTTERANCE_RANGE = 'utterance_range'
@@ -33,15 +34,16 @@ named_utterance: {UTTERANCE_NAME} ":=" utterance
 utterance: {UTTERANCE_CHOICE_ITEMS} 
 utterance_sequence: utterance_piece (_WS+ utterance_piece)*
 utterance_piece: ({UTTERANCE_WORD} | {UTTERANCE_REFERENCE} | {UTTERANCE_CHOICES} | {UTTERANCE_CHOICES_OPTIONAL}) [{UTTERANCE_REPETITION}] [{ACTION_SUBSTITUTE}]
-{UTTERANCE_CHOICES_OPTIONAL}: "[" {UTTERANCE_CHOICE_ITEMS} "]"
-{UTTERANCE_CHOICES}: "(" {UTTERANCE_CHOICE_ITEMS} ")"
+{UTTERANCE_CHOICES_OPTIONAL}: [{IGNORE_AMBIGUITIES}] "[" {UTTERANCE_CHOICE_ITEMS} "]"
+{UTTERANCE_CHOICES}: [{IGNORE_AMBIGUITIES}] "(" {UTTERANCE_CHOICE_ITEMS} ")"
 {UTTERANCE_CHOICE_ITEMS}: utterance_sequence ("|" utterance_sequence)* 
 {UTTERANCE_NAME}: NAME
 {UTTERANCE_WORD}: /[a-z0-9]+/
-{UTTERANCE_REFERENCE}: "<" {UTTERANCE_NAME} ">"
+{UTTERANCE_REFERENCE}: [{IGNORE_AMBIGUITIES}] "<" {UTTERANCE_NAME} ">"
 {ACTION_SUBSTITUTE}: "=" _action
 !{UTTERANCE_REPETITION}: (("_" ({ZERO_OR_POSITIVE_INT} | {UTTERANCE_RANGE})) | "*" | "?" | "+")
 {UTTERANCE_RANGE}: {ZERO_OR_POSITIVE_INT} "-" [{ZERO_OR_POSITIVE_INT}]
+{IGNORE_AMBIGUITIES}: "_"
 
 command: utterance "=" _action 
 
@@ -51,7 +53,7 @@ _action: ({EXPR} | {EXPR_SEQUENCE})
 {EXPR}: [{UNARY_OPERATOR}] ({EXPR_SEQUENCE} | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 _chainable: (NAME | attribute | call | list | {VARIABLE})
 expr_grouping: "(" {EXPR} ")"
-BINARY_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%" | "==" | "!=")
+BINARY_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%")
 {UNARY_OPERATOR}: ("+" | "-")
 binop.2: {EXPR} BINARY_OPERATOR {EXPR}
 keypress: "{{" {EXPR} ("," {EXPR})* "}}"
@@ -116,7 +118,7 @@ def lark_node_text(lark_ir, text):
     return 'foo'
 
 def find_type(lark_tree, _type):
-    for child in lark_tree.children:
+    for child in getattr(lark_tree, 'children', []):
         child_type_attr = 'data' if isinstance(child, Tree) else 'type'
         child_type = getattr(child, child_type_attr)
         if child_type == _type:
