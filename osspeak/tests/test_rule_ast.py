@@ -28,13 +28,102 @@ def test_fixed_repetition():
 def test_nested_grouping():
     text = 'hello world | goodbye (universe | solar system)'
 
-def test_grouping_sequences():
-    text = "(at sign='@')"
+def test_action_substitute2():
+    text = "question = how are you | fruit = i like apples"
+    utterance = utterance_from_text(text)
+    to_clipboard(utterance)
+    assert_equal(utterance, {
+    "root": {
+        "action_substitute": None,
+        "ignore_ambiguities": False,
+        "repeat_high": 1,
+        "repeat_low": 1,
+        "sequences": [
+            [
+                {
+                    "action_substitute": {
+                        "expressions": [
+                            {
+                                "expressions": [
+                                    {
+                                        "type": "Literal",
+                                        "value": "how"
+                                    },
+                                    {
+                                        "type": "ExprSequenceSeparator",
+                                        "value": " "
+                                    },
+                                    {
+                                        "type": "Literal",
+                                        "value": "are"
+                                    }
+                                ],
+                                "type": "ExpressionSequence"
+                            },
+                            {
+                                "type": "ExprSequenceSeparator",
+                                "value": " "
+                            },
+                            {
+                                "type": "Literal",
+                                "value": "you"
+                            }
+                        ],
+                        "type": "ExpressionSequence"
+                    },
+                    "repeat_high": 1,
+                    "repeat_low": 1,
+                    "text": "question",
+                    "type": "WordNode"
+                }
+            ],
+            [
+                {
+                    "action_substitute": {
+                        "expressions": [
+                            {
+                                "type": "Literal",
+                                "value": "i"
+                            },
+                            {
+                                "type": "ExprSequenceSeparator",
+                                "value": " "
+                            },
+                            {
+                                "expressions": [
+                                    {
+                                        "type": "Literal",
+                                        "value": "like"
+                                    },
+                                    {
+                                        "type": "ExprSequenceSeparator",
+                                        "value": " "
+                                    },
+                                    {
+                                        "type": "Literal",
+                                        "value": "apples"
+                                    }
+                                ],
+                                "type": "ExpressionSequence"
+                            }
+                        ],
+                        "type": "ExpressionSequence"
+                    },
+                    "repeat_high": 1,
+                    "repeat_low": 1,
+                    "text": "fruit",
+                    "type": "WordNode"
+                }
+            ]
+        ],
+        "type": "GroupingNode"
+    },
+    "type": "Rule"
+})
 
 def test_action_substitute():
     text = "go to (google='http://google.com' | reddit='http://reddit.com')"
     utterance = utterance_from_text(text)
-    to_clipboard(utterance)
     assert_equal(utterance, {
     "root": {
         "action_substitute": None,

@@ -48,14 +48,14 @@ utterance_piece: ({UTTERANCE_WORD} | {UTTERANCE_REFERENCE} | {UTTERANCE_CHOICES}
 command: utterance "=" _action 
 
 _action: ({EXPR} | {EXPR_SEQUENCE})
-{EXPR_SEQUENCE_SEPARATOR}: /[ \t]/
-{EXPR_SEQUENCE}.-99: {EXPR} ({EXPR_SEQUENCE_SEPARATOR}* {EXPR})+
+{EXPR_SEQUENCE_SEPARATOR}: /[ \t]+/
+{EXPR_SEQUENCE}.-99: {EXPR} ({EXPR_SEQUENCE_SEPARATOR} {EXPR})+
 {EXPR}: [{UNARY_OPERATOR}] ({EXPR_SEQUENCE} | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 _chainable: (NAME | attribute | call | list | {VARIABLE})
 expr_grouping: "(" {EXPR} ")"
 BINARY_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%")
 {UNARY_OPERATOR}: ("+" | "-")
-binop.2: {EXPR} BINARY_OPERATOR {EXPR}
+binop.20: {EXPR} BINARY_OPERATOR {EXPR}
 keypress: "{{" {EXPR} ("," {EXPR})* "}}"
 {VARIABLE}: "$" INTEGER
 {ARGUMENT_REFERENCE}: "$" NAME
@@ -65,8 +65,8 @@ LITERAL_PIECE: /[a-zA-Z0-9!]+/
 literal.-100: LITERAL_PIECE (WS+ LITERAL_PIECE)*
 
 list: "[" [{EXPR} ["," {EXPR}]] "]"
-attribute.2: _chainable "." NAME
-call.3: _chainable "(" (({ARG_LIST} ["," {KWARG_LIST}]) | [{KWARG_LIST}]) ")"
+attribute.20: _chainable "." NAME
+call.30: _chainable "(" (({ARG_LIST} ["," {KWARG_LIST}]) | [{KWARG_LIST}]) ")"
 {ARG_LIST}: {EXPR} ("," {EXPR})*
 {KWARG_LIST}: kwarg ("," kwarg)* 
 kwarg: NAME "=" {EXPR}

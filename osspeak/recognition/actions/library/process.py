@@ -29,4 +29,11 @@ class ProcessHandler:
 
     def start_stdout_listening(self):
         t = threading.Thread(target=self.dispatch_process_output, daemon=True)
-        t.start()       
+        t.start()
+
+def run(s):
+    proc = ProcessHandler(s)
+    return proc
+
+def run_sync(s):
+    return subprocess.run(s, shell=True).stdout

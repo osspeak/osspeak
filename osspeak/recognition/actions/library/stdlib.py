@@ -1,6 +1,6 @@
 from recognition.actions.library import (window, thread,
 extensions, general, text, clipboard, osspeak, conditionals, history,
-fsystem, math, directinput, flow)
+fsystem, math, directinput, flow, process)
 from recognition.actions.library import _mouse as mouse
 from recognition.actions.library import _keyboard as keyboard
 from types import SimpleNamespace
@@ -24,6 +24,8 @@ namespace = {
     'mod': operator.mod,
     'mul': operator.mul,
     'print': print,
+    'run': process.run,
+    'run_sync': process.run_sync,
     'state': SimpleNamespace(),
     'sub': operator.sub,
     'wait': wait,

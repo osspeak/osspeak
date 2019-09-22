@@ -240,13 +240,3 @@ class Variable(BaseActionNode):
             return
         for action in var_actions:
             yield from exhaust_generator(action.evaluate_lazy(context))
-
-def to_json_string(action):
-    return json.dumps(action, cls=SimpleJsonEncoder, sort_keys=True, indent=4)
-
-class SimpleJsonEncoder(json.JSONEncoder):
-
-    def default(self, o):
-        d = o.__dict__.copy()
-        d['type'] = o.__class__.__name__
-        return d

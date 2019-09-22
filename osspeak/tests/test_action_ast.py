@@ -1,7 +1,7 @@
 import sys
 import json
 sys.path.insert(0, '../osspeak')
-from recognition.actions import astree
+from recognition.actions import astree_constructor
 import recognition.actions.library.clipboard
 from recognition import lark_parser
 from recognition.lark_parser import action_grammar
@@ -243,54 +243,6 @@ def test_multiple_args():
         "type": "Call"
     })
 
-def test_compare1():
-    text = "$1 < 1 + 2 + 3 < $1"
-    action = text_to_action(text)
-    to_clipboard(action)
-    assert_equal(action,  {
-    "comparators": [
-        {
-            "comparators": [
-                {
-                    "type": "Variable",
-                    "value": 1
-                }
-            ],
-            "left": {
-                "left": {
-                    "type": "Integer",
-                    "value": 1
-                },
-                "operation": "add",
-                "right": {
-                    "left": {
-                        "type": "Integer",
-                        "value": 2
-                    },
-                    "operation": "add",
-                    "right": {
-                        "type": "Integer",
-                        "value": 3
-                    },
-                    "type": "BinOp"
-                },
-                "type": "BinOp"
-            },
-            "ops": [
-                "<"
-            ],
-            "type": "Compare"
-        }
-    ],
-    "left": {
-        "type": "Variable",
-        "value": 1
-    },
-    "ops": [
-        "<"
-    ],
-    "type": "Compare"
-})
 
 # def test_order_of_operations1():
 #     text = "1+2*3"
@@ -317,13 +269,13 @@ def test_compare1():
 #     })
 
 def to_clipboard(action):
-    recognition.actions.library.clipboard.set(astree.to_json_string(action))
+    recognition.actions.library.clipboard.set(astree_constructor.to_json_string(action))
 
 def assert_equal(action_node, json_value):
-    assert json.loads(astree.to_json_string(action_node)) == json_value
+    assert json.loads(astree_constructor.to_json_string(action_node)) == json_value
 
 
 def text_to_action(text):
     lark_ir = lark_parser.parse_action(text)
-    return astree.action_from_lark_ir(lark_ir, text)
+    return astree_constructor.action_from_lark_ir(lark_ir, text)
 
