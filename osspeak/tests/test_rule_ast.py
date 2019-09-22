@@ -42,78 +42,26 @@ def test_action_substitute2():
             [
                 {
                     "action_substitute": {
-                        "expressions": [
-                            {
-                                "expressions": [
-                                    {
-                                        "type": "Literal",
-                                        "value": "how"
-                                    },
-                                    {
-                                        "type": "ExprSequenceSeparator",
-                                        "value": " "
-                                    },
-                                    {
-                                        "type": "Literal",
-                                        "value": "are"
-                                    }
-                                ],
-                                "type": "ExpressionSequence"
-                            },
-                            {
-                                "type": "ExprSequenceSeparator",
-                                "value": " "
-                            },
-                            {
-                                "type": "Literal",
-                                "value": "you"
-                            }
-                        ],
-                        "type": "ExpressionSequence"
+                        "type": "Literal",
+                        "value": "how are you"
                     },
                     "repeat_high": 1,
                     "repeat_low": 1,
                     "text": "question",
                     "type": "WordNode"
-                }
+                },
             ],
             [
                 {
                     "action_substitute": {
-                        "expressions": [
-                            {
-                                "type": "Literal",
-                                "value": "i"
-                            },
-                            {
-                                "type": "ExprSequenceSeparator",
-                                "value": " "
-                            },
-                            {
-                                "expressions": [
-                                    {
-                                        "type": "Literal",
-                                        "value": "like"
-                                    },
-                                    {
-                                        "type": "ExprSequenceSeparator",
-                                        "value": " "
-                                    },
-                                    {
-                                        "type": "Literal",
-                                        "value": "apples"
-                                    }
-                                ],
-                                "type": "ExpressionSequence"
-                            }
-                        ],
-                        "type": "ExpressionSequence"
+                        "type": "Literal",
+                        "value": "i like apples"
                     },
                     "repeat_high": 1,
                     "repeat_low": 1,
                     "text": "fruit",
                     "type": "WordNode"
-                }
+                },
             ]
         ],
         "type": "GroupingNode"

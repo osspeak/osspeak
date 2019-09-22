@@ -40,12 +40,12 @@ from recognition.lark_parser import action_grammar
 #     text = "first.foo.bar.baz()"
 #     lark_ir = lark_parser.parse_action(text)
 
-def test_literal():
-    text = "hello \tworld"
+def test_literal1():
+    text = "hello there \tworld"
     action = text_to_action(text)
     assert_equal(action, {
         "type": "Literal",
-        "value": "hello \tworld"
+        "value": "hello there \tworld"
     })
 
 def test_literal2():
