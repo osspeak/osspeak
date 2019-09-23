@@ -1,6 +1,5 @@
 import collections
 from recognition.rules import astree
-from recognition.actions.action import Action
 
 class RecognitionResultsTree:
 

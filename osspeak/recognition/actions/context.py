@@ -10,11 +10,5 @@ class RecognitionContext:
         self.words = words
         self.text = None if words is None else ' '.join(words)
 
-    def get(self, key):
-        return self._meta.temp_variables.get(key)
-
-    def set(self, key, value):
-        self._meta.temp_variables[key] = value
-
 def empty_recognition_context():
     return RecognitionContext([], [], {}, [])
