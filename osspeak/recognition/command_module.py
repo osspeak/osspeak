@@ -11,7 +11,7 @@ from recognition import cache
 import recognition.actions.astree_constructor
 import recognition.actions.context
 import recognition.rules.astree
-from recognition import action as _action, rule as _rule, function, lark_parser
+from recognition import  lark_parser
 from log import logger
 
 class CommandModule:

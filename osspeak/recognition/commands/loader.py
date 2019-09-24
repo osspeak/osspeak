@@ -22,6 +22,7 @@ from recognition import lark_parser
 from communication import pubsub, topics
 from common import limited_size_dict
 import recognition.cache
+import clargs
 
 DEFAULT_DIRECTORY_SETTINGS = {
     'recurse': True,
@@ -38,6 +39,8 @@ class CommandModuleController:
         self.active_command_modules = {}
 
     def initialize_command_modules(self):
+        if clargs.get_args()['clean_cache']:
+            recognition.cache.delete_cache()
         command_module_cache = recognition.cache.load_cache()
         new_cache = recognition.cache.empty_cache()
         files = self.module_loader.load_files()

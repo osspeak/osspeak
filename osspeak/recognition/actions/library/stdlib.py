@@ -26,8 +26,10 @@ namespace = {
     'print': print,
     'run': process.run,
     'run_sync': process.run_sync,
+    'screengrid': screengrid,
     'state': SimpleNamespace(),
     'sub': operator.sub,
+    'true': lambda: True,
     'wait': wait,
     'window': window,
 }

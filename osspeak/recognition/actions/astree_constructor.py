@@ -40,8 +40,11 @@ def parse_call(lark_ir):
     fn = parse_node(lark_ir.children[0])
     args_ir = lark_parser.find_type(lark_ir, lark_parser.ARG_LIST)
     args = [parse_node(x) for x in args_ir.children] if args_ir else []
-    kwargs_ir = lark_parser.find_type(lark_ir, lark_parser.KWARG_LIST) or {}
+    kwarg_list = lark_parser.find_type(lark_ir, lark_parser.KWARG_LIST)
     kwargs = {}
+    if kwarg_list is not None:
+        for kwarg_ir in kwarg_list.children:
+            kwargs[str(kwarg_ir.children[0])] = parse_node(kwarg_ir.children[1])
     return astree.Call(fn, args, kwargs)
 
 def parse_attribute(lark_ir):

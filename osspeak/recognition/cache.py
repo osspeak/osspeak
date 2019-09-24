@@ -1,4 +1,5 @@
 import json
+import os
 import importlib
 import settings
 
@@ -8,6 +9,12 @@ def to_json_string(obj):
 def from_text(text: str):
     return json.loads(text, object_hook=object_decoder)
 
+def delete_cache():
+    try:
+        os.remove(settings.settings['cache'])
+    except FileNotFoundError:
+        pass
+    
 def load_cache():
     try:
         with open(settings.settings['cache']) as f:

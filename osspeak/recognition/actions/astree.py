@@ -154,7 +154,7 @@ class Call(BaseActionNode):
         self.kwargs = kwargs
 
     def prepare_call(self, context):
-        kwarg_values = {}
+        kwarg_values = {k: v.evaluate(context) for k, v in self.kwargs.items()}
         function_to_call = self.fn.evaluate(context)
         if function_to_call in stdlib.deferred_arguments_eval:
             arg_values = [context] + self.args

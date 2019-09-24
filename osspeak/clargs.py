@@ -19,6 +19,9 @@ def get_args():
     parser.add_argument('--network', default=Nil) # or remote
     parser.add_argument('--server_address', default=Nil)
     parser.add_argument('--type_delay', default=Nil)
+    parser.add_argument('--clean_cache', type=str2bool, nargs='?',
+                        const=True, default=False,
+                        help="Perform recognized speech actions")
     parser.add_argument('-a', '--perform_actions', type=str2bool, nargs='?',
                         const=True, default=True,
                         help="Perform recognized speech actions")
