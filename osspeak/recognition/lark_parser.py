@@ -48,12 +48,12 @@ utterance_piece.-101: ({UTTERANCE_WORD} | {UTTERANCE_REFERENCE} | {UTTERANCE_CHO
 command: utterance "=" _action 
 
 _action: ({EXPR} | {EXPR_SEQUENCE})
+_grouping.29: "(" {EXPR} ")"
 {EXPR_SEQUENCE_SEPARATOR}: /[ \t]+/
 {EXPR_SEQUENCE}.-99: {EXPR} ({EXPR_SEQUENCE_SEPARATOR} {EXPR})+
-{EXPR}: [{UNARY_OPERATOR}] ({EXPR_SEQUENCE} | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | expr_grouping | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
+{EXPR}: [{UNARY_OPERATOR}] ({EXPR_SEQUENCE} | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 _chainable: (NAME | attribute | call | list | {VARIABLE})
-expr_grouping: "(" {EXPR} ")"
-BINARY_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%")
+BINARY_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%" | "==")
 {UNARY_OPERATOR}: ("+" | "-")
 binop.20: {EXPR} BINARY_OPERATOR {EXPR}
 keypress: "{{" {EXPR} ("," {EXPR})* "}}"

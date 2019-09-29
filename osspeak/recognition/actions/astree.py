@@ -5,6 +5,15 @@ from recognition import lark_parser
 import lark.tree
 import types
 import json
+import operator
+
+operators = {
+    'multiply': {'precedence': 11, 'function': operator.mul},
+    'divide': {'precedence': 11, 'function': operator.truediv},
+    'add': {'precedence': 10, 'function': operator.add},
+    'subtract': {'precedence': 10, 'function': operator.sub},
+    'eq': {'precedence': 10, 'function': operator.eq},
+}
 
 def evaluate_generator(gen):
     assert isinstance(gen, types.GeneratorType)
@@ -119,10 +128,20 @@ class UnaryOp(BaseActionNode):
 
 class BinOp(BaseActionNode):
 
-    def __init__(self, operation, left, right):
-        self.operation = operation
+    def __init__(self, operator, left, right):
+        self.operator = operator
         self.left = left
         self.right = right
+
+    def evaluate(self, context):
+        left = self.left.evaluate(context)
+        right = self.right.evaluate(context)
+        return operators[self.operator]['function'](left, right)
+        if self.operator == 'add':
+            return left + right
+        if self.operator == 'multiply':
+            return left * right
+        raise NotImplementedError
 
 class Compare(BaseActionNode):
 

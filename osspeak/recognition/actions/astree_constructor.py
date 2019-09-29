@@ -5,6 +5,20 @@ import lark.tree
 import types
 import json
 
+operator_strings = {
+    '*': 'multiply',
+    '+': 'add',
+    '-': 'subtract',
+}
+
+def compare_operators(a, b):
+    precedence1, precedence2 = astree.operators[a]['precedence'], astree.operators[b]['precedence']
+    if precedence1 > precedence2:
+        return 'greater_than'
+    if precedence1 < precedence2:
+        return 'less_than'
+    return 'equals'
+
 def parse_node(lark_ir):
     node_type = lark_parser.lark_node_type(lark_ir)
     value_ast = parse_map[node_type](lark_ir)
@@ -63,10 +77,19 @@ def parse_unaryop(lark_ir):
     return astree.BinOp(op, operand)
 
 def parse_binop(lark_ir):
-    op = 'add'
+    op_name = operator_strings[lark_ir.children[1]]
     left = parse_node(lark_ir.children[0])
     right = parse_node(lark_ir.children[2])
-    return astree.BinOp(op, left, right)
+    node = astree.BinOp(op_name, left, right)
+    if isinstance(left, astree.BinOp):
+        if compare_operators(node.operator, node.left.operator) == 'greater_than':
+            node.left, left.left, left.right = left.right, node, left.left
+            return left
+    if isinstance(right, astree.BinOp):
+        if compare_operators(node.operator, node.right.operator) == 'greater_than':
+            node.right, right.right, right.left = right.left, node, right.right
+            return right
+    return node
 
 def parse_compare(lark_ir):
     left = parse_expr(lark_ir.children[0])

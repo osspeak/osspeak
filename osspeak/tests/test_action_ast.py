@@ -2,6 +2,7 @@ import sys
 import json
 sys.path.insert(0, '../osspeak')
 from recognition.actions import astree_constructor
+import recognition.actions.context
 import recognition.actions.library.clipboard
 from recognition import lark_parser
 from recognition.lark_parser import action_grammar
@@ -117,7 +118,7 @@ def test_variable1():
             "type": "Integer",
             "value": 4
         },
-        "operation": "add",
+        "operator": "add",
         "right": {
             "type": "Variable",
             "value": 1
@@ -158,7 +159,7 @@ def test_binop1():
             "type": "Integer",
             "value": 4
         },
-        "operation": "add",
+        "operator": "add",
         "right": {
             "type": "Integer",
             "value": 5
@@ -244,29 +245,24 @@ def test_multiple_args():
     })
 
 
-# def test_order_of_operations1():
-#     text = "1+2*3"
-#     action = text_to_action(text)
-#     assert_equal(action, {
-#         "left": {
-#             "type": "Integer",
-#             "value": 1
-#         },
-#         "operation": "add",
-#         "right": {
-#             "left": {
-#                 "type": "Integer",
-#                 "value": 2
-#             },
-#             "operation": "add",
-#             "right": {
-#                 "type": "Integer",
-#                 "value": 3
-#             },
-#             "type": "BinOp"
-#         },
-#         "type": "BinOp"
-#     })
+def test_order_of_operations1():
+    text = "1+2*3"
+    assert evaluate_action_text(text) == 7
+
+def test_order_of_operations2():
+    text = "1+(3*4)-9"
+    assert evaluate_action_text(text) == 4
+
+def test_order_of_operations3():
+    text = "1+3*4-9"
+    assert evaluate_action_text(text) == 4
+
+def evaluate_action_text(text: str):
+    action = text_to_action(text)
+    to_clipboard(action)
+    context = recognition.actions.context.empty_recognition_context()
+    return action.evaluate(context)
+
 
 def to_clipboard(action):
     recognition.actions.library.clipboard.set(astree_constructor.to_json_string(action))
@@ -277,5 +273,6 @@ def assert_equal(action_node, json_value):
 
 def text_to_action(text):
     lark_ir = lark_parser.parse_action(text)
+    print(lark_ir.pretty())
     return astree_constructor.action_from_lark_ir(lark_ir, text)
 

@@ -2,7 +2,7 @@ import sys
 import json
 sys.path.insert(0, '../osspeak')
 from recognition.rules import astree, _lark
-from recognition import rule, lark_parser
+from recognition import lark_parser
 from recognition.lark_parser import utterance_grammar
 
 def utterance_from_text(text):
