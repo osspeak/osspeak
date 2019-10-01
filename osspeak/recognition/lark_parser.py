@@ -16,17 +16,21 @@ ZERO_OR_POSITIVE_INT = 'ZERO_OR_POSITIVE_INT'
 EXPR = 'expr'
 EXPR_SEQUENCE = 'expr_sequence'
 EXPR_SEQUENCE_SEPARATOR = 'EXPR_SEQUENCE_SEPARATOR'
+SLICE_SEPARATOR = 'SLICE_SEPARATOR'
 VARIABLE = 'variable'
 ARG_LIST = 'arg_list'
 KWARG_LIST = 'kwarg_list'
 UNARY_OPERATOR = 'UNARY_OPERATOR'
 ARGUMENT_REFERENCE = 'argument_reference'
+SLICE = 'slice'
 
 grammar = f'''start: ([_block] _NEWLINE)* [_block]
 _block: (command | function_definition | named_utterance | comment)
 comment: /[ \t]*#.*/
 _WS: /[ \t]/
 WS: /[ \t]/
+NO_WS_AHEAD: /(?![ \t])/
+NO_WS_BEHIND: /(?<![ \t])/
 
 _NEWLINE: /\\n/
 NAME: /[_a-zA-Z][_a-zA-Z0-9]*/
@@ -43,7 +47,7 @@ utterance_piece.-101: ({UTTERANCE_WORD} | {UTTERANCE_REFERENCE} | {UTTERANCE_CHO
 {ACTION_SUBSTITUTE}: "=" _action
 !{UTTERANCE_REPETITION}: (("_" ({ZERO_OR_POSITIVE_INT} | {UTTERANCE_RANGE})) | "*" | "?" | "+")
 {UTTERANCE_RANGE}: {ZERO_OR_POSITIVE_INT} "-" [{ZERO_OR_POSITIVE_INT}]
-{IGNORE_AMBIGUITIES}: "_"
+{IGNORE_AMBIGUITIES}: "_" NO_WS_AHEAD
 
 command: utterance "=" _action 
 
@@ -51,22 +55,29 @@ _action: ({EXPR} | {EXPR_SEQUENCE})
 _grouping.29: "(" {EXPR} ")"
 {EXPR_SEQUENCE_SEPARATOR}: /[ \t]+/
 {EXPR_SEQUENCE}.-99: {EXPR} ({EXPR_SEQUENCE_SEPARATOR} {EXPR})+
-{EXPR}: [{UNARY_OPERATOR}] ({EXPR_SEQUENCE} | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
-_chainable: (NAME | attribute | call | list | {VARIABLE})
+{EXPR}: [{UNARY_OPERATOR}] ({EXPR_SEQUENCE} | index | {SLICE} | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
+_chainable: (NAME | attribute | call | list | {VARIABLE} | index | {SLICE})
 BINARY_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%" | "==")
 {UNARY_OPERATOR}: ("+" | "-")
 binop.20: {EXPR} BINARY_OPERATOR {EXPR}
 keypress: "{{" {EXPR} ("," {EXPR})* "}}"
-{VARIABLE}: "$" INTEGER
-{ARGUMENT_REFERENCE}: "$" NAME
+_VAR_PREC: "$" NO_WS_AHEAD
+_ATTR_SEPARATOR: NO_WS_BEHIND "." NO_WS_AHEAD
+_SUBSCRIPT_PREFIX: NO_WS_BEHIND "["
+SLICE_SEPARATOR: ":"
+_CALL_START: NO_WS_BEHIND "("
+{VARIABLE}: _VAR_PREC INTEGER
+{ARGUMENT_REFERENCE}: _VAR_PREC NAME
 {ZERO_OR_POSITIVE_INT}: /[0-9]+/
 INTEGER: /-?[0-9]+/
 LITERAL_PIECE: /[a-zA-Z0-9!]+/ 
 literal.-100: LITERAL_PIECE (WS+ LITERAL_PIECE)*
 
-list: "[" [{EXPR} ["," {EXPR}]] "]"
-attribute.20: _chainable "." NAME
-call.30: _chainable "(" (({ARG_LIST} ["," {KWARG_LIST}]) | [{KWARG_LIST}]) ")"
+list: "[" [{EXPR} ("," {EXPR})*] "]"
+index: _chainable _SUBSCRIPT_PREFIX {EXPR} "]"
+{SLICE}: _chainable _SUBSCRIPT_PREFIX [{EXPR}] SLICE_SEPARATOR [{EXPR}] [SLICE_SEPARATOR [{EXPR}]] "]"
+attribute.20: _chainable  _ATTR_SEPARATOR NAME
+call.30: _chainable _CALL_START (({ARG_LIST} ["," {KWARG_LIST}]) | [{KWARG_LIST}]) ")"
 {ARG_LIST}: {EXPR} ("," {EXPR})*
 {KWARG_LIST}: kwarg ("," kwarg)* 
 kwarg: NAME "=" {EXPR}

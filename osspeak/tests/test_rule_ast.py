@@ -31,7 +31,6 @@ def test_nested_grouping():
 def test_action_substitute2():
     text = "question = how are you | fruit = i like apples"
     utterance = utterance_from_text(text)
-    to_clipboard(utterance)
     assert_equal(utterance, {
     "root": {
         "action_substitute": None,

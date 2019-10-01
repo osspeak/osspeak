@@ -1,3 +1,4 @@
+import pytest
 import sys
 import json
 sys.path.insert(0, '../osspeak')
@@ -170,7 +171,6 @@ def test_binop1():
 def test_float1():
     text = "-4.5 .23 0.2"
     action = text_to_action(text)
-    to_clipboard(action)
     assert_equal(action,  {
         "operand": {
             "expressions": [
@@ -244,6 +244,73 @@ def test_multiple_args():
         "type": "Call"
     })
 
+def test_index():
+    text = "[1,2,3][1]"
+    action = text_to_action(text)
+    to_clipboard(action)
+    assert_equal(action,  {
+        "index": {
+            "type": "Integer",
+            "value": 1
+        },
+        "index_of": {
+            "items": [
+                {
+                    "type": "Integer",
+                    "value": 1
+                },
+                {
+                    "type": "Integer",
+                    "value": 2
+                },
+                {
+                    "type": "Integer",
+                    "value": 3
+                }
+            ],
+            "type": "List"
+        },
+        "type": "Index"
+    })
+    context = recognition.actions.context.empty_recognition_context()
+    assert action.evaluate(context) == 2
+
+def test_slice():
+    text = "[1, 2, 3][1:3]"
+    action = text_to_action(text)
+    to_clipboard(action)
+    assert_equal(action,  {
+        "slice_of": {
+            "items": [
+                {
+                    "type": "Integer",
+                    "value": 1
+                },
+                {
+                    "type": "Integer",
+                    "value": 2
+                },
+                {
+                    "type": "Integer",
+                    "value": 3
+                }
+            ],
+            "type": "List"
+        },
+        "start": {
+            "type": "Integer",
+            "value": 1
+        },
+        "step": None,
+        "stop": {
+            "type": "Integer",
+            "value": 3
+        },
+        "type": "Slice"
+    })
+    context = recognition.actions.context.empty_recognition_context()
+    assert action.evaluate(context) == [2, 3]
+
 
 def test_order_of_operations1():
     text = "1+2*3"
@@ -257,9 +324,22 @@ def test_order_of_operations3():
     text = "1+3*4-9"
     assert evaluate_action_text(text) == 4
 
+def test_spacing():
+    text = "$ 1"
+    with pytest.raises(Exception):
+        action = text_to_action("$ 1")
+    with pytest.raises(Exception):
+        action = text_to_action("foo . bar")
+    with pytest.raises(Exception):
+        text_to_action("foo. bar")
+    with pytest.raises(Exception):
+        action = text_to_action("foo .bar")
+    with pytest.raises(Exception):
+        text_to_action("foo . bar")
+    text_to_action("foo.bar")
+
 def evaluate_action_text(text: str):
     action = text_to_action(text)
-    to_clipboard(action)
     context = recognition.actions.context.empty_recognition_context()
     return action.evaluate(context)
 
@@ -273,6 +353,5 @@ def assert_equal(action_node, json_value):
 
 def text_to_action(text):
     lark_ir = lark_parser.parse_action(text)
-    print(lark_ir.pretty())
     return astree_constructor.action_from_lark_ir(lark_ir, text)
 

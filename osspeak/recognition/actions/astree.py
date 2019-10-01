@@ -155,6 +155,9 @@ class List(BaseActionNode):
     def __init__(self, items):
         self.items = items
 
+    def evaluate(self, context):
+        return [x.evaluate(context) for x in self.items]
+
 class Attribute(BaseActionNode):
 
     def __init__(self, attribute_of, name):
@@ -164,6 +167,32 @@ class Attribute(BaseActionNode):
     def evaluate(self, context):
         attribute_of_value = self.attribute_of.evaluate(context)
         return getattr(attribute_of_value, self.name)
+
+class Index(BaseActionNode):
+
+    def __init__(self, index_of, index):
+        self.index_of = index_of
+        self.index = index
+
+    def evaluate(self, context):
+        index_of_value = self.index_of.evaluate(context)
+        index = self.index.evaluate(context)
+        return index_of_value[index]
+
+class Slice(BaseActionNode):
+
+    def __init__(self, slice_of, start, stop, step):
+        self.slice_of = slice_of
+        self.start = start
+        self.stop = stop
+        self.step = step
+
+    def evaluate(self, context):
+        slice_of_value = self.slice_of.evaluate(context)
+        start = None if self.start is None else self.start.evaluate(context)
+        stop = None if self.stop is None else self.stop.evaluate(context)
+        step = None if self.step is None else self.step.evaluate(context)
+        return slice_of_value[start:stop:step]
 
 class Call(BaseActionNode):
 

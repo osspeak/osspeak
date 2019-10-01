@@ -29,6 +29,7 @@ namespace = {
     'run_sync': process.run_sync,
     'screengrid': screengrid,
     'state': SimpleNamespace(),
+    'str': str,
     'sub': operator.sub,
     'true': lambda: True,
     'wait': wait,

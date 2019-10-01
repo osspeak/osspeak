@@ -102,6 +102,23 @@ def parse_compare(lark_ir):
             comparators.append(parse_expr(child))
     return astree.Compare(left, ops, comparators)
 
+def parse_index(lark_ir):
+    index_of = parse_node(lark_ir.children[0])
+    index = parse_node(lark_ir.children[1])
+    return astree.Index(index_of, index)
+
+def parse_slice(lark_ir):
+    slice_pieces = [None, None, None]
+    i = 0
+    slice_of = parse_node(lark_ir.children[0])
+    for child in lark_ir.children[1:]:
+        if lark_parser.lark_node_type(child) == lark_parser.SLICE_SEPARATOR:
+            i += 1
+        else:
+            slice_pieces[i] = parse_node(child)
+    start, stop, step = slice_pieces
+    return astree.Slice(slice_of, start, stop, step)
+
 parse_map = {
     'literal': lambda x: astree.Literal(''.join(str(s) for s in x.children)),
     'STRING_DOUBLE': lambda x: astree.String(str(x)[1:-1]),
@@ -116,7 +133,9 @@ parse_map = {
     'variable': lambda x: astree.Variable(int(x.children[0])),
     'NAME': lambda x: astree.Name(str(x)),
     'INTEGER': lambda x: astree.Integer(int(x)),
-    'FLOAT': lambda x: astree.Float(float(x)), 
+    'FLOAT': lambda x: astree.Float(float(x)),
+    'index': parse_index,
+    'slice': parse_slice,
     lark_parser.EXPR_SEQUENCE_SEPARATOR: lambda x: astree.ExprSequenceSeparator(str(x)),
     lark_parser.ARGUMENT_REFERENCE: lambda x: astree.ArgumentReference(str(x.children[0])),
     lark_parser.EXPR_SEQUENCE: parse_expression_sequence,
