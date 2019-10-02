@@ -2,6 +2,7 @@ from profile import Profiler
 import itertools
 from recognition.actions import library
 import uuid
+import lark.exceptions
 import os
 import os.path
 import xml.etree.ElementTree as ET
@@ -51,7 +52,12 @@ class CommandModuleController:
                     cmd_module_json_str = command_module_cache['command_modules'][text]
                     cmd_module = recognition.cache.from_text(cmd_module_json_str)
                 else:
-                    module_ir = lark_parser.parse_command_module(text)
+                    try:
+                        module_ir = lark_parser.parse_command_module(text)
+                    except lark.exceptions.UnexpectedCharacters as e:
+                        print(f'Error parsing command module {file_name}:\n{e}')
+                        print('Continuing...')
+                        continue
                     cmd_module = command_module.command_module_from_lark_ir(module_ir, text)
                 command_modules[file_name] = cmd_module
                 new_cache['command_modules'][text] = recognition.cache.to_json_string(cmd_module)
@@ -78,17 +84,17 @@ class CommandModuleController:
         await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
 
     def build_grammar(self) -> grammar.GrammarContext:
-        named_rules, command_rules = self.get_active_rules()
-        all_rules = list(named_rules.values()) + command_rules
-        node_ids = self.generate_node_ids(all_rules, named_rules)
+        named_utterances, command_utterances = self.get_active_utterances()
+        all_rules = list(named_utterances.values()) + command_utterances
+        node_ids = self.generate_node_ids(all_rules, named_utterances)
         active_commands = self.get_active_commands()
         namespace = self.get_namespace()
         command_contexts = {}
         for cmd in active_commands:
-            variable_tree = variables.RecognitionResultsTree(cmd.utterance, node_ids, named_rules)
+            variable_tree = variables.RecognitionResultsTree(cmd.utterance, node_ids, named_utterances)
             command_contexts[node_ids[cmd.utterance]] = cmd, variable_tree
-        grammar_xml = self.build_grammar_xml(all_rules, node_ids, named_rules)
-        grammar_context = grammar.GrammarContext(grammar_xml, command_contexts, active_commands, namespace, named_rules, node_ids)
+        grammar_xml = self.build_grammar_xml(all_rules, node_ids, named_utterances)
+        grammar_context = grammar.GrammarContext(grammar_xml, command_contexts, active_commands, namespace, named_utterances, node_ids)
         return grammar_context
 
     def get_namespace(self):
@@ -127,7 +133,7 @@ class CommandModuleController:
     def build_grammar_xml(self, all_active_rules, node_ids, named_rules):
         return SrgsXmlConverter(node_ids, named_rules).build_grammar(all_active_rules)
 
-    def get_active_rules(self):
+    def get_active_utterances(self):
         named_utterances = {}
         named_utterances.update(self.special_rules())
         command_utterances = []
