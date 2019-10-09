@@ -3,6 +3,7 @@ import collections
 import log
 import asyncio
 import settings
+import clargs
 from recognition.commands import loader
 from recognition.actions import perform
 from communication import topics, pubsub
@@ -18,7 +19,8 @@ def create_message_subscriptions(msg_list, command_module_controller):
 
 def start_watching_user_state():
     msg_list = [None]
-    module_loader = loader.StaticFileCommandModuleLoader(settings.settings['command_directory'])
+    command_module_file_pattern = clargs.get_args()['file_pattern']
+    module_loader = loader.StaticFileCommandModuleLoader(settings.settings['command_directory'], command_module_file_pattern)
     command_module_controller = loader.CommandModuleController(module_loader)
     command_module_controller.command_modules = command_module_controller.initialize_command_modules()
     engine_status_history = collections.deque([], 10)

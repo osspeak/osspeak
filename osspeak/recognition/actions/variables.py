@@ -48,4 +48,3 @@ class RuleNodeWrapper:
         self.node = node
         self.ancestors = ancestors
         self.path = tuple([node_ids[n] for n in ancestors] + [node_ids[node]])
-

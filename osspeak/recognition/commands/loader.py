@@ -74,17 +74,26 @@ class CommandModuleController:
     async def load_modules(self, current_window, initialize_modules: bool=False):
         previous_active_modules = self.active_command_modules
         if initialize_modules:
-            self.populate()
+            raise NotImplementedError
         self.active_command_modules = self.get_active_modules(current_window)
         namespace = self.get_namespace()
         self.fire_activation_events(previous_active_modules, namespace)
         grammar_context = self.build_grammar()
-        self.save_grammar(grammar_context)
-        grammar_xml, grammar_id = ET.tostring(grammar_context.xml).decode('utf8'), grammar_context.uuid
-        await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
+        if grammar_context is not None:
+            self.save_grammar(grammar_context)
+            grammar_xml, grammar_id = ET.tostring(grammar_context.xml).decode('utf8'), grammar_context.uuid
+            await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
 
     def build_grammar(self) -> grammar.GrammarContext:
         named_utterances, command_utterances = self.get_active_utterances()
+        cycles = self.calculate_named_utterance_cycles(named_utterances)
+        if cycles:
+            s = "" if len(cycles) == 1 else "s"
+            print(f'Unable to load grammar - found utterance cycle{s}')
+            for cycle in cycles:
+                print(' -> '.join(cycle))
+            print('')
+            return
         all_rules = list(named_utterances.values()) + command_utterances
         node_ids = self.generate_node_ids(all_rules, named_utterances)
         active_commands = self.get_active_commands()
@@ -149,10 +158,38 @@ class CommandModuleController:
         grouped_commands = [m.commands for m in self.active_command_modules.values()]
         return list(itertools.chain.from_iterable(grouped_commands))
     
+    def calculate_named_utterance_cycles(self, named_utterances):
+        graph = DirectedGraph()
+        for name, utterance in named_utterances.items():
+            for utterance_piece in utterance.walk():
+                if isinstance(utterance_piece, astree.RuleReference):
+                    graph.add_edge(name, utterance_piece.rule_name)
+        return self.cycles_from_graph(graph)
+
+    def cycles_from_graph(self, graph):
+        nodes_with_cycles = set()
+        cycles = []
+        for name in graph.adjacency_list:
+            cycles.extend(self.dfs(name, graph, (name,), set()))
+        return cycles
+
+    def dfs(self, node, graph, root, visited):
+        visited.add(node)
+        utterance_cycles = []
+        adj = graph.adjacency_list[node]
+        for adjacent_utterance in adj:
+            path = root + (adjacent_utterance,)
+            if adjacent_utterance in visited:
+                utterance_cycles.append(path)
+            else:
+                utterance_cycles.extend(self.dfs(adjacent_utterance, graph, path, visited))
+        return utterance_cycles
+
 class StaticFileCommandModuleLoader:
 
-    def __init__(self, root):
+    def __init__(self, root, command_module_file_pattern):
         self.root = root
+        self.command_module_file_pattern = command_module_file_pattern
         self.file_cache = limited_size_dict.LimitedSizeDict(size_limit=1000)
 
     def load_files(self):
@@ -171,7 +208,7 @@ class StaticFileCommandModuleLoader:
             for entry in sorted(i, key=lambda x: x.name):
                 if entry.name.startswith('.'):
                     continue
-                if entry.is_file() and entry.name.endswith('.speak'):
+                if entry.is_file() and entry.name.endswith('.speak') and self.command_module_file_pattern in entry.name:
                     path = entry.path
                     file = self.file_cache.get(path, CommandModuleFile(path))
                     self.file_cache[path] = file
@@ -199,3 +236,17 @@ class CommandModuleFile:
             with open(self.path) as f:
                 self._contents = f.read()
         return self._contents
+
+class DirectedGraph:
+
+    def __init__(self):
+        self.adjacency_list = {}
+        
+    def add_edge(self, from_vertex, to_vertex):
+        self.add_vertex(from_vertex)
+        self.add_vertex(to_vertex)
+        self.adjacency_list[from_vertex].add(to_vertex)
+
+    def add_vertex(self, value):
+        if value not in self.adjacency_list:
+            self.adjacency_list[value] = set()

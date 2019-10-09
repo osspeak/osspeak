@@ -87,7 +87,7 @@ def node_from_utterance_piece(lark_ir):
     elif wrapped_type == lark_parser.UTTERANCE_CHOICES_OPTIONAL:
         choice_items = lark_parser.find_type(wrapped_node, lark_parser.UTTERANCE_CHOICE_ITEMS)
         node = grouping_from_choice_items(choice_items)
-        node.repeat_low, node.repeat_low = 0, 1
+        node.repeat_low, node.repeat_high = 0, 1
     elif wrapped_type == lark_parser.UTTERANCE_REFERENCE:
         ref = lark_parser.find_type(wrapped_node, lark_parser.UTTERANCE_NAME)
         ref_name = ref.children[0]
