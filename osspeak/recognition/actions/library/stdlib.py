@@ -6,13 +6,16 @@ from recognition.actions.library import _keyboard as keyboard
 from types import SimpleNamespace
 import operator
 import screengrid
+import re
 import time
 
 def wait(n):
     time.sleep(n)
 
 namespace = {
+    'active_window': lambda: window.active_window_name().title(),
     'click': mouse.click,
+    'directinput': directinput,
     'eq': operator.eq,
     'eval': lambda context, x: eval(str(x.evaluate(context)), {}, context.namespace),
     'gt': operator.gt,
@@ -23,8 +26,10 @@ namespace = {
     'lt': operator.lt,
     'loop': flow.loop,
     'mod': operator.mod,
+    'mouse': mouse,
     'mul': operator.mul,
     'print': print,
+    're': re,
     'run': process.run,
     'run_sync': process.run_sync,
     'screengrid': screengrid,

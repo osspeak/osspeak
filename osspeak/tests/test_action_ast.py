@@ -311,7 +311,6 @@ def test_slice():
     context = recognition.actions.context.empty_recognition_context()
     assert action.evaluate(context) == [2, 3]
 
-
 def test_order_of_operations1():
     text = "1+2*3"
     assert evaluate_action_text(text) == 7
@@ -322,7 +321,71 @@ def test_order_of_operations2():
 
 def test_order_of_operations3():
     text = "1+3*4-9"
-    assert evaluate_action_text(text) == 4
+    action = text_to_action(text)
+    to_clipboard(action)
+    assert_equal(action, {
+        "left": {
+            "left": {
+                "left": {
+                    "type": "Integer",
+                    "value": 3
+                },
+                "operator": "multiply",
+                "right": {
+                    "type": "Integer",
+                    "value": 4
+                },
+                "type": "BinOp"
+            },
+            "operator": "add",
+            "right": {
+                "type": "Integer",
+                "value": 1
+            },
+            "type": "BinOp"
+        },
+        "operator": "subtract",
+        "right": {
+            "type": "Integer",
+            "value": 9
+        },
+        "type": "BinOp"
+    })
+    assert evaluate_action(action) == 4
+
+def test_order_of_operations4():
+    text = "1 + 5 == 7 - 1"
+    action = text_to_action(text)
+    to_clipboard(action)
+    assert_equal(action, {
+        "left": {
+            "left": {
+                "type": "Integer",
+                "value": 7
+            },
+            "operator": "subtract",
+            "right": {
+                "type": "Integer",
+                "value": 1
+            },
+            "type": "BinOp"
+        },
+        "operator": "eq",
+        "right": {
+            "left": {
+                "type": "Integer",
+                "value": 1
+            },
+            "operator": "add",
+            "right": {
+                "type": "Integer",
+                "value": 5
+            },
+            "type": "BinOp"
+        },
+        "type": "BinOp"
+    })
+    assert evaluate_action(action) is True
 
 def test_spacing():
     text = "$ 1"
@@ -337,6 +400,10 @@ def test_spacing():
     with pytest.raises(Exception):
         text_to_action("foo . bar")
     text_to_action("foo.bar")
+
+def evaluate_action(action):
+    context = recognition.actions.context.empty_recognition_context()
+    return action.evaluate(context)
 
 def evaluate_action_text(text: str):
     action = text_to_action(text)

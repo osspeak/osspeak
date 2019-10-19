@@ -6,8 +6,9 @@ import types
 import json
 
 operator_strings = {
-    '*': 'multiply',
     '+': 'add',
+    '==': 'eq',
+    '*': 'multiply',
     '-': 'subtract',
 }
 
@@ -49,6 +50,11 @@ def parse_list(lark_ir):
     for child in lark_ir.children:
         list_items.append(parse_node(child))
     return astree.List(list_items)
+
+def parse_loop(lark_ir):
+    fn = astree.Name('loop')
+    keys = [parse_node(x) for x in lark_ir.children]
+    return astree.Call(fn, keys, {})
 
 def parse_call(lark_ir):
     fn = parse_node(lark_ir.children[0])
@@ -125,11 +131,13 @@ parse_map = {
     'STRING_SINGLE': lambda x: astree.String(str(x)[1:-1]),
     'compare': parse_compare,
     'list': parse_list,
+    'loop': parse_loop,
     'expr': parse_expr,
     'attribute': parse_attribute,
     'call': parse_call,
     'keypress': parse_keypress,
-    'binop': parse_binop,
+    'left_to_right': parse_binop,
+    'right_to_left': parse_binop,
     'variable': lambda x: astree.Variable(int(x.children[0])),
     'NAME': lambda x: astree.Name(str(x)),
     'INTEGER': lambda x: astree.Integer(int(x)),

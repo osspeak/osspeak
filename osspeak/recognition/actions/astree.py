@@ -12,7 +12,7 @@ operators = {
     'divide': {'precedence': 11, 'function': operator.truediv},
     'add': {'precedence': 10, 'function': operator.add},
     'subtract': {'precedence': 10, 'function': operator.sub},
-    'eq': {'precedence': 10, 'function': operator.eq},
+    'eq': {'precedence': 5, 'function': operator.eq},
 }
 
 def evaluate_generator(gen):

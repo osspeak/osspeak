@@ -53,15 +53,19 @@ command: utterance "=" _action
 
 _action: ({EXPR} | {EXPR_SEQUENCE})
 _grouping.29: "(" {EXPR} ")"
+loop: {EXPR} _LOOP_SEPARATOR {EXPR}
 {EXPR_SEQUENCE_SEPARATOR}: /[ \t]+/
 {EXPR_SEQUENCE}.-99: {EXPR} ({EXPR_SEQUENCE_SEPARATOR} {EXPR})+
-{EXPR}: [{UNARY_OPERATOR}] ({EXPR_SEQUENCE} | index | {SLICE} | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | binop | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
-_chainable: (NAME | attribute | call | list | {VARIABLE} | index | {SLICE})
-BINARY_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%" | "==")
+{EXPR}: [{UNARY_OPERATOR}] (left_to_right | right_to_left | _other_expr)
+_chainable: (NAME | attribute | call | list | {VARIABLE} | {ARGUMENT_REFERENCE} | index | {SLICE})
+LEFT_TO_RIGHT_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%" | "==")
+left_to_right: {EXPR} LEFT_TO_RIGHT_OPERATOR (right_to_left | _other_expr)
+right_to_left: {EXPR} ("**") {EXPR}
+_other_expr: ({EXPR_SEQUENCE} | index | {SLICE} | loop | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 {UNARY_OPERATOR}: ("+" | "-")
-binop.20: {EXPR} BINARY_OPERATOR {EXPR}
 keypress: "{{" {EXPR} ("," {EXPR})* "}}"
 _VAR_PREC: "$" NO_WS_AHEAD
+_LOOP_SEPARATOR: NO_WS_BEHIND "~" NO_WS_AHEAD
 _ATTR_SEPARATOR: NO_WS_BEHIND "." NO_WS_AHEAD
 _SUBSCRIPT_PREFIX: NO_WS_BEHIND "["
 SLICE_SEPARATOR: ":"
@@ -125,8 +129,12 @@ def lark_node_type(lark_ir):
     type_attr = 'data' if isinstance(lark_ir, Tree) else 'type'
     return getattr(lark_ir, type_attr)
 
-def lark_node_text(lark_ir, text):
-    return 'foo'
+def lark_node_text(lark_ir, text_by_line):
+    text = 'foo'
+    start_line, end_line = text_by_line[lark_ir.line - 1], text_by_line[lark_ir.end_line - 1]
+    if lark_ir.line == lark_ir.end_line:
+        text = start_line[lark_ir.column - 1:lark_ir.end_column - 1]
+    return text
 
 def find_type(lark_tree, _type):
     for child in getattr(lark_tree, 'children', []):

@@ -58,7 +58,8 @@ class CommandModuleController:
                         print(f'Error parsing command module {file_name}:\n{e}')
                         print('Continuing...')
                         continue
-                    cmd_module = command_module.command_module_from_lark_ir(module_ir, text)
+                    text_by_line = text.split('\n')
+                    cmd_module = command_module.command_module_from_lark_ir(module_ir, text_by_line)
                 command_modules[file_name] = cmd_module
                 new_cache['command_modules'][text] = recognition.cache.to_json_string(cmd_module)
         recognition.cache.save_cache(new_cache)

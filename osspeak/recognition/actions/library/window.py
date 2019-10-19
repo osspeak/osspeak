@@ -27,7 +27,7 @@ def start(name):
 def shell(text):
     subprocess.run(text.split(), shell=True)
 
-def get_active_window_name():
+def active_window_name():
     return pywindow.foreground_window().title
 
 def external():
