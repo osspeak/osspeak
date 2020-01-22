@@ -59,8 +59,9 @@ loop: {EXPR} _LOOP_SEPARATOR {EXPR}
 {EXPR}: [{UNARY_OPERATOR}] (left_to_right | right_to_left | _other_expr)
 _chainable: (NAME | attribute | call | list | {VARIABLE} | {ARGUMENT_REFERENCE} | index | {SLICE})
 LEFT_TO_RIGHT_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%" | "==")
+RIGHT_TO_LEFT_OPERATOR: "**"
 left_to_right: {EXPR} LEFT_TO_RIGHT_OPERATOR (right_to_left | _other_expr)
-right_to_left: {EXPR} ("**") {EXPR}
+right_to_left: {EXPR} RIGHT_TO_LEFT_OPERATOR {EXPR}
 _other_expr: ({EXPR_SEQUENCE} | index | {SLICE} | loop | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 {UNARY_OPERATOR}: ("+" | "-")
 keypress: "{{" {EXPR} ("," {EXPR})* "}}"

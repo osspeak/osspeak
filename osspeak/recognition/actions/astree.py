@@ -8,6 +8,7 @@ import json
 import operator
 
 operators = {
+    'pow': {'precedence': 12, 'function': operator.pow},
     'multiply': {'precedence': 11, 'function': operator.mul},
     'divide': {'precedence': 11, 'function': operator.truediv},
     'add': {'precedence': 10, 'function': operator.add},
@@ -137,11 +138,6 @@ class BinOp(BaseActionNode):
         left = self.left.evaluate(context)
         right = self.right.evaluate(context)
         return operators[self.operator]['function'](left, right)
-        if self.operator == 'add':
-            return left + right
-        if self.operator == 'multiply':
-            return left * right
-        raise NotImplementedError
 
 class Compare(BaseActionNode):
 

@@ -387,6 +387,40 @@ def test_order_of_operations4():
     })
     assert evaluate_action(action) is True
 
+def test_order_of_operations5():
+    text = "2**3**1+2"
+    action = text_to_action(text)
+    to_clipboard(action)
+    assert_equal(action, {
+        "left": {
+            "left": {
+                "left": {
+                    "type": "Integer",
+                    "value": 2
+                },
+                "operator": "pow",
+                "right": {
+                    "type": "Integer",
+                    "value": 3
+                },
+                "type": "BinOp"
+            },
+            "operator": "pow",
+            "right": {
+                "type": "Integer",
+                "value": 1
+            },
+            "type": "BinOp"
+        },
+        "operator": "add",
+        "right": {
+            "type": "Integer",
+            "value": 2
+        },
+        "type": "BinOp"
+    })
+    assert evaluate_action(action) == 512
+
 def test_spacing():
     text = "$ 1"
     with pytest.raises(Exception):

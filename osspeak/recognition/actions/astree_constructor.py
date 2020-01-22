@@ -9,6 +9,7 @@ operator_strings = {
     '+': 'add',
     '==': 'eq',
     '*': 'multiply',
+    '**': 'pow',
     '-': 'subtract',
 }
 
