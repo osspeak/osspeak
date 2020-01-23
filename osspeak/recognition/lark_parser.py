@@ -139,7 +139,8 @@ def lark_node_text(lark_ir, text_by_line):
 
 def find_type(lark_tree, _type):
     for child in getattr(lark_tree, 'children', []):
-        child_type_attr = 'data' if isinstance(child, Tree) else 'type'
-        child_type = getattr(child, child_type_attr)
-        if child_type == _type:
-            return child
+        if child is not None:
+            child_type_attr = 'data' if isinstance(child, Tree) else 'type'
+            child_type = getattr(child, child_type_attr)
+            if child_type == _type:
+                return child

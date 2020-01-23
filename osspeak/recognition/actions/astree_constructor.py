@@ -119,7 +119,7 @@ def parse_slice(lark_ir):
     i = 0
     slice_of = parse_node(lark_ir.children[0])
     for child in lark_ir.children[1:]:
-        if lark_parser.lark_node_type(child) == lark_parser.SLICE_SEPARATOR:
+        if child is None or lark_parser.lark_node_type(child) == lark_parser.SLICE_SEPARATOR:
             i += 1
         else:
             slice_pieces[i] = parse_node(child)
