@@ -34,21 +34,6 @@ def yield_queue_contents(q):
         except queue.Empty:
             return
 
-def get_open_port():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("",0))
-    s.listen(1)
-    port = s.getsockname()[1]
-    s.close()
-    return port
-
-def parametrized(dec):
-    def layer(*args, **kwargs):
-        def repl(f):
-            return dec(f, *args, **kwargs)
-        return repl
-    return layer
-
 def finish_tasks(tasks):
     '''
     tasks must be in a separate thread, otherwise this just blocks forever
