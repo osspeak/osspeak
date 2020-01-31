@@ -120,8 +120,8 @@ def parse_repetition(lark_ir):
         low = int(child.children[0])
         try:
             high = int(child.children[1])
-        except IndexError:
-            high = None
+        except TypeError:
+            pass
     return low, high
 
 def same_json(o1, o2):

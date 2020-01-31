@@ -100,9 +100,9 @@ STRING_DOUBLE: "\\"" _STRING_ESC_INNER "\\""
 %ignore " "
 '''
 
-lark_grammar = Lark(grammar, propagate_positions=True)
-utterance_grammar = Lark(grammar, start='utterance', propagate_positions=True)
-action_grammar = Lark(grammar, start='_action', propagate_positions=True)
+lark_grammar = Lark(grammar, propagate_positions=True, maybe_placeholders=True)
+utterance_grammar = Lark(grammar, start='utterance', propagate_positions=True, maybe_placeholders=True)
+action_grammar = Lark(grammar, start='_action', propagate_positions=True, maybe_placeholders=True)
 
 class Foo(Transformer):
 
