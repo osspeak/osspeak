@@ -54,7 +54,7 @@ class CommandModuleController:
                 else:
                     try:
                         module_ir = lark_parser.parse_command_module(text)
-                    except lark.exceptions.UnexpectedCharacters as e:
+                    except (lark.exceptions.UnexpectedCharacters, lark.exceptions.UnexpectedEOF) as e:
                         print(f'Error parsing command module {file_name}:\n{e}')
                         print('Continuing...')
                         continue
