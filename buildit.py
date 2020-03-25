@@ -41,7 +41,6 @@ def main():
     #     print('Unit test(s) failed')
     #     return
     build_osspeak()
-    # build_gui()
     if cl_args.release:
         create_github_release()
 
@@ -49,25 +48,6 @@ def parse_cl_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--release', action='store_true')
     return parser.parse_args()
-
-def build_gui():
-    start_dir = os.getcwd()
-    os.chdir(BASE_ELECTRON_FOLDER)
-    for entry in os.scandir():
-        if entry.is_dir() and entry.name == 'node_modules':
-            continue
-        dest = os.path.join(ELECTRON_BUILD_PATH, entry.name)
-        if entry.is_dir():
-            if not os.path.exists(dest):
-                os.makedirs(dest)
-            shutil.copytree(entry.name, dest)
-        else:
-            shutil.copyfile(entry.name, dest)
-    dist_app = os.path.join('..', DIST_FOLDER, 'app')
-    if os.path.exists(dist_app):
-        shutil.rmtree(dist_app)
-    shutil.copytree(ELECTRON_DIST_SRC, dist_app)
-    os.chdir(start_dir)
 
 def build_osspeak():
     lark_path = os.path.dirname(os.path.abspath(lark.__file__))
