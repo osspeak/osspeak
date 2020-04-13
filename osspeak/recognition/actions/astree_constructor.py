@@ -78,10 +78,10 @@ def parse_and(lark_ir):
     return left_to_right(lark_ir, default_operation=astree.And)
 
 def parse_not(lark_ir):
-    print(lark_ir.children)
+    parsed_child = parse_node(lark_ir.children[-1])
     if lark_ir.children[0] is not None:
-        return astree.Unar
-    return parse_node(lark_ir.children[-1])
+        return astree.UnaryOp('not', parsed_child)
+    return parsed_child
 
 def parse_additive(lark_ir):
     operator_map = {'+': astree.Add, '-': astree.Subtract}

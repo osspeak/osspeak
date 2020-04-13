@@ -114,17 +114,17 @@ def test_call1():
 def test_variable1():
     text = "4 + $1"
     action = text_to_action(text)
+    to_clipboard(action)
     assert_equal(action,  {
         "left": {
             "type": "Integer",
             "value": 4
         },
-        "operator": "add",
         "right": {
             "type": "Variable",
             "value": 1
         },
-        "type": "BinOp"
+        "type": "Add"
     })
 
 def test_attribute1():
@@ -144,6 +144,24 @@ def test_attribute1():
         "type": "Call"
     })
 
+def test_not():
+    text = "!true()"
+    action = text_to_action(text)
+    assert_equal(action,  {
+        "operand": {
+            "args": [],
+            "fn": {
+                "type": "Name",
+                "value": "true"
+            },
+            "kwargs": {},
+            "type": "Call"
+        },
+        "operation": "not",
+        "type": "UnaryOp"
+    })
+    assert evaluate_action(action) is False
+
 def test_string1():
     text = "'http://news.ycombinator.com'"
     action = text_to_action(text)
@@ -152,7 +170,7 @@ def test_string1():
         "value": "http://news.ycombinator.com"
     })
 
-def test_binop1():
+def test_add():
     text = "4 + 5"
     action = text_to_action(text)
     assert_equal(action,  {
@@ -160,45 +178,45 @@ def test_binop1():
             "type": "Integer",
             "value": 4
         },
-        "operator": "add",
         "right": {
             "type": "Integer",
             "value": 5
         },
-        "type": "BinOp"
+        "type": "Add"
     })
+    assert evaluate_action(action) == 9
 
 def test_float1():
     text = "-4.5 .23 0.2"
     action = text_to_action(text)
     assert_equal(action,  {
-        "operand": {
-            "expressions": [
-                {
+        "expressions": [
+            {
+                "operand": {
                     "type": "Float",
                     "value": 4.5
                 },
-                {
-                    "type": "ExprSequenceSeparator",
-                    "value": " "
-                },
-                {
-                    "type": "Float",
-                    "value": 0.23
-                },
-                {
-                    "type": "ExprSequenceSeparator",
-                    "value": " "
-                },
-                {
-                    "type": "Float",
-                    "value": 0.2
-                }
-            ],
-            "type": "ExpressionSequence"
-        },
-        "operation": "usub",
-        "type": "UnaryOp"
+                "operation": "negative",
+                "type": "UnaryOp"
+            },
+            {
+                "type": "ExprSequenceSeparator",
+                "value": " "
+            },
+            {
+                "type": "Float",
+                "value": 0.23
+            },
+            {
+                "type": "ExprSequenceSeparator",
+                "value": " "
+            },
+            {
+                "type": "Float",
+                "value": 0.2
+            }
+        ],
+        "type": "ExpressionSequence"
     })
 
 def test_argument_reference():
@@ -247,7 +265,6 @@ def test_multiple_args():
 def test_index():
     text = "[1,2,3][1]"
     action = text_to_action(text)
-    to_clipboard(action)
     assert_equal(action,  {
         "index": {
             "type": "Integer",
@@ -278,7 +295,6 @@ def test_index():
 def test_slice():
     text = "[1, 2, 3][1:3]"
     action = text_to_action(text)
-    to_clipboard(action)
     assert_equal(action,  {
         "slice_of": {
             "items": [
@@ -322,7 +338,6 @@ def test_order_of_operations2():
 def test_order_of_operations3():
     text = "1+3*4-9"
     action = text_to_action(text)
-    to_clipboard(action)
     assert_equal(action, {
         "left": {
             "left": {
@@ -354,32 +369,34 @@ def test_order_of_operations4():
     text = "1 + 5 == 7 - 1"
     action = text_to_action(text)
     assert_equal(action, {
+        "comparators": [
+            {
+                "left": {
+                    "type": "Integer",
+                    "value": 7
+                },
+                "right": {
+                    "type": "Integer",
+                    "value": 1
+                },
+                "type": "Subtract"
+            }
+        ],
         "left": {
             "left": {
                 "type": "Integer",
-                "value": 7
-            },
-            "operator": "subtract",
-            "right": {
-                "type": "Integer",
                 "value": 1
             },
-            "type": "BinOp"
-        },
-        "operator": "eq",
-        "right": {
-            "left": {
-                "type": "Integer",
-                "value": 1
-            },
-            "operator": "add",
             "right": {
                 "type": "Integer",
                 "value": 5
             },
-            "type": "BinOp"
+            "type": "Add"
         },
-        "type": "BinOp"
+        "ops": [
+            "=="
+        ],
+        "type": "Compare"
     })
     assert evaluate_action(action) is True
 
@@ -435,7 +452,6 @@ def evaluate_action_text(text: str):
     action = text_to_action(text)
     context = recognition.actions.context.empty_recognition_context()
     return action.evaluate(context)
-
 
 def to_clipboard(action):
     recognition.actions.library.clipboard.set(astree_constructor.to_json_string(action))
