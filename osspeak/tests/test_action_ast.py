@@ -326,37 +326,33 @@ def test_order_of_operations3():
     assert_equal(action, {
         "left": {
             "left": {
+                "type": "Integer",
+                "value": 1
+            },
+            "right": {
                 "left": {
                     "type": "Integer",
                     "value": 3
                 },
-                "operator": "multiply",
                 "right": {
                     "type": "Integer",
                     "value": 4
                 },
-                "type": "BinOp"
+                "type": "Multiply"
             },
-            "operator": "add",
-            "right": {
-                "type": "Integer",
-                "value": 1
-            },
-            "type": "BinOp"
+            "type": "Add"
         },
-        "operator": "subtract",
         "right": {
             "type": "Integer",
             "value": 9
         },
-        "type": "BinOp"
+        "type": "Subtract"
     })
     assert evaluate_action(action) == 4
 
 def test_order_of_operations4():
     text = "1 + 5 == 7 - 1"
     action = text_to_action(text)
-    to_clipboard(action)
     assert_equal(action, {
         "left": {
             "left": {
@@ -390,36 +386,32 @@ def test_order_of_operations4():
 def test_order_of_operations5():
     text = "2**3**1+2"
     action = text_to_action(text)
-    to_clipboard(action)
     assert_equal(action, {
         "left": {
             "left": {
+                "type": "Integer",
+                "value": 2
+            },
+            "right": {
                 "left": {
-                    "type": "Integer",
-                    "value": 2
-                },
-                "operator": "pow",
-                "right": {
                     "type": "Integer",
                     "value": 3
                 },
-                "type": "BinOp"
+                "right": {
+                    "type": "Integer",
+                    "value": 1
+                },
+                "type": "Exponent"
             },
-            "operator": "pow",
-            "right": {
-                "type": "Integer",
-                "value": 1
-            },
-            "type": "BinOp"
+            "type": "Exponent"
         },
-        "operator": "add",
         "right": {
             "type": "Integer",
             "value": 2
         },
-        "type": "BinOp"
+        "type": "Add"
     })
-    assert evaluate_action(action) == 512
+    assert evaluate_action(action) == 10
 
 def test_spacing():
     text = "$ 1"

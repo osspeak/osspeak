@@ -48,6 +48,9 @@ utterance_piece.-101: ({UTTERANCE_WORD} | {UTTERANCE_REFERENCE} | {UTTERANCE_CHO
 !{UTTERANCE_REPETITION}: (("_" ({ZERO_OR_POSITIVE_INT} | {UTTERANCE_RANGE})) | "*" | "?" | "+")
 {UTTERANCE_RANGE}: {ZERO_OR_POSITIVE_INT} "-" [{ZERO_OR_POSITIVE_INT}]
 {IGNORE_AMBIGUITIES}: "_" NO_WS_AHEAD
+COMPARE_OPERATOR: ("==" | "!=" | "<=" | ">=" | "<"  | ">")
+ADDITIVE_OPERATOR: ("+" | "-")
+MULTIPLICATIVE_OPERATOR: ("*" | "/" | "//" | "%")
 
 command: utterance "=" _action 
 
@@ -56,14 +59,20 @@ _grouping.29: "(" {EXPR} ")"
 loop: {EXPR} _LOOP_SEPARATOR {EXPR}
 {EXPR_SEQUENCE_SEPARATOR}: /[ \t]+/
 {EXPR_SEQUENCE}.-99: {EXPR} ({EXPR_SEQUENCE_SEPARATOR} {EXPR})+
-{EXPR}: [{UNARY_OPERATOR}] (left_to_right | right_to_left | _other_expr)
+{EXPR}: (_singular | _multiple)
+_multiple: compare
+compare: or (COMPARE_OPERATOR or)*
+or: and ("||" and)*
+and: not ("&&" not)*
+not: [NOT_OPERATOR] additive
+additive: multiplicative (ADDITIVE_OPERATOR multiplicative)*
+multiplicative: unary (MULTIPLICATIVE_OPERATOR unary)*
+unary: [{UNARY_OPERATOR}] exponent
+exponent: _singular ("**" _singular)*
+_singular: ({EXPR_SEQUENCE} | index | {SLICE} | loop | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 _chainable: (NAME | attribute | call | list | {VARIABLE} | {ARGUMENT_REFERENCE} | index | {SLICE})
-LEFT_TO_RIGHT_OPERATOR: ("+" | "-" | "*" | "/" | "//" | "%" | "==")
-RIGHT_TO_LEFT_OPERATOR: "**"
-left_to_right: {EXPR} LEFT_TO_RIGHT_OPERATOR (right_to_left | _other_expr)
-right_to_left: {EXPR} RIGHT_TO_LEFT_OPERATOR {EXPR}
-_other_expr: ({EXPR_SEQUENCE} | index | {SLICE} | loop | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 {UNARY_OPERATOR}: ("+" | "-")
+NOT_OPERATOR: "!"
 keypress: "{{" {EXPR} ("," {EXPR})* "}}"
 _VAR_PREC: "$" NO_WS_AHEAD
 _LOOP_SEPARATOR: NO_WS_BEHIND "~" NO_WS_AHEAD

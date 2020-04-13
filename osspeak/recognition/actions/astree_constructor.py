@@ -4,22 +4,7 @@ from recognition import lark_parser
 import lark.tree
 import types
 import json
-
-operator_strings = {
-    '+': 'add',
-    '==': 'eq',
-    '*': 'multiply',
-    '**': 'pow',
-    '-': 'subtract',
-}
-
-def compare_operators(a, b):
-    precedence1, precedence2 = astree.operators[a]['precedence'], astree.operators[b]['precedence']
-    if precedence1 > precedence2:
-        return 'greater_than'
-    if precedence1 < precedence2:
-        return 'less_than'
-    return 'equals'
+import operator
 
 def parse_node(lark_ir):
     node_type = lark_parser.lark_node_type(lark_ir)
@@ -34,6 +19,15 @@ def parse_expression_sequence(lark_ir):
         expressions.append(expr)
     return astree.ExpressionSequence(expressions)
 
+def parse_unary(lark_ir):
+    value_ir = lark_ir.children[-1]
+    value_ast = parse_node(value_ir)
+    unary_ir = lark_ir.children[0]
+    if unary_ir is not None:
+        op = 'negative'
+        return astree.UnaryOp(op, value_ast)
+    return value_ast
+
 def parse_expr(lark_ir):
     node_type = lark_parser.lark_node_type(lark_ir)
     if isinstance(lark_ir, lark.tree.Tree):
@@ -41,10 +35,61 @@ def parse_expr(lark_ir):
         value_ast = parse_node(value_ir)
         unary_ir = lark_parser.find_type(lark_ir, lark_parser.UNARY_OPERATOR)
         if unary_ir is not None:
-            return astree.UnaryOp('usub', value_ast)
+            return astree.UnaryOp('negative', value_ast)
     else:
         value_ast = parse_node(lark_ir)
     return value_ast
+
+def left_to_right(lark_ir, default_operation=None, operator_map=None):
+    operation_class = default_operation 
+    left = parse_node(lark_ir.children[0])
+    for child in lark_ir.children[1:]:
+        if isinstance(child, lark.lexer.Token):
+            operation_class = operator_map[child]
+        else:
+            right = parse_node(child)
+            left = operation_class(left, right)
+    return left
+
+def parse_exponent(lark_ir):
+    right = parse_node(lark_ir.children[-1])
+    for child in reversed(lark_ir.children[:-1]):
+        left = parse_node(child)
+        right = astree.Exponent(left, right)
+    return right
+
+def parse_compare(lark_ir):
+    if len(lark_ir.children) == 1:
+        return parse_node(lark_ir.children[0])
+    left = parse_node(lark_ir.children[0])
+    ops = []
+    comparators = []
+    for i, child in enumerate(lark_ir.children[1:]):
+        if i % 2 == 0:
+            ops.append(str(child))
+        else:
+            comparators.append(parse_node(child))
+    return astree.Compare(left, ops, comparators)
+
+def parse_or(lark_ir):
+    return left_to_right(lark_ir, default_operation=astree.Or)
+
+def parse_and(lark_ir):
+    return left_to_right(lark_ir, default_operation=astree.And)
+
+def parse_not(lark_ir):
+    print(lark_ir.children)
+    if lark_ir.children[0] is not None:
+        return astree.Unar
+    return parse_node(lark_ir.children[-1])
+
+def parse_additive(lark_ir):
+    operator_map = {'+': astree.Add, '-': astree.Subtract}
+    return left_to_right(lark_ir, operator_map=operator_map)
+
+def parse_multiplicative(lark_ir):
+    operator_map = {'*': astree.Multiply, '/': astree.Divide}
+    return left_to_right(lark_ir, operator_map=operator_map)
 
 def parse_list(lark_ir):
     list_items = []
@@ -79,35 +124,9 @@ def parse_keypress(lark_ir):
     return astree.Call(fn, keys, {})
 
 def parse_unaryop(lark_ir):
-    op = 'usub'
+    op = 'negative'
     operand = parse_node(lark_ir.children[1])
     return astree.BinOp(op, operand)
-
-def parse_binop(lark_ir):
-    op_name = operator_strings[lark_ir.children[1]]
-    left = parse_node(lark_ir.children[0])
-    right = parse_node(lark_ir.children[2])
-    node = astree.BinOp(op_name, left, right)
-    if isinstance(left, astree.BinOp):
-        if compare_operators(node.operator, node.left.operator) == 'greater_than':
-            node.left, left.left, left.right = left.right, node, left.left
-            return left
-    if isinstance(right, astree.BinOp):
-        if compare_operators(node.operator, node.right.operator) == 'greater_than':
-            node.right, right.right, right.left = right.left, node, right.right
-            return right
-    return node
-
-def parse_compare(lark_ir):
-    left = parse_expr(lark_ir.children[0])
-    ops = []
-    comparators = []
-    for i, child in enumerate(lark_ir.children[1:], start=1):
-        if i % 2 == 1:
-            ops.append(str(child))
-        else:
-            comparators.append(parse_expr(child))
-    return astree.Compare(left, ops, comparators)
 
 def parse_index(lark_ir):
     index_of = parse_node(lark_ir.children[0])
@@ -130,15 +149,12 @@ parse_map = {
     'literal': lambda x: astree.Literal(''.join(str(s) for s in x.children)),
     'STRING_DOUBLE': lambda x: astree.String(str(x)[1:-1]),
     'STRING_SINGLE': lambda x: astree.String(str(x)[1:-1]),
-    'compare': parse_compare,
     'list': parse_list,
     'loop': parse_loop,
     'expr': parse_expr,
     'attribute': parse_attribute,
     'call': parse_call,
     'keypress': parse_keypress,
-    'left_to_right': parse_binop,
-    'right_to_left': parse_binop,
     'variable': lambda x: astree.Variable(int(x.children[0])),
     'NAME': lambda x: astree.Name(str(x)),
     'INTEGER': lambda x: astree.Integer(int(x)),
@@ -148,6 +164,14 @@ parse_map = {
     lark_parser.EXPR_SEQUENCE_SEPARATOR: lambda x: astree.ExprSequenceSeparator(str(x)),
     lark_parser.ARGUMENT_REFERENCE: lambda x: astree.ArgumentReference(str(x.children[0])),
     lark_parser.EXPR_SEQUENCE: parse_expression_sequence,
+    'compare': parse_compare,
+    'or': parse_or,
+    'and': parse_and,
+    'not': parse_not,
+    'additive': parse_additive,
+    'multiplicative': parse_multiplicative,
+    'unary': parse_unary,
+    'exponent': parse_exponent,
 }
 
 def action_root_from_text(text):

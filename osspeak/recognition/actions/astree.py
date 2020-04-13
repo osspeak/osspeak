@@ -7,15 +7,6 @@ import types
 import json
 import operator
 
-operators = {
-    'pow': {'precedence': 12, 'function': operator.pow},
-    'multiply': {'precedence': 11, 'function': operator.mul},
-    'divide': {'precedence': 11, 'function': operator.truediv},
-    'add': {'precedence': 10, 'function': operator.add},
-    'subtract': {'precedence': 10, 'function': operator.sub},
-    'eq': {'precedence': 5, 'function': operator.eq},
-}
-
 def evaluate_generator(gen):
     assert isinstance(gen, types.GeneratorType)
     last = None
@@ -127,17 +118,78 @@ class UnaryOp(BaseActionNode):
         self.operation = operation
         self.operand = operand
 
-class BinOp(BaseActionNode):
+    def evaluate(self, context):
+        if self.operation == 'positive':
+            return +(self.operand.evaluate(context))
+        if self.operation == 'negative':
+            return -(self.operand.evaluate(context))
+        if self.operation == 'not':
+            return not self.operand.evaluate(context)
+        raise NotImplementedError
 
-    def __init__(self, operator, left, right):
-        self.operator = operator
+class Add(BaseActionNode):
+
+    def __init__(self, left, right):
         self.left = left
         self.right = right
 
     def evaluate(self, context):
-        left = self.left.evaluate(context)
+        return self.left.evaluate(context) + self.right.evaluate(context)
+
+class Subtract(BaseActionNode):
+
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def evaluate(self, context):
+        return self.left.evaluate(context) - self.right.evaluate(context)
+        
+class Multiply(BaseActionNode):
+
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def evaluate(self, context):
+        return self.left.evaluate(context) * self.right.evaluate(context)
+
+class Divide(BaseActionNode):
+
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def evaluate(self, context):
+        self.left.evaluate(context) / self.right.evaluate(context)
+
+class Exponent(BaseActionNode):
+
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def evaluate(self, context):
         right = self.right.evaluate(context)
-        return operators[self.operator]['function'](left, right)
+        return self.left.evaluate(context) ** right
+
+class Or(BaseActionNode):
+
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def evaluate(self, context):
+        self.left.evaluate(context) or self.right.evaluate(context)
+
+class And(BaseActionNode):
+
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+
+    def evaluate(self, context):
+        self.left.evaluate(context) and self.right.evaluate(context)
 
 class Compare(BaseActionNode):
 
@@ -145,6 +197,17 @@ class Compare(BaseActionNode):
         self.left = left
         self.ops = ops
         self.comparators = comparators
+
+    def evaluate(self, context):
+        operator_map = {'!=': operator.ne, '==': operator.eq, '<': operator.lt, '<=': operator.le, '>': operator.gt, '>=': operator.ge}
+        curr = self.left.evaluate(context)
+        for op, node in zip(self.ops, self.comparators):
+            op_func = operator_map[op]
+            right = node.evaluate(context)
+            if not op_func(curr, right):
+                return False
+            curr = right
+        return True
 
 class List(BaseActionNode):
 
