@@ -28,10 +28,41 @@ from recognition.lark_parser import action_grammar
 #     lark_ir = lark_parser.parse_action(text)
 #     print(lark_ir.pretty())
 
-# def test_call_args():
-#     text = "mouse.move(7, 8, y=$1, relative = True )"
-#     lark_ir = lark_parser.parse_action(text)
-#     print(lark_ir.pretty())
+def test_call_args():
+    text = "mouse.move(7, 8, y=$1, relative = true() )"
+    action = text_to_action(text)
+    to_clipboard(action)
+        assert_equal(action, {
+        "args": [
+            {
+                "type": "Integer",
+                "value": 7
+            },
+            {
+                "type": "Integer",
+                "value": 8
+            }
+        ],
+        "fn": {
+            "attribute_of": {
+                "type": "Name",
+                "value": "mouse"
+            },
+            "name": "move",
+            "type": "Attribute"
+        },
+        "kwargs": {
+            "relative": {
+                "type": "Literal",
+                "value": "True"
+            },
+            "y": {
+                "type": "Variable",
+                "value": 1
+            }
+        },
+        "type": "Call"
+    })
 
 # def test_call_args():
 #     text = "mouse.move(7, 8, y=$1, relative = True )"
@@ -114,7 +145,6 @@ def test_call1():
 def test_variable1():
     text = "4 + $1"
     action = text_to_action(text)
-    to_clipboard(action)
     assert_equal(action,  {
         "left": {
             "type": "Integer",

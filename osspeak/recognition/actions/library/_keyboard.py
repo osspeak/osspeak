@@ -29,5 +29,3 @@ def press_and_release(keys):
     for s in keys:
         flattened_keys.extend(s.split(' '))
     send_input('{' + '+'.join(flattened_keys) + '}')
-    # new_keys = add_keyboard_shortcuts(keys)
-    # keyboard.press_and_release(new_keys)
