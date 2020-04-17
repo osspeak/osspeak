@@ -25,7 +25,7 @@ ARGUMENT_REFERENCE = 'argument_reference'
 SLICE = 'slice'
 
 grammar = f'''start: ([_block] _NEWLINE)* [_block]
-_block: (command | function_definition | named_utterance | comment)
+_block: (command | function_definition | named_utterance | comment | priority)
 comment: /[ \t]*#.*/
 _WS: /[ \t]/
 WS: /[ \t]/
@@ -98,6 +98,8 @@ kwarg: NAME "=" {EXPR}
 
 function_definition: NAME "(" [positional_parameters] ")" "=>" _action
 positional_parameters: NAME ("," NAME)*
+
+priority: "priority" ":" INTEGER
 
 _STRING_INNER: /.*?/
 _STRING_ESC_INNER: _STRING_INNER /(?<!\\\\)(\\\\\\\\)*?/ 

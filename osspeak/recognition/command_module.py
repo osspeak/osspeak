@@ -44,8 +44,11 @@ class Command:
 
 def command_module_from_lark_ir(module_ir, text_by_line):
     cmd_module = CommandModule()
+    command_priority = 1
     for child in module_ir.children:
         ir_type = lark_parser.lark_node_type(child)
+        if ir_type == 'priority':
+            command_priority = int(child.children[0])
         if ir_type == 'command':
             utterance_ir, action_ir = child.children 
             utterance_text = lark_parser.lark_node_text(utterance_ir, text_by_line)
