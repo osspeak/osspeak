@@ -4,7 +4,7 @@ from recognition.rules import _lark
 
 class GrammarContext:
     
-    def __init__(self, xml, command_contexts, active_commands, namespace, named_rules, node_ids):
+    def __init__(self, xml, command_contexts, active_commands, namespace, named_rules, node_ids, utterance_priority):
         self.xml = xml
         self.uuid = str(uuid.uuid4())
         self.command_contexts = command_contexts
@@ -13,4 +13,4 @@ class GrammarContext:
         self.node_ids = node_ids
         self.named_rules = named_rules
         command_rules = [cmd.utterance for cmd in active_commands]
-        self.lark_grammar = _lark.create_lark_grammar(command_rules, named_rules, node_ids)
+        self.lark_grammar = _lark.create_lark_grammar(command_rules, named_rules, node_ids, utterance_priority)

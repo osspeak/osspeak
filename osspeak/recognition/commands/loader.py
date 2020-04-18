@@ -8,6 +8,7 @@ import os.path
 import xml.etree.ElementTree as ET
 import copy
 import re
+import operator
 import collections
 import json
 import log
@@ -29,6 +30,8 @@ DEFAULT_DIRECTORY_SETTINGS = {
     'recurse': True,
     'conditions': {},
 }
+
+PRIORITY_FN = operator.attrgetter('priority')
 
 class CommandModuleController:
 
@@ -86,7 +89,8 @@ class CommandModuleController:
             await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
 
     def build_grammar(self) -> grammar.GrammarContext:
-        named_utterances, command_utterances = self.get_active_utterances()
+        command_modules_by_ascending_priority = sorted(list(self.active_command_modules.values()), key=PRIORITY_FN)
+        named_utterances, command_utterances, utterance_priority = self.get_active_utterances(command_modules_by_ascending_priority)
         cycles = self.calculate_named_utterance_cycles(named_utterances)
         if cycles:
             s = "" if len(cycles) == 1 else "s"
@@ -95,16 +99,16 @@ class CommandModuleController:
                 print(' -> '.join(cycle))
             print('')
             return
-        all_rules = list(named_utterances.values()) + command_utterances
-        node_ids = self.generate_node_ids(all_rules, named_utterances)
-        active_commands = self.get_active_commands()
+        all_utterances = list(named_utterances.values()) + command_utterances
+        node_ids = self.generate_node_ids(all_utterances)
+        active_commands = self.get_active_commands(command_modules_by_ascending_priority)
         namespace = self.get_namespace()
         command_contexts = {}
         for cmd in active_commands:
             variable_tree = variables.RecognitionResultsTree(cmd.utterance, node_ids, named_utterances)
             command_contexts[node_ids[cmd.utterance]] = cmd, variable_tree
-        grammar_xml = self.build_grammar_xml(all_rules, node_ids, named_utterances)
-        grammar_context = grammar.GrammarContext(grammar_xml, command_contexts, active_commands, namespace, named_utterances, node_ids)
+        grammar_xml = self.build_grammar_xml(all_utterances, node_ids, named_utterances)
+        grammar_context = grammar.GrammarContext(grammar_xml, command_contexts, active_commands, namespace, named_utterances, node_ids, utterance_priority)
         return grammar_context
 
     def get_namespace(self):
@@ -119,10 +123,10 @@ class CommandModuleController:
             self.grammars.popitem(last=False)
         self.grammars[grammar.uuid] = grammar
 
-    def generate_node_ids(self, utterances, named_rule_map):
+    def generate_node_ids(self, utterances):
         node_ids = {}
         for utterance in utterances:
-            for node in utterance.walk(rules=named_rule_map):
+            for node in utterance.walk():
                 if node not in node_ids:
                     node_ids[node] = f'n{len(node_ids) + 1}'
         return node_ids
@@ -143,20 +147,25 @@ class CommandModuleController:
     def build_grammar_xml(self, all_active_rules, node_ids, named_rules):
         return SrgsXmlConverter(node_ids, named_rules).build_grammar(all_active_rules)
 
-    def get_active_utterances(self):
+    def get_active_utterances(self, command_modules_by_ascending_priority):
         named_utterances = {}
         named_utterances.update(self.special_rules())
         command_utterances = []
-        for cmd_module in self.active_command_modules.values():
-            named_utterances.update(cmd_module.named_utterances)
-            command_utterances.extend(cmd.utterance for cmd in cmd_module.commands)
-        return named_utterances, command_utterances
+        utterance_priority = {}
+        for cmd_module in command_modules_by_ascending_priority:
+            for name, utterance in cmd_module.named_utterances.items():
+                utterance_priority[utterance] = cmd_module.priority
+                named_utterances[name] = utterance
+            for command in cmd_module.commands:
+                utterance_priority[command.utterance] = cmd_module.priority
+                command_utterances.append(command.utterance)
+        return named_utterances, command_utterances, utterance_priority
 
     def special_rules(self):
         return {'_dictate': astree.Rule()}
 
-    def get_active_commands(self):
-        grouped_commands = [m.commands for m in self.active_command_modules.values()]
+    def get_active_commands(self, command_modules_by_ascending_priority):
+        grouped_commands = [m.commands for m in command_modules_by_ascending_priority]
         return list(itertools.chain.from_iterable(grouped_commands))
     
     def calculate_named_utterance_cycles(self, named_utterances):

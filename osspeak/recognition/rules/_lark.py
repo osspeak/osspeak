@@ -56,10 +56,19 @@ parse_functions = {
     astree.RuleReference: parse_rule_reference
 }
 
-def create_lark_grammar(command_utterances, named_utterances, node_ids):
+def create_lark_grammar(command_utterances, named_utterances, node_ids, utterance_priority):
     lark_rules = create_lark_grammar_list(command_utterances, named_utterances, node_ids)
-
-    rule_lines = [f'{rule_name}: {rule_text}' for rule_name, rule_text in lark_rules]
+    map_node_id_to_priority = {}
+    for utterance, utterance_id in node_ids.items():
+        if utterance in utterance_priority:
+            map_node_id_to_priority[utterance_id] = utterance_priority[utterance]
+    map_id_to_priority = {}
+    rule_lines = []
+    for utterance_id, utterance_text in lark_rules:
+        priority = map_node_id_to_priority.get(utterance_id, 1)
+        priority_text = '' if priority == 1 else f'.{priority}'
+        rule_line = f'{utterance_id}{priority_text}: {utterance_text}'
+        rule_lines.append(rule_line)
     rule_names = ' | '.join([node_ids[c] for c in command_utterances])
     dictation_rule = named_utterances['_dictate']
     dictation_rule_id = node_ids[dictation_rule]
@@ -79,11 +88,11 @@ def create_lark_grammar_list(command_utterances: List, named_utterances, node_id
     lark_named_rules = {}
     lark_command_rules = {}
     lark_internal_rules = {}
-    for rule_name, rule in named_utterances.items():
-        if not rule_name.startswith('_'):
-            lark_named_rules[node_ids[rule]] = parse_rule(rule, lark_internal_rules, node_ids, named_utterances)
-    for rule in command_utterances:
-        lark_command_rules[node_ids[rule]] = parse_rule(rule, lark_internal_rules, node_ids, named_utterances)
+    for utterance_name, utterance in named_utterances.items():
+        if not utterance_name.startswith('_'):
+            lark_named_rules[node_ids[utterance]] = parse_rule(utterance, lark_internal_rules, node_ids, named_utterances)
+    for utterance in command_utterances:
+        lark_command_rules[node_ids[utterance]] = parse_rule(utterance, lark_internal_rules, node_ids, named_utterances)
     return [(k, v) for k, v in {**lark_named_rules, **lark_command_rules, **lark_internal_rules}.items()]
 
 def yield_paths(lark_node, node_map, named_utterances, ancestor_path=()):

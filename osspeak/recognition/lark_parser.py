@@ -99,7 +99,7 @@ kwarg: NAME "=" {EXPR}
 function_definition: NAME "(" [positional_parameters] ")" "=>" _action
 positional_parameters: NAME ("," NAME)*
 
-priority: "priority" ":" INTEGER
+priority: "priority" ":" {EXPR}
 
 _STRING_INNER: /.*?/
 _STRING_ESC_INNER: _STRING_INNER /(?<!\\\\)(\\\\\\\\)*?/ 

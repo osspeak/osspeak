@@ -13,7 +13,7 @@ class Rule(ASTNode):
     def __init__(self):
         self.root = GroupingNode()
 
-    def walk(self, ancestors=None, rules=None):
+    def walk(self):
         yield self
         yield from self.root.walk()
 

@@ -31,6 +31,11 @@ class BaseActionNode:
     def evaluate_lazy(self, context):
         yield self, self.evaluate(context)
 
+    def evaluate_without_context(self):
+        import recognition.actions.context
+        context = recognition.actions.context.empty_recognition_context() 
+        return self.evaluate(context)
+
 class ExpressionSequence(BaseActionNode):
 
     def __init__(self, expressions):
