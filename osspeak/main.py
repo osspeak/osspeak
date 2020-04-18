@@ -46,7 +46,8 @@ def get_cli_loop():
     if no_cli:
         input_blocker = lambda: input('')
     else:
-        input_blocker = menu.MainMenu().start
+        main_menu = menu.MainMenu()
+        input_blocker = main_menu.start
 
     def loop_func():
         input_blocker()

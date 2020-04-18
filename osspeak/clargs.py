@@ -22,7 +22,10 @@ def get_args():
     parser.add_argument('-f', '--file_pattern', default='', help='File pattern for command modules')
     parser.add_argument('--clean_cache', type=str2bool, nargs='?',
                         const=True, default=False,
-                        help="Perform recognized speech actions")
+                        help="Clear out command module cache")
+    parser.add_argument('-t', '--text_mode', type=str2bool, nargs='?',
+                        const=True, default=False,
+                        help="Start in text mode")
     parser.add_argument('-a', '--perform_actions', type=str2bool, nargs='?',
                         const=True, default=True,
                         help="Perform recognized speech actions")

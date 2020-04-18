@@ -40,12 +40,12 @@ class MainMenu(Menu):
     def __init__(self):
         self.title = 'Main Menu'
         self.options = [
-            {'text': 'Debug commands', 'on_select': self.on_debug_commands},
+            {'text': 'Use text commands', 'on_select': self.on_use_text_commands},
             {'text': 'Adjust settings', 'on_select': self.on_adjust_settings},
             {'text': 'Reload command modules', 'on_select': self.reload_command_modules},
         ]
 
-    def on_debug_commands(self):
+    def on_use_text_commands(self):
         self.await_publish(topics.ENGINE_STOP)
         while True:
             user_input = input('Enter text to test or press enter to go back: ')
@@ -66,6 +66,8 @@ class MainMenu(Menu):
 
     def start(self):
         try:
+            if settings.settings['text_mode']:
+                self.on_use_text_commands()
             self.main_loop()
         finally:
             from communication.server import loop, shutdown
