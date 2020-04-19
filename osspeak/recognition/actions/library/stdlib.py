@@ -14,6 +14,7 @@ def wait(n):
 
 namespace = {
     'active_window': lambda: window.active_window_name().title(),
+    'between': flow.between,
     'click': mouse.click,
     'directinput': directinput,
     'eval': lambda context, x: eval(str(x.evaluate(context)), {}, context.namespace),
@@ -42,5 +43,6 @@ namespace['setState'] = lambda name, value: setattr(namespace['state'], name, va
 deferred_arguments_eval = set([
     flow.osspeak_if,
     flow.loop,
+    flow.between,
     namespace['eval'],
 ])

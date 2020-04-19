@@ -24,6 +24,20 @@ def osspeak_if(context, *args):
     elif len(args) >= 3:
         yield from exhaust_generator(args[2].evaluate_lazy(context))
 
+def between(context, main_code, intermediate_code, count_ast):
+    from recognition.actions.astree import exhaust_generator
+    try:
+        count = int(count_ast.evaluate(context))
+    except (TypeError, ValueError):
+        count = 1
+    if count < 1:
+        return
+    for i in range(count - 1):
+        yield from exhaust_generator(main_code.evaluate_lazy(context))
+        yield from exhaust_generator(intermediate_code.evaluate_lazy(context))
+    yield from exhaust_generator(main_code.evaluate_lazy(context))
+
+
 def osspeak_while(*args):
     action_args = args[1:]
     while args[0]():
