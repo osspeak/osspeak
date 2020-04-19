@@ -68,7 +68,7 @@ def perform_action_from_event(action, namespace):
 def perform_commands(grammar_context, words):
     word_list = [word['Text'] for word in words]
     utterance = ' '.join(word_list)
-    lark_recognition_tree = grammar_context.lark_grammar.parse(utterance)
+    lark_recognition_tree = grammar_context.lark_grammar.parse(utterance + ' ') # add a space at the end to account for lark grammar expecting a whitespace after every word
     recognition_contexts = get_recognition_contexts(lark_recognition_tree, grammar_context)
     if settings['perform_actions']:
         for recognition_context, command in recognition_contexts:

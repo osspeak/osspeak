@@ -19,7 +19,7 @@ def build_repeat(node):
     return f'~{low}' if low == high else f'~{low}..{high}'
 
 def parse_word(node: astree.WordNode, internal_rules, node_ids, named_utterances):
-    return build_lark_rule(node, f'"{node.text}"', internal_rules, node_ids)
+    return build_lark_rule(node, f'"{node.text}" _WS+', internal_rules, node_ids)
 
 def parse_rule_reference(node: astree.RuleReference, internal_rules, node_ids, named_utterances):
     referenced_rule = named_utterances[node.rule_name]
@@ -75,7 +75,7 @@ def create_lark_grammar(command_utterances, named_utterances, node_ids, utteranc
     rule_lines.append(rf'{dictation_rule_id}: /(.+)+/')
     rule_lines.append('%import common.WORD')
     rule_lines.append('_WS: /[ \\t]/')
-    rule_lines.append(f'start: ({rule_names}) (_WS+ ({rule_names}))*')
+    rule_lines.append(f'start: ({rule_names})+')
     text = '\n'.join(rule_lines)
     if text in grammar_cache:
         gram = grammar_cache[text]
