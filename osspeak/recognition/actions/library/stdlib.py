@@ -10,7 +10,11 @@ import re
 import time
 
 def wait(n):
-    time.sleep(n)
+    try:
+        count = float(n)
+    except TypeError:
+        count = 0
+    time.sleep(count)
 
 namespace = {
     'active_window': lambda: window.active_window_name().title(),

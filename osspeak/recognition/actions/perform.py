@@ -8,6 +8,7 @@ from lib import keyboard
 from settings import settings
 import platforms.api
 from recognition.actions import context, astree
+from recognition.actions.library import _keyboard
 from recognition.rules import _lark
 
 recognition_queue = queue.Queue()
@@ -32,8 +33,8 @@ def perform_action(action, context):
             if isinstance(node, astree.Literal) and i > 1:
                 previous = evaluated_nodes[i - 1]
                 if written_nodes and isinstance(written_nodes[-1], astree.Literal) and isinstance(previous, astree.ExprSequenceSeparator):
-                    keyboard.write(previous.value, delay=.05)
-            keyboard.write(str(result), delay=.05)
+                    _keyboard.write(previous.value)
+            _keyboard.write(str(result))
             written_nodes.append(node)
         evaluated_nodes.append(node)
     context.argument_frames.pop()
