@@ -26,7 +26,6 @@ namespace = {
     'if': flow.osspeak_if,
     'index': lambda obj, key: obj[key],
     'int': int,
-    'keypress': lambda *k: keyboard.press_and_release(list(k)),
     'loop': flow.loop,
     'mouse': mouse,
     'none': lambda: None,

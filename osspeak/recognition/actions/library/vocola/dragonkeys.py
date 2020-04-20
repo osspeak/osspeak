@@ -23,8 +23,8 @@ debug = False
 # ignore_unknown_names True means type out bad chords rather than
 # raising a KeyError; e.g., "{bad}" sends {, b, a, d, }.
 #
-def senddragonkeys_to_events(input, ignore_unknown_names=True):
-    chords = parse_into_chords(input)
+def senddragonkeys_to_events(input_spec, ignore_unknown_names=True):
+    chords = parse_into_chords(input_spec)
 
     events = []
     for c in chords:
@@ -41,7 +41,7 @@ def senddragonkeys_to_events(input, ignore_unknown_names=True):
             for char in characters:
                 events += chord_to_events([None, char, None, char])
 
-    return events
+    return events, chords
 
     
 

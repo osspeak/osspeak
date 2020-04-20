@@ -73,7 +73,7 @@ _singular: ({EXPR_SEQUENCE} | index | {SLICE} | loop | _grouping | attribute | l
 _chainable: (NAME | attribute | call | list | {VARIABLE} | {ARGUMENT_REFERENCE} | index | {SLICE})
 {UNARY_OPERATOR}: ("+" | "-")
 NOT_OPERATOR: "!"
-keypress: "{{" {EXPR} ("," {EXPR})* "}}"
+keypress: "{{" {EXPR} "}}"
 _VAR_PREC: "$" NO_WS_AHEAD
 _LOOP_SEPARATOR: NO_WS_BEHIND "~" NO_WS_AHEAD
 _ATTR_SEPARATOR: NO_WS_BEHIND "." NO_WS_AHEAD

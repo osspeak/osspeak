@@ -352,3 +352,14 @@ class Variable(BaseActionNode):
             return
         for action in var_actions:
             yield from exhaust_generator(action.evaluate_lazy(context))
+
+class KeySequence(BaseActionNode):
+
+    def __init__(self, keys):
+        self.keys = keys
+
+    def evaluate(self, context):
+        from recognition.actions.library import _keyboard
+        keys = self.keys.evaluate(context)
+        kp = _keyboard.KeyPress.from_space_delimited_string(keys)
+        return kp

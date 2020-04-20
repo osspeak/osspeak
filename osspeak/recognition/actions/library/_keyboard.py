@@ -9,39 +9,46 @@ shortcuts = {
     'back': 'backspace'
 }
 
+class KeyPress:
+
+    def __init__(self, chords):
+        self.chords = chords
+
+    @classmethod
+    def from_raw_text(cls, s: str):
+        chords = []
+        for char in s:
+            chords.append([None, char, None, char])
+        instance = cls(chords)
+        return instance
+
+    @classmethod
+    def from_space_delimited_string(cls, s: str):
+        spl = s.split(' ')
+        specification = '{' + '+'.join(spl) + '}'
+        chords = dragonkeys.parse_into_chords(specification)
+        instance = cls(chords)
+        return instance
+
+    def send(self):
+        events = []
+        for chord in self.chords:
+            keys_pressed = keys_pressed_from_chord(chord)
+            chord_events = dragonkeys.chord_to_events(chord)
+            events.extend(chord_events)
+        sendinput.send_input(events)
+
 class KeyDelayer:
 
     def __init__(self):
         self.delays_by_key = {}
+        self.last_keypresses = {}
 
 key_delayer = KeyDelayer()
 
+def add_delay():
+    pass
 
-def add_keyboard_shortcuts(keys):
-    return [shortcuts.get(k, k) for k in keys]
-    for item in keys:
-        new_keys.append([shortcuts.get(k, k) for k in item])
-    return new_keys
-
-def hold(keys):
-    api.type_keypresses(keys, direction='down')
-
-def press(keys):
-    keyboard.press(add_keyboard_shortcuts(keys))
-
-def release(keys):
-    keyboard.release(add_keyboard_shortcuts(keys))
-
-def press_and_release(keys):
-    flattened_keys = []
-    for s in keys:
-        flattened_keys.extend(s.split(' '))
-    specification = '{' + '+'.join(flattened_keys) + '}'
-    key_events = dragonkeys.senddragonkeys_to_events(specification)
-    sendinput.send_input(key_events)
-
-def write(text, delay=.05):
-    events = []
-    for char in text:
-        events.extend(dragonkeys.chord_to_events([None, char, None, char]))
-    sendinput.send_input(events)
+def keys_pressed_from_chord(chord):
+    first = [] if chord[0] is None else chord[0].split('+')
+    return tuple(first + [chord[1]])

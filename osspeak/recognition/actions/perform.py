@@ -33,9 +33,11 @@ def perform_action(action, context):
             if isinstance(node, astree.Literal) and i > 1:
                 previous = evaluated_nodes[i - 1]
                 if written_nodes and isinstance(written_nodes[-1], astree.Literal) and isinstance(previous, astree.ExprSequenceSeparator):
-                    _keyboard.write(previous.value)
-            _keyboard.write(str(result))
+                    _keyboard.KeyPress.from_raw_text(previous.value).send()
+            _keyboard.KeyPress.from_raw_text(str(result)).send()
             written_nodes.append(node)
+        elif isinstance(result, _keyboard.KeyPress):
+            result.send()
         evaluated_nodes.append(node)
     context.argument_frames.pop()
 
@@ -55,12 +57,6 @@ def recognition_action_worker():
 
 worker = threading.Thread(target=recognition_action_worker, daemon=True)
 worker.start()
-
-def perform_io(item):
-    if isinstance(item, (str, float, int)):
-        keyboard.write(str(item), delay=.05)
-        return True
-    return False
 
 def perform_action_from_event(action, namespace):
     recognition_context = context.RecognitionContext([], None, namespace, [])

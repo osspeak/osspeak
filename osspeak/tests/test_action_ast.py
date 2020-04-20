@@ -8,31 +8,10 @@ import recognition.actions.library.clipboard
 from recognition import lark_parser
 from recognition.lark_parser import action_grammar
 
-# def test_escaped_strings():
-#     text = r"'he\'ll\"o'"
-#     lark_ir = lark_parser.parse_action(text)
-#     print(lark_ir.pretty())
-
-# def test_keypress():
-#     text = "{ctrl, alt, del}"
-#     lark_ir = lark_parser.parse_action(text)
-#     print(lark_ir.pretty())
-
-# def test_variables():
-#     text = "$3 $-2"
-#     lark_ir = lark_parser.parse_action(text)
-#     print(lark_ir.pretty())
-
-# def test_call_chain():
-#     text = "current_window.something().click()"
-#     lark_ir = lark_parser.parse_action(text)
-#     print(lark_ir.pretty())
-
 def test_call_args():
     text = "mouse.move(7, 8, y=$1, relative = true() )"
     action = text_to_action(text)
-    to_clipboard(action)
-        assert_equal(action, {
+    assert_equal(action, {
         "args": [
             {
                 "type": "Integer",
@@ -53,8 +32,13 @@ def test_call_args():
         },
         "kwargs": {
             "relative": {
-                "type": "Literal",
-                "value": "True"
+                "args": [],
+                "fn": {
+                    "type": "Name",
+                    "value": "true"
+                },
+                "kwargs": {},
+                "type": "Call"
             },
             "y": {
                 "type": "Variable",
@@ -116,18 +100,11 @@ def test_call1():
     assert_equal(action, {
         "args": [
             {
-                "args": [
-                    {
-                        "type": "Variable",
-                        "value": 1
-                    }
-                ],
-                "fn": {
-                    "type": "Name",
-                    "value": "keypress"
+                "keys": {
+                    "type": "Variable",
+                    "value": 1
                 },
-                "kwargs": {},
-                "type": "Call"
+                "type": "KeySequence"
             },
             {
                 "type": "Variable",

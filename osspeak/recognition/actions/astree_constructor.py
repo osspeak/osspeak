@@ -119,9 +119,8 @@ def parse_attribute(lark_ir):
     return astree.Attribute(attribute_of, name)
 
 def parse_keypress(lark_ir):
-    fn = astree.Name('keypress')
-    keys = [parse_node(x) for x in lark_ir.children]
-    return astree.Call(fn, keys, {})
+    keys = parse_node(lark_ir.children[0])
+    return astree.KeySequence(keys)
 
 def parse_unaryop(lark_ir):
     op = 'negative'
