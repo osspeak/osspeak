@@ -6,10 +6,6 @@ from platforms import api
 import time
 import threading
 
-shortcuts = {
-    'back': 'backspace'
-}
-
 class KeyPress:
 
     def __init__(self, chords):
