@@ -85,11 +85,27 @@ class KeyDelayer:
         for key_combo in keys:
             self.delays[key_combo] = delay
 
+    def remove_delay(self, keys):
+        for key_combo in keys:
+            try:
+                del self.delays[key_combo]
+            except KeyError:
+                pass
+
 key_delayer = KeyDelayer()
 
 def add_delay(context, keys, n):
     keys = keys.evaluate(context)
     n = n.evaluate(context)
+    all_keys = expand_keys(keys)
+    key_delayer.add_delay(all_keys, n)
+
+def remove_delay(context, keys):
+    keys = keys.evaluate(context)
+    all_keys = expand_keys(keys)
+    key_delayer.remove_delay(all_keys)
+
+def expand_keys(keys):
     if not isinstance(keys, (list, tuple)):
         keys = [keys]
     all_keys = []
@@ -104,7 +120,9 @@ def add_delay(context, keys, n):
             key_tuple = value,
             if key_tuple not in all_keys:
                 all_keys.append(key_tuple)
-    key_delayer.add_delay(all_keys, n)
+        else:
+            raise NotImplementedError
+    return all_keys
 
 def keys_pressed_from_chord(chord):
     first = [] if chord[0] in (None, '') else chord[0].split('+')

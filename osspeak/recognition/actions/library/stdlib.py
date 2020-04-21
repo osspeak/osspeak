@@ -49,5 +49,6 @@ deferred_arguments_eval = set([
     flow.loop,
     flow.between,
     keyboard.add_delay,
+    keyboard.remove_delay,
     namespace['eval'],
 ])

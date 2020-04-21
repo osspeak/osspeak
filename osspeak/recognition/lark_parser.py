@@ -116,14 +116,6 @@ lark_grammar = Lark(grammar, propagate_positions=True, maybe_placeholders=True)
 utterance_grammar = Lark(grammar, start='utterance', propagate_positions=True, maybe_placeholders=True)
 action_grammar = Lark(grammar, start='_action', propagate_positions=True, maybe_placeholders=True)
 
-class Foo(Transformer):
-
-    def string(self, children):
-        child = children[0]
-        if isinstance(child, Tree) and child.data =='literal':
-            return str(child.children[0])
-        return child[1:-1]
-
 def parse_command_module(text: str):
     ir = lark_grammar.parse(text)
     return ir
@@ -135,8 +127,6 @@ def parse_utterance(text: str):
 def parse_action(text: str):
     ast = action_grammar.parse(text)
     return ast.children[0]
-    transformed = Foo().transform(ast)
-    return transformed
 
 def lark_node_type(lark_ir):
     type_attr = 'data' if isinstance(lark_ir, Tree) else 'type'
