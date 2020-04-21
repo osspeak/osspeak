@@ -186,7 +186,7 @@ class Or(BaseActionNode):
         self.right = right
 
     def evaluate(self, context):
-        self.left.evaluate(context) or self.right.evaluate(context)
+        return self.left.evaluate(context) or self.right.evaluate(context)
 
 class And(BaseActionNode):
 
@@ -195,7 +195,7 @@ class And(BaseActionNode):
         self.right = right
 
     def evaluate(self, context):
-        self.left.evaluate(context) and self.right.evaluate(context)
+        return self.left.evaluate(context) and self.right.evaluate(context)
 
 class Compare(BaseActionNode):
 
