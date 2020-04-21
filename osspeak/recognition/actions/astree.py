@@ -4,6 +4,7 @@ from lib import keyboard
 from recognition import lark_parser
 import lark.tree
 import types
+import re
 import json
 import operator
 
@@ -364,3 +365,11 @@ class KeySequence(BaseActionNode):
         keys = self.keys.evaluate(context)
         kp = _keyboard.KeyPress.from_space_delimited_string(keys)
         return kp
+
+class RegularExpression(BaseActionNode):
+    
+    def __init__(self, value):
+        self.value = value
+
+    def evaluate(self, context):
+        return re.compile(self.value)

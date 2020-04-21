@@ -148,6 +148,7 @@ parse_map = {
     'literal': lambda x: astree.Literal(''.join(str(s) for s in x.children)),
     'STRING_DOUBLE': lambda x: astree.String(str(x)[1:-1]),
     'STRING_SINGLE': lambda x: astree.String(str(x)[1:-1]),
+    'REGEX': lambda x: astree.RegularExpression(str(x)[1:-1]),
     'list': parse_list,
     'loop': parse_loop,
     'expr': parse_expr,

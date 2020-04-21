@@ -69,7 +69,7 @@ additive: multiplicative (ADDITIVE_OPERATOR multiplicative)*
 multiplicative: unary (MULTIPLICATIVE_OPERATOR unary)*
 unary: [{UNARY_OPERATOR}] exponent
 exponent: _singular ("**" _singular)*
-_singular: ({EXPR_SEQUENCE} | index | {SLICE} | loop | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
+_singular: ({EXPR_SEQUENCE} | index | {SLICE} | loop | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | REGEX | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 _chainable: (NAME | attribute | call | list | {VARIABLE} | {ARGUMENT_REFERENCE} | index | {SLICE})
 {UNARY_OPERATOR}: ("+" | "-")
 NOT_OPERATOR: "!"
@@ -105,6 +105,7 @@ _STRING_INNER: /.*?/
 _STRING_ESC_INNER: _STRING_INNER /(?<!\\\\)(\\\\\\\\)*?/ 
 STRING_SINGLE: "'" _STRING_ESC_INNER "'"
 STRING_DOUBLE: "\\"" _STRING_ESC_INNER "\\""
+REGEX: "/" _STRING_ESC_INNER "/"
 
 %import common.WORD  // imports from terminal library
 %import common.FLOAT  // imports from terminal library
