@@ -36,13 +36,13 @@ namespace = {
     'run': process.run,
     'run_sync': process.run_sync,
     'screengrid': screengrid,
+    'setState': lambda name, value: setattr(namespace['state'], name, value),
     'state': SimpleNamespace(),
     'str': str,
     'true': lambda: True,
     'wait': wait,
     'window': window,
 }
-namespace['setState'] = lambda name, value: setattr(namespace['state'], name, value)
 
 deferred_arguments_eval = set([
     flow.osspeak_if,
