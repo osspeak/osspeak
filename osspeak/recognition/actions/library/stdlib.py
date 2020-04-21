@@ -26,6 +26,7 @@ namespace = {
     'if': flow.osspeak_if,
     'index': lambda obj, key: obj[key],
     'int': int,
+    'keyboard': keyboard,
     'loop': flow.loop,
     'mouse': mouse,
     'none': lambda: None,
@@ -47,5 +48,6 @@ deferred_arguments_eval = set([
     flow.osspeak_if,
     flow.loop,
     flow.between,
+    keyboard.add_delay,
     namespace['eval'],
 ])

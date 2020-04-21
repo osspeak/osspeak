@@ -1,4 +1,5 @@
 import threading
+import re
 from lib import keyboard
 from recognition.actions.library.vocola import dragonkeys, sendinput
 from platforms import api
@@ -31,24 +32,84 @@ class KeyPress:
         return instance
 
     def send(self):
-        events = []
-        for chord in self.chords:
-            keys_pressed = keys_pressed_from_chord(chord)
-            chord_events = dragonkeys.chord_to_events(chord)
-            events.extend(chord_events)
-        sendinput.send_input(events)
+        unpressed_chords = []
+        for i, chord in enumerate(self.chords):
+            is_last_chord = i + 1 == len(self.chords)
+            chord_keys = keys_pressed_from_chord(chord)
+            delay = key_delayer.delays.get(chord_keys)
+            time_to_wait = delay.time_to_wait if delay else 0
+            if time_to_wait:
+                send_chords(unpressed_chords)
+                time.sleep(delay.time_to_wait)
+                unpressed_chords = [chord]
+            else:
+                unpressed_chords.append(chord)
+            if is_last_chord:
+                send_chords(unpressed_chords)
+            if delay:
+                delay.reset()
+
+def send_chords(chords):
+    if not chords:
+        return
+    events = events_from_chords(chords)
+    sendinput.send_input(events)
+
+def events_from_chords(chords):
+    events = []
+    for chord in chords:
+        chord_events = dragonkeys.chord_to_events(chord)
+        events.extend(chord_events)
+    return events
+
+class DelayTimer:
+
+    def __init__(self, length):
+        self.length = length
+        self.start = None
+
+    def reset(self):
+        self.start = time.time()
+
+    @property
+    def time_to_wait(self):
+        if self.start is None:
+            return 0
+        now = time.time()
+        done_at = self.start + self.length
+        return max(done_at - now, 0)
 
 class KeyDelayer:
 
     def __init__(self):
-        self.delays_by_key = {}
-        self.last_keypresses = {}
+        self.delays = {}
+
+    def add_delay(self, keys, n):
+        delay = DelayTimer(n)
+        for key_combo in keys:
+            self.delays[key_combo] = delay
 
 key_delayer = KeyDelayer()
 
-def add_delay():
-    pass
+def add_delay(context, keys, n):
+    keys = keys.evaluate(context)
+    n = n.evaluate(context)
+    if not isinstance(keys, (list, tuple)):
+        keys = [keys]
+    all_keys = []
+    for value in keys:
+        if isinstance(value, re.Pattern):
+            for known_key in dragonkeys.Key_name:
+                if value.match(known_key):
+                    key_tuple = known_key,
+                    if key_tuple not in all_keys:
+                        all_keys.append(key_tuple)
+        elif isinstance(value, str):
+            key_tuple = value,
+            if key_tuple not in all_keys:
+                all_keys.append(key_tuple)
+    key_delayer.add_delay(all_keys, n)
 
 def keys_pressed_from_chord(chord):
-    first = [] if chord[0] is None else chord[0].split('+')
-    return tuple(first + [chord[1]])
+    first = [] if chord[0] in (None, '') else chord[0].split('+')
+    return tuple(x.lower() for x in first + [chord[1]])

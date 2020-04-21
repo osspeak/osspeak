@@ -266,12 +266,13 @@ class Call(BaseActionNode):
         self.kwargs = kwargs
 
     def prepare_call(self, context):
-        kwarg_values = {k: v.evaluate(context) for k, v in self.kwargs.items()}
         function_to_call = self.fn.evaluate(context)
         if function_to_call in stdlib.deferred_arguments_eval:
             arg_values = [context] + self.args
+            kwarg_values = self.kwargs.copy()
         else:
             arg_values = [arg.evaluate(context) for arg in self.args]
+            kwarg_values = {k: v.evaluate(context) for k, v in self.kwargs.items()}
         return arg_values, kwarg_values, function_to_call
 
     def add_argument_frame(self, context, function_to_call, arg_values):
