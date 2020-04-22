@@ -14,3 +14,7 @@ class GrammarContext:
         self.named_rules = named_rules
         command_rules = [cmd.utterance for cmd in active_commands]
         self.lark_grammar = _lark.create_lark_grammar(command_rules, named_rules, node_ids, utterance_priority)
+
+    def parse_recognition(self, text):
+        return self.lark_grammar.parse(text + ' ') # add a space at the end to account for lark grammar expecting a whitespace after every word
+

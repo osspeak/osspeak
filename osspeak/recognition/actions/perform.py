@@ -14,14 +14,6 @@ from recognition.rules import _lark
 recognition_queue = queue.Queue()
 results_map = {}
 
-def get_recognition_context():
-    t = threading.current_thread()
-    return results_map[t]['context']
-
-def recognition_namespace():
-    recognition_context = get_recognition_context()
-    return {'context': recognition_context, **recognition_context._meta.namespace}
-
 def perform_action(action, context):
     context.argument_frames.append({})
     gen = action.evaluate_lazy(context)
@@ -65,7 +57,7 @@ def perform_action_from_event(action, namespace):
 def perform_commands(grammar_context, words):
     word_list = [word['Text'] for word in words]
     utterance = ' '.join(word_list)
-    lark_recognition_tree = grammar_context.lark_grammar.parse(utterance + ' ') # add a space at the end to account for lark grammar expecting a whitespace after every word
+    lark_recognition_tree = grammar_context.parse_recognition(utterance)
     recognition_contexts = get_recognition_contexts(lark_recognition_tree, grammar_context)
     if settings['perform_actions']:
         for recognition_context, command in recognition_contexts:
@@ -100,6 +92,7 @@ def get_recognition_contexts(lark_recognition_tree, grammar_context):
         variables = tuple(match_variables.values())
         log.logger.info(f'Matched rule: {command.utterance_text}')
         # formatted_variable_words = tuple(' '.join(x) for x in variable_words.values())
+        print(variable_words)
         formatted_variable_words = ()
         rec_context = context.RecognitionContext(variables, words, grammar_context.namespace, formatted_variable_words)
         recognition_contexts.append((rec_context, command))
