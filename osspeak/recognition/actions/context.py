@@ -4,7 +4,7 @@ from recognition.actions import library
 
 class RecognitionContext:
 
-    def __init__(self, variables, words, namespace, variable_words):
+    def __init__(self, variables, words, namespace):
         self.variables = variables
         self.namespace = namespace
         self.argument_frames = []
@@ -13,4 +13,4 @@ class RecognitionContext:
 
 def empty_recognition_context():
     ns = recognition.actions.library.stdlib.namespace.copy()
-    return RecognitionContext([], [], ns, [])
+    return RecognitionContext([], [], ns)

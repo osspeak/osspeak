@@ -1,6 +1,7 @@
 import lark.lexer
 from recognition.actions.library import stdlib
 from lib import keyboard
+from recognition.actions.library import _keyboard
 from recognition import lark_parser
 import lark.tree
 import types
@@ -36,6 +37,25 @@ class BaseActionNode:
         import recognition.actions.context
         context = recognition.actions.context.empty_recognition_context() 
         return self.evaluate(context)
+
+    def perform(self, context):
+        context.argument_frames.append({})
+        gen = self.evaluate_lazy(context)
+        evaluated_nodes = []
+        written_nodes = []
+        for i, (node, result) in enumerate(self.evaluate_lazy(context)):
+            assert isinstance(node, BaseActionNode)
+            if isinstance(result, (str, float, int)):
+                if isinstance(node, Literal) and i > 1:
+                    previous = evaluated_nodes[i - 1]
+                    if written_nodes and isinstance(written_nodes[-1], Literal) and isinstance(previous, ExprSequenceSeparator):
+                        _keyboard.KeyPress.from_raw_text(previous.value).send()
+                _keyboard.KeyPress.from_raw_text(str(result)).send()
+                written_nodes.append(node)
+            elif isinstance(result, _keyboard.KeyPress):
+                result.send()
+            evaluated_nodes.append(node)
+        context.argument_frames.pop()
 
 class ExpressionSequence(BaseActionNode):
 
