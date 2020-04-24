@@ -1,5 +1,5 @@
 from recognition.actions.library import (window, thread,
-extensions, general, text, clipboard, osspeak, conditionals, history,
+extensions, general, text, clipboard, macro, osspeak, conditionals,
 fsystem, math, directinput, flow, process)
 from recognition.actions.library import _mouse as mouse
 from recognition.actions.library import _keyboard as keyboard
@@ -28,6 +28,7 @@ namespace = {
     'int': int,
     'keyboard': keyboard,
     'loop': flow.loop,
+    'macro': macro,
     'mouse': mouse,
     'none': lambda: None,
     'print': print,
@@ -43,6 +44,8 @@ namespace = {
     'wait': wait,
     'window': window,
 }
+# avoid circular import timing issue
+macro._restore_saved()
 
 deferred_arguments_eval = set([
     flow.osspeak_if,

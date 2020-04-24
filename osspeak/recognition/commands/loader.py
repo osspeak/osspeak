@@ -41,6 +41,7 @@ class CommandModuleController:
         self.map_grammar_to_commands = collections.OrderedDict()
         self.command_modules = {}
         self.active_command_modules = {}
+        self.map_nodes_to_command_module = {}
 
     def initialize_command_modules(self):
         if clargs.get_args()['clean_cache']:
@@ -49,8 +50,8 @@ class CommandModuleController:
         new_cache = recognition.cache.empty_cache()
         files = self.module_loader.load_files()
         command_modules = {}
-        for file_name, text in files.items():
-            if file_name.endswith('.speak'):
+        for full_path, text in files.items():
+            if full_path.endswith('.speak'):
                 if text in command_module_cache['command_modules']:
                     cmd_module_json_str = command_module_cache['command_modules'][text]
                     cmd_module = recognition.cache.from_text(cmd_module_json_str)
@@ -58,12 +59,14 @@ class CommandModuleController:
                     try:
                         module_ir = lark_parser.parse_command_module(text)
                     except (lark.exceptions.UnexpectedCharacters, lark.exceptions.UnexpectedEOF) as e:
-                        print(f'Error parsing command module {file_name}:\n{e}')
+                        print(f'Error parsing command module {full_path}:\n{e}')
                         print('Continuing...')
                         continue
                     text_by_line = text.split('\n')
                     cmd_module = command_module.command_module_from_lark_ir(module_ir, text_by_line)
-                command_modules[file_name] = cmd_module
+                command_modules[full_path] = cmd_module
+                cmd_module.relative_path = os.path.relpath(full_path, self.module_loader.root)
+                cmd_module.absolute_path = full_path
                 new_cache['command_modules'][text] = recognition.cache.to_json_string(cmd_module)
         recognition.cache.save_cache(new_cache)
         return command_modules
@@ -90,7 +93,7 @@ class CommandModuleController:
 
     def build_grammar(self) -> grammar.GrammarContext:
         command_modules_by_ascending_priority = sorted(list(self.active_command_modules.values()), key=PRIORITY_FN)
-        named_utterances, command_utterances, utterance_priority = self.get_active_utterances(command_modules_by_ascending_priority)
+        named_utterances, commands, utterance_priority = self.get_active_named_utterances_and_commands(command_modules_by_ascending_priority)
         cycles = self.calculate_named_utterance_cycles(named_utterances)
         if cycles:
             s = "" if len(cycles) == 1 else "s"
@@ -99,16 +102,16 @@ class CommandModuleController:
                 print(' -> '.join(cycle))
             print('')
             return
+        command_utterances = [cmd.utterance for cmd in commands]
         all_utterances = list(named_utterances.values()) + command_utterances
         node_ids = self.generate_node_ids(all_utterances)
-        active_commands = self.get_active_commands(command_modules_by_ascending_priority)
         namespace = self.get_namespace()
         command_contexts = {}
-        for cmd in active_commands:
+        for cmd in commands:
             variable_tree = variables.RecognitionResultsTree(cmd.utterance, node_ids, named_utterances)
             command_contexts[node_ids[cmd.utterance]] = cmd, variable_tree
         grammar_xml = self.build_grammar_xml(all_utterances, node_ids, named_utterances)
-        grammar_context = grammar.GrammarContext(grammar_xml, command_contexts, active_commands, namespace, named_utterances, node_ids, utterance_priority)
+        grammar_context = grammar.GrammarContext(grammar_xml, command_modules_by_ascending_priority, command_contexts, commands, namespace, named_utterances, node_ids, utterance_priority)
         return grammar_context
 
     def get_namespace(self):
@@ -136,30 +139,32 @@ class CommandModuleController:
         for deactivated_name in previous_names - current_names:
             cmd_module = previous_active_modules[deactivated_name]
             if 'on_deactivate' in cmd_module.functions:
+                source = {'command_module': cmd_module, 'type': 'command_module_deactivated'}
                 action = cmd_module.functions['on_deactivate'].action
-                perform.perform_action_from_event(action, namespace)
+                perform.perform_action_from_event(action, namespace, source)
         for activated_name in current_names - previous_names:
             cmd_module = self.active_command_modules[activated_name]
             if 'on_activate' in cmd_module.functions:
+                source = {'command_module': cmd_module, 'type': 'command_module_activated'}
                 action = cmd_module.functions['on_activate'].action
-                perform.perform_action_from_event(action, namespace)
+                perform.perform_action_from_event(action, namespace, source)
 
     def build_grammar_xml(self, all_active_rules, node_ids, named_rules):
         return SrgsXmlConverter(node_ids, named_rules).build_grammar(all_active_rules)
 
-    def get_active_utterances(self, command_modules_by_ascending_priority):
+    def get_active_named_utterances_and_commands(self, command_modules_by_ascending_priority):
         named_utterances = {}
         named_utterances.update(self.special_rules())
-        command_utterances = []
         utterance_priority = {}
+        active_commands = []
         for cmd_module in command_modules_by_ascending_priority:
             for name, utterance in cmd_module.named_utterances.items():
                 utterance_priority[utterance] = cmd_module.priority
                 named_utterances[name] = utterance
             for command in cmd_module.commands:
                 utterance_priority[command.utterance] = cmd_module.priority
-                command_utterances.append(command.utterance)
-        return named_utterances, command_utterances, utterance_priority
+                active_commands.append(command)
+        return named_utterances, active_commands, utterance_priority
 
     def special_rules(self):
         return {'_dictate': astree.Rule()}

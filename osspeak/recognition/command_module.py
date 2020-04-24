@@ -5,7 +5,7 @@ import itertools
 import json
 import lark.exceptions
 
-from recognition.actions.library import history, window
+from recognition.actions.library import window
 from recognition.actions import variables
 from recognition import cache
 import recognition.actions.astree_constructor
@@ -22,13 +22,14 @@ class CommandModule:
         self.commands = []
         # currently activate and deactivate
         self.events = {}
+        self.relative_path = None
+        self.absolute_path = None
         self.priority = 1
 
     def is_active(self, current_window: str):
         test_fn = self.functions.get('is_active')
         if test_fn:
-            context = recognition.actions.context.empty_recognition_context()
-            eval_result = test_fn.action.evaluate(context)
+            eval_result = test_fn.action.evaluate_without_context()
             if isinstance(eval_result, str):
                 current_window_matches = re.search(eval_result, current_window, flags=re.IGNORECASE)
                 return current_window_matches
@@ -52,7 +53,6 @@ def command_module_from_lark_ir(module_ir, text_by_line):
             action_ir = child.children[0]
             action_text = lark_parser.lark_node_text(action_ir, text_by_line)
             action = recognition.actions.astree_constructor.action_from_lark_ir(action_ir, action_text)
-            action.evaluate_without_context()
             priority = action.evaluate_without_context()
             if isinstance(priority, (int, float)):
                 cmd_module.priority = priority

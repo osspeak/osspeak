@@ -15,6 +15,7 @@ DEFAULT_CONFIG = {
     'command_directory': os.path.join(OSSPEAK_DIRECTORY, 'commands'),
     'external_directory': os.path.join(OSSPEAK_DIRECTORY, 'external'),
     'cache': os.path.join(OSSPEAK_DIRECTORY, '.cache.json'),
+    'macros': os.path.join(OSSPEAK_DIRECTORY, 'macros.json'),
     'gui_port': 3922,
     'perform_actions': True,
     'engine': {

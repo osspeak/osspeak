@@ -8,37 +8,57 @@ from lib import keyboard
 from settings import settings
 import platforms.api
 from recognition.actions import context, astree
-from recognition.actions.library import _keyboard
+from recognition.actions.library import _keyboard, macro
 from recognition.rules import _lark
 
 recognition_queue = queue.Queue()
 recognition_history = collections.deque(maxlen=100)
 
+class RecognitionEvent:
+
+    def __init__(self, words):
+        self.words = words
+
+class ActionPerformContext:
+
+    def __init__(self, action: astree.BaseActionNode, recognition_context: context.RecognitionContext, source):
+        self.action = action
+        self.recognition_context = recognition_context
+        self.source = source
+
 def recognition_action_worker():
     while True:
-        action, recognition_context = recognition_queue.get()
+        queued_action_context = recognition_queue.get()
+        # action, recognition_context, source = recognition_queue.get()
         try:
-            evaluation = action.perform(recognition_context)
+            evaluation = queued_action_context.action.perform(queued_action_context.recognition_context)
         except Exception as e:
             traceback.print_exc()
-            log.logger.error(f'Action {action} errored: {str(e)}')
+            log.logger.error(f'Action {queued_action_context.action} errored: {str(e)}')
             print(e)
+        recognition_history.append(queued_action_context)
+        for m in macro.recording_macros.values():
+            m.action_contexts.append(queued_action_context)
 
 worker = threading.Thread(target=recognition_action_worker, daemon=True)
 worker.start()
 
-def perform_action_from_event(action, namespace):
+def perform_action_from_event(action, namespace, source):
     recognition_context = context.RecognitionContext([], None, namespace)
-    recognition_queue.put((action, recognition_context))
+    queued_action = ActionPerformContext(action, recognition_context, source)
+    recognition_queue.put(queued_action)
 
 def perform_commands(grammar_context, words):
     word_list = [word['Text'] for word in words]
     utterance = ' '.join(word_list)
     lark_recognition_tree = grammar_context.parse_recognition(utterance)
     recognition_contexts = get_recognition_contexts(lark_recognition_tree, grammar_context)
+    recognition_event = RecognitionEvent(word_list)
+    source = {'type': 'recognition_event', 'event': recognition_event}
     if settings['perform_actions']:
         for recognition_context, command in recognition_contexts:
-            recognition_queue.put((command.action, recognition_context))
+            queued_action = ActionPerformContext(command.action, recognition_context, source)
+            recognition_queue.put(queued_action)
 
 def get_recognition_contexts(lark_recognition_tree, grammar_context):
     recognition_contexts = []
