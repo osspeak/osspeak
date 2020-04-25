@@ -11,3 +11,6 @@ def x():
 
 def y():
     return mouse.get_position()[1]
+
+def wheel(delta=1):
+    mouse.wheel(delta)
