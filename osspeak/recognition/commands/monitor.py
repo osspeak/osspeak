@@ -7,7 +7,6 @@ import clargs
 from recognition.commands import loader
 from recognition.actions import perform
 from communication import topics, pubsub
-from profile import Profiler
 import time
 
 

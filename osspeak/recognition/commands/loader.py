@@ -1,4 +1,3 @@
-from profile import Profiler
 import itertools
 from recognition.actions import library
 import uuid
