@@ -1,6 +1,5 @@
 import json
 import asyncio
-import socket
 from communication import pubsub
 import queue
 from log import logger

@@ -28,7 +28,7 @@ def play(name):
         log.logger.warn(f'No macro named {name}')
     for action_context in macros[name].action_contexts:
         try:
-            evaluation = action_context.action.perform(action_context.recognition_context)
+            action_context.action.perform(action_context.recognition_context)
         except Exception as e:
             traceback.print_exc()
             log.logger.error(f'Action {action_context.action} errored: {str(e)}')

@@ -122,11 +122,6 @@ def parse_keypress(lark_ir):
     keys = parse_node(lark_ir.children[0])
     return astree.KeySequence(keys)
 
-def parse_unaryop(lark_ir):
-    op = 'negative'
-    operand = parse_node(lark_ir.children[1])
-    return astree.BinOp(op, operand)
-
 def parse_index(lark_ir):
     index_of = parse_node(lark_ir.children[0])
     index = parse_node(lark_ir.children[1])
