@@ -11,7 +11,10 @@ def pascal_case(s, sep=None):
     return ''.join(w.title() for w in spl)
 
 def snake_case(s):
-    return case(s, '_')
+    s = s if isinstance(s, str) else ''
+    spl = s.split()
+    return '_'.join(spl)
+    return case(s or '', '_')
 
 def case(s, delim):
     import re

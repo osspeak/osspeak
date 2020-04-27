@@ -44,6 +44,7 @@ class KeyPress:
                 send_chords(unpressed_chords)
             if delay:
                 delay.reset()
+        time.sleep(.1)
 
 def send_chords(chords):
     if not chords:

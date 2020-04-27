@@ -70,7 +70,7 @@ def create_lark_grammar(command_utterances, named_utterances, node_ids, utteranc
         rule_line = f'{utterance_id}{priority_text}: {utterance_text}'
         rule_lines.append(rule_line)
     rule_names = ' | '.join([node_ids[c] for c in command_utterances])
-    dictation_rule = named_utterances['_dictate']
+    dictation_rule = named_utterances['_dictation']
     dictation_rule_id = node_ids[dictation_rule]
     rule_lines.append(rf'{dictation_rule_id}: /(.+)+/')
     rule_lines.append('%import common.WORD')
@@ -107,5 +107,5 @@ def yield_paths(lark_node, node_map, named_utterances, ancestor_path=()):
 def node_text(node, lark_node, named_utterances):
     if isinstance(node, astree.WordNode):
         return node.text
-    elif isinstance(node, astree.Rule) and named_utterances['_dictate'] is node:
+    elif isinstance(node, astree.Rule) and named_utterances['_dictation'] is node:
         return lark_node.children[0]

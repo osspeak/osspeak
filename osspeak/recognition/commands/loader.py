@@ -166,7 +166,7 @@ class CommandModuleController:
         return named_utterances, active_commands, utterance_priority
 
     def special_rules(self):
-        return {'_dictate': astree.Rule()}
+        return {'_dictation': astree.Rule()}
 
     def get_active_commands(self, command_modules_by_ascending_priority):
         grouped_commands = [m.commands for m in command_modules_by_ascending_priority]

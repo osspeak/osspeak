@@ -23,7 +23,7 @@ class RecognitionResultsTree:
                 return False
         is_grouping_variable = isinstance(node_wrapper.node, astree.GroupingNode) and len(node_wrapper.node.sequences) > 1
         is_dictation = (isinstance(node_wrapper.node, astree.RuleReference) and
-                        node_wrapper.node.rule_name == '_dictate')
+                        node_wrapper.node.rule_name == '_dictation')
         is_variable = is_grouping_variable or is_dictation
         return is_variable
 

@@ -310,7 +310,11 @@ class Call(BaseActionNode):
             result = function_to_call.action.evaluate(context)
             context.argument_frames.pop()
             return result
-        result = function_to_call(*arg_values, **kwarg_values)
+        try:
+            result = function_to_call(*arg_values, **kwarg_values)
+        except Exception as e:
+            print(f'Error calling function {self.fn.value}:')
+            raise e
         if isinstance(result, types.GeneratorType):
             return evaluate_generator(result)
         return result
@@ -322,7 +326,11 @@ class Call(BaseActionNode):
             yield from function_to_call.action.evaluate_lazy(context)
             context.argument_frames.pop()
         else:
-            result = function_to_call(*arg_values, **kwarg_values)
+            try:
+                result = function_to_call(*arg_values, **kwarg_values)
+            except Exception as e:
+                print(f'Error calling function {self.fn.value}:')
+                raise e
             if isinstance(result, types.GeneratorType):
                 yield from exhaust_generator(result)
             else:
