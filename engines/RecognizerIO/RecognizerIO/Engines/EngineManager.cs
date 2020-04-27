@@ -26,6 +26,8 @@ namespace RecognizerIO.Engines
 
         void InitEngine() {
             Engine = new SpeechRecognitionEngine();
+            Engine.EndSilenceTimeout = new TimeSpan();
+            Engine.EndSilenceTimeoutAmbiguous = new TimeSpan();
             Engine.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(recognizer_SpeechRecognized);
             Engine.RecognizerUpdateReached += new EventHandler<RecognizerUpdateReachedEventArgs>(recognizer_RecognizerUpdateReached);
             AudioInputDeviceConnected = false;
