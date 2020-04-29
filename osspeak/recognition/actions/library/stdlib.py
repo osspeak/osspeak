@@ -16,6 +16,10 @@ def wait(n):
         count = 0
     time.sleep(count)
 
+def initialize():
+    # avoid circular import timing issue
+    macro._restore_saved()
+
 namespace = {
     'active_window': lambda: window.active_window_name().title(),
     'between': flow.between,
@@ -46,8 +50,6 @@ namespace = {
     'wait': wait,
     'window': window,
 }
-# avoid circular import timing issue
-macro._restore_saved()
 
 deferred_arguments_eval = set([
     flow.osspeak_if,

@@ -45,6 +45,7 @@ class CommandModuleController:
     def initialize_command_modules(self):
         if clargs.get_args()['clean_cache']:
             recognition.cache.delete_cache()
+        recognition.actions.library.stdlib.initialize()
         command_module_cache = recognition.cache.load_cache()
         new_cache = recognition.cache.empty_cache()
         files = self.module_loader.load_files()
