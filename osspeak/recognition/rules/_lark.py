@@ -19,7 +19,11 @@ def build_repeat(node):
     return f'~{low}' if low == high else f'~{low}..{high}'
 
 def parse_word(node: astree.WordNode, internal_rules, node_ids, named_utterances):
-    return build_lark_rule(node, f'"{node.text}" _WS+', internal_rules, node_ids)
+    text = f'"{node.text}" _WS+'
+    has_repeat = node.repeat_low != 1 or node.repeat_high != 1
+    if has_repeat:
+        text = f'({text})'
+    return build_lark_rule(node, text, internal_rules, node_ids)
 
 def parse_rule_reference(node: astree.RuleReference, internal_rules, node_ids, named_utterances):
     referenced_rule = named_utterances[node.rule_name]
