@@ -24,8 +24,9 @@ class RecognitionResultsTree:
         is_grouping_variable = isinstance(node_wrapper.node, astree.GroupingNode) and len(node_wrapper.node.sequences) > 1
         is_dictation = (isinstance(node_wrapper.node, astree.RuleReference) and
                         node_wrapper.node.rule_name == '_dictation')
+        multiple_repeat_possibilities = getattr(node_wrapper.node, 'repeat_low', None) != getattr(node_wrapper.node, 'repeat_high', None) 
         is_variable = is_grouping_variable or is_dictation
-        return is_variable
+        return is_variable or multiple_repeat_possibilities
 
 
     def iterate_subtree(self, node, ancestors=()):

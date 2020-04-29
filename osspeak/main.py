@@ -29,9 +29,6 @@ def main():
 @atexit.register
 def shutdown():
     pubsub.publish(topics.STOP_MAIN_PROCESS)
-    for task in asyncio.Task.all_tasks():
-        task.cancel()
-    server.loop.stop()
 
 async def initialize_speech_engine_connector():
     network = settings.settings['network']
