@@ -1,15 +1,11 @@
-import itertools
 from recognition.actions import library
-import uuid
 import lark.exceptions
 import os
 import os.path
 import xml.etree.ElementTree as ET
 import copy
-import re
 import operator
 import collections
-import json
 import log
 import recognition.actions.library.stdlib
 from recognition.actions import perform
@@ -169,10 +165,6 @@ class CommandModuleController:
     def special_rules(self):
         return {'_dictation': astree.Rule()}
 
-    def get_active_commands(self, command_modules_by_ascending_priority):
-        grouped_commands = [m.commands for m in command_modules_by_ascending_priority]
-        return list(itertools.chain.from_iterable(grouped_commands))
-    
     def calculate_named_utterance_cycles(self, named_utterances):
         graph = DirectedGraph()
         for name, utterance in named_utterances.items():
