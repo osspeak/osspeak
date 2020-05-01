@@ -1,8 +1,3 @@
-'''
-All of the arguments in these functions are wrapped in 
-lambdas in recognition.asttransform.py to prevent early binding
-'''
-
 def loop(context, *args):
     from recognition.actions.astree import exhaust_generator, KeySequence
     count = args[-1].evaluate(context)
@@ -16,7 +11,7 @@ def loop(context, *args):
         assert len(kp.chords) == 1
         press_count = kp.chords[0][2]
         if press_count is None:
-            press_count = '1'
+            press_count = 1
         press_count = str(count * int(press_count))
         kp.chords[0][2] = press_count
         yield eval_arg, kp
@@ -24,14 +19,12 @@ def loop(context, *args):
         for i in range(count):
             yield from exhaust_generator(eval_arg.evaluate_lazy(context))
 
-def osspeak_if(context, *args):
+def osspeak_if(context, test_condition, then_node, else_node=None):
     from recognition.actions.astree import exhaust_generator
-    assert 1 < len(args) < 4
-    condition_evaluation = args[0].evaluate(context)
-    if condition_evaluation:
-        yield from exhaust_generator(args[1].evaluate_lazy(context))
-    elif len(args) >= 3:
-        yield from exhaust_generator(args[2].evaluate_lazy(context))
+    if test_condition.evaluate(context):
+        yield from exhaust_generator(then_node.evaluate_lazy(context))
+    elif else_node is not None:
+        yield from exhaust_generator(else_node.evaluate_lazy(context))
 
 def between(context, main_code, intermediate_code, count_ast):
     from recognition.actions.astree import exhaust_generator
@@ -46,12 +39,10 @@ def between(context, main_code, intermediate_code, count_ast):
         yield from exhaust_generator(intermediate_code.evaluate_lazy(context))
     yield from exhaust_generator(main_code.evaluate_lazy(context))
 
-
-def osspeak_while(*args):
-    action_args = args[1:]
-    while args[0]():
-        for arg in action_args:
-            arg()
+def osspeak_while(context, test_condition, *args):
+    while test_condition.evaluate(context):
+        for arg in args:
+            yield from exhaust_generator(arg.evaluate_lazy(context))
 
 def wait_for(condition, timeout=None):
     import time
