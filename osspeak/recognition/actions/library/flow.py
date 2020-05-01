@@ -4,15 +4,24 @@ lambdas in recognition.asttransform.py to prevent early binding
 '''
 
 def loop(context, *args):
-    from recognition.actions.astree import exhaust_generator
+    from recognition.actions.astree import exhaust_generator, KeySequence
     count = args[-1].evaluate(context)
     try:
         count = int(count)
     except (TypeError, ValueError):
         count = 1
-    eval_args = args[:-1]
-    for i in range(count):
-        for eval_arg in eval_args:
+    eval_arg = args[0]
+    if isinstance(eval_arg, KeySequence):
+        kp = eval_arg.evaluate(context)
+        assert len(kp.chords) == 1
+        press_count = kp.chords[0][2]
+        if press_count is None:
+            press_count = '1'
+        press_count = str(count * int(press_count))
+        kp.chords[0][2] = press_count
+        yield eval_arg, kp
+    else:
+        for i in range(count):
             yield from exhaust_generator(eval_arg.evaluate_lazy(context))
 
 def osspeak_if(context, *args):

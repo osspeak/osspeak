@@ -19,32 +19,6 @@ from recognition.actions.library.vocola.sendinput import *
 
 debug = False
 
-
-# ignore_unknown_names True means type out bad chords rather than
-# raising a KeyError; e.g., "{bad}" sends {, b, a, d, }.
-#
-def senddragonkeys_to_events(input_spec, ignore_unknown_names=True):
-    chords = parse_into_chords(input_spec)
-
-    events = []
-    for c in chords:
-        try:
-            events += chord_to_events(c)
-        except LookupError as e:
-            if not ignore_unknown_names: 
-                raise
-            if not c[0] and not c[2] and len(c[1])==1:
-                raise  # already a single key chord
-            characters = c[3]
-            if debug:
-                print("typing out bad chord: " + characters + ": " + repr(e))
-            for char in characters:
-                events += chord_to_events([None, char, None, char])
-
-    return events, chords
-
-    
-
 ### 
 ### Break SendDragonKeys input into the chords that make it up.  Each
 ### chord is represented in terms of its three parts: modifiers, base,
@@ -59,19 +33,14 @@ def senddragonkeys_to_events(input_spec, ignore_unknown_names=True):
 
 def parse_into_chords(specification):
     chords = []
-    
     while len(specification) > 0:
         m = chord_pattern.match(specification)
-        if m:
-            modifiers = m.group(1)
-            if modifiers: modifiers = modifiers[:-1]  # remove final "+"
-            chords += [[modifiers, m.group(2), m.group(3), m.group(0)]]
-            specification = specification[m.end():]
-        else:
-            char = specification[0]
-            chords += [[None, char, None, char]]
-            specification = specification[1:]
-    
+        if not m:
+            raise ValueError(f'Cannot parse chords from specification {specification}')
+        modifiers = m.group(1)
+        if modifiers: modifiers = modifiers[:-1]  # remove final "+"
+        chords += [[modifiers, m.group(2), m.group(3), m.group(0)]]
+        specification = specification[m.end():]
     return chords
 
 # Because we can't be sure of the current code page, treat all non-ASCII
