@@ -7,3 +7,6 @@ def python_print(*values, sep=' '):
 
 def python_list(*args):
     return args
+
+def error(text=''):
+    raise RuntimeError(text)

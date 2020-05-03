@@ -24,7 +24,13 @@ def parse_unary(lark_ir):
     value_ast = parse_node(value_ir)
     unary_ir = lark_ir.children[0]
     if unary_ir is not None:
-        op = 'negative'
+        if unary_ir == '+':
+            op = 'positive'
+        elif unary_ir == '-':
+            op = 'negative'
+        else:
+            raise ValueError()
+        print(unary_ir)
         return astree.UnaryOp(op, value_ast)
     return value_ast
 
@@ -33,9 +39,6 @@ def parse_expr(lark_ir):
     if isinstance(lark_ir, lark.tree.Tree):
         value_ir = lark_ir.children[-1]
         value_ast = parse_node(value_ir)
-        unary_ir = lark_parser.find_type(lark_ir, lark_parser.UNARY_OPERATOR)
-        if unary_ir is not None:
-            return astree.UnaryOp('negative', value_ast)
     else:
         value_ast = parse_node(lark_ir)
     return value_ast
@@ -141,8 +144,8 @@ def parse_slice(lark_ir):
 
 parse_map = {
     'literal': lambda x: astree.Literal(''.join(str(s) for s in x.children)),
-    'STRING_DOUBLE': lambda x: astree.String(str(x)[1:-1]),
-    'STRING_SINGLE': lambda x: astree.String(str(x)[1:-1]),
+    'STRING_DOUBLE': lambda x: astree.String(str(x)[1:-1].replace('\\\\', '\\')),
+    'STRING_SINGLE': lambda x: astree.String(str(x)[1:-1].replace('\\\\', '\\')),
     'REGEX': lambda x: astree.RegularExpression(str(x)[1:-1]),
     'list': parse_list,
     'loop': parse_loop,

@@ -1,4 +1,6 @@
 import os
+import time
+import re
 import subprocess
 import pywindow
 
@@ -29,6 +31,20 @@ def shell(text):
 
 def active_window_name():
     return pywindow.foreground_window().title
+
+def wait(test_title, timeout=10):
+    timeout_at = time.time() + timeout
+    while not match_title(test_title, active_window_name()):
+        now = time.time()
+        if now > timeout_at:
+            raise RuntimeError('window.wait timed out')
+
+def match_title(test, title):
+    if isinstance(test, str):
+        return test.lower() in title
+    if isinstance(test, re.Pattern):
+        return test.match(title, re.IGNORECASE)
+    raise TypeError
 
 def external():
     pass

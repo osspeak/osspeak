@@ -6,6 +6,7 @@ def loop(context, *args):
     except (TypeError, ValueError):
         count = 1
     eval_arg = args[0]
+    # merge consecutive keypresses
     if isinstance(eval_arg, KeySequence):
         kp = eval_arg.evaluate(context)
         assert len(kp.chords) == 1
