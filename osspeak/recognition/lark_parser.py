@@ -55,12 +55,11 @@ MULTIPLICATIVE_OPERATOR: ("*" | "/" | "//" | "%")
 command: utterance "=" _action 
 
 _action: ({EXPR} | {EXPR_SEQUENCE})
-_grouping.29: "(" {EXPR} ")"
+_grouping: "(" {EXPR} ")"
 loop: {EXPR} _LOOP_SEPARATOR {EXPR}
 {EXPR_SEQUENCE_SEPARATOR}: /[ \t]+/
 {EXPR_SEQUENCE}.-99: {EXPR} ({EXPR_SEQUENCE_SEPARATOR} {EXPR})+
-{EXPR}: (_singular | _multiple)
-_multiple: compare
+{EXPR}: compare
 compare: or (COMPARE_OPERATOR or)*
 or: and ("||" and)*
 and: not ("&&" not)*
@@ -68,8 +67,8 @@ not: [NOT_OPERATOR] additive
 additive: multiplicative (ADDITIVE_OPERATOR multiplicative)*
 multiplicative: unary (MULTIPLICATIVE_OPERATOR unary)*
 unary: [{UNARY_OPERATOR}] exponent
-exponent: _singular ("**" _singular)*
-_singular: ({EXPR_SEQUENCE} | index | {SLICE} | loop | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | REGEX | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
+exponent: _atom ("**" _atom)*
+_atom: (index | {SLICE} | loop | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | REGEX | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 _chainable: (NAME | attribute | call | list | {VARIABLE} | {ARGUMENT_REFERENCE} | index | {SLICE})
 {UNARY_OPERATOR}: ("+" | "-")
 NOT_OPERATOR: "!"
@@ -84,14 +83,14 @@ _CALL_START: NO_WS_BEHIND "("
 {ARGUMENT_REFERENCE}: _VAR_PREC NAME
 {ZERO_OR_POSITIVE_INT}: /[0-9]+/
 INTEGER: /-?[0-9]+/
-LITERAL_PIECE: /[a-zA-Z0-9!_]+/ 
+LITERAL_PIECE: /[a-zA-Z0-9_]+/ 
 literal.-100: LITERAL_PIECE (WS+ LITERAL_PIECE)*
 
 list: "[" [{EXPR} ("," {EXPR})*] "]"
 index: _chainable _SUBSCRIPT_PREFIX {EXPR} "]"
 {SLICE}: _chainable _SUBSCRIPT_PREFIX [{EXPR}] SLICE_SEPARATOR [{EXPR}] [SLICE_SEPARATOR [{EXPR}]] "]"
-attribute.20: _chainable  _ATTR_SEPARATOR NAME
-call.30: _chainable _CALL_START (({ARG_LIST} ["," {KWARG_LIST}]) | [{KWARG_LIST}]) ")"
+attribute: _chainable  _ATTR_SEPARATOR NAME
+call: _chainable _CALL_START (({ARG_LIST} ["," {KWARG_LIST}]) | [{KWARG_LIST}]) ")"
 {ARG_LIST}: {EXPR} ("," {EXPR})*
 {KWARG_LIST}: kwarg ("," kwarg)* 
 kwarg: NAME "=" {EXPR}
