@@ -65,6 +65,37 @@ def test_literal1():
         "value": "hello there \tworld"
     })
 
+{
+    "expressions": [
+        {
+            "type": "Literal",
+            "value": "hello"
+        },
+        {
+            "type": "ExprSequenceSeparator",
+            "value": " "
+        },
+        {
+            "expressions": [
+                {
+                    "type": "Literal",
+                    "value": "there"
+                },
+                {
+                    "type": "ExprSequenceSeparator",
+                    "value": " \t"
+                },
+                {
+                    "type": "Literal",
+                    "value": "world"
+                }
+            ],
+            "type": "ExpressionSequence"
+        }
+    ],
+    "type": "ExpressionSequence"
+}
+
 def test_literal2():
     text = "Hello ',' $1"
     action = text_to_action(text)
@@ -151,6 +182,68 @@ def test_attribute1():
         "type": "Call"
     })
 
+def test_unary69():
+    text = "'cd ..' + '/..' {enter}"
+    action = text_to_action(text)
+    assert_equal(action, {
+    "expressions": [
+        {
+            "left": {
+                "type": "String",
+                "value": "cd .."
+            },
+            "right": {
+                "type": "String",
+                "value": "/.."
+            },
+            "type": "Add"
+        },
+        {
+            "type": "ExprSequenceSeparator",
+            "value": " "
+        },
+        {
+            "keys": {
+                "type": "Literal",
+                "value": "enter"
+            },
+            "type": "KeySequence"
+        }
+    ],
+    "type": "ExpressionSequence"
+})
+
+def test_unary70():
+    text = "'cd ..' + '/..' * int($1) {enter}"
+    action = text_to_action(text)
+    assert_equal(action, {
+    "expressions": [
+        {
+            "left": {
+                "type": "String",
+                "value": "cd .."
+            },
+            "right": {
+                "type": "String",
+                "value": "/.."
+            },
+            "type": "Add"
+        },
+        {
+            "type": "ExprSequenceSeparator",
+            "value": " "
+        },
+        {
+            "keys": {
+                "type": "Literal",
+                "value": "enter"
+            },
+            "type": "KeySequence"
+        }
+    ],
+    "type": "ExpressionSequence"
+})
+
 def test_not():
     text = "!true()"
     action = text_to_action(text)
@@ -196,6 +289,7 @@ def test_add():
 def test_float1():
     text = "-4.5 .23 0.2"
     action = text_to_action(text)
+    to_clipboard(action)
     assert_equal(action,  {
         "expressions": [
             {

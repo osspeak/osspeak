@@ -23,6 +23,7 @@ def parse_unary(lark_ir):
     value_ir = lark_ir.children[-1]
     value_ast = parse_node(value_ir)
     unary_ir = lark_ir.children[0]
+    print('uir', unary_ir)
     if unary_ir is not None:
         if unary_ir == '+':
             op = 'positive'
@@ -30,9 +31,38 @@ def parse_unary(lark_ir):
             op = 'negative'
         else:
             raise ValueError()
+        print(op)
         return astree.UnaryOp(op, value_ast)
     return value_ast
-
+{
+    "operand": {
+        "expressions": [
+            {
+                "type": "Float",
+                "value": 4.5
+            },
+            {
+                "type": "ExprSequenceSeparator",
+                "value": " "
+            },
+            {
+                "type": "Float",
+                "value": 0.23
+            },
+            {
+                "type": "ExprSequenceSeparator",
+                "value": " "
+            },
+            {
+                "type": "Float",
+                "value": 0.2
+            }
+        ],
+        "type": "ExpressionSequence"
+    },
+    "operation": "negative",
+    "type": "UnaryOp"
+}
 def parse_expr(lark_ir):
     node_type = lark_parser.lark_node_type(lark_ir)
     if isinstance(lark_ir, lark.tree.Tree):

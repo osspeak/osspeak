@@ -54,12 +54,12 @@ MULTIPLICATIVE_OPERATOR: ("*" | "/" | "//" | "%")
 
 command: utterance "=" _action 
 
-_action: ({EXPR} | {EXPR_SEQUENCE})
+_action: {EXPR}
 _grouping: "(" {EXPR} ")"
 loop: {EXPR} _LOOP_SEPARATOR {EXPR}
 {EXPR_SEQUENCE_SEPARATOR}: /[ \t]+/
 {EXPR_SEQUENCE}.-99: {EXPR} ({EXPR_SEQUENCE_SEPARATOR} {EXPR})+
-{EXPR}: compare
+{EXPR}: compare | {EXPR_SEQUENCE}
 compare: or (COMPARE_OPERATOR or)*
 or: and ("||" and)*
 and: not ("&&" not)*
@@ -68,7 +68,7 @@ additive: multiplicative (ADDITIVE_OPERATOR multiplicative)*
 multiplicative: unary (MULTIPLICATIVE_OPERATOR unary)*
 unary: [{UNARY_OPERATOR}] exponent
 exponent: _atom ("**" _atom)*
-_atom: ({EXPR_SEQUENCE} | index | {SLICE} | loop | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | REGEX | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
+_atom: (index | {SLICE} | loop | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | REGEX | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 _chainable: (NAME | attribute | call | list | {VARIABLE} | {ARGUMENT_REFERENCE} | index | {SLICE})
 {UNARY_OPERATOR}: ("+" | "-")
 NOT_OPERATOR: "!"
