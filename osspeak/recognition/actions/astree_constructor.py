@@ -30,7 +30,6 @@ def parse_unary(lark_ir):
             op = 'negative'
         else:
             raise ValueError()
-        print(unary_ir)
         return astree.UnaryOp(op, value_ast)
     return value_ast
 

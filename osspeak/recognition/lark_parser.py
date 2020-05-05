@@ -68,7 +68,7 @@ additive: multiplicative (ADDITIVE_OPERATOR multiplicative)*
 multiplicative: unary (MULTIPLICATIVE_OPERATOR unary)*
 unary: [{UNARY_OPERATOR}] exponent
 exponent: _atom ("**" _atom)*
-_atom: (index | {SLICE} | loop | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | REGEX | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
+_atom: ({EXPR_SEQUENCE} | index | {SLICE} | loop | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | REGEX | keypress | INTEGER | FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
 _chainable: (NAME | attribute | call | list | {VARIABLE} | {ARGUMENT_REFERENCE} | index | {SLICE})
 {UNARY_OPERATOR}: ("+" | "-")
 NOT_OPERATOR: "!"
