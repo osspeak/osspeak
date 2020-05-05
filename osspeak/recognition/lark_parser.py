@@ -120,12 +120,12 @@ def parse_command_module(text: str):
     return ir
     
 def parse_utterance(text: str):
-    ast = utterance_grammar.parse(text)
-    return ast
+    ir = utterance_grammar.parse(text)
+    return ir
 
 def parse_action(text: str):
-    ast = action_grammar.parse(text)
-    return ast.children[0]
+    ir = action_grammar.parse(text)
+    return ir.children[0]
 
 def lark_node_type(lark_ir):
     type_attr = 'data' if isinstance(lark_ir, Tree) else 'type'
