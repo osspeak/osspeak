@@ -1,4 +1,3 @@
-import functools
 from lark import Lark, Transformer, v_args, Token, Tree
 
 UTTERANCE_CHOICES = 'utterance_choices'
@@ -133,83 +132,25 @@ def parse_action(text: str):
 
 class ResolveAmbiguities(Transformer):
 
-    resolve_priorities = {node_type: -i for i, node_type in enumerate((EXPR_SEQUENCE, 'literal', 'utterance_piece'), start=1)}
+    node_type_priorities = {node_type: -i for i, node_type in enumerate((EXPR_SEQUENCE, 'literal', 'utterance_piece'), start=1)}
 
     def _ambig(self, children):
-        print('--------------')
-        for child in children:
-            print(child.pretty())
-        compare_fn = functools.cmp_to_key(self.compare_nodes)
-        result = min(children, key=compare_fn)
-        print(result.pretty())
+        result = max(children, key=self.score_node)
         return result
-        idx = self.find_highest_priority_option_index(children)
-        return children[idx]
 
-    def find_highest_priority_option_index(self, nodes):
-        max_priority = None
-        max_priority_indices = []
-        for i, node in enumerate(nodes):
-            node_type = lark_node_type(node)
-            priority = self.resolve_priorities.get(node_type, 0)
-            if max_priority is None or priority > max_priority:
-                max_priority_indices = []
-                max_priority = priority
-            if priority == max_priority:
-                max_priority_indices.append(i)
-        assert max_priority_indices
-        if len(max_priority_indices) == 1:
-            return max_priority_indices[0]
-        max_priority_options = [nodes[i] for i in max_priority_indices]
-        max_index = self.handle_ambig_cases(max_priority_options)
-        return max_priority_indices[max_index]
-
-    def handle_ambig_cases(self, options):
-        node_types = set(lark_node_type(x) for x in options)
-        if len(node_types) == 1:
-            node_type = list(node_types)[0]
-            if node_type == 'expr_sequence':
-                return self.fewest_children(options)
-            if node_type == 'utterance_sequence':
-                return self.fewest_children(options)
-            if node_type == 'unary' and len(options) == 2:
-                if options[0].children[0] is None:
-                    return 0
-                else:
-                    return 1
-            if node_type == 'expr':
-                expr_children = [expr.children[0] for expr in options]
-                highest_child = self.find_highest_priority_option_index(expr_children)
-                return highest_child
-        for i, child in enumerate(options):
-            with open(f'{i}.txt', 'w') as f:
-                f.write(child.pretty())
-        raise RuntimeError('Unresolved ambiguity')
-
-    def compare_nodes(self, a, b):
-        a_info = self.node_info(a)
-        b_info = self.node_info(b)
-        print(a_info, b_info)   
-        for a_score, b_score in zip(a_info, b_info):
-            if a_score > b_score:
-                return 1
-            if b_score > a_score:
-                return -1
-        for a_child, b_child in zip(getattr(a, 'children', []), getattr(b, 'children', [])):
-            cmp = self.compare_nodes(a_child, b_child)
-            if cmp:
-                return cmp
-        return 0
-        
-    def node_info(self, node):
-        priority = self.resolve_priorities.get(node, 0)
-        child_length = len(getattr(node, 'children', []))
-        is_terminal = not isinstance(node, Tree)
-        return priority, child_length, is_terminal
-
-    def fewest_children(self, nodes):
-        min_children = nodes.index(min(nodes, key=lambda node: len(node.children)))
-        return min_children
+    def score_node(self, node):
+        '''
+        Resolve ambiguities with the following rules, in order of importance:
+            1. Node type - utterance_piece < literal < expr_sequence < everything else
+            2. Number of children, the fewer the better. Terminal nodes have 0. Nones are excluded
+            3. Comparison of child scores
+        '''
+        node_type_priority = self.node_type_priorities.get(lark_node_type(node), 0)
+        children = [x for x in getattr(node, 'children', []) if x is not None]
+        child_scores = []
+        for child in children:
+            child_scores.append(self.score_node(child))
+        return node_type_priority, -len(children), tuple(child_scores)
 
 def lark_node_type(lark_ir):
     type_attr = 'data' if isinstance(lark_ir, Tree) else 'type'

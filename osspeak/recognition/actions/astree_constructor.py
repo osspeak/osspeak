@@ -154,6 +154,7 @@ parse_map = {
     'keypress': parse_keypress,
     'variable': lambda x: astree.Variable(int(x.children[0])),
     'NAME': lambda x: astree.Name(str(x)),
+    'INTEGER': lambda x: astree.Integer(int(x)),
     'ZERO_OR_POSITIVE_INTEGER': lambda x: astree.Integer(int(x)),
     'ZERO_OR_POSITIVE_FLOAT': lambda x: astree.Float(float(x)),
     'index': parse_index,

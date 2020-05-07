@@ -182,67 +182,61 @@ def test_attribute1():
         "type": "Call"
     })
 
-def test_unary69():
-    text = "'cd ..' + '/..' {enter}"
+def test_ambig1():
+    text = "'cd ..' + '/..' * int($1 || 0) {enter}"
     action = text_to_action(text)
+    to_clipboard(action)
     assert_equal(action, {
-    "expressions": [
-        {
-            "left": {
-                "type": "String",
-                "value": "cd .."
+        "expressions": [
+            {
+                "left": {
+                    "type": "String",
+                    "value": "cd .."
+                },
+                "right": {
+                    "left": {
+                        "type": "String",
+                        "value": "/.."
+                    },
+                    "right": {
+                        "args": [
+                            {
+                                "left": {
+                                    "type": "Variable",
+                                    "value": 1
+                                },
+                                "right": {
+                                    "type": "Integer",
+                                    "value": 0
+                                },
+                                "type": "Or"
+                            }
+                        ],
+                        "fn": {
+                            "type": "Name",
+                            "value": "int"
+                        },
+                        "kwargs": {},
+                        "type": "Call"
+                    },
+                    "type": "Multiply"
+                },
+                "type": "Add"
             },
-            "right": {
-                "type": "String",
-                "value": "/.."
+            {
+                "type": "ExprSequenceSeparator",
+                "value": " "
             },
-            "type": "Add"
-        },
-        {
-            "type": "ExprSequenceSeparator",
-            "value": " "
-        },
-        {
-            "keys": {
-                "type": "Literal",
-                "value": "enter"
-            },
-            "type": "KeySequence"
-        }
-    ],
-    "type": "ExpressionSequence"
-})
-
-def test_unary70():
-    text = "'cd ..' + '/..' * int($1) {enter}"
-    action = text_to_action(text)
-    assert_equal(action, {
-    "expressions": [
-        {
-            "left": {
-                "type": "String",
-                "value": "cd .."
-            },
-            "right": {
-                "type": "String",
-                "value": "/.."
-            },
-            "type": "Add"
-        },
-        {
-            "type": "ExprSequenceSeparator",
-            "value": " "
-        },
-        {
-            "keys": {
-                "type": "Literal",
-                "value": "enter"
-            },
-            "type": "KeySequence"
-        }
-    ],
-    "type": "ExpressionSequence"
-})
+            {
+                "keys": {
+                    "type": "Literal",
+                    "value": "enter"
+                },
+                "type": "KeySequence"
+            }
+        ],
+        "type": "ExpressionSequence"
+    })
 
 def test_not():
     text = "!true()"
@@ -289,7 +283,6 @@ def test_add():
 def test_float1():
     text = "-4.5 .23 0.2"
     action = text_to_action(text)
-    to_clipboard(action)
     assert_equal(action,  {
         "expressions": [
             {
@@ -496,6 +489,39 @@ def test_order_of_operations4():
         },
         "ops": [
             "=="
+        ],
+        "type": "Compare"
+    })
+    assert evaluate_action(action) is True
+
+def test_compare_chain():
+    text = "1 < 3 <= 2 + 1"
+    action = text_to_action(text)
+    assert_equal(action,{
+        "comparators": [
+            {
+                "type": "Integer",
+                "value": 3
+            },
+            {
+                "left": {
+                    "type": "Integer",
+                    "value": 2
+                },
+                "right": {
+                    "type": "Integer",
+                    "value": 1
+                },
+                "type": "Add"
+            }
+        ],
+        "left": {
+            "type": "Integer",
+            "value": 1
+        },
+        "ops": [
+            "<",
+            "<="
         ],
         "type": "Compare"
     })
