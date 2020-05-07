@@ -85,7 +85,7 @@ def get_recognition_contexts(lark_recognition_tree, grammar_context):
             if is_substitute:
                 substitute_paths.add(start_path)
         variables = tuple(match_variables.values())
-        log.logger.info(f'Matched rule: {command.utterance_text}')
+        log.logger.info(f'''Matched rule: {command.utterance_text} with words "{' '.join(words)}"''')
         rec_context = context.RecognitionContext(variables, words, grammar_context.namespace)
         recognition_contexts.append((rec_context, command))
     return recognition_contexts
