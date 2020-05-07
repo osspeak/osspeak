@@ -56,7 +56,7 @@ command: utterance "=" _action
 
 _action: {EXPR}
 _grouping: "(" {EXPR} ")"
-loop: {EXPR} _LOOP_SEPARATOR {EXPR}
+loop: _atom_entry _LOOP_SEPARATOR _atom_entry
 {EXPR_SEQUENCE_SEPARATOR}: /[ \t]+/
 {EXPR_SEQUENCE}.-99: _atom_entry ({EXPR_SEQUENCE_SEPARATOR} _atom_entry)+
 {EXPR}: _atom_entry | {EXPR_SEQUENCE}
