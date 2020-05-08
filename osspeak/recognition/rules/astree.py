@@ -36,7 +36,6 @@ class GroupingNode(ASTNode):
         self.repeat_low = 1
         self.repeat_high = 1
         self.action_substitute = None
-        self.ignore_ambiguities = False
         self.sequences = []
 
     def walk(self):
@@ -52,7 +51,6 @@ class RuleReference(ASTNode):
         self.repeat_low = 1
         self.repeat_high = 1
         self.action_substitute = None
-        self.ignore_ambiguities = False
 
 def utterance_from_lark_ir(lark_ir):
     rule = Rule()
@@ -77,7 +75,6 @@ def node_from_utterance_piece(lark_ir):
     import recognition.actions.astree_constructor
     wrapped_node = lark_ir.children[0]
     wrapped_type = lark_parser.lark_node_type(wrapped_node)
-    ignore_ambiguities = lark_parser.find_type(wrapped_node, lark_parser.IGNORE_AMBIGUITIES)
     if wrapped_type == lark_parser.UTTERANCE_WORD:
         word_text = str(wrapped_node)
         node = WordNode(word_text)
@@ -94,8 +91,6 @@ def node_from_utterance_piece(lark_ir):
         node = RuleReference(ref_name)
     else:
         raise ValueError(f'Unrecognized utterance piece type: {wrapped_type}')
-    if ignore_ambiguities:
-        node.ignore_ambiguities = True
     rep = lark_parser.find_type(lark_ir, lark_parser.UTTERANCE_REPETITION)
     if rep:
         node.repeat_low, node.repeat_high = parse_repetition(rep)

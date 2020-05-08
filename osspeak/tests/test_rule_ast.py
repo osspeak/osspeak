@@ -34,7 +34,6 @@ def test_action_substitute2():
     assert_equal(utterance, {
     "root": {
         "action_substitute": None,
-        "ignore_ambiguities": False,
         "repeat_high": 1,
         "repeat_low": 1,
         "sequences": [
@@ -74,7 +73,6 @@ def test_action_substitute():
     assert_equal(utterance, {
     "root": {
         "action_substitute": None,
-        "ignore_ambiguities": False,
         "repeat_high": 1,
         "repeat_low": 1,
         "sequences": [
@@ -95,7 +93,6 @@ def test_action_substitute():
                 },
                 {
                     "action_substitute": None,
-                    "ignore_ambiguities": False,
                     "repeat_high": 1,
                     "repeat_low": 1,
                     "sequences": [
