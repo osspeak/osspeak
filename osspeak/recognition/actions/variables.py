@@ -23,9 +23,6 @@ class RecognitionResultsTree:
                 self.variables[wrapper.path] = wrapper.node
 
     def is_variable(self, node_wrapper):
-        for wrapper in node_wrapper.ancestors + (node_wrapper,):
-            if getattr(wrapper.node, 'ignore_ambiguities', False):
-                return False
         is_grouping_variable = isinstance(node_wrapper.node, astree.GroupingNode) and len(node_wrapper.node.sequences) > 1
         is_dictation = (isinstance(node_wrapper.node, astree.RuleReference) and
                         node_wrapper.node.rule_name == '_dictation')
