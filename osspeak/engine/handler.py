@@ -54,17 +54,12 @@ class EngineProcessHandler:
             await self.send_simple_message('GET_ENGINE_STATUS')
             await asyncio.sleep(5)
 
-    async def dispatch_engine_message(self, topic, *a, **kw):
-        if self.server is None:
-            pubsub.publish(topic, *a, **kw)
-        else:
-            await self.server.send_message(topic, *a, **kw)
-
     async def on_engine_message(self, msg_string):
         msg = json.loads(msg_string)
         if msg['Type'] == 'recognition':
             if msg['Confidence'] > settings['engine']['recognitionConfidence']:
-                await self.dispatch_engine_message(topics.PERFORM_COMMANDS, msg['GrammarId'], msg['Words'])
+                pubsub.publish(topics.PERFORM_COMMANDS, msg['GrammarId'], msg['Words'])
+                # await self.dispatch_engine_message(topics.PERFORM_COMMANDS, msg['GrammarId'], msg['Words'])
         # elif msg['Type'] == messages.SET_ENGINE_STATUS:
         #     messages.dispatch(messages.SET_ENGINE_STATUS, msg)
         elif msg['Type'] == 'error':
