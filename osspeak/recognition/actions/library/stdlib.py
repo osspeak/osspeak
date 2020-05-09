@@ -43,6 +43,7 @@ namespace = {
     'run': process.run,
     'run_sync': process.run_sync,
     'screengrid': screengrid,
+    'setattr': setattr,
     'setState': lambda name, value: setattr(namespace['state'], name, value),
     'snake_case': text.snake_case,
     'state': SimpleNamespace(),
