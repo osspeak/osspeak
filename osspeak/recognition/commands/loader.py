@@ -75,20 +75,20 @@ class CommandModuleController:
         return active_modules
 
     async def load_modules(self, current_window, initialize_modules: bool=False):
-        previous_active_modules = self.active_command_modules
+        previous_active_modules = self.sorted_command_modules(self.active_command_modules)
         if initialize_modules:
             raise NotImplementedError
         self.active_command_modules = self.get_active_modules(current_window)
+        command_modules_by_ascending_priority = self.sorted_command_modules(self.active_command_modules)
         namespace = self.get_namespace()
-        self.fire_activation_events(previous_active_modules, namespace)
-        grammar_context = self.build_grammar()
+        self.fire_activation_events(previous_active_modules, command_modules_by_ascending_priority, namespace)
+        grammar_context = self.build_grammar(command_modules_by_ascending_priority.values())
         if grammar_context is not None:
             self.save_grammar(grammar_context)
             grammar_xml, grammar_id = ET.tostring(grammar_context.xml).decode('utf8'), grammar_context.uuid
             await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
 
-    def build_grammar(self) -> grammar.GrammarContext:
-        command_modules_by_ascending_priority = sorted(list(self.active_command_modules.values()), key=PRIORITY_FN)
+    def build_grammar(self, command_modules_by_ascending_priority) -> grammar.GrammarContext:
         named_utterances, commands, utterance_priority = self.get_active_named_utterances_and_commands(command_modules_by_ascending_priority)
         cycles = self.calculate_named_utterance_cycles(named_utterances)
         if cycles:
@@ -110,6 +110,12 @@ class CommandModuleController:
         grammar_context = grammar.GrammarContext(grammar_xml, command_modules_by_ascending_priority, command_contexts, commands, namespace, named_utterances, node_ids, utterance_priority)
         return grammar_context
 
+    def sorted_command_modules(self, command_modules):
+        sorted_modules = {}
+        for path in sorted(command_modules, key=lambda x: (command_modules[x].priority)):
+            sorted_modules[path]  = command_modules[path]
+        return sorted_modules
+
     def get_namespace(self):
         ns = recognition.actions.library.stdlib.namespace.copy()
         for mod in self.active_command_modules.values():
@@ -130,17 +136,14 @@ class CommandModuleController:
                     node_ids[node] = f'n{len(node_ids) + 1}'
         return node_ids
 
-    def fire_activation_events(self, previous_active_modules, namespace):
-        previous_names, current_names = set(previous_active_modules), set(self.active_command_modules)
-        for deactivated_name in previous_names - current_names:
-            cmd_module = previous_active_modules[deactivated_name]
-            if 'on_deactivate' in cmd_module.functions:
+    def fire_activation_events(self, previous_active_modules, current_active_modules, namespace):
+        for path, cmd_module in previous_active_modules.items():
+            if path not in current_active_modules and 'on_deactivate' in cmd_module.functions:
                 source = {'command_module': cmd_module, 'type': 'command_module_deactivated'}
                 action = cmd_module.functions['on_deactivate'].action
                 perform.perform_action_from_event(action, namespace, source)
-        for activated_name in current_names - previous_names:
-            cmd_module = self.active_command_modules[activated_name]
-            if 'on_activate' in cmd_module.functions:
+        for path, cmd_module in current_active_modules.items():
+            if path not in previous_active_modules and 'on_activate' in cmd_module.functions:
                 source = {'command_module': cmd_module, 'type': 'command_module_activated'}
                 action = cmd_module.functions['on_activate'].action
                 perform.perform_action_from_event(action, namespace, source)

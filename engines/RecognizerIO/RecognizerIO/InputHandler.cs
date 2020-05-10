@@ -19,16 +19,10 @@ namespace RecognizerIO
         public InputHandler()
         {
             EngManager = new Engines.EngineManager();
-            //EngManager.LoadGrammar(@"C:\Users\evan\AppData\Local\Temp\1a2f4100-8b3f-47f5-a3f2-ca79d282682b.xml");
         }
 
         public bool ProcessIncomingInput(string input)
         {
-            /*
-            EngManager.LoadGrammar(@"C:\Users\evan\AppData\Local\Temp\249f2b8a-4611-4f3e-b48f-1d694c62ec6b.xml", "foo");
-            EngManager.Begin();
-            return false;
-            */
             bool shutdown = false;
             dynamic jsonMsg = JsonConvert.DeserializeObject(input);
             string msgType = jsonMsg.Type;
@@ -48,6 +42,7 @@ namespace RecognizerIO
                     if (!EngManager.IsRunning && EngManager.AudioInputDeviceConnected && startEngine) EngManager.Begin();
                     break;
                 case "LOAD_SETTINGS":
+                    Debug.sendMessage("Loading settings from message" + input);
                     break;
                 case "EMULATE_RECOGNITION_EVENT":
                     string text = jsonMsg.Text;
