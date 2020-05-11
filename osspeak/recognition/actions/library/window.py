@@ -48,3 +48,9 @@ def match_title(test, title):
 
 def external():
     pass
+
+def test(s):
+    title = active_window_name()
+    if isinstance(s, str):
+        return s.lower() in title.lower()
+    raise NotImplementedError

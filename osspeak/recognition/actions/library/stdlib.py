@@ -32,7 +32,7 @@ namespace = {
     'false': lambda: False,
     'if': flow.osspeak_if,
     'int': int,
-    'is': lambda a, b: a is b
+    'is': lambda a, b: a is b,
     'keyboard': keyboard,
     'loop': flow.loop,
     'macro': macro,

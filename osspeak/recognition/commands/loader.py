@@ -60,6 +60,11 @@ class CommandModuleController:
                         continue
                     text_by_line = text.split('\n')
                     cmd_module = command_module.command_module_from_lark_ir(module_ir, text_by_line)
+                if 'on_load' in cmd_module.functions:
+                    namespace = self.get_namespace()
+                    source = {'command_module': cmd_module, 'type': 'command_module_loaded'}
+                    action = cmd_module.functions['on_load'].action
+                    perform.perform_action_from_event(action, namespace, source)
                 command_modules[full_path] = cmd_module
                 cmd_module.relative_path = os.path.relpath(full_path, self.module_loader.root)
                 cmd_module.absolute_path = full_path
