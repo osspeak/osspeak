@@ -32,6 +32,7 @@ namespace = {
     'false': lambda: False,
     'if': flow.osspeak_if,
     'int': int,
+    'is': lambda a, b: a is b
     'keyboard': keyboard,
     'loop': flow.loop,
     'macro': macro,
@@ -44,6 +45,7 @@ namespace = {
     'run': process.run,
     'run_sync': process.run_sync,
     'screengrid': screengrid,
+    'set': set,
     'setattr': setattr,
     'setState': lambda name, value: setattr(namespace['state'], name, value),
     'snake_case': text.snake_case,

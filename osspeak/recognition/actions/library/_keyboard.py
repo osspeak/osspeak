@@ -1,6 +1,5 @@
 import threading
 import re
-from lib import keyboard
 from recognition.actions.library.vocola import dragonkeys, sendinput
 from platforms import api
 import time

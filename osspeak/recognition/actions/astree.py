@@ -1,6 +1,5 @@
 import lark.lexer
 from recognition.actions.library import stdlib
-from lib import keyboard
 from recognition.actions.library import _keyboard
 from recognition import lark_parser
 import lark.tree
@@ -389,7 +388,6 @@ class KeySequence(BaseActionNode):
         self.keys = keys
 
     def evaluate(self, context):
-        from recognition.actions.library import _keyboard
         keys = self.keys.evaluate(context)
         kp = _keyboard.KeyPress.from_space_delimited_string(keys)
         return kp

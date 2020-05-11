@@ -4,7 +4,6 @@ import time
 import queue
 import collections
 import traceback
-from lib import keyboard
 from settings import settings
 import platforms.api
 from recognition.actions import context, astree
