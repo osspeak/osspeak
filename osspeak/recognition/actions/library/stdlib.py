@@ -23,6 +23,7 @@ def initialize():
 namespace = {
     'active_window': lambda: window.active_window_name().title(),
     'between': flow.between,
+    'camel_case': text.camel_case,
     'click': mouse.click,
     'directinput': directinput,
     'engines': engines,
@@ -34,6 +35,7 @@ namespace = {
     'int': int,
     'is': lambda a, b: a is b,
     'keyboard': keyboard,
+    'len': len,
     'loop': flow.loop,
     'macro': macro,
     'mouse': mouse,
@@ -52,6 +54,7 @@ namespace = {
     'state': SimpleNamespace(),
     'str': str,
     'text': text,
+    'title_case': text.title_case,
     'true': lambda: True,
     'wait': wait,
     'window': window,
