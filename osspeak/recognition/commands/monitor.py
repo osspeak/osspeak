@@ -1,6 +1,7 @@
 import pywindow
 import collections
 import log
+import copy
 import asyncio
 import settings
 import clargs
@@ -28,14 +29,18 @@ def start_watching_user_state():
     asyncio.ensure_future(fut)
 
 async def watch_user_system_state(msg_list, command_module_controller):
+    from recognition.actions.library.stdlib import namespace
     loop = asyncio.get_event_loop()
     previous_window = None
+    previous_state = None
     initial_load_done = False
     while True:
+        current_state = copy.copy(namespace['state'])
         current_window = pywindow.foreground_window().title.lower()
         is_different_window = current_window != previous_window
+        is_different_state = current_state != previous_state
         msg = msg_list[0]
-        if is_different_window or msg:
+        if is_different_window or is_different_state or msg:
             msg_list[0] = None
             new_active_modules = command_module_controller.get_active_modules(current_window)
             reload_files = msg == topics.RELOAD_COMMAND_MODULE_FILES
@@ -47,6 +52,7 @@ async def watch_user_system_state(msg_list, command_module_controller):
                 raise NotImplementedError
                 command_module_controller.load_and_send_grammar()
             previous_window = current_window
+            previous_state = current_state
         await asyncio.sleep(1)
 
 def set_message(msg_list, msg):
