@@ -79,7 +79,7 @@ class CommandModuleController:
                 active_modules[path] = cmd_module
         return active_modules
 
-    async def load_modules(self, current_window, initialize_modules: bool=False):
+    def load_modules(self, current_window, initialize_modules: bool=False):
         previous_active_modules = self.sorted_command_modules(self.active_command_modules)
         if initialize_modules:
             raise NotImplementedError
@@ -91,7 +91,7 @@ class CommandModuleController:
         if grammar_context is not None:
             self.save_grammar(grammar_context)
             grammar_xml, grammar_id = ET.tostring(grammar_context.xml).decode('utf8'), grammar_context.uuid
-            await pubsub.publish_async(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
+            pubsub.publish(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
 
     def build_grammar(self, command_modules_by_ascending_priority) -> grammar.GrammarContext:
         named_utterances, commands, utterance_priority = self.get_active_named_utterances_and_commands(command_modules_by_ascending_priority)
