@@ -10,7 +10,9 @@ imported_modules = {}
 def run(path, alias=None):
     runpath = get_runpath(path)
     save_as = path if alias is None else alias
-    imported_modules[save_as] = load_module(runpath)
+    mod = load_module(runpath)
+    imported_modules[save_as] = mod
+    return mod
 
 def get_runpath(path):
     if path.endswith('.py'):
@@ -18,9 +20,12 @@ def get_runpath(path):
     filepath = path.replace('.', os.sep) + '.py'
     return os.path.join(settings.settings['command_directory'], filepath)
 
-def call(path, function, *args):
-    module = imported_modules[path]
-    getattr(module, function)(*args)
+def call(path, function, *args, **kwargs):
+    try:
+        module = imported_modules[path]
+    except KeyError:
+        module = run(path)
+    getattr(module, function)(*args, **kwargs)
 
 def load_module(path):
     # prepare to load module from path
