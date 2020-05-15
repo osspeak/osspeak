@@ -1,7 +1,9 @@
 import pywindow
+import time
+import threading
 import collections
 import log
-import asyncio
+import copy
 import settings
 import clargs
 from recognition.commands import loader
@@ -24,30 +26,33 @@ def start_watching_user_state():
     command_module_controller.command_modules = command_module_controller.initialize_command_modules()
     engine_status_history = collections.deque([], 10)
     create_message_subscriptions(msg_list, command_module_controller)
-    fut = watch_user_system_state(msg_list, command_module_controller)
-    asyncio.ensure_future(fut)
+    threading.Thread(target=watch_user_system_state, daemon=True, args=(msg_list, command_module_controller)).start()
 
-async def watch_user_system_state(msg_list, command_module_controller):
-    loop = asyncio.get_event_loop()
+def watch_user_system_state(msg_list, command_module_controller):
+    from recognition.actions.library.stdlib import namespace
     previous_window = None
+    previous_state = None
     initial_load_done = False
     while True:
+        current_state = copy.copy(namespace['state'])
         current_window = pywindow.foreground_window().title.lower()
         is_different_window = current_window != previous_window
+        is_different_state = current_state != previous_state
         msg = msg_list[0]
-        if is_different_window or msg:
+        if is_different_window or is_different_state or msg:
             msg_list[0] = None
             new_active_modules = command_module_controller.get_active_modules(current_window)
             reload_files = msg == topics.RELOAD_COMMAND_MODULE_FILES
             if new_active_modules != command_module_controller.active_command_modules or reload_files:
                 initialize_modules = not initial_load_done or reload_files
-                await command_module_controller.load_modules(current_window, initialize_modules=False)
+                command_module_controller.load_modules(current_window, initialize_modules=False)
                 initial_load_done = True
             elif msg == topics.RELOAD_GRAMMAR:
                 raise NotImplementedError
                 command_module_controller.load_and_send_grammar()
             previous_window = current_window
-        await asyncio.sleep(1)
+            previous_state = current_state
+        time.sleep(1)
 
 def set_message(msg_list, msg):
     msg_list[0] = msg
