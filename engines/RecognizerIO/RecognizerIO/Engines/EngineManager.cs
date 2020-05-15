@@ -61,6 +61,7 @@ namespace RecognizerIO.Engines
             }
             ActiveGrammar = gram;
             GrammarId = grammarId;
+            Debug.sendMessage("New grammar loaded");
         }
 
         void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)

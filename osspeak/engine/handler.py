@@ -66,7 +66,7 @@ class EngineProcessHandler:
             print('error!')
             print(msg['Message'])
         elif msg['Type'] == 'DEBUG':
-            print(f'Debug Message:\n{msg["Message"]}')
+            print(f'{msg["Message"]}')
         elif msg['Type'] == 'RESET_DEVICE':
             await self.send_simple_message(msg['Type'])
 
