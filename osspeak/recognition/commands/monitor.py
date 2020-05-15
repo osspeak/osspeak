@@ -46,7 +46,7 @@ async def watch_user_system_state(msg_list, command_module_controller):
             reload_files = msg == topics.RELOAD_COMMAND_MODULE_FILES
             if new_active_modules != command_module_controller.active_command_modules or reload_files:
                 initialize_modules = not initial_load_done or reload_files
-                await command_module_controller.load_modules(current_window, initialize_modules=False)
+                command_module_controller.load_modules(current_window, initialize_modules=False)
                 initial_load_done = True
             elif msg == topics.RELOAD_GRAMMAR:
                 raise NotImplementedError
