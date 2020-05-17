@@ -68,7 +68,7 @@ _atom_entry: compare
 ?unary: [{UNARY_OPERATOR}] exponent
 ?exponent: _atom ("**" _atom)*
 _atom: (index | {SLICE} | loop | _grouping | attribute | literal | list | STRING_SINGLE | STRING_DOUBLE | REGEX | keypress | {ZERO_OR_POSITIVE_INTEGER} | ZERO_OR_POSITIVE_FLOAT | {VARIABLE} | call | {ARGUMENT_REFERENCE})
-_chainable: (NAME | attribute | call | list | {VARIABLE} | {ARGUMENT_REFERENCE} | index | {SLICE})
+_chainable: (NAME | attribute | call | list | {VARIABLE} | {ARGUMENT_REFERENCE} | index | {SLICE} | STRING_SINGLE | STRING_DOUBLE | REGEX | _grouping | {ZERO_OR_POSITIVE_INTEGER} | ZERO_OR_POSITIVE_FLOAT)
 {UNARY_OPERATOR}: ("+" | "-")
 NOT_OPERATOR: "!"
 keypress: "{{" {EXPR} "}}"

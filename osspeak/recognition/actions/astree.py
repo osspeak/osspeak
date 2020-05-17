@@ -312,7 +312,7 @@ class Call(BaseActionNode):
         try:
             result = function_to_call(*arg_values, **kwarg_values)
         except Exception as e:
-            print(f'Error calling function {self.fn.value}:')
+            print(f'Error calling function {function_to_call}:')
             raise e
         if isinstance(result, types.GeneratorType):
             return evaluate_generator(result)
@@ -328,7 +328,7 @@ class Call(BaseActionNode):
             try:
                 result = function_to_call(*arg_values, **kwarg_values)
             except Exception as e:
-                print(f'Error calling function {self.fn.value}:')
+                print(f'Error calling function {function_to_call}:')
                 raise e
             if isinstance(result, types.GeneratorType):
                 yield from exhaust_generator(result)
