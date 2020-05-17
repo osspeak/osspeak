@@ -7,6 +7,11 @@ import settings
 
 imported_modules = {}
 
+def register(path, name):
+    from recognition.actions.library import stdlib
+    mod = get_or_load_module(path)
+    stdlib.namespace[name] = mod
+
 def run(path, alias=None):
     runpath = get_runpath(path)
     save_as = path if alias is None else alias
@@ -20,12 +25,15 @@ def get_runpath(path):
     filepath = path.replace('.', os.sep) + '.py'
     return os.path.join(settings.settings['command_directory'], filepath)
 
-def call(path, function, *args, **kwargs):
+def get_or_load_module(path):
     try:
-        module = imported_modules[path]
+        return imported_modules[path]
     except KeyError:
-        module = run(path)
-    getattr(module, function)(*args, **kwargs)
+        return run(path)
+
+def call(path, function, *args, **kwargs):
+    module = get_or_load_module(path)
+    return getattr(module, function)(*args, **kwargs)
 
 def load_module(path):
     # prepare to load module from path

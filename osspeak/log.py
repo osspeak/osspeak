@@ -24,8 +24,8 @@ def setup_logger():
     print_debug_level = logging.INFO
     ch.setLevel(print_debug_level)
     ch.setFormatter(formatter)
-    # logger.addHandler(handler)
-    logger.addHandler(ch) 
+    logger.addHandler(handler)
+    logger.addHandler(ch)
     return logger
 
 logger = setup_logger()

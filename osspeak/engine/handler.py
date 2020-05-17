@@ -1,4 +1,5 @@
 import json
+import log
 import xml.etree.ElementTree as ET
 import asyncio
 import sys
@@ -66,7 +67,7 @@ class EngineProcessHandler:
             print('error!')
             print(msg['Message'])
         elif msg['Type'] == 'DEBUG':
-            print(f'{msg["Message"]}')
+            log.logger.debug(f'{msg["Message"]}')
         elif msg['Type'] == 'RESET_DEVICE':
             await self.send_simple_message(msg['Type'])
 

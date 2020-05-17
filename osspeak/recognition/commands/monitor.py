@@ -31,7 +31,6 @@ def start_watching_user_state():
 
 async def watch_user_system_state(msg_list, command_module_controller):
     from recognition.actions.library.stdlib import namespace
-    loop = asyncio.get_event_loop()
     previous_window = None
     previous_state = None
     initial_load_done = False
