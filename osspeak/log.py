@@ -10,21 +10,20 @@ def setup_logger():
     if not os.path.isdir(logging_directory):
         os.makedirs(logging_directory)
     logger = logging.getLogger('root')
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(settings.settings['file_logging_level'])
     # Add the log message handler to the logger
-    log_filename = os.path.join(logging_directory, 'log')
-    handler = logging.handlers.RotatingFileHandler(
+    log_filename = os.path.join(logging_directory, 'log.txt')
+    file_handler = logging.handlers.RotatingFileHandler(
         log_filename,
         maxBytes=65536,
         backupCount=5,
     )
     formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s: %(message)s')
-    handler.setFormatter(formatter)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
     ch = logging.StreamHandler()
-    print_debug_level = logging.INFO
-    ch.setLevel(print_debug_level)
+    ch.setLevel(settings.settings['print_logging_level'])
     ch.setFormatter(formatter)
-    logger.addHandler(handler)
     logger.addHandler(ch)
     return logger
 

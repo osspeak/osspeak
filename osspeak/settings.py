@@ -1,4 +1,5 @@
 import os
+import logging
 import json
 import clargs
 import sys
@@ -16,6 +17,8 @@ DEFAULT_CONFIG = {
     'external_directory': os.path.join(OSSPEAK_DIRECTORY, 'external'),
     'cache': os.path.join(OSSPEAK_DIRECTORY, '.cache.json'),
     'macros': os.path.join(OSSPEAK_DIRECTORY, 'macros.json'),
+    'print_logging_level': logging.INFO,
+    'file_logging_level': logging.DEBUG,
     'gui_port': 3922,
     'perform_actions': True,
     'engine': {
