@@ -355,9 +355,6 @@ class Variable(BaseActionNode):
     def __init__(self, value):
         self.value = value
 
-    def get_actions(self, idx):
-        pass
-
     def evaluate(self, context):
         index = self.value - 1 if self.value > 0 else self.value
         try:
