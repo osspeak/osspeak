@@ -11,10 +11,9 @@ import time
 
 def wait(n):
     try:
-        count = float(n)
+        time.sleep(float(n))
     except TypeError:
-        count = 0
-    time.sleep(count)
+        pass
 
 def initialize():
     # avoid circular import timing issue
@@ -25,6 +24,7 @@ namespace = {
     'between': flow.between,
     'camel_case': text.camel_case,
     'click': mouse.click,
+    'dict': dict,
     'directinput': directinput,
     'engines': engines,
     'error': general.error,
@@ -33,6 +33,7 @@ namespace = {
     'false': lambda: False,
     'if': flow.osspeak_if,
     'int': int,
+    'in': lambda a, b: a in b,
     'is': lambda a, b: a is b,
     'keyboard': keyboard,
     'len': len,

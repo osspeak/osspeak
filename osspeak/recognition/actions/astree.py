@@ -395,4 +395,4 @@ class RegularExpression(BaseActionNode):
         self.value = value
 
     def evaluate(self, context):
-        return re.compile(self.value)
+        return re.compile(self.value, flags=re.IGNORECASE)

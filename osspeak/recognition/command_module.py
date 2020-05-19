@@ -30,9 +30,8 @@ class CommandModule:
         test_fn = self.functions.get('is_active')
         if test_fn:
             eval_result = test_fn.action.evaluate_without_context()
-            if isinstance(eval_result, str):
-                current_window_matches = re.search(eval_result, current_window, flags=re.IGNORECASE)
-                return current_window_matches
+            if isinstance(eval_result, (str, re.Pattern)):
+                return window.test(eval_result)
             return bool(eval_result)
         return True
 

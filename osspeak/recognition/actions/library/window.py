@@ -5,14 +5,13 @@ import subprocess
 import pywindow
 
 def focus(title, index=None):
-    title = title.lower()
     index = 1 if index is None else int(index)
     if index > 0:
         index -= 1
     windows = [(w, w.title.lower()) for w in pywindow.all_windows()]
-    windows = [(w, win_title) for w, win_title in windows if title in win_title]
-    windows.sort(key=lambda x: len(x[1]))
-    windows[index][0].focus()
+    matched_windows = [(w, win_title) for w, win_title in windows if test(title, win_title)]
+    matched_windows.sort(key=lambda x: len(x[1]))
+    matched_windows[index][0].focus()
 
 def close():
     pywindow.foreground_window().close()
@@ -46,10 +45,11 @@ def wait(test_title, timeout=10, raise_on_timeout=True):
 def external():
     pass
 
-def test(s):
-    title = active_window_name().lower()
+def test(s, current_title=None):
+    if current_title is None:
+        current_title = active_window_name()
     if isinstance(s, str):
-        return s.lower() in title
+        return s.lower() in current_title.lower()
     if isinstance(s, re.Pattern):
-        return s.match(title, re.IGNORECASE)
+        return s.search(current_title)
     raise TypeError
