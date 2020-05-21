@@ -114,7 +114,6 @@ def mouse_move(x=None, y=None, relative=False):
         return
     if x is None: x = 0
     if y is None: y = 0
-    print('moise move')
     ctypes.windll.user32.SetCursorPos(startx + x, starty + y)
 
 def get_clipboard_contents():

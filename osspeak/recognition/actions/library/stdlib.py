@@ -24,6 +24,7 @@ namespace = {
     'between': flow.between,
     'camel_case': text.camel_case,
     'click': mouse.click,
+    'clipboard': clipboard,
     'dict': dict,
     'directinput': directinput,
     'engines': engines,
