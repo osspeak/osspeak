@@ -1,4 +1,4 @@
-from recognition.actions.library import (window, thread, engines,
+from recognition.actions.library import (window, thread, engine,
 extensions, general, text, clipboard, macro, osspeak, conditionals,
 fsystem, math, directinput, flow, process)
 from recognition.actions.library import _mouse as mouse
@@ -27,7 +27,7 @@ namespace = {
     'clipboard': clipboard,
     'dict': dict,
     'directinput': directinput,
-    'engines': engines,
+    'engine': engine,
     'error': general.error,
     'eval': lambda context, x: eval(str(x.evaluate(context)), {}, context.namespace),
     'extensions': extensions,

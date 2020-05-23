@@ -35,11 +35,19 @@ class EngineProcessHandler:
         pubsub.subscribe(topics.ENGINE_STOP, self.stop)
         pubsub.subscribe(topics.STOP_MAIN_PROCESS, self.shutdown)
         pubsub.subscribe(topics.EMULATE_RECOGNITION_EVENT, self.emulate_recognition)
+        pubsub.subscribe(topics.SET_ENGINE_SETTINGS, self.set_engine_settings)
         
     async def message_engine(self, msg):
         if isinstance(msg, dict):
             msg = json.dumps(msg)
         await self.process.send_message(msg)
+
+    async def set_engine_settings(self, engine_settings):
+        msg = {
+            'Type': topics.SET_ENGINE_SETTINGS,
+            'Settings': engine_settings
+        }
+        await self.message_engine(msg)
 
     async def load_engine_grammar(self, grammar_xml, grammar_id):
         msg = {

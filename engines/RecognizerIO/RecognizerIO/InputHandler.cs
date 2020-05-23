@@ -44,6 +44,16 @@ namespace RecognizerIO
                 case "LOAD_SETTINGS":
                     Debug.sendMessage("Loading settings from message" + input);
                     break;
+                case "SET_ENGINE_SETTINGS":
+                    dynamic endSilenceTimeout = jsonMsg.Settings.end_silence_timeout;
+                    dynamic endSilenceTimeoutAmbiguous = jsonMsg.Settings.end_silence_timeout_ambiguous;
+                    if (endSilenceTimeout != null) {
+                        EngManager.Engine.EndSilenceTimeout = TimeSpan.FromSeconds(Convert.ToDouble(endSilenceTimeout));
+                    }
+                    if (endSilenceTimeoutAmbiguous != null) {
+                        EngManager.Engine.EndSilenceTimeoutAmbiguous = TimeSpan.FromSeconds(Convert.ToDouble(endSilenceTimeoutAmbiguous));
+                    }
+                    break; // {"Type": "SET_ENGINE_SETTINGS", "Settings": {"end_silence_timeout": "5"}}
                 case "EMULATE_RECOGNITION_EVENT":
                     string text = jsonMsg.Text;
                     EngManager.Engine.EmulateRecognize(text);

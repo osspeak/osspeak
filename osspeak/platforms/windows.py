@@ -89,7 +89,7 @@ def activate_window(title, position=1):
     (winconstants.SPI_SETFOREGROUNDLOCKTIMEOUT, 0, ctypes.byref(zero), winconstants.SPIF_SENDCHANGE)
     BringWindowToTop(hwnd)
     SetForegroundWindow(hwnd)
-    SystemParametersInfo(winconstants.SPI_SETFOREGROUNDLOCKTIMEOUT, 0, ctypes.byref(timeout), winconstants.SPIF_SENDCHANGE); 
+    SystemParametersInfo(winconstants.SPI_SETFOREGROUNDLOCKTIMEOUT, 0, ctypes.byref(timeout), winconstants.SPIF_SENDCHANGE)
     if GetForegroundWindow() == hwnd:
         return True
     return False
