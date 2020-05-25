@@ -76,10 +76,10 @@ def create_lark_grammar(command_utterances, named_utterances, node_ids, utteranc
     rule_names = ' | '.join([node_ids[c] for c in command_utterances])
     dictation_rule = named_utterances['_dictation']
     dictation_rule_id = node_ids[dictation_rule]
-    rule_lines.append(rf'{dictation_rule_id}: /(.+)+/')
+    rule_lines.append(rf'{dictation_rule_id}: /[a-z0-9]+([ \\t][a-z0-9]+)*/')
     rule_lines.append('%import common.WORD')
     rule_lines.append('_WS: /[ \\t]/')
-    rule_lines.append(f'start: ({rule_names})+')
+    rule_lines.append(f'start: ({rule_names})+ _WS*')
     text = '\n'.join(rule_lines)
     if text in grammar_cache:
         gram = grammar_cache[text]
