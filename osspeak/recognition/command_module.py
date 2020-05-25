@@ -48,13 +48,6 @@ def command_module_from_lark_ir(module_ir, text_by_line):
     priority = None
     for child in module_ir.children:
         ir_type = lark_parser.lark_node_type(child)
-        if ir_type == 'priority':
-            action_ir = child.children[0]
-            action_text = lark_parser.lark_node_text(action_ir, text_by_line)
-            action = recognition.actions.astree_constructor.action_from_lark_ir(action_ir, action_text)
-            priority = action.evaluate_without_context()
-            if isinstance(priority, (int, float)):
-                cmd_module.priority = priority
         if ir_type == 'command':
             utterance_ir, action_ir = child.children 
             utterance_text = lark_parser.lark_node_text(utterance_ir, text_by_line)
@@ -66,6 +59,10 @@ def command_module_from_lark_ir(module_ir, text_by_line):
         elif ir_type == 'function_definition':
             func = recognition.actions.astree_constructor.function_definition_from_lark_ir(child)
             cmd_module.functions[func.name] = func
+            if func.name == 'priority':
+                priority = func.action.evaluate_without_context()
+                if isinstance(priority, (int, float)):
+                    cmd_module.priority = priority
         elif ir_type == 'named_utterance':
             name = str(lark_parser.find_type(child, 'utterance_name').children[0])
             utterance_ir = lark_parser.find_type(child, 'utterance')
