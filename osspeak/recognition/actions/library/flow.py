@@ -1,5 +1,6 @@
 def loop(context, *args):
     from recognition.actions.astree import exhaust_generator, KeySequence
+    from recognition.actions.library import _keyboard as keyboard
     count = args[-1].evaluate(context)
     try:
         count = int(count)
@@ -10,6 +11,12 @@ def loop(context, *args):
     if isinstance(eval_arg, KeySequence):
         kp = eval_arg.evaluate(context)
         assert len(kp.chords) == 1
+        press_key = kp.chords[0][1]
+        if (press_key.lower(),) in keyboard.key_delayer.delays:
+            yield eval_arg, kp
+            for i in range(count - 1):
+                yield from exhaust_generator(eval_arg.evaluate_lazy(context))
+            return
         press_count = kp.chords[0][2]
         if press_count is None:
             press_count = 1
