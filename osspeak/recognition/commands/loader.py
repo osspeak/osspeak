@@ -32,11 +32,12 @@ class CommandModuleController:
 
     def __init__(self, module_loader):
         self.module_loader = module_loader
-        self.grammars = collections.OrderedDict()
+        self.grammars = limited_size_dict.LimitedSizeDict(size_limit=5)
         self.map_grammar_to_commands = collections.OrderedDict()
         self.command_modules = {}
         self.active_command_modules = {}
         self.map_nodes_to_command_module = {}
+        self.grammar_xml_cache = limited_size_dict.LimitedSizeDict(size_limit=10)
 
     def initialize_command_modules(self):
         if clargs.get_args()['clean_cache']:
@@ -89,7 +90,7 @@ class CommandModuleController:
         self.fire_activation_events(previous_active_modules, command_modules_by_ascending_priority, namespace)
         grammar_context = self.build_grammar(command_modules_by_ascending_priority.values())
         if grammar_context is not None:
-            self.save_grammar(grammar_context)
+            self.grammars[grammar_context.uuid] = grammar_context
             grammar_xml, grammar_id = ET.tostring(grammar_context.xml).decode('utf8'), grammar_context.uuid
             pubsub.publish(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
 
@@ -126,12 +127,6 @@ class CommandModuleController:
         for mod in self.active_command_modules.values():
             ns.update(mod.functions)
         return ns
-
-    def save_grammar(self, grammar):
-        # remove oldest grammar if needed
-        if len(self.grammars) > 4:
-            self.grammars.popitem(last=False)
-        self.grammars[grammar.uuid] = grammar
 
     def generate_node_ids(self, utterances):
         node_ids = {}
