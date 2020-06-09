@@ -8,7 +8,7 @@ import sys
 from settings import settings
 from communication import pubsub, topics
 
-class ProcessHandler:
+class ThreadedProcessHandler:
 
     def __init__(self, *args, on_output=None):
         self.process = subprocess.Popen(args, stdin=subprocess.PIPE,
