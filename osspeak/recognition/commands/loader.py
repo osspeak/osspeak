@@ -92,6 +92,9 @@ class CommandModuleController:
         if grammar_context is not None:
             self.grammars[grammar_context.uuid] = grammar_context
             grammar_xml, grammar_id = ET.tostring(grammar_context.xml).decode('utf8'), grammar_context.uuid
+            if grammar_xml in self.grammar_xml_cache:
+                grammar_context.recognition_cache = copy.copy(self.grammar_xml_cache[grammar_xml].recognition_cache)
+            self.grammar_xml_cache[grammar_xml] = grammar_context
             pubsub.publish(topics.LOAD_ENGINE_GRAMMAR, grammar_xml, grammar_id)
 
     def build_grammar(self, command_modules_by_ascending_priority) -> grammar.GrammarContext:

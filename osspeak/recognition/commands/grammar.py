@@ -17,7 +17,7 @@ class GrammarContext:
         self.named_rules = named_rules
         command_rules = [cmd.utterance for cmd in active_commands]
         self.lark_grammar = _lark.create_lark_grammar(command_rules, named_rules, node_ids, utterance_priority)
-        self.recognition_cache = limited_size_dict.LimitedSizeDict(size_limit=5000) # this is cleared every time a new grammar is loaded - maybe find a way to reuse?
+        self.recognition_cache = limited_size_dict.LimitedSizeDict(size_limit=5000)
 
     def parse_recognition(self, text):
         if text in self.recognition_cache:
