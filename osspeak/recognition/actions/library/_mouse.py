@@ -18,11 +18,20 @@ def right_click():
 def move(x=None, y=None, absolute=True, duration=0):
     mouse.move(x, y, absolute, duration)
 
+def move_relative(x=None, y=None, duration=0):
+    move(x=x, y=y, absolute=False, duration=duration)
+
+def move_absolute(x=None, y=None, duration=0):
+    move(x=x, y=y, absolute=True, duration=duration)
+
 def x():
     return mouse.get_position()[0]
 
 def y():
     return mouse.get_position()[1]
+
+def position():
+    return mouse.get_position()
 
 def wheel(delta=1):
     mouse.wheel(delta)

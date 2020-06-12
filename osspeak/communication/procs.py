@@ -1,4 +1,5 @@
 import time
+import os
 import asyncio
 import asyncio.subprocess
 import subprocess
@@ -10,12 +11,15 @@ from communication import pubsub, topics
 
 class ThreadedProcessHandler:
 
-    def __init__(self, *args, on_output=None):
+    def __init__(self, *args, on_output=None, cwd=None):
         self.process = subprocess.Popen(args, stdin=subprocess.PIPE,
-            stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+            stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True, cwd=cwd)
         self.on_output = on_output
         self.start_listening()
-        
+
+    def kill(self):
+        subprocess.call(['taskkill', '/F', '/T', '/PID',  str(self.process.pid)], stdout=open(os.devnull, 'w'))
+         
     def send_message(self, msg):
         if not isinstance(msg, bytes):
             msg = msg.encode('utf8')
@@ -29,12 +33,12 @@ class ThreadedProcessHandler:
 
     def dispatch_process_output(self):
         for line in self.process.stdout:
-            line = line.decode('utf8')
+            line = line.decode('utf8').rstrip('\n')
             self.on_output(line)
 
     def dispatch_process_error(self):
         for line in self.process.stderr:
-            line = line.decode('utf8')
+            line = line.decode('utf8').rstrip('\n')
             print('error: ', line)
 
     def start_listening(self):
