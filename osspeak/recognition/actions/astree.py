@@ -358,26 +358,18 @@ class Variable(BaseActionNode):
     def evaluate(self, context):
         index = self.value - 1 if self.value > 0 else self.value
         try:
-            var_actions = context.variables[index]
+            action = context.variables[index]
         except IndexError:
             return
-        last_result = None
-        for action in var_actions:
-            result = action.evaluate(context)
-            if isinstance(last_result, str) and isinstance(result, str):
-                last_result += result
-            elif result is not None:
-                last_result = result
-        return last_result
+        return action.evaluate(context)
 
     def evaluate_lazy(self, context):
         index = self.value - 1 if self.value > 0 else self.value
         try:
-            var_actions = context.variables[index]
+            action = context.variables[index]
         except IndexError:
             return
-        for action in var_actions:
-            yield from exhaust_generator(action.evaluate_lazy(context))
+        yield from exhaust_generator(action.evaluate_lazy(context))
 
 class KeySequence(BaseActionNode):
 

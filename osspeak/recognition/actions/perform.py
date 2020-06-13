@@ -83,7 +83,7 @@ def get_recognition_contexts(lark_recognition_tree, grammar_context):
                 path = path[:-1]
             if is_substitute:
                 substitute_paths.add(start_path)
-        variables = tuple(match_variables.values())
+        variables = tuple([consolidate_variables(x) for x in match_variables.values()])
         log.logger.info(f'''Matched rule: {command.utterance_text} with words "{' '.join(words)}"''')
         rec_context = context.RecognitionContext(variables, words, grammar_context.namespace)
         recognition_contexts.append((rec_context, command))
@@ -94,5 +94,17 @@ def get_leaf_action(node, text):
     if getattr(node, 'action_substitute', None) is not None:
         leaf_action, is_substitute = node.action_substitute, True 
     elif text is not None:
-        leaf_action, is_substitute = astree.String(text), False
+        leaf_action, is_substitute = astree.Literal(text), False
     return leaf_action, is_substitute
+
+def consolidate_variables(var_actions):
+    if len(var_actions) == 1:
+        return var_actions[0]
+    expressions = []
+    for expr in var_actions[:-1]:
+        expressions.extend([expr, astree.ExprSequenceSeparator(' ')])
+    try:
+        expressions.append(var_actions[-1])
+    except IndexError:
+        pass
+    return astree.ExpressionSequence(expressions)
