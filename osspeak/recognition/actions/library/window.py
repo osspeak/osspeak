@@ -2,7 +2,7 @@ import os
 import time
 import re
 import subprocess
-import pywindow
+from recognition.actions.library import pywindow
 
 def focus(title, index=None):
     index = 1 if index is None else int(index)
@@ -42,8 +42,8 @@ def wait(test_title, timeout=10, raise_on_timeout=True):
         time.sleep(0.1)
     return True
 
-def external():
-    pass
+def active_window():
+    return pywindow.foreground_window()
 
 def test(s, current_title=None):
     if current_title is None:

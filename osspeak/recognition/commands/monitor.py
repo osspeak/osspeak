@@ -1,4 +1,3 @@
-import pywindow
 import threading
 import collections
 import log
@@ -6,6 +5,7 @@ import copy
 import asyncio
 import settings
 import clargs
+from recognition.actions.library import pywindow
 from recognition.commands import loader
 from recognition.actions import perform
 from communication import topics, pubsub

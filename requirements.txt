@@ -17,7 +17,6 @@ pypiwin32==223
 pytest==5.4.1
 pywin32==227
 pywin32-ctypes==0.2.0
-pywindow==0.0.3
 screengrid==0.0.16
 six==1.14.0
 wcwidth==0.1.9
