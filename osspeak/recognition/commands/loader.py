@@ -181,22 +181,44 @@ class CommandModuleController:
 
     def cycles_from_graph(self, graph):
         nodes_with_cycles = set()
+        unvisited = set()
+        visiting = set()
+        visited = set()
         cycles = []
         for name in graph.adjacency_list:
-            cycles.extend(self.dfs(name, graph, (name,), set()))
+            unvisited.add(name)
+        while unvisited:
+            node = unvisited.pop()
+            visiting.add(node)
+            path = (node,)
+            node_cycles = self.detect_node_cycles(graph, node, unvisited, visiting, visited, path)
+            cycles.extend(node_cycles)
         return cycles
 
-    def dfs(self, node, graph, root, visited):
+    def detect_node_cycles(self, graph, node, unvisited, visiting, visited, path):
+        # node is in visiting, last item in path
+        cycles = []
+        adjacent_nodes = graph.adjacency_list[node]
+        for adj in adjacent_nodes:
+            if adj in unvisited: # adjacent is unvisited, recurse down
+                unvisited.remove(adj)
+                visiting.add(adj)
+                child_path = path + (adj,)
+                adj_cycles = self.detect_node_cycles(graph, adj, unvisited, visiting, visited, child_path)
+                cycles.extend(adj_cycles)
+            elif adj in visiting: # found a cycle
+                cycle_path = None
+                for i, path_node in enumerate(path):
+                    if path_node == adj:
+                        cycle_path = path[i:]
+                        break
+                assert cycle_path
+                cycles.append(cycle_path + (adj,))
+            else: #
+                assert adj in visited
+        visiting.remove(node)
         visited.add(node)
-        utterance_cycles = []
-        adj = graph.adjacency_list[node]
-        for adjacent_utterance in adj:
-            path = root + (adjacent_utterance,)
-            if adjacent_utterance in visited:
-                utterance_cycles.append(path)
-            else:
-                utterance_cycles.extend(self.dfs(adjacent_utterance, graph, path, visited))
-        return utterance_cycles
+        return cycles
 
 class StaticFileCommandModuleLoader:
 
