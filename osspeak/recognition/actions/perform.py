@@ -76,11 +76,11 @@ def get_recognition_contexts(lark_recognition_tree, grammar_context):
                 continue
             path = start_path
             while path:
-                if path in substitute_paths:
-                    break
                 if path in match_variables:
                     match_variables[path].append(action)
                 path = path[:-1]
+                if path in substitute_paths:
+                    break
             if is_substitute:
                 substitute_paths.add(start_path)
         variables = tuple([consolidate_variables(x) for x in match_variables.values()])
@@ -88,7 +88,7 @@ def get_recognition_contexts(lark_recognition_tree, grammar_context):
         rec_context = context.RecognitionContext(variables, words, grammar_context.namespace)
         recognition_contexts.append((rec_context, command))
     return recognition_contexts
-
+    
 def get_leaf_action(node, text):
     leaf_action, is_substitute = None, None
     if getattr(node, 'action_substitute', None) is not None:
