@@ -15,6 +15,9 @@ def wait(n):
     except TypeError:
         pass
 
+def assign_var(context, name, value):
+    context.argument_frames[-1][name.evaluate(context)] = value.evaluate(context)
+
 def initialize():
     # avoid circular import timing issue
     macro._restore_saved()
@@ -58,6 +61,7 @@ namespace = {
     'text': text,
     'title_case': text.title_case,
     'true': lambda: True,
+    'var': assign_var,
     'wait': wait,
     'window': window,
 }
@@ -69,4 +73,5 @@ deferred_arguments_eval = set([
     keyboard.add_delay,
     keyboard.remove_delay,
     namespace['eval'],
+    assign_var,
 ])

@@ -16,7 +16,7 @@ class RecognitionResultsTree:
             if self.is_variable(node_wrapper):
                 possible_variables.append(node_wrapper)
             self.node_paths[node_wrapper.path] = node_wrapper.node
-        self.variables = collections.OrderedDict()
+        self.variables = {}
         for wrapper in possible_variables:
             ancestor_is_variable = any(w in possible_variables for w in wrapper.ancestors)
             if not ancestor_is_variable:

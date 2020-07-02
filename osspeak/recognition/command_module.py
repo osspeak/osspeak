@@ -29,7 +29,11 @@ class CommandModule:
     def is_active(self, current_window: str):
         test_fn = self.functions.get('is_active')
         if test_fn:
-            eval_result = test_fn.action.evaluate_without_context()
+            try:
+                eval_result = test_fn.action.evaluate_without_context()
+            except Exception as e:
+                logger.debug(e)
+                return False
             if isinstance(eval_result, (str, re.Pattern)):
                 return window.test(eval_result)
             return bool(eval_result)

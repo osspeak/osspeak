@@ -65,7 +65,7 @@ def get_recognition_contexts(lark_recognition_tree, grammar_context):
         words = []
         rule_id = matched_rule.data
         command, variable_tree = grammar_context.command_contexts[rule_id]
-        match_variables = collections.OrderedDict({path: [] for path in variable_tree.variables})
+        match_variables = {path: [] for path in variable_tree.variables}
         substitute_paths = set()
         for start_path, text in _lark.yield_paths(matched_rule, variable_tree.node_paths, grammar_context.named_rules):
             if text is not None:
