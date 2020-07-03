@@ -59,7 +59,7 @@ namespace = {
     'state': SimpleNamespace(),
     'str': str,
     'text': text,
-    'title_case': text.title_case,
+    'pascal_case': text.pascal_case,
     'true': lambda: True,
     'var': assign_var,
     'wait': wait,
