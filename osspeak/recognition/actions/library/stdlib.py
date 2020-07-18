@@ -18,6 +18,17 @@ def wait(n):
 def assign_var(context, name, value):
     context.argument_frames[-1][name.evaluate(context)] = value.evaluate(context)
 
+
+class _Nil:
+    pass
+
+def parse_int(val, default=1):
+    if isinstance(val, str):
+        val = val.replace(' ', '')
+    try:
+        return int(val)
+    except (ValueError, TypeError) as e:
+        return default
 def initialize():
     # avoid circular import timing issue
     macro._restore_saved()
@@ -45,6 +56,7 @@ namespace = {
     'macro': macro,
     'mouse': mouse,
     'none': lambda: None,
+    'parse_int': parse_int,
     'print': print,
     'process': process,
     're': re,
