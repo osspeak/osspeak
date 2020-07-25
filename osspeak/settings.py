@@ -6,7 +6,7 @@ import sys
 
 OSSPEAK_DIRECTORY = os.path.join(os.path.expanduser('~'), '.osspeak')
 EXECUTABLE_DIRECTORY = os.path.split(os.path.abspath(sys.argv[0]))[0]
-OSSPEAK_CONFIG_PATH = 'osspeak.json' if os.path.exists('osspeak.json') else os.path.join(OSSPEAK_DIRECTORY, 'osspeak.json')
+OSSPEAK_CONFIG_PATH = 'settings.json' if os.path.exists('settings.json') else os.path.join(OSSPEAK_DIRECTORY, 'settings.json')
 
 DEFAULT_CONFIG = {
     'interface': 'cli',
@@ -41,8 +41,9 @@ def save_settings(settings):
 
 def load_user_settings():
     user_settings = DEFAULT_CONFIG.copy()
-    user_settings.update(try_load_json_file(os.path.join(OSSPEAK_DIRECTORY, 'osspeak.json')))
-    user_settings.update(try_load_json_file(os.path.join(EXECUTABLE_DIRECTORY, 'osspeak.json')))
+    user_settings.update(try_load_json_file(os.path.join(OSSPEAK_DIRECTORY, 'settings.json')))
+    user_settings.update(try_load_json_file(os.path.join(EXECUTABLE_DIRECTORY, 'settings.json')))
+    user_settings.update(try_load_json_file(os.path.join('..', 'settings.json')))
     args = clargs.get_args()
     if args is not None:
         user_settings.update(args)

@@ -7,3 +7,4 @@ Lib/
 Scripts/
 engines/RecognizerIO/RecognizerIO/obj/Debug/project.razor.json
 pyvenv.cfg
+settings.json
