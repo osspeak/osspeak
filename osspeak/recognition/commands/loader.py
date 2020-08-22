@@ -40,7 +40,7 @@ class CommandModuleController:
         self.grammar_xml_cache = limited_size_dict.LimitedSizeDict(size_limit=10)
 
     def initialize_command_modules(self):
-        if clargs.get_args()['clean_cache']:
+        if settings.settings['clean_cache']:
             recognition.cache.delete_cache()
         recognition.actions.library.stdlib.initialize()
         command_module_cache = recognition.cache.load_cache()

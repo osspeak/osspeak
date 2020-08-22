@@ -20,7 +20,7 @@ def create_message_subscriptions(msg_list, command_module_controller):
 
 def start_watching_user_state():
     msg_list = [None]
-    command_module_file_pattern = clargs.get_args()['file_pattern']
+    command_module_file_pattern = settings.settings['file_pattern']
     module_loader = loader.StaticFileCommandModuleLoader(settings.settings['command_directory'], command_module_file_pattern)
     command_module_controller = loader.CommandModuleController(module_loader)
     command_module_controller.command_modules = command_module_controller.initialize_command_modules()
