@@ -22,6 +22,11 @@ def assign_var(context, name, value):
 class _Nil:
     pass
 
+def not_none(val, default):
+    if val is not None:
+        return val
+    return default
+
 def parse_int(val, default=1):
     if isinstance(val, str):
         val = val.replace(' ', '')
@@ -56,6 +61,7 @@ namespace = {
     'macro': macro,
     'mouse': mouse,
     'none': lambda: None,
+    'not_none': not_none,
     'parse_int': parse_int,
     'print': print,
     'process': process,
