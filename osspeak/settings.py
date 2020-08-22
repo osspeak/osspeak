@@ -8,6 +8,8 @@ OSSPEAK_DIRECTORY = os.path.join(os.path.expanduser('~'), '.osspeak')
 EXECUTABLE_DIRECTORY = os.path.split(os.path.abspath(sys.argv[0]))[0]
 OSSPEAK_CONFIG_PATH = 'settings.json' if os.path.exists('settings.json') else os.path.join(OSSPEAK_DIRECTORY, 'settings.json')
 
+settings = None
+
 DEFAULT_CONFIG = {
     'interface': 'cli',
     'network': 'local',
@@ -26,12 +28,18 @@ DEFAULT_CONFIG = {
     }
 }
 
+
+
 def try_load_json_file(path, default=dict):
     try:
         with open(path) as f:
             return json.load(f)
     except (FileNotFoundError, json.decoder.JSONDecodeError):
         return default() if callable(default) else default
+
+def set_settings(_settings):
+    global settings
+    settings = _settings
 
 def save_settings(settings):
     if not os.path.isdir(OSSPEAK_DIRECTORY):
@@ -48,11 +56,6 @@ def load_user_settings():
     if args is not None:
         user_settings.update(args)
     return user_settings
-
-try:
-    settings = load_user_settings()
-except:
-    settings = DEFAULT_CONFIG.copy()
 
 def get_server_address():
     address = settings['server_address'].rsplit(':', 1)
