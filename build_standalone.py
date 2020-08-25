@@ -4,6 +4,7 @@ cxfreeze command line tool
 
 import argparse
 import os
+import json
 import shutil
 import sys
 
@@ -16,6 +17,11 @@ __all__ = ["main"]
 EXCLUDES = []
 
 MAIN = os.path.join('osspeak', 'main.py')
+
+def create_settings_file(app_root):
+    settings = {'command_directory': 'commands'}
+    with open(os.path.join(app_root, 'settings.json'), 'w') as f:
+        json.dump(settings, f)
 
 DIST_FOLDER = 'dist'
 WSR_SRC_FOLDER = os.path.join('engines', 'RecognizerIO', 'RecognizerIO', 'bin', 'Debug')
@@ -67,6 +73,12 @@ def prepare_parser():
         action="store_true",
         dest="silent",
         help="suppress all output except warnings and errors",
+    )
+    parser.add_argument(
+        "--command_dir",
+        dest="base_name",
+        metavar="NAME",
+        help="command directory",
     )
     parser.add_argument(
         "--base-name",
@@ -229,7 +241,7 @@ def main():
             MAIN,
             args.init_script,
             args.base_name,
-            args.target_name,
+            args.name,
             args.icon,
         )
     ]
@@ -252,6 +264,10 @@ def main():
     freezer.Freeze()
     wsr_dest_folder = os.path.join(target_dir, 'engines', 'wsr')
     shutil.copytree(WSR_SRC_FOLDER, wsr_dest_folder)
+    commands_root = os.path.join(target_dir, 'commands')
+    app_commands_dir = os.path.join(os.path.expanduser('~'), '.osspeak', 'commands', args.name)
+    shutil.copytree(app_commands_dir, commands_root)
+    create_settings_file(target_dir)
 
 
 if __name__ == "__main__":
