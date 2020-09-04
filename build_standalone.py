@@ -5,6 +5,8 @@ cxfreeze command line tool
 import argparse
 import os
 import json
+import io
+import zipfile
 import shutil
 import sys
 
@@ -14,7 +16,7 @@ from cx_Freeze.common import normalize_to_list
 
 __all__ = ["main"]
 
-EXCLUDES = []
+EXCLUDES = ['tkinter']
 
 MAIN = os.path.join('osspeak', 'main.py')
 
@@ -46,6 +48,12 @@ def try_remove_directory(path):
     try:
         shutil.rmtree(path)
     except FileNotFoundError:
+        pass
+
+def try_makedirs(path):
+    try:
+        os.makedirs(path)
+    except FileExistsError:
         pass
 
 def prepare_parser():
@@ -231,17 +239,38 @@ def parse_command_line(parser):
     args.zip_includes = zip_includes
     return args
 
+def zipdir(path):
+    # ziph is zipfile handle
+    file_like_object = io.BytesIO()
+    zipfile_ob = zipfile.ZipFile(file_like_object, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9)
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            zipfile_ob.write(os.path.join(root, file))
+    return file_like_object
+
+def copy_dir(root_src_dir, root_dst_dir, filter=None):
+    try_remove_directory(root_dst_dir)
+    for src_dir, dirs, files in os.walk(root_src_dir):
+        files_to_write = [f for f in files if filter(f)] if filter else files
+        if files_to_write:
+            dst_dir = src_dir.replace(root_src_dir, root_dst_dir, 1)
+            try_makedirs(dst_dir)
+            for file_ in files_to_write:
+                src_file = os.path.join(src_dir, file_)
+                dst_file = os.path.join(dst_dir, file_)
+                shutil.copy(src_file, dst_dir)
 
 def main():
     args = parse_command_line(prepare_parser())
-    target_dir = os.path.join('standalone_applications', args.name)
-    try_remove_directory(target_dir)
+    app_name = args.name
+    app_root = os.path.join('standalone_applications', app_name)
+    try_remove_directory(app_root)
     executables = [
         cx_Freeze.Executable(
             MAIN,
             args.init_script,
             args.base_name,
-            args.name,
+            app_name,
             args.icon,
         )
     ]
@@ -254,7 +283,7 @@ def main():
         compress=args.compress,
         optimizeFlag=args.optimize_flag,
         path=None,
-        targetDir=target_dir,
+        targetDir=app_root,
         includeFiles=args.include_files,
         zipIncludes=args.zip_includes,
         silent=args.silent,
@@ -262,12 +291,19 @@ def main():
         zipExcludePackages=args.zip_exclude_packages,
     )
     freezer.Freeze()
-    wsr_dest_folder = os.path.join(target_dir, 'engines', 'wsr')
+    wsr_dest_folder = os.path.join(app_root, 'engines', 'wsr')
     shutil.copytree(WSR_SRC_FOLDER, wsr_dest_folder)
-    commands_root = os.path.join(target_dir, 'commands')
-    app_commands_dir = os.path.join(os.path.expanduser('~'), '.osspeak', 'commands', args.name)
-    shutil.copytree(app_commands_dir, commands_root)
-    create_settings_file(target_dir)
+    commands_root = os.path.join(app_root, 'commands')
+    app_commands_dir = os.path.join(os.path.expanduser('~'), '.osspeak', 'commands', app_name)
+    copy_dir(app_commands_dir, commands_root, lambda x: x.endswith('.speak'))
+    create_settings_file(app_root)
+    # shutil.make_archive(os.path.join(app_root, app_name), 'zip', app_root)
+    os.chdir('standalone_applications')
+    zf = zipdir(app_name)
+    os.chdir('..')
+    with open(os.path.join(app_root, app_name + '.zip'), 'wb') as f:
+        f.write(zf.getvalue())
+    print(args)
 
 
 if __name__ == "__main__":

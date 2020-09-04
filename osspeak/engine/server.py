@@ -1,7 +1,6 @@
 import json
 import asyncio
 from log import logger
-import websockets
 import settings
 from settings import settings
 from communication import common
