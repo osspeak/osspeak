@@ -6,6 +6,8 @@
 import ctypes
 import time
 
+HELD = set()
+
 SendInput = ctypes.windll.user32.SendInput
 
 mouse_button_down_mapping = {
@@ -61,6 +63,10 @@ CODES = {
     'ctrl': 0x1D,
     'pageup': 0xC9 + 1024,
     'pagedown': 0xD1 + 1024,
+    'up': 0xC8,
+    'left': 0xCB,
+    'right': 0xCD,
+    'down': 0xD0,
     'alt': 0x38,
 }
 
@@ -97,27 +103,39 @@ class Input(ctypes.Structure):
 
 # Actuals Functions
 
-def PressKey(hexKeyCode):
+def release_all():
+    held = list(HELD)
+    for key in held:
+        release(key)
+        try:
+            HELD.remove(key)
+        except KeyError:
+            pass
+
+def hold(key):
+    hexKeyCode = CODES[str(key)]
     extra = ctypes.c_ulong(0)
     ii_ = Input_I()
     ii_.ki = KeyBdInput( 0, hexKeyCode, 0x0008, 0, ctypes.pointer(extra) )
     x = Input( ctypes.c_ulong(1), ii_ )
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+    HELD.add(key)
 
-def ReleaseKey(hexKeyCode):
+def release(key):
+    hexKeyCode = CODES[str(key)]
     extra = ctypes.c_ulong(0)
     ii_ = Input_I()
     ii_.ki = KeyBdInput( 0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra) )
     x = Input( ctypes.c_ulong(1), ii_ )
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+    HELD.remove(key)
 
 def send(keys):
-    delay = .01
-    keycodes = [CODES[str(k)] for k in keys]
-    for code in keycodes:
-        PressKey(code)
+    delay = .1
+    for key in keys:
+        hold(key)
         time.sleep(delay)
-        ReleaseKey(code)
+        release(key)
     # for code in keycodes:
     #     time.sleep(delay)
 
@@ -146,14 +164,14 @@ if __name__ == '__main__':
     # send(['w'])
     # for i in range(100):
     #     send('wasd')
-    #     PressKey(CODES['w'])
+    #     hold(CODES['w'])
     #     time.sleep(5)
-    #     ReleaseKey(CODES['w'])
+    #     release(CODES['w'])
     #     time.sleep(5)
-        # PressKey(ONE)
-        # ReleaseKey(ONE)
+        # hold(ONE)
+        # release(ONE)
         # time.sleep(1)
-        # PressKey(TWO)
+        # hold(TWO)
         # time.sleep(1)
-        # ReleaseKey(TWO)
+        # release(TWO)
         # time.sleep(1)

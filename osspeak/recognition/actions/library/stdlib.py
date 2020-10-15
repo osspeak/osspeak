@@ -81,11 +81,13 @@ namespace = {
     'true': lambda: True,
     'var': assign_var,
     'wait': wait,
+    'while': flow.osspeak_while,
     'window': window,
 }
 
 deferred_arguments_eval = set([
     flow.osspeak_if,
+    flow.osspeak_while,
     flow.loop,
     flow.between,
     keyboard.add_delay,

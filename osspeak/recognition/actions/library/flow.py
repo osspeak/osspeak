@@ -48,6 +48,7 @@ def between(context, main_code, intermediate_code, count_ast):
     yield from exhaust_generator(main_code.evaluate_lazy(context))
 
 def osspeak_while(context, test_condition, *args):
+    from recognition.actions.astree import exhaust_generator
     while test_condition.evaluate(context):
         for arg in args:
             yield from exhaust_generator(arg.evaluate_lazy(context))

@@ -1,4 +1,3 @@
-import lark.lexer
 from recognition.actions import astree
 from recognition import lark_parser
 import lark.tree
