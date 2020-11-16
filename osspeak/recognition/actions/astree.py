@@ -44,7 +44,8 @@ class BaseActionNode:
         written_nodes = []
         for i, (node, result) in enumerate(self.evaluate_lazy(context)):
             assert isinstance(node, BaseActionNode)
-            if isinstance(result, (str, float, int)):
+            is_boolean = result not in (True, False)
+            if isinstance(result, (str, float, int)) and not is_boolean:
                 if isinstance(node, Literal) and i > 1:
                     previous = evaluated_nodes[i - 1]
                     if written_nodes and isinstance(written_nodes[-1], Literal) and isinstance(previous, ExprSequenceSeparator):
