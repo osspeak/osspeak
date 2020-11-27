@@ -3,9 +3,9 @@ extensions, general, text, clipboard, macro, osspeak, conditionals,
 fsystem, math, directinput, flow, process)
 from recognition.actions.library import _mouse as mouse
 from recognition.actions.library import _keyboard as keyboard
+from recognition.actions.library import screengrid
 from types import SimpleNamespace
 import operator
-import screengrid
 import re
 import time
 
