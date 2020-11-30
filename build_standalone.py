@@ -20,6 +20,9 @@ EXCLUDES = ['tkinter']
 
 MAIN = os.path.join('osspeak', 'main.py')
 
+class StopDirectoryRecursion(BaseException):
+    pass
+
 def create_settings_file(app_root):
     settings = {'command_directory': 'commands'}
     with open(os.path.join(app_root, 'settings.json'), 'w') as f:
@@ -60,6 +63,7 @@ def prepare_parser():
     parser = argparse.ArgumentParser(epilog=VERSION)
     parser.add_argument("--version", action="version", version=VERSION)
     parser.add_argument("name", nargs="?", metavar="SCRIPT", help="application name")
+    parser.add_argument("--command-folders", nargs="*", metavar="SCRIPT", help="Command module folders")
     parser.add_argument(
         "-O",
         action="count",
@@ -260,6 +264,9 @@ def copy_dir(root_src_dir, root_dst_dir, filter=None):
                 dst_file = os.path.join(dst_dir, file_)
                 shutil.copy(src_file, dst_dir)
 
+def filter_commands():
+    pass
+
 def main():
     args = parse_command_line(prepare_parser())
     app_name = args.name
@@ -294,8 +301,11 @@ def main():
     wsr_dest_folder = os.path.join(app_root, 'engines', 'wsr')
     shutil.copytree(WSR_SRC_FOLDER, wsr_dest_folder)
     commands_root = os.path.join(app_root, 'commands')
-    app_commands_dir = os.path.join(os.path.expanduser('~'), '.osspeak', 'commands', app_name)
-    copy_dir(app_commands_dir, commands_root, lambda x: x.endswith('.speak'))
+    top_level_directories = [app_name]
+    for directory in top_level_directories:
+        app_commands_dir = os.path.join(os.path.expanduser('~'), '.osspeak', 'commands', directory)
+        commands_dir = os.path.join(commands_root, directory)
+        copy_dir(app_commands_dir, commands_dir, lambda x: x.endswith('.speak') or x.endswith('.py'))
     create_settings_file(app_root)
     # shutil.make_archive(os.path.join(app_root, app_name), 'zip', app_root)
     os.chdir('standalone_applications')
