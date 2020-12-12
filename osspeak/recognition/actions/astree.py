@@ -8,13 +8,6 @@ import re
 import json
 import operator
 
-def evaluate_generator(gen):
-    assert isinstance(gen, types.GeneratorType)
-    last = None
-    for node, item in exhaust_generator(gen):
-        last = item
-    return last
-
 def exhaust_generator(gen):
     assert isinstance(gen, types.GeneratorType)
     for item in gen:
@@ -286,11 +279,15 @@ class Call(BaseActionNode):
         self.args = args
         self.kwargs = kwargs
 
-    def prepare_call(self, context):
+    def prepare_call(self, context, is_lazy):
         function_to_call = self.fn.evaluate(context)
         if function_to_call in stdlib.deferred_arguments_eval:
             arg_values = [context] + self.args
             kwarg_values = self.kwargs.copy()
+            if is_lazy:
+                gen = stdlib.deferred_arguments_eval[function_to_call]
+                if gen:
+                    function_to_call = gen
         else:
             arg_values = [arg.evaluate(context) for arg in self.args]
             kwarg_values = {k: v.evaluate(context) for k, v in self.kwargs.items()}
@@ -304,7 +301,7 @@ class Call(BaseActionNode):
         context.argument_frames.append(frame)
 
     def evaluate(self, context):
-        arg_values, kwarg_values, function_to_call = self.prepare_call(context)
+        arg_values, kwarg_values, function_to_call = self.prepare_call(context, False)
         if isinstance(function_to_call, FunctionDefinition):
             self.add_argument_frame(context, function_to_call, arg_values)
             result = function_to_call.action.evaluate(context)
@@ -316,11 +313,11 @@ class Call(BaseActionNode):
             print(f'Error calling function {function_to_call}:')
             raise e
         if isinstance(result, types.GeneratorType):
-            return evaluate_generator(result)
+            raise RuntimeError(f'Got a generator for {function_to_call}:')
         return result
 
     def evaluate_lazy(self, context):
-        arg_values, kwarg_values, function_to_call = self.prepare_call(context)
+        arg_values, kwarg_values, function_to_call = self.prepare_call(context, True)
         if isinstance(function_to_call, FunctionDefinition):
             self.add_argument_frame(context, function_to_call, arg_values)
             yield from function_to_call.action.evaluate_lazy(context)

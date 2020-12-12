@@ -85,13 +85,13 @@ namespace = {
     'window': window,
 }
 
-deferred_arguments_eval = set([
-    flow.osspeak_if,
-    flow.osspeak_while,
-    flow.loop,
-    flow.between,
-    keyboard.add_delay,
-    keyboard.remove_delay,
-    namespace['eval'],
-    assign_var,
-])
+deferred_arguments_eval = {
+    flow.osspeak_if: flow.osspeak_if_gen,
+    flow.osspeak_while: flow.osspeak_while_gen,
+    flow.loop: flow.loop_gen,
+    flow.between: None,
+    keyboard.add_delay: None,
+    keyboard.remove_delay: None,
+    namespace['eval']: None,
+    assign_var: None,
+}
