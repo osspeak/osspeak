@@ -180,7 +180,7 @@ class Divide(BaseActionNode):
         self.right = right
 
     def evaluate(self, context):
-        self.left.evaluate(context) / self.right.evaluate(context)
+        return self.left.evaluate(context) / self.right.evaluate(context)
 
 class Exponent(BaseActionNode):
 

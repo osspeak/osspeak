@@ -185,7 +185,6 @@ def test_attribute1():
 def test_ambig1():
     text = "'cd ..' + '/..' * int($1 || 0) {enter}"
     action = text_to_action(text)
-    to_clipboard(action)
     assert_equal(action, {
         "expressions": [
             {
@@ -556,6 +555,22 @@ def test_order_of_operations5():
         "type": "Add"
     })
     assert evaluate_action(action) == 10
+    
+def test_divide():
+    text = "6 / 5"
+    action = text_to_action(text)
+    assert_equal(action, {
+        "left": {
+            "type": "Integer",
+            "value": 6
+        },
+        "right": {
+            "type": "Integer",
+            "value": 5
+        },
+        "type": "Divide"
+    })
+    assert evaluate_action(action) == 1.2
 
 def test_spacing():
     text = "$ 1"
