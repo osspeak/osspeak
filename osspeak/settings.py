@@ -8,7 +8,6 @@ OSSPEAK_DIRECTORY = os.path.join(os.path.expanduser('~'), '.osspeak')
 EXECUTABLE_DIRECTORY = os.path.split(os.path.abspath(sys.argv[0]))[0]
 OSSPEAK_CONFIG_PATH = 'settings.json' if os.path.exists('settings.json') else os.path.join(OSSPEAK_DIRECTORY, 'settings.json')
 
-settings = None
 
 DEFAULT_CONFIG = {
     'interface': 'cli',
@@ -29,6 +28,7 @@ DEFAULT_CONFIG = {
 }
 
 
+settings = DEFAULT_CONFIG.copy()
 
 def try_load_json_file(path, default=dict):
     try:

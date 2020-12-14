@@ -51,7 +51,7 @@ def loop_gen(context, *args):
             press_count = 1
         press_count = str(count * int(press_count))
         kp.chords[0][2] = press_count
-        yield eval_arg, kpx
+        yield eval_arg, kp
     else:
         for i in range(count):
             yield from exhaust_generator(eval_arg.evaluate_lazy(context))
