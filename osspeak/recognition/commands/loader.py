@@ -37,6 +37,7 @@ class CommandModuleController:
         self.command_modules = {}
         self.active_command_modules = {}
         self.map_nodes_to_command_module = {}
+        self.namespace = recognition.actions.library.stdlib.Namespace()
         self.grammar_xml_cache = limited_size_dict.LimitedSizeDict(size_limit=10)
 
     def initialize_command_modules(self):

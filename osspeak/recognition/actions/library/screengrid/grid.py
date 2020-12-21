@@ -64,8 +64,12 @@ class Grid:
                 x, y = self.centers[f'{self.selection}{key.name}']
                 mouse.move(x, y)
                 if on_done is not None:
-                    on_done()
-                self.empty()                
+                    try:
+                        on_done()
+                    finally:
+                        self.empty()                
+                else:
+                    self.empty()
             elif is_backspace:
                 self.overlay(on_done=on_done)
             elif is_escape:

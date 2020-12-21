@@ -4,6 +4,7 @@ fsystem, math, directinput, flow, process)
 from recognition.actions.library import _mouse as mouse
 from recognition.actions.library import _keyboard as keyboard
 from recognition.actions.library import screengrid
+from recognition.actions import astree
 from types import SimpleNamespace
 import operator
 import re
@@ -18,6 +19,9 @@ def wait(n):
 def assign_var(context, name, value):
     context.argument_frames[-1][name.evaluate(context)] = value.evaluate(context)
 
+def osspeak_lambda(context, params, action):
+    fn = astree.FunctionDefinition(None, params, action)
+    return fn
 
 class _Nil:
     pass
@@ -56,6 +60,7 @@ namespace = {
     'in': lambda a, b: a in b,
     'is': lambda a, b: a is b,
     'keyboard': keyboard,
+    'lambda': osspeak_lambda,
     'len': len,
     'loop': flow.loop,
     'macro': macro,
@@ -85,6 +90,17 @@ namespace = {
     'window': window,
 }
 
+class Namespace:
+
+    def __init__(self):
+        self.stdlib = namespace.copy()
+        self._frames = [{}] 
+
+    def __getattr__(self, k):
+        pass
+
+
+
 deferred_arguments_eval = {
     flow.osspeak_if: flow.osspeak_if_gen,
     flow.osspeak_while: flow.osspeak_while_gen,
@@ -94,4 +110,5 @@ deferred_arguments_eval = {
     keyboard.remove_delay: None,
     namespace['eval']: None,
     assign_var: None,
+    osspeak_lambda: None,
 }

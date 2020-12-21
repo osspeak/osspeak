@@ -348,6 +348,10 @@ class FunctionDefinition:
         self.parameters = parameters
         self.action = action
     
+
+    def __call__(self, *a, **kw):
+        pass
+
 class Variable(BaseActionNode):
 
     def __init__(self, value):

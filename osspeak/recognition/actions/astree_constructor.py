@@ -95,7 +95,8 @@ def parse_multiplicative(lark_ir):
 def parse_list(lark_ir):
     list_items = []
     for child in lark_ir.children:
-        list_items.append(parse_node(child))
+        if child is not None:
+            list_items.append(parse_node(child))
     return astree.List(list_items)
 
 def parse_loop(lark_ir):
